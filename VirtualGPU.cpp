@@ -1,9 +1,40 @@
 #include "VirtualGPU.h"
 #include <stdlib.h>
+#include <QThread>
 
 VirtualGPU::VirtualGPU()
 {
 
+}
+
+void VirtualGPU::renderVolume(VirtualVolume &volume)
+{
+    // convert from nano to micro
+    unsigned long processingTimeN = volumeRenderingTime( volume ) ;
+    unsigned long processingTimeU = processingTimeN/1000 ;
+
+    QThread::currentThread()->usleep( processingTimeU );
+
+    resultantImage_ = new VirtualImage( volume.dim()[0],
+                                        volume.dim()[1],
+                                        volume.center() );
+
+    emit this->finishedRendering();
+}
+
+void VirtualGPU::compositeImages(QList<VirtualImage *> *images)
+{
+    if( images->isEmpty() ) return;
+
+    unsigned long processingTimeN = imagesCompositingTime( images ) ;
+    unsigned long processingTimeU = processingTimeN/1000 ;
+
+    QThread::currentThread()->usleep( processingTimeU );
+
+    resultantImage_ = new VirtualImage( images->front()->dim()[0]*images->count(),
+                                        images->front()->dim()[1] );
+
+    emit this->finishedCompositing();
 }
 
 double VirtualGPU::volumeRenderingTime( VirtualVolume &volume_ )
@@ -22,6 +53,11 @@ double VirtualGPU::imagesCompositingTime(QList<VirtualImage *> *images)
         totalTime += imageProcessingTime_( *image ) ;
     }
     return totalTime * compositingScale;
+}
+
+VirtualImage *VirtualGPU::resultantImage() const
+{
+    return resultantImage_ ;
 }
 
 double VirtualGPU::volumeProcessingTime_( VirtualVolume &volume_ )

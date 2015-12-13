@@ -21,20 +21,31 @@ struct GPUParameters
 
 class VirtualGPU
 {
+    Q_OBJECT
 public:
     VirtualGPU();
 
+    void renderVolume( VirtualVolume &volume );
+    void compositeImages( QList<VirtualImage *> *images ) ;
+
+    // nano-seconds
     double volumeRenderingTime( VirtualVolume &volume_) ;
-
-
     double imagesCompositingTime( QList<VirtualImage*> *images ) ;
+
+    VirtualImage* resultantImage() const ;
+
+signals :
+    void finishedRendering();
+    void finishedCompositing();
 
 private:
 
     double volumeProcessingTime_(VirtualVolume &volume_);
-
     double imageProcessingTime_( VirtualImage  &image);
+
+
     GPUParameters parameters_;
+    VirtualImage *resultantImage_;
 };
 
 #endif // VIRTUALGPU_H
