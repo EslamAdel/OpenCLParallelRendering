@@ -16,7 +16,8 @@ enum FrameWorkMode{ AutoTest } ;
                       const FrameWorkMode frameWorkMode = FrameWorkMode::AutoTest );
 
 
-    void addVirtualNode( VirtualNode* newNode ) ;
+    void addVirtualNode() ;
+
 
 
 private:
@@ -29,7 +30,6 @@ public slots :
 
     void slotNewTransformations();
 
-    void slotNewNode();
 
 signals :
     void blockTransformations(bool);
