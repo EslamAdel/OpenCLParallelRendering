@@ -18,6 +18,15 @@ VirtualImage::VirtualImage(const int x, const int y, float (&c)[3])
     center_[Dim::Z] = c[Dim::Z];
 }
 
+VirtualImage::VirtualImage(const int x, const int y)
+{
+    d_[Dim::X] = x;
+    d_[Dim::Y] = y;
+    center_[Dim::X] = c[Dim::X];
+    center_[Dim::Y] = c[Dim::Y];
+    center_[Dim::Z] = 0;
+}
+
 float (&VirtualImage::center()) [3]
 {
     return center_;

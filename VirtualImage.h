@@ -10,6 +10,9 @@ public:
     VirtualImage(int (&d) [2] , float (&c) [3] );
 
     VirtualImage( const int x , const int y  , float (&c) [3] );
+
+    VirtualImage( const int x , const int y ) ;
+
     int (&dim()) [2];
     float (&center()) [3];
 private :
