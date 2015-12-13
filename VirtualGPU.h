@@ -2,6 +2,8 @@
 #define VIRTUALGPU_H
 #include <VirtualExperiment.h>
 #include <VirtualVolume.h>
+#include <VirtualImage.h>
+
 
 //GPU parameters: some heuristic quasai-linear equation to mimic the gpu processing time
 // a*(xyz) + b*(xy) + c*(xz) + d*(zy) + e*(x) + f*(y) + g*(z)
@@ -25,10 +27,13 @@ public:
     double volumeRenderingTime( VirtualVolume &volume_) ;
 
 
+    double imagesCompositingTime( QList<VirtualImage*> *images ) ;
+
 private:
 
     double volumeProcessingTime_(VirtualVolume &volume_);
 
+    double imageProcessingTime_( VirtualImage  &image);
     GPUParameters parameters_;
 };
 

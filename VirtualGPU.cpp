@@ -12,6 +12,18 @@ double VirtualGPU::volumeRenderingTime( VirtualVolume &volume_ )
             VirtualExperiment::processScale( VirtualExperiment::ProcessOrder::Rendering );
 }
 
+double VirtualGPU::imagesCompositingTime(QList<VirtualImage *> *images)
+{
+    if ( images->isEmpty() ) return 0 ;
+    double totalTime = 0 ;
+    double compositingScale = VirtualExperiment::processScale( VirtualExperiment::ProcessOrder::Compositing );
+    foreach( VirtualImage* image , *images )
+    {
+        totalTime += imageProcessingTime_( *image ) ;
+    }
+    return totalTime * compositingScale;
+}
+
 double VirtualGPU::volumeProcessingTime_( VirtualVolume &volume_ )
 {
     //non-linear
@@ -23,6 +35,14 @@ double VirtualGPU::volumeProcessingTime_( VirtualVolume &volume_ )
             parameters_.f * volume_.dim()[1] +
             parameters_.g * volume_.dim()[2] ;
 }
+
+double VirtualGPU::imageProcessingTime_(VirtualImage &image)
+{
+    return parameters_.a * image.dim()[0] * image.dim()[1] +
+           parameters_.b * image.dim()[0] +
+           parameters_.c * image.dim()[1] ;
+}
+
 
 
 GPUParameters::GPUParameters()

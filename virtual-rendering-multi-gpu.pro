@@ -13,12 +13,14 @@ SOURCES += main.cpp \
     VirtualNode.cpp \
     VirtualGPU.cpp \
     VirtualVolume.cpp \
-    VirtualFrameWork.cpp
+    VirtualFrameWork.cpp \
+    VirtualImage.cpp
 
 HEADERS += \
     VirtualExperiment.h \
     VirtualNode.h \
     VirtualGPU.h \
     VirtualVolume.h \
-    VirtualFrameWork.h
+    VirtualFrameWork.h \
+    VirtualImage.h
 

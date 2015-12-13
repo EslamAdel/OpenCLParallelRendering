@@ -6,6 +6,12 @@ VirtualFrameWork::VirtualFrameWork()
 }
 
 
+void VirtualFrameWork::addVirtualNode()
+{
+    VirtualNode *newNode = new VirtualNode();
+    nodes_.append( newNode );
+}
+
 void VirtualFrameWork::distributeVolume_()
 {
     qDebug() << "void VirtualFrameWork::distributeVolume_()" ;

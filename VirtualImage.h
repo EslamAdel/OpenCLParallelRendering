@@ -7,8 +7,11 @@ class VirtualImage
     enum Dim: int { X=0 , Y  , Z } ;
 
 public:
-    VirtualImage( int (&dim) [2] , float (&center) [3] );
+    VirtualImage(int (&d) [2] , float (&c) [3] );
 
+    VirtualImage( const int x , const int y  , float (&c) [3] );
+    int (&dim()) [2];
+    float (&center()) [3];
 private :
     int d_[2];
     float center_[3];
