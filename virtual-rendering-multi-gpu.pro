@@ -14,7 +14,9 @@ SOURCES += main.cpp \
     VirtualGPU.cpp \
     VirtualVolume.cpp \
     VirtualFrameWork.cpp \
-    VirtualImage.cpp
+    VirtualImage.cpp \
+    TaskRender.cpp \
+    TaskCollect.cpp
 
 HEADERS += \
     VirtualExperiment.h \
@@ -22,5 +24,7 @@ HEADERS += \
     VirtualGPU.h \
     VirtualVolume.h \
     VirtualFrameWork.h \
-    VirtualImage.h
+    VirtualImage.h \
+    TaskRender.h \
+    TaskCollect.h
 
