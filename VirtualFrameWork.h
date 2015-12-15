@@ -28,7 +28,9 @@ private:
     void distributeVolume_();
 
 public slots :
-    void slotNodeFinished( VirtualNode* vNode );
+    void slotNodeFinishedRendering( VirtualNode *vNode );
+    void slotNodeFinishedCompositing( VirtualNode *vNode );
+    void slotNodeImageUploaded( VirtualNode *vNode);
     void slotNewTransformations();
 
 
