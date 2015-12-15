@@ -1,25 +1,49 @@
 #include "VirtualGPU.h"
 #include <stdlib.h>
 #include <QThread>
+#include <stdio.h>
 
 VirtualGPU::VirtualGPU()
 {
 
 }
 
-void VirtualGPU::renderVolume(VirtualVolume &volume)
+void VirtualGPU::loadVolume(const VirtualVolume *volume)
 {
+    volume_ = volume;
+    volumeExists_ = true;
+}
+
+void VirtualGPU::freeVolume()
+{
+    volume_ = nullptr;
+    volumeExists_ = false;
+}
+
+void VirtualGPU::renderVolume()
+{
+    if( volumeExists() == false )
+    {
+        std::cout << "No volume exists!\n";
+        return;
+    }
+
     // convert from nano to micro
-    unsigned long processingTimeN = volumeRenderingTime( volume ) ;
+    unsigned long processingTimeN = volumeRenderingTime( *volume_ ) ;
     unsigned long processingTimeU = processingTimeN/1000 ;
 
     QThread::currentThread()->usleep( processingTimeU );
 
-    resultantImage_ = new VirtualImage( volume.dim()[0],
-                                        volume.dim()[1],
-                                        volume.center() );
+    resultantImage_ = new VirtualImage( volume_->dim()[0],
+                                        volume_->dim()[1],
+                                        volume_->center() );
 
     emit this->finishedRendering();
+}
+
+void VirtualGPU::applyTransformation(Transformation *transformation)
+{
+    renderVolume();
 }
 
 void VirtualGPU::compositeImages(QList<VirtualImage *> *images)
@@ -58,6 +82,11 @@ double VirtualGPU::imagesCompositingTime(QList<VirtualImage *> *images)
 VirtualImage *VirtualGPU::resultantImage() const
 {
     return resultantImage_ ;
+}
+
+bool VirtualGPU::volumeExists() const
+{
+    return volumeExists_;
 }
 
 double VirtualGPU::volumeProcessingTime_( VirtualVolume &volume_ )
