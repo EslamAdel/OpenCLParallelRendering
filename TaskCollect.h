@@ -1,9 +1,9 @@
 #ifndef TASKCOLLECT_H
 #define TASKCOLLECT_H
 
-#include <QThreadPool>
+#include <QRunnable>
 
-class TaskCollect : public QObject , public QThreadPool
+class TaskCollect : public QObject , public QRunnable
 {
 public:
     TaskCollect();
