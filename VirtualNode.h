@@ -3,6 +3,7 @@
 #include "VirtualGPU.h"
 #include "VirtualVolume.h"
 #include "VirtualImage.h"
+#include "Transformation.h"
 
 class VirtualNode
 {
@@ -14,22 +15,28 @@ public:
     void setVolume( const VirtualVolume &volume );
     bool volumeExist() const ;
 
-    void startRendering();
-    void applyTransformation();
+    void initialRendering();
+    void applyTransformation( const Transformation *transformation);
 
-    void uploadImage( VirtualImage newImage );
+    void startRendering();
+
+    void uploadImage();
 
 signals:
-    void finishedRendering();
+    void finishedRendering( VirtualNode *thisPtr );
+    void finishedCompositing( VirtualNode *thisPtr );
+    void imageUploaded( VirtualNode *thisPtr );
 
 public slots:
-    void slotFinishedRendering( VirtualGPU *finishedGPU ) ;
+    void slotFinishedRendering() ;
+    void slotFinishedCompositing();
+
 
 private :
     bool volumeExist_;
     VirtualGPU vGPU_;
     VirtualVolume subVolume_ ; //sort last
-
+    VirtualImage *uploadedResultantImage_;
 };
 
 #endif // VIRTUALNODE_H
