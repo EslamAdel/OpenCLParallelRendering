@@ -26,5 +26,6 @@ HEADERS += \
     VirtualFrameWork.h \
     VirtualImage.h \
     TaskRender.h \
-    TaskCollect.h
+    TaskCollect.h \
+    Transformation.h
 
