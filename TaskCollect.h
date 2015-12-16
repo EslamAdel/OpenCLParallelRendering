@@ -9,7 +9,7 @@ class TaskCollect : public QObject , public QRunnable
 {
     Q_OBJECT
 public:
-    TaskCollect( const VirtualNode &vNode);
+    TaskCollect( VirtualNode &vNode);
 
     void run();
 

@@ -14,6 +14,11 @@ void TaskComposite::insertImage(const VirtualNode *vNode, const VirtualImage *vI
     nodesOutputImages_[ vNode ] = vImage ;
 }
 
+void TaskComposite::run()
+{
+
+}
+
 NodesOutputImages &TaskComposite::nodesOutputImages()
 {
     return nodesOutputImages_;

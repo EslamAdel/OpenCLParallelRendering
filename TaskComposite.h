@@ -14,13 +14,16 @@ class TaskComposite : public QObject , public QRunnable
 {
     Q_OBJECT
 
-enum CompositingMode{ AllOnce , WhatYouGet , Patch } ;
 
 public:
+    enum CompositingMode{ AllOnce , WhatYouGet , Patch } ;
+
     TaskComposite( const VirtualGPU &vGPU ,
                    const CompositingMode compositingMode = CompositingMode::AllOnce);
 
     void insertImage( const VirtualNode* vNode, const VirtualImage *vImage );
+
+    void run();
 
     NodesOutputImages &nodesOutputImages();
 

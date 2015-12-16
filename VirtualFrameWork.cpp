@@ -1,9 +1,8 @@
 #include "VirtualFrameWork.h"
+#include <iostream>
+#include <QDebug>
 
-
-
-
-VirtualFrameWork::VirtualFrameWork(const VirtualVolume &volume,
+VirtualFrameWork::VirtualFrameWork(VirtualVolume &volume,
                                    const TaskComposite::CompositingMode compositingMode,
                                    const VirtualFrameWork::FrameWorkMode frameWorkMode)
     : mainVolume_( volume ),
@@ -14,6 +13,12 @@ VirtualFrameWork::VirtualFrameWork(const VirtualVolume &volume,
 
 void VirtualFrameWork::addVirtualNode()
 {
+    if( blockNewNodes_ = true )
+    {
+        std::cout << "Adding new nodes is blocked!\n";
+        exit(EXIT_FAILURE);
+    }
+
     VirtualNode *newNode = new VirtualNode();
 
     TaskRender *taskRender = new TaskRender( *newNode );
@@ -22,8 +27,8 @@ void VirtualFrameWork::addVirtualNode()
 
 
     nodes_.append( newNode );
-    nodesRenderTasks_.insert( NodesRenderTasks::value_type( newNode, raskRender));
-    nodesCollectTasks_.insert( NodesCollectTasks::value_type( newNode , taskCollect));
+    nodesRenderTasks_[ newNode ] = taskRender;
+    nodesCollectTasks_[ newNode ] = taskCollect ;
 
     connect( newNode ,
              SIGNAL(finishedCompositing(VirtualNode*)),
@@ -46,6 +51,9 @@ void VirtualFrameWork::startRendering()
     {
         renderer_.start( nodesRenderTasks_[ vNode ] );
     }
+
+    transformationsBlocked_ = true;
+    emit this->blockTransformations(true);
 }
 
 Transformation &VirtualFrameWork::globalTransformation()
@@ -70,14 +78,17 @@ void VirtualFrameWork::distributeVolume_()
 
     int nNodes = nodes_.count();
 
-    QList<VirtualVolume *> subVolumes = mainVolume_.subVolumes1D( nNodes ) ;
+    QList<VirtualVolume *> *subVolumes = mainVolume_.subVolumes1D( nNodes ) ;
 
-    VirtualVolume *subVolume = subVolumes.begin();
+    QList<VirtualVolume*>::Iterator subVolume = subVolumes->begin();
     foreach ( VirtualNode *node , nodes_ )
     {
-        node->setVolume( subVolume );
+        node->setVolume( **subVolume );
         subVolume++;
     }
+
+    blockNewNodes_ = true;
+    emit this->blockNewNodes(blockNewNodes_);
 }
 
 void VirtualFrameWork::slotNodeFinishedRendering(VirtualNode *vNode)
@@ -87,6 +98,8 @@ void VirtualFrameWork::slotNodeFinishedRendering(VirtualNode *vNode)
 
 void VirtualFrameWork::slotNodeFinishedCompositing(VirtualNode *vNode)
 {
+    transformationsBlocked_ = false ;
+
     flushScreen_();
 }
 

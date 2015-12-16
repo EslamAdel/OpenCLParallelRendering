@@ -17,7 +17,6 @@ public:
 
     VirtualVolume(const int x, const int y , const int z );
 
-
     float (&center())[3];
     int (&dim()) [3];
     Dim maxDim() const ;

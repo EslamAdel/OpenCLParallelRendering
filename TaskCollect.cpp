@@ -1,6 +1,6 @@
 #include "TaskCollect.h"
 
-TaskCollect::TaskCollect(const VirtualNode &vNode)
+TaskCollect::TaskCollect( VirtualNode &vNode)
     : vNode_( vNode )
 {
     setAutoDelete( false );

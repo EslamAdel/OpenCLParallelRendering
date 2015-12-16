@@ -1,7 +1,6 @@
 #include "TaskRender.h"
-
-
-TaskRender::TaskRender( const VirtualNode &node,
+#include <iostream>
+TaskRender::TaskRender( VirtualNode &node,
                         const TaskRender::RenderingTask renderingTask,
                         const Transformation *transformation)
     : node_( node ),
@@ -11,7 +10,7 @@ TaskRender::TaskRender( const VirtualNode &node,
     if ( renderingTask == RenderingTask::ApplyTransformation &&
          transformation == nullptr )
     {
-        std::count << "Pass valid transformations!\n";
+        std::cout << "Pass valid transformations!\n";
         exit(EXIT_FAILURE);
     }
 

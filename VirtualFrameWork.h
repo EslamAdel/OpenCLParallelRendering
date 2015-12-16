@@ -23,7 +23,7 @@ public :
 
 enum FrameWorkMode{ AutoTest } ;
 
-    VirtualFrameWork( const VirtualVolume &volume ,
+    VirtualFrameWork( VirtualVolume &volume ,
                       const TaskComposite::CompositingMode compositingMode = TaskComposite::CompositingMode::AllOnce ,
                       const FrameWorkMode frameWorkMode = FrameWorkMode::AutoTest );
 
@@ -59,6 +59,7 @@ private:
     QList<VirtualNode*> nodes_;
     NodesRenderTasks nodesRenderTasks_;
     NodesCollectTasks nodesCollectTasks_;
+    bool blockNewNodes_;
 
     Transformation globalTransformation_;
     bool transformationsBlocked_ ;
