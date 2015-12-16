@@ -15,6 +15,13 @@ TaskRender::TaskRender( const VirtualNode &node,
         exit(EXIT_FAILURE);
     }
 
+    setAutoDelete( false );
+
+}
+
+void TaskRender::setRenderingTask(const TaskRender::RenderingTask renderingTask)
+{
+    renderingTask_ = renderingTask;
 }
 
 const VirtualNode &TaskRender::node() const

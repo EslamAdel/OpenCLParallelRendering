@@ -8,6 +8,7 @@
 
 class TaskRender : public QObject , public QRunnable
 {
+    Q_OBJECT
 public:
     enum RenderingTask { InitialRendering , ApplyTransformation } ;
 
@@ -15,6 +16,7 @@ public:
                 const RenderingTask renderingTask = RenderingTask::InitialRendering ,
                 const Transformation *transformation = nullptr );
 
+    void setRenderingTask( const RenderingTask renderingTask ) ;
     const VirtualNode &node() const ;
     RenderingTask renderingTask() const;
     const Transformation *transformation() const;
@@ -27,7 +29,7 @@ signals :
 
 private:
     const VirtualNode &node_;
-    const RenderingTask renderingTask_;
+    RenderingTask renderingTask_;
     const Transformation *transformation_;
 
 };
