@@ -1,11 +1,13 @@
 #ifndef VIRTUALNODE_H
 #define VIRTUALNODE_H
+
+#include <QObject>
 #include "VirtualGPU.h"
 #include "VirtualVolume.h"
 #include "VirtualImage.h"
 #include "Transformation.h"
 
-class VirtualNode
+class VirtualNode : public QObject
 {
     Q_OBJECT
 

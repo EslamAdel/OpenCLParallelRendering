@@ -1,20 +1,30 @@
 #ifndef VIRTUALFRAMEWORK_H
 #define VIRTUALFRAMEWORK_H
+#include <QObject>
+#include <QList>
+#include <QThreadPool>
+#include <unordered_map>
 #include "VirtualNode.h"
 #include "VirtualVolume.h"
 #include "VirtualGPU.h"
-#include <QList>
-#include <QThreadPool>
+#include "TaskRender.h"
+#include "TaskCollect.h"
+#include "TaskComposite.h"
+#include "Transformation.h"
 
-class VirtualFrameWork
+
+typedef std::unordered_map<VirtualNode*,TaskRender*> NodesRenderTasks;
+typedef std::unordered_map<VirtualNode*,TaskCollect*> NodesCollectTasks;
+
+class VirtualFrameWork : public QObject
 {
     Q_OBJECT
 public :
-enum CompositingMode{ AllOnce , WhatYouGet , Patch } ;
+
 enum FrameWorkMode{ AutoTest } ;
 
     VirtualFrameWork( const VirtualVolume &volume ,
-                      const CompositingMode compositingMode = CompositingMode::AllOnce ,
+                      const TaskComposite::CompositingMode compositingMode = TaskComposite::CompositingMode::AllOnce ,
                       const FrameWorkMode frameWorkMode = FrameWorkMode::AutoTest );
 
     void addVirtualNode() ;
@@ -23,8 +33,11 @@ enum FrameWorkMode{ AutoTest } ;
     void applyTramsformation();
 
 
+    Transformation &globalTransformation();
+
+    bool transformationsBlocked() const;
 private:
-    void updateRendering_();
+    void flushScreen_();
     void distributeVolume_();
 
 public slots :
@@ -39,10 +52,17 @@ signals :
     void blockNewNodes(bool);
 
 private:
-    VirtualVolume mainVolume_;
+    VirtualVolume &mainVolume_;
+    const FrameWorkMode frameWorkmode_;
+    TaskComposite *taskComposite_;
+
     QList<VirtualNode*> nodes_;
-    bool blockTransform_ ;
-    VirtualGPU *serverGPU_;
+    NodesRenderTasks nodesRenderTasks_;
+    NodesCollectTasks nodesCollectTasks_;
+
+    Transformation globalTransformation_;
+    bool transformationsBlocked_ ;
+    VirtualGPU serverGPU_;
 
     QThreadPool renderer_ ; // producer for collector
     QThreadPool collector_; // consumer for renderer, producer for compositor

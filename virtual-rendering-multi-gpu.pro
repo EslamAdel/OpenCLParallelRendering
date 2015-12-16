@@ -16,7 +16,8 @@ SOURCES += main.cpp \
     VirtualFrameWork.cpp \
     VirtualImage.cpp \
     TaskRender.cpp \
-    TaskCollect.cpp
+    TaskCollect.cpp \
+    TaskComposite.cpp
 
 HEADERS += \
     VirtualExperiment.h \
@@ -27,5 +28,6 @@ HEADERS += \
     VirtualImage.h \
     TaskRender.h \
     TaskCollect.h \
-    Transformation.h
+    Transformation.h \
+    TaskComposite.h
 

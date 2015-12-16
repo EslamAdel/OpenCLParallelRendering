@@ -74,6 +74,8 @@ void VirtualNode::slotFinishedRendering()
 
 void VirtualNode::slotFinishedCompositing()
 {
+    uploadedResultantImage_ = vGPU_.resultantImage();
+
     emit this->finishedCompositing( this );
 }
 

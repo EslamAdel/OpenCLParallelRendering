@@ -1,5 +1,6 @@
 #ifndef VIRTUALGPU_H
 #define VIRTUALGPU_H
+#include <QObject>
 #include <VirtualExperiment.h>
 #include <VirtualVolume.h>
 #include <VirtualImage.h>
@@ -19,7 +20,7 @@ struct GPUParameters
     double g;
 };
 
-class VirtualGPU
+class VirtualGPU : public QObject
 {
     Q_OBJECT
 public:
