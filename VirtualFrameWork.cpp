@@ -13,7 +13,7 @@ VirtualFrameWork::VirtualFrameWork(VirtualVolume &volume,
 
 void VirtualFrameWork::addVirtualNode()
 {
-    if( blockNewNodes_ = true )
+    if( blockNewNodes_ == true )
     {
         std::cout << "Adding new nodes is blocked!\n";
         exit(EXIT_FAILURE);

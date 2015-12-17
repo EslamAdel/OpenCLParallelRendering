@@ -1,14 +1,14 @@
 #include "VirtualGPU.h"
 #include <stdlib.h>
 #include <QThread>
-#include <stdio.h>
+#include <iostream>
 
 VirtualGPU::VirtualGPU()
 {
 
 }
 
-void VirtualGPU::loadVolume(const VirtualVolume *volume)
+void VirtualGPU::loadVolume( VirtualVolume * const volume)
 {
     volume_ = volume;
     volumeExists_ = true;
@@ -61,13 +61,13 @@ void VirtualGPU::compositeImages(QList<VirtualImage *> *images)
     emit this->finishedCompositing();
 }
 
-double VirtualGPU::volumeRenderingTime( VirtualVolume &volume_ )
+double VirtualGPU::volumeRenderingTime( VirtualVolume &volume_ ) const
 {
     return  volumeProcessingTime_( volume_ ) *
             VirtualExperiment::processScale( VirtualExperiment::ProcessOrder::Rendering );
 }
 
-double VirtualGPU::imagesCompositingTime(QList<VirtualImage *> *images)
+double VirtualGPU::imagesCompositingTime(QList<VirtualImage *> *images) const
 {
     if ( images->isEmpty() ) return 0 ;
     double totalTime = 0 ;
@@ -89,7 +89,7 @@ bool VirtualGPU::volumeExists() const
     return volumeExists_;
 }
 
-double VirtualGPU::volumeProcessingTime_( VirtualVolume &volume_ )
+double VirtualGPU::volumeProcessingTime_( VirtualVolume &volume_ ) const
 {
     //non-linear
     return  parameters_.a * volume_.dim()[0] * volume_.dim()[1] * volume_.dim()[2] +
@@ -101,7 +101,7 @@ double VirtualGPU::volumeProcessingTime_( VirtualVolume &volume_ )
             parameters_.g * volume_.dim()[2] ;
 }
 
-double VirtualGPU::imageProcessingTime_(VirtualImage &image)
+double VirtualGPU::imageProcessingTime_(VirtualImage &image) const
 {
     return parameters_.a * image.dim()[0] * image.dim()[1] +
            parameters_.b * image.dim()[0] +

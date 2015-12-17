@@ -26,7 +26,7 @@ class VirtualGPU : public QObject
 public:
     VirtualGPU();
 
-    void loadVolume( const VirtualVolume *volume ) ;
+    void loadVolume( VirtualVolume * const volume ) ;
     void freeVolume();
 
     void renderVolume();
@@ -34,8 +34,8 @@ public:
     void compositeImages( QList<VirtualImage *> *images ) ;
 
     // nano-seconds
-    double volumeRenderingTime( VirtualVolume &volume_) ;
-    double imagesCompositingTime( QList<VirtualImage*> *images ) ;
+    double volumeRenderingTime( VirtualVolume &volume_) const;
+    double imagesCompositingTime( QList<VirtualImage*> *images ) const;
 
     VirtualImage* resultantImage() const ;
 
@@ -46,8 +46,8 @@ signals :
 
 private:
 
-    double volumeProcessingTime_(VirtualVolume &volume_);
-    double imageProcessingTime_( VirtualImage  &image);
+    double volumeProcessingTime_(VirtualVolume &volume_) const;
+    double imageProcessingTime_( VirtualImage  &image) const;
 
     bool volumeExists_;
     GPUParameters parameters_;

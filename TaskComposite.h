@@ -8,7 +8,7 @@
 #include "VirtualNode.h"
 #include <unordered_map>
 
-typedef std::unordered_map<VirtualNode*,VirtualImage*> NodesOutputImages;
+typedef std::unordered_map<const VirtualNode*,const VirtualImage*> NodesOutputImages;
 
 class TaskComposite : public QObject , public QRunnable
 {
@@ -28,7 +28,7 @@ public:
     NodesOutputImages &nodesOutputImages();
 
 private:
-    VirtualGPU &vGPU_;
+    const VirtualGPU &vGPU_;
     const CompositingMode compositingMode_;
     NodesOutputImages nodesOutputImages_;
 };

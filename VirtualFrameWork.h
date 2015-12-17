@@ -13,8 +13,8 @@
 #include "Transformation.h"
 
 
-typedef std::unordered_map<VirtualNode*,TaskRender*> NodesRenderTasks;
-typedef std::unordered_map<VirtualNode*,TaskCollect*> NodesCollectTasks;
+typedef std::unordered_map<const VirtualNode*, TaskRender*> NodesRenderTasks;
+typedef std::unordered_map<const VirtualNode*, TaskCollect*> NodesCollectTasks;
 
 class VirtualFrameWork : public QObject
 {
