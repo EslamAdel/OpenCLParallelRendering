@@ -1,9 +1,9 @@
 #ifndef VIRTUALGPU_H
 #define VIRTUALGPU_H
 #include <QObject>
-#include <VirtualExperiment.h>
-#include <VirtualVolume.h>
-#include <VirtualImage.h>
+#include "VirtualExperiment.h"
+#include "VirtualVolume.h"
+#include "VirtualImage.h"
 #include "Transformation.h"
 
 //GPU parameters: some heuristic quasai-linear equation to mimic the gpu processing time
@@ -30,30 +30,30 @@ public:
     void freeVolume();
 
     void renderVolume();
-    void applyTransformation( Transformation *transformation );
-    void compositeImages( QList<VirtualImage *> *images ) ;
+    void applyTransformation( const Transformation *transformation );
+    void compositeImages( const std::vector<const VirtualImage *> &images ) const ;
 
     // nano-seconds
     double volumeRenderingTime( VirtualVolume &volume_) const;
-    double imagesCompositingTime( QList<VirtualImage*> *images ) const;
+    double imagesCompositingTime( const std::vector<const VirtualImage*> &images ) const;
 
     VirtualImage* resultantImage() const ;
 
     bool volumeExists() const;
 signals :
-    void finishedRendering();
-    void finishedCompositing();
+    void finishedRendering() const;
+    void finishedCompositing() const;
 
 private:
 
-    double volumeProcessingTime_(VirtualVolume &volume_) const;
-    double imageProcessingTime_( VirtualImage  &image) const;
+    double volumeProcessingTime_( VirtualVolume &volume_) const;
+    double imageProcessingTime_( const VirtualImage  &image) const;
 
     bool volumeExists_;
     GPUParameters parameters_;
 
     VirtualVolume *volume_;
-    VirtualImage *resultantImage_;
+    mutable VirtualImage *resultantImage_;
 };
 
 #endif // VIRTUALGPU_H

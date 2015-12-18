@@ -23,9 +23,6 @@ public:
 
     void run();
 
-signals :
-    void finishedRendering( TaskRender *thisPtr ) ;
-
 
 private:
     VirtualNode &node_;

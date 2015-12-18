@@ -1,6 +1,11 @@
 #include "VirtualVolume.h"
 
 
+VirtualVolume::VirtualVolume()
+{
+
+}
+
 VirtualVolume::VirtualVolume(const int x, const int y, const int z , float (&center)[3])
 {
     d_[Dim::X] = x;
@@ -10,16 +15,6 @@ VirtualVolume::VirtualVolume(const int x, const int y, const int z , float (&cen
     center_[Dim::Y] = center[Dim::Y];
     center_[Dim::Z] = center[Dim::Z];
 }
-
-//VirtualVolume::VirtualVolume(const VirtualVolume &copy)
-//{
-//    d_[Dim::X] = copy.dim()[Dim::X];
-//    d_[Dim::Y] = copy.dim()[Dim::Y];
-//    d_[Dim::Z] = copy.dim()[Dim::Z];
-//    center_[Dim::X] = copy.center()[Dim::X];
-//    center_[Dim::Y] = copy.center()[Dim::Y];
-//    center_[Dim::Z] = copy.center()[Dim::Z];
-//}
 
 VirtualVolume::VirtualVolume(const int (&dimensions)[3], const float (&center)[3])
 {

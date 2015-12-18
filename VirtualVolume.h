@@ -9,6 +9,8 @@ class VirtualVolume
 enum Dim : quint8 { X=0 , Y , Z };
 
 public:
+    VirtualVolume();
+
     VirtualVolume(const int x, const int y , const int z, float (&center)[3] );
 
 //    VirtualVolume( const VirtualVolume &copy );

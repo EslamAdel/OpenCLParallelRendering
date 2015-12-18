@@ -1,7 +1,9 @@
 #include "VirtualNode.h"
-#include <stdio.h>
+#include <iostream>
 
-VirtualNode::VirtualNode()
+
+VirtualNode::VirtualNode(const int id)
+    : nodeId_(id)
 {
     volumeExist_ = false;
 
@@ -10,10 +12,11 @@ VirtualNode::VirtualNode()
              this,
              SLOT(slotFinishedRendering()) );
 
-    connect( &vGPU_ ,
-             SIGNAL(finishedCompositing()),
-             this,
-             SLOT(slotFinishedCompositing()));
+//    connect( &vGPU_ ,
+//             SIGNAL(finishedCompositing()),
+//             this,
+//             SLOT(slotFinishedCompositing()));
+
 }
 
 void VirtualNode::setVolume(const VirtualVolume &volume)
@@ -67,15 +70,24 @@ void VirtualNode::uploadImage()
     emit this->imageUploaded( this );
 }
 
+const VirtualImage *VirtualNode::uploadedResultantImage() const
+{
+    return uploadedResultantImage_;
+}
+
+const int VirtualNode::nodeId() const
+{
+    return nodeId_;
+}
+
 void VirtualNode::slotFinishedRendering()
 {
     emit this->finishedRendering( this );
 }
 
-void VirtualNode::slotFinishedCompositing()
-{
-    uploadedResultantImage_ = vGPU_.resultantImage();
+//void VirtualNode::slotFinishedCompositing()
+//{
+//    uploadedResultantImage_ = vGPU_.resultantImage();
 
-    emit this->finishedCompositing( this );
-}
-
+//    emit this->finishedCompositing( this );
+//}

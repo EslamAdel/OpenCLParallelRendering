@@ -6,7 +6,7 @@
 class VirtualExperiment
 {
 public:
-    enum class ProcessOrder : int  { Rendering = 0  , Compression = -2 , Compositing = -1 };
+    enum class ProcessOrder : int  { Rendering = 3  , Compression = -2 , Compositing = 1 };
 
     VirtualExperiment( const ProcessOrder processOrder );
 

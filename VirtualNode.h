@@ -12,7 +12,7 @@ class VirtualNode : public QObject
     Q_OBJECT
 
 public:
-    VirtualNode();
+    VirtualNode( const int id);
 
     void setVolume( const VirtualVolume &volume );
     bool volumeExist() const ;
@@ -24,18 +24,22 @@ public:
 
     void uploadImage();
 
+    const VirtualImage *uploadedResultantImage() const;
+
+    const int nodeId() const;
 signals:
     void finishedRendering( VirtualNode *thisPtr );
-    void finishedCompositing( VirtualNode *thisPtr );
+//    void finishedCompositing( VirtualNode *thisPtr );
     void imageUploaded( VirtualNode *thisPtr );
 
 public slots:
     void slotFinishedRendering() ;
-    void slotFinishedCompositing();
+//    void slotFinishedCompositing();
 
 
 private :
     bool volumeExist_;
+    const int nodeId_;
     VirtualGPU vGPU_;
     VirtualVolume subVolume_ ; //sort last
     VirtualImage *uploadedResultantImage_;

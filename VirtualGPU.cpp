@@ -5,7 +5,7 @@
 
 VirtualGPU::VirtualGPU()
 {
-
+    std::cout<<"\tVirtual GPU created!"<<std::endl;
 }
 
 void VirtualGPU::loadVolume( VirtualVolume * const volume)
@@ -41,22 +41,22 @@ void VirtualGPU::renderVolume()
     emit this->finishedRendering();
 }
 
-void VirtualGPU::applyTransformation(Transformation *transformation)
+void VirtualGPU::applyTransformation( const Transformation *transformation)
 {
     renderVolume();
 }
 
-void VirtualGPU::compositeImages(QList<VirtualImage *> *images)
+void VirtualGPU::compositeImages(const std::vector<const VirtualImage *> &images) const
 {
-    if( images->isEmpty() ) return;
+    if( images.empty() ) return;
 
     unsigned long processingTimeN = imagesCompositingTime( images ) ;
     unsigned long processingTimeU = processingTimeN/1000 ;
 
     QThread::currentThread()->usleep( processingTimeU );
 
-    resultantImage_ = new VirtualImage( images->front()->dim()[0]*images->count(),
-                                        images->front()->dim()[1] );
+    resultantImage_ = new VirtualImage( images.front()->dim(0) * (int)images.size() ,
+                                        images.front()->dim(1) );
 
     emit this->finishedCompositing();
 }
@@ -67,12 +67,12 @@ double VirtualGPU::volumeRenderingTime( VirtualVolume &volume_ ) const
             VirtualExperiment::processScale( VirtualExperiment::ProcessOrder::Rendering );
 }
 
-double VirtualGPU::imagesCompositingTime(QList<VirtualImage *> *images) const
+double VirtualGPU::imagesCompositingTime( const std::vector<const VirtualImage *> &images) const
 {
-    if ( images->isEmpty() ) return 0 ;
+    if ( images.empty() ) return 0 ;
     double totalTime = 0 ;
     double compositingScale = VirtualExperiment::processScale( VirtualExperiment::ProcessOrder::Compositing );
-    foreach( VirtualImage* image , *images )
+    for( auto &image : images )
     {
         totalTime += imageProcessingTime_( *image ) ;
     }
@@ -101,11 +101,11 @@ double VirtualGPU::volumeProcessingTime_( VirtualVolume &volume_ ) const
             parameters_.g * volume_.dim()[2] ;
 }
 
-double VirtualGPU::imageProcessingTime_(VirtualImage &image) const
+double VirtualGPU::imageProcessingTime_( const VirtualImage &image) const
 {
-    return parameters_.a * image.dim()[0] * image.dim()[1] +
-           parameters_.b * image.dim()[0] +
-           parameters_.c * image.dim()[1] ;
+    return parameters_.a * image.dim(0) * image.dim(1) +
+           parameters_.b * image.dim(0) +
+           parameters_.c * image.dim(1) ;
 }
 
 

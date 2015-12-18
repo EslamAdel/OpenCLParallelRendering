@@ -1,5 +1,6 @@
 #include "TaskRender.h"
 #include <iostream>
+#include <QThread>
 TaskRender::TaskRender( VirtualNode &node,
                         const TaskRender::RenderingTask renderingTask,
                         const Transformation *transformation)
@@ -40,6 +41,9 @@ const Transformation *TaskRender::transformation() const
 
 void TaskRender::run()
 {
+    std::cout <<"\tfrom thread:"<< QThread::currentThread();
+    std::cout <<" ,rendering on node:"<<node_.nodeId()<<" ...\n";
+
     switch ( renderingTask_ )
     {
     case RenderingTask::InitialRendering :
@@ -54,5 +58,10 @@ void TaskRender::run()
     }
 
     }
+
+    std::cout <<"\tfrom thread:"<< QThread::currentThread();
+    std::cout <<" ,rendering DONE on node:"<<node_.nodeId();
+    std::cout <<std::endl;
+
 
 }

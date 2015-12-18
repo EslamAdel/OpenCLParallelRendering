@@ -1,16 +1,55 @@
 #include "VirtualFrameWork.h"
 #include <iostream>
 #include <QDebug>
-
 VirtualFrameWork::VirtualFrameWork(VirtualVolume &volume,
                                    const TaskComposite::CompositingMode compositingMode,
                                    const VirtualFrameWork::FrameWorkMode frameWorkMode)
     : mainVolume_( volume ),
+      volumeDistributed_(false),
+      blockNewNodes_(false),
       frameWorkmode_( frameWorkMode )
 {
     taskComposite_ = new TaskComposite( serverGPU_, compositingMode);
+
+    connect( &serverGPU_,
+             SIGNAL(finishedCompositing()),
+             this,
+             SLOT(slotNodeFinishedCompositing()));
+#ifdef DEMO
+    std::cout << "Number of virtual nodes:";
+    int n=0;
+    std::cin >> n;
+    for(auto i=0; i < n ; i++ ) addVirtualNode();
+
+
+    connect( this ,
+             SIGNAL(blockTransformations(bool)),
+             this,
+             SLOT(slotApplyNewTransformation(bool)));
+
+    char startRendering = 'n';
+    std::cout <<"Start Rendering?<y/n>:";
+    std::cin >> startRendering ;
+
+    if(startRendering == 'y') this->startRendering();
+    else return ;
+
+#endif
+
+
 }
 
+
+#ifdef DEMO
+void VirtualFrameWork::slotApplyNewTransformation(bool blockTransformation)
+{
+    if(!blockTransformation)
+    {
+        slotNewTransformations();
+    }
+
+}
+#endif
 void VirtualFrameWork::addVirtualNode()
 {
     if( blockNewNodes_ == true )
@@ -19,7 +58,11 @@ void VirtualFrameWork::addVirtualNode()
         exit(EXIT_FAILURE);
     }
 
-    VirtualNode *newNode = new VirtualNode();
+    static int nNodes = 1 ;
+
+    std::cout << "Adding node #:"<<nNodes<< std::endl;
+
+    VirtualNode *newNode = new VirtualNode(nNodes);
 
     TaskRender *taskRender = new TaskRender( *newNode );
 
@@ -30,10 +73,6 @@ void VirtualFrameWork::addVirtualNode()
     nodesRenderTasks_[ newNode ] = taskRender;
     nodesCollectTasks_[ newNode ] = taskCollect ;
 
-    connect( newNode ,
-             SIGNAL(finishedCompositing(VirtualNode*)),
-             this,
-             SLOT(slotNodeFinishedCompositing(VirtualNode*)));
     connect( newNode,
              SIGNAL(finishedRendering(VirtualNode*)),
              this,
@@ -43,17 +82,32 @@ void VirtualFrameWork::addVirtualNode()
              this,
              SLOT(slotNodeImageUploaded(VirtualNode*)));
 
+    nNodes++;
 }
 
-void VirtualFrameWork::startRendering()
+void VirtualFrameWork::startRendering(const Transformation *transformation)
 {
+    transformationsBlocked_ = true;
+    emit this->blockTransformations(true);
+
+
+    if(volumeDistributed_ == false )
+    {
+        distributeVolume_();
+        std::cout <<"Volume distributed!"<<std::endl;
+        volumeDistributed_ = true;
+    }
+
     foreach( VirtualNode *vNode , nodes_)
     {
         renderer_.start( nodesRenderTasks_[ vNode ] );
     }
 
-    transformationsBlocked_ = true;
-    emit this->blockTransformations(true);
+}
+
+void VirtualFrameWork::applyTramsformation(const Transformation *transformation )
+{
+    startRendering( transformation );
 }
 
 Transformation &VirtualFrameWork::globalTransformation()
@@ -68,6 +122,9 @@ bool VirtualFrameWork::transformationsBlocked() const
 
 void VirtualFrameWork::flushScreen_()
 {
+
+    static int psuedoCount = 0 ;
+    std::cout << "Frame #:" << psuedoCount++ << std::endl ;
 
 }
 
@@ -96,19 +153,29 @@ void VirtualFrameWork::slotNodeFinishedRendering(VirtualNode *vNode)
     collector_.start( nodesCollectTasks_[ vNode ] );
 }
 
-void VirtualFrameWork::slotNodeFinishedCompositing(VirtualNode *vNode)
+void VirtualFrameWork::slotNodeFinishedCompositing()
 {
     transformationsBlocked_ = false ;
-
+    emit this->blockTransformations( false );
     flushScreen_();
 }
 
 void VirtualFrameWork::slotNodeImageUploaded(VirtualNode *vNode)
 {
+    static int nUploadedImages = 0;
 
+    nUploadedImages++;
+
+    taskComposite_->insertImage( vNode , vNode->uploadedResultantImage() );
+
+    if( nUploadedImages == nodes_.size() )
+    {
+        compositor_.start( taskComposite_ );
+        nUploadedImages = 0 ;
+    }
 }
 
 void VirtualFrameWork::slotNewTransformations()
 {
-
+    applyTramsformation( &globalTransformation_ );
 }

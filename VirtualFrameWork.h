@@ -12,6 +12,7 @@
 #include "TaskComposite.h"
 #include "Transformation.h"
 
+#define DEMO
 
 typedef std::unordered_map<const VirtualNode*, TaskRender*> NodesRenderTasks;
 typedef std::unordered_map<const VirtualNode*, TaskCollect*> NodesCollectTasks;
@@ -29,8 +30,8 @@ enum FrameWorkMode{ AutoTest } ;
 
     void addVirtualNode() ;
 
-    void startRendering();
-    void applyTramsformation();
+    void startRendering(const Transformation *transformation = nullptr );
+    void applyTramsformation(const Transformation *transformation);
 
 
     Transformation &globalTransformation();
@@ -42,10 +43,13 @@ private:
 
 public slots :
     void slotNodeFinishedRendering( VirtualNode *vNode );
-    void slotNodeFinishedCompositing( VirtualNode *vNode );
+    void slotNodeFinishedCompositing();
     void slotNodeImageUploaded( VirtualNode *vNode);
     void slotNewTransformations();
 
+#ifdef DEMO
+    void slotApplyNewTransformation(bool);
+#endif
 
 signals :
     void blockTransformations(bool);
@@ -53,6 +57,7 @@ signals :
 
 private:
     VirtualVolume &mainVolume_;
+    bool volumeDistributed_;
     const FrameWorkMode frameWorkmode_;
     TaskComposite *taskComposite_;
 
