@@ -29,7 +29,12 @@ void TaskComposite::run()
 
     vGPU_.compositeImages( imagesStack_ );
 
-    std::cout <<"\tCompositing DONE. Flush to screen!"<<std::endl;
+    static int psuedoCount = 0 ;
+    std::cout << "Frame #:" << psuedoCount++ <<" is READY!\n" ;
+
+    std::cout <<"Compositing DONE. Flush to screen!"<<std::endl;
+
+
 
 }
 

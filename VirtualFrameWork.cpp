@@ -123,9 +123,6 @@ bool VirtualFrameWork::transformationsBlocked() const
 void VirtualFrameWork::flushScreen_()
 {
 
-    static int psuedoCount = 0 ;
-    std::cout << "Frame #:" << psuedoCount++ << std::endl ;
-
 }
 
 void VirtualFrameWork::distributeVolume_()
