@@ -1,7 +1,7 @@
 QT += core
 QT -= gui
 
-TARGET = virtual-rendering-multi-gpu
+TARGET = parallel-rendering-multi-gpu
 CONFIG += console
 CONFIG -= app_bundle
 CONFIG += c++11
