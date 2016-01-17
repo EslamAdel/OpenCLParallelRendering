@@ -14,6 +14,14 @@
 
 #define DEMO
 
+
+/**
+ * @brief NodesRenderTasks
+ * For each node, there will be specific QRunnable object created before starting the rendering loop.
+ * Although using the same QRunnable object more than one time is not advised, allocating the object
+ * before the rendering loop will avoid the dynamic allocation overhead imposed by allocating QRunnable
+ * object for every new frame.
+ */
 typedef std::unordered_map<const VirtualNode*, TaskRender*> NodesRenderTasks;
 typedef std::unordered_map<const VirtualNode*, TaskCollect*> NodesCollectTasks;
 
