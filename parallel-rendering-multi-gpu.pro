@@ -8,6 +8,9 @@ CONFIG += c++11
 
 TEMPLATE = app
 
+INCLUDEPATH += system/
+
+
 SOURCES += main.cpp \
     VirtualExperiment.cpp \
     VirtualNode.cpp \
@@ -17,7 +20,8 @@ SOURCES += main.cpp \
     VirtualImage.cpp \
     TaskRender.cpp \
     TaskCollect.cpp \
-    TaskComposite.cpp
+    TaskComposite.cpp \
+    system/Logger.cpp
 
 HEADERS += \
     VirtualExperiment.h \
@@ -29,5 +33,8 @@ HEADERS += \
     TaskRender.h \
     TaskCollect.h \
     Transformation.h \
-    TaskComposite.h
+    TaskComposite.h \
+    system/Colors.hh \
+    system/Logger.h \
+    system/LogLevel.hh
 
