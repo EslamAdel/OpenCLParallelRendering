@@ -1,6 +1,7 @@
 #include "TaskComposite.h"
 #include <QThread>
 #include <iostream>
+#include "Logger.h"
 
 TaskComposite::TaskComposite(const VirtualGPU &vGPU,
                              const CompositingMode compositingMode)
@@ -21,7 +22,9 @@ void TaskComposite::insertImage(const VirtualNode *vNode, const VirtualImage *vI
 void TaskComposite::run()
 {
 
-    std::cout << "\tfrom thread:"<<QThread::currentThread()<<", Compositing Images.."<<std::endl;
+    LOG_INFO("\tFrom thread:{%d}, Compositing Images..\n" ,
+             QThread::currentThread());
+
 
     unsigned int i=0;
     for( auto &vImage : nodesOutputImages_ )
@@ -30,9 +33,10 @@ void TaskComposite::run()
     vGPU_.compositeImages( imagesStack_ );
 
     static int psuedoCount = 0 ;
-    std::cout << "Frame #:" << psuedoCount++ <<" is READY!\n" ;
 
-    std::cout <<"Compositing DONE. Flush to screen!"<<std::endl;
+    LOG_INFO("Frame #:%d is READY\n"
+             "Compositing DONE. Flush to screen!\n"
+             "------------------------", psuedoCount++ );
 
 
 

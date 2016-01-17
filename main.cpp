@@ -1,5 +1,6 @@
 #include <QCoreApplication>
 #include <iostream>
+#include "Logger.h"
 
 #define DEMO
 #include "VirtualFrameWork.h"
@@ -11,7 +12,7 @@ int main(int argc, char *argv[])
 
 #ifdef DEMO
     VirtualVolume v( 512 , 512 , 512 );
-    std::cout<<"Creating the virtual framework"<<std::endl;
+    LOG_INFO("Creating the virtual framework");
     VirtualFrameWork fw( v );
 #endif
 

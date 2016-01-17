@@ -1,6 +1,8 @@
 #include "TaskRender.h"
 #include <iostream>
 #include <QThread>
+#include "Logger.h"
+
 TaskRender::TaskRender( VirtualNode &node,
                         const TaskRender::RenderingTask renderingTask,
                         const Transformation *transformation)
@@ -11,7 +13,7 @@ TaskRender::TaskRender( VirtualNode &node,
     if ( renderingTask == RenderingTask::ApplyTransformation &&
          transformation == nullptr )
     {
-        std::cout << "Pass valid transformations!\n";
+        LOG_ERROR("Pass valid transformations!");
         exit(EXIT_FAILURE);
     }
 
@@ -41,8 +43,11 @@ const Transformation *TaskRender::transformation() const
 
 void TaskRender::run()
 {
-    std::cout <<"\tfrom thread:"<< QThread::currentThread();
-    std::cout <<" ,rendering on node:"<<node_.nodeId()<<" ...\n";
+
+    LOG_INFO("From thread:{%d},\n"
+             "\trendering on node:<%d> ...",
+             QThread::currentThread(),
+             node_.nodeId());
 
     switch ( renderingTask_ )
     {
@@ -59,9 +64,11 @@ void TaskRender::run()
 
     }
 
-    std::cout <<"\tfrom thread:"<< QThread::currentThread();
-    std::cout <<" ,rendering DONE on node:"<<node_.nodeId();
-    std::cout <<std::endl;
+    LOG_INFO("From thread:{%d},\n"
+             "\trendering is DONE on node:<%d>",
+             QThread::currentThread(),
+             node_.nodeId());
+
 
 
 }
