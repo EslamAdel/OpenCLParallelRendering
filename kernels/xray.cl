@@ -1,0 +1,183 @@
+#define MAX_STEPS 500
+#define T_STEP 0.01
+
+/**
+ * @brief intersectBox
+ * A function that checks the intersectin between a ray and a box representing
+ * the bounding box of a three-dimensional volume texture .
+ * @param rayOrigin The origin of the ray.
+ * @param rayDirection The direction of the ray.
+ * @param pMin The minimum point of the boundnig box that reflects the left and
+ * lower corner.
+ * @param pMax The maximum point of the bounding box that reflects the right and
+ * upper corner.
+ * @param tNear The parametric value of the the near intersection of the ray
+ * with the bounding box.
+ * @param tFar The parametric value of the the far intersection of the ray
+ * with the bounding box.
+ * @return True if the ray intersects with the bounding box and false otherwise.
+ * @note To understand how does this method work, it is recommended to have a
+ * look at the following link
+ * http://www.siggraph.org/education/materials/HyperGraph/raytrace/rtinter3.htm
+ */
+int intersectBox( float4 rayOrigin, float4 rayDirection,
+                  float4 pMin, float4 pMax,
+                  float* tNear, float* tFar)
+{
+    // Compute the intersection of the ray with all the six planes of the
+    // bounding box.
+    float4 invR = ( float4 )( 1.0, 1.0, 1.0, 1.0) / rayDirection;
+    float4 tPMin = invR * ( pMin - rayOrigin );
+    float4 tPMax = invR * ( pMax - rayOrigin );
+
+    // Re-order the intersections to find smallest and largest on each axis.
+    float4 tMin = min( tPMax, tPMin );
+    float4 tMax = max( tPMax, tPMin );
+
+    // Find the largest < tMin > and the smallest < tMax >.
+    float tMinLargest = max( max( tMin.x, tMin.y ), max( tMin.x, tMin.z ));
+    float tMaxSmallest = min( min( tMax.x, tMax.y ), min( tMax.x, tMax.z ));
+
+    *tNear = tMinLargest;
+    *tFar = tMaxSmallest;
+
+    return tMaxSmallest > tMinLargest;
+}
+
+/**
+ * @brief rgbaFloatToInt
+ * Converts a float4 with RGBA components into a 32-bit unsigned integer, at
+ * which each byte represents a color component. This step is required to
+ * optimize the way the final color array that represents the image is created.
+ * It basically converts a 4 x 32-bit float vector into a single 32-bit value.
+ * @param rgba The color vector in RGBA fashion.
+ * @return A 32-bit integer representing the color.
+ * @note Use the swizzeling operator to access the individual color components
+ * from the rgba vector and use shift operation to sort them in the unsigned int.
+ */
+uint rgbaFloatToInt( float4 rgba )
+{
+    rgba.x = clamp( rgba.x, 0.0, 1.0);
+    rgba.y = clamp( rgba.y, 0.0, 1.0);
+    rgba.z = clamp( rgba.z, 0.0, 1.0);
+    rgba.w = clamp( rgba.w, 0.0, 1.0);
+    return (( uint )( rgba.w * 255.0 ) << 24 ) |     // Alpha
+           (( uint )( rgba.z * 255.0 ) << 16 ) |     // Blue
+           (( uint )( rgba.y * 255.0 ) << 8  ) |     // Green
+            ( uint )( rgba.x * 255.0 );              // Red
+}
+
+/**
+ * @brief xray
+ * @param frameBuffer
+ * @param width
+ * @param height
+ * @param density
+ * @param brightness
+ * @param invViewMatrix
+ * @param volume
+ * @param volumeSampler
+ */
+__kernel void xray( __global    uint* frameBuffer,
+                                uint width, uint height,
+                                float density, float brightness,
+                    __constant  float* invViewMatrix,
+                    __read_only image3d_t volume,
+                    sampler_t   volumeSampler )
+{
+    uint x = get_global_id( 0 );
+    uint y = get_global_id( 1 );
+
+    float u = ( x / ( float ) width ) * 2.0 - 1.0;
+    float v = ( y / ( float ) height ) * 2.0 - 1.0;
+
+    // float T_STEP = 0.01f;
+    float4 boxMin = ( float4 )( -1.0f, -1.0f, -1.0f, 1.0f );
+    float4 boxMax = ( float4 )( 1.0f, 1.0f, 1.0f, 1.0f );
+
+    // Calculate eye ray in world space
+    float4 eyeRayOrigin;
+    float4 eyeRayDirection;
+
+    eyeRayOrigin = ( float4 )( invViewMatrix[ 3  ],
+                               invViewMatrix[ 7  ],
+                               invViewMatrix[ 11 ],
+                               1.0f );
+
+    float4 direction = normalize((( float4 )( u, v, -2.0, 0.0 )));
+    eyeRayDirection.x = dot( direction, (( float4 )( invViewMatrix[ 0  ],
+                                                     invViewMatrix[ 1  ],
+                                                     invViewMatrix[ 2  ],
+                                                     invViewMatrix[ 3  ] )));
+    eyeRayDirection.y = dot( direction, (( float4 )( invViewMatrix[ 4  ],
+                                                     invViewMatrix[ 5  ],
+                                                     invViewMatrix[ 6  ],
+                                                     invViewMatrix[ 7  ] )));
+    eyeRayDirection.z = dot( direction, (( float4 )( invViewMatrix[ 8  ],
+                                                     invViewMatrix[ 9  ],
+                                                     invViewMatrix[ 10 ],
+                                                     invViewMatrix[ 11 ] )));
+    eyeRayDirection.w = 0.0f;
+
+    // Find the intersection of the ray with the box
+    float tNear, tFar;
+    int hit = intersectBox( eyeRayOrigin, eyeRayDirection,
+                            boxMin, boxMax, &tNear, &tFar );
+
+    // If it doesn't hit, then return a black value in the corresponding pixel
+    if( !hit )
+    {
+        if(( x < width ) && ( y < height ))
+        {
+            // Get the 1D index of the pixel to set its color, and return
+            uint index = ( y * width ) + x;
+            frameBuffer[ index ] = 0;
+        }
+        return;
+    }
+
+    // Clamp to near plane if the tNear was negative
+    if (tNear < 0.0f)
+        tNear = 0.0f;
+
+    // March along the ray accumulating the densities
+    float4 intensityBuffer = ( float4 )( 0.0, 0.0, 0.0, 0.0 );
+    float t = tFar;
+
+    for( uint i = 0; i < MAX_STEPS; i++ )
+    {
+        // Current position along the ray
+        float4 position = eyeRayOrigin + eyeRayDirection * t;
+
+        // Center the texture at the origin, and mapping the positions
+        // between 0.0 and 1.0
+        position = position * 0.5f + 0.5f;    // map position to [0, 1] coordinates
+
+        // Sample the 3D volume data using the _volumeSampler_ at the specified
+        // positions along the ray.
+        float4 intensity = read_imagef( volume, volumeSampler, position );
+
+        // Accumulate the result by mixing what is currently in the
+        // _intensityBuffer_ with the new intensity value that was sampled from
+        // the volume, with the corrsponding alpha components
+        float alpha = intensity.w * density;
+        intensityBuffer = mix( intensityBuffer, intensity,
+                             ( float4 )( alpha, alpha, alpha, alpha ));
+
+        // Get the parametric value of the next sample along the ray
+        t -= T_STEP;
+        if( t < tNear )
+            break;
+    }
+
+    // Adjust the brightness of the pixel
+    intensityBuffer *= brightness;
+
+    // Write the pixel color if it fits only within the image space.
+    if(( x < width ) && ( y < height ))
+    {
+        // Get a 1D index of the pixel in the _frameBuffer_
+        uint index = ( y * width ) + x;
+        frameBuffer[ index ] = rgbaFloatToInt( intensityBuffer );
+    }
+}
