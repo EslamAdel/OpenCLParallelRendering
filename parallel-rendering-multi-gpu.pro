@@ -18,20 +18,22 @@ INCLUDEPATH += opencl/
 INCLUDEPATH += kernel/
 INCLUDEPATH += rendering/
 INCLUDEPATH += /usr/local/include/oclHWDL/
+INCLUDEPATH += /usr/local/cuda-7.5/include/
+INCLUDEPATH += framework/
 
 LIBS += -L/usr/local/lib -loclHWDL
-LIBS += -L/opt/AMDAPPSDK-3.0/lib/x86 -lOpenCL
+LIBS += -L/usr/lib/x86_64-linux-gnu/ -lOpenCL
 
 SOURCES += main.cpp \
-    VirtualExperiment.cpp \
-    VirtualNode.cpp \
-    VirtualGPU.cpp \
-    VirtualVolume.cpp \
-    VirtualFrameWork.cpp \
-    VirtualImage.cpp \
-    TaskRender.cpp \
-    TaskCollect.cpp \
-    TaskComposite.cpp \
+    #VirtualExperiment.cpp \
+    #VirtualNode.cpp \
+    #VirtualGPU.cpp \
+    #VirtualVolume.cpp \
+    #VirtualFrameWork.cpp \
+    #VirtualImage.cpp \
+    #TaskRender.cpp \
+    #TaskCollect.cpp \
+    #TaskComposite.cpp \
     system/Logger.cpp \
     data/Image.cpp \
     data/TransferFunction.cpp \
@@ -50,18 +52,24 @@ SOURCES += main.cpp \
     #rendering/GLContext.cpp \
     system/Utilities.cpp \
  #   system/oclUtils.cpp
+    system/oclUtils.cpp \
+    framework/ParallelRendering.cpp \
+    framework/RenderingNode.cpp \
+    framework/TaskRender.cpp \
+    framework/TaskCollect.cpp \
+    framework/TaskComposite.cpp
 
 HEADERS += \
-    VirtualExperiment.h \
-    VirtualNode.h \
-    VirtualGPU.h \
-    VirtualVolume.h \
-    VirtualFrameWork.h \
-    VirtualImage.h \
-    TaskRender.h \
-    TaskCollect.h \
-    Transformation.h \
-    TaskComposite.h \
+    #VirtualExperiment.h \
+    #VirtualNode.h \
+    #VirtualGPU.h \
+    #VirtualVolume.h \
+    #VirtualFrameWork.h \
+    #VirtualImage.h \
+    #TaskRender.h \
+    #TaskCollect.h \
+    #Transformation.h \
+    #TaskComposite.h \
     system/Colors.hh \
     system/Logger.h \
     system/LogLevel.hh \
@@ -225,4 +233,12 @@ HEADERS += \
     #rendering/GLContext.h \
     system/Utilities.h \
 #    system/oclUtils.h
+    system/oclUtils.h \
+    framework/ParallelRendering.h \
+    framework/RenderingNode.h \
+    data/VolumeVariant.hh \
+    data/ImageVariant.hh \
+    framework/TaskRender.h \
+    framework/TaskCollect.h \
+    framework/TaskComposite.h
 

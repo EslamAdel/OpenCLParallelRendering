@@ -32,10 +32,7 @@ public:
     void createPixelBuffer( const uint bufferWidth,
                             const uint bufferHeight );
 
-    /**
-     * @brief startRendering
-     */
-    void startRendering( );
+    void loadNewVolume( const Volume< T >* volume );
 
     /**
      * @brief getGPUIndex
@@ -83,7 +80,14 @@ public:
       * @brief renderFrame
       * @param inverseMatrix_
       */
-    void renderFrame( float* inverseMatrix );
+    void renderFrame( const float* inverseMatrix ,
+                      const float &volumeDensity ,
+                      const float &imageBrightness );
+
+
+    void uploadFrame();
+
+    void frameBufferToPixmap();
 
     /**
       * @brief releasePixelBuffer
@@ -96,51 +100,11 @@ public:
      */
     QPixmap* getFrame( );
 
-public slots:
 
-    /**
-     * @brief updateRotationX_SLOT
-     * @param angle
-     */
-    void updateRotationX_SLOT( int angle );
-
-    /**
-     * @brief updateRotationY_SLOT
-     * @param angle
-     */
-    void updateRotationY_SLOT( int angle );
-
-    /**
-     * @brief updateRotationZ_SLOT
-     * @param angle
-     */
-    void updateRotationZ_SLOT( int angle );
-
-    /**
-     * @brief updateTranslationX_SLOT
-     * @param distance
-     */
-    void updateTranslationX_SLOT( int distance );
-
-    /**
-     * @brief updateTranslationY_SLOT
-     * @param distance
-     */
-    void updateTranslationY_SLOT( int distance );
-
-    /**
-     * @brief updateImageBrightness_SLOT
-     * @param brithness
-     */
-    void updateImageBrightness_SLOT( float brithness );
-
-    /**
-     * @brief updateVolumeDensity_SLOT
-     * @param density
-     */
-    void updateVolumeDensity_SLOT( float density );
-
-    void paint();
+    void paint( const Coordinates3D &rotation ,
+                const Coordinates3D &translation,
+                const float &volumeDensity ,
+                const float &imageBrightness);
 
 private:
 
@@ -251,16 +215,6 @@ protected:
     cl_sampler transferFunctionSampler_;
 
     /**
-     * @brief volumeDensity_
-     */
-    float volumeDensity_;
-
-    /**
-     * @brief imageBrightness_
-     */
-    float imageBrightness_;
-
-    /**
      * @brief tfOffset_
      */
     float tfOffset_;
@@ -304,16 +258,6 @@ protected:
      * @brief frame_
      */
     QPixmap frame_;
-
-    /**
-     * @brief rotation_
-     */
-    Coordinates3D rotation_;
-
-    /**
-     * @brief translation_
-     */
-    Coordinates3D translation_;
 
     /**
      * @brief inverseMatrix_

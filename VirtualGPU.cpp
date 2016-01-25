@@ -3,6 +3,7 @@
 #include <QThread>
 #include <iostream>
 
+
 VirtualGPU::VirtualGPU()
 {
     std::cout<<"\tVirtual GPU created!"<<std::endl;

@@ -10,17 +10,13 @@
 #include <auxillary/glm/gtc/matrix_transform.hpp>
 #include <auxillary/glm/gtc/type_ptr.hpp>
 
-#define INITIAL_VOLUME_CENTER_X 0.0
-#define INITIAL_VOLUME_CENTER_Y 0.0
-#define INITIAL_VOLUME_CENTER_Z -4.0
-#define INITIAL_VOLUME_ROTATION_X 0.0
-#define INITIAL_VOLUME_ROTATION_Y 0.0
-#define INITIAL_VOLUME_ROTATION_Z 0.0
+
 
 #define DEG_TO_RAD(x) (x * 0.0174532925199f)
 
 #define LOCAL_SIZE_X    16
 #define LOCAL_SIZE_Y    16
+
 
 template< class T >
 CLContext< T >::CLContext(const Volume<T>* volume, const uint64_t gpuIndex )
@@ -30,15 +26,7 @@ CLContext< T >::CLContext(const Volume<T>* volume, const uint64_t gpuIndex )
 
     linearFiltering_ = true;
 
-    // Translation
-    translation_.x = INITIAL_VOLUME_CENTER_X;
-    translation_.y = INITIAL_VOLUME_CENTER_X;
-    translation_.z = INITIAL_VOLUME_CENTER_Z;
 
-    // Rotation
-    rotation_.x = INITIAL_VOLUME_ROTATION_X;
-    rotation_.x = INITIAL_VOLUME_ROTATION_Y;
-    rotation_.x = INITIAL_VOLUME_ROTATION_Z;
 
     /// @note The oclHWDL scans the entire system, and returns a list of
     /// platforms and devices. Since we don't really care about the different
@@ -228,22 +216,25 @@ void CLContext< T >::handleKernel(std::string string)
 }
 
 template< class T >
-void CLContext< T >::paint(  )
+void CLContext< T >::paint(const Coordinates3D &rotation ,
+                           const Coordinates3D &translation,
+                           const float &volumeDensity ,
+                           const float &imageBrightness)
 {
     // Use the GLM to create the Model View Matrix.
     // Initialize to identity.
     glm::mat4 glmMVMatrix = glm::mat4( 1.0f );
 
     // Use quatrenions
-    glm::tvec3<float> rotationVector = glm::tvec3<float>( rotation_.x,
-                                                          rotation_.y,
-                                                          rotation_.z );
+    glm::tvec3<float> rotationVector = glm::tvec3<float>( rotation.x,
+                                                          rotation.y,
+                                                          rotation.z );
     glm::tquat< float > quaternion =
             glm::tquat< float >(DEG_TO_RAD(rotationVector));
     float angle = glm::angle(quaternion);
     glm::tvec3< float > axis = glm::axis(quaternion);
-    glm::tvec3< float > translationVector = glm::tvec3<float>( translation_.x,
-                                                               translation_.y,
+    glm::tvec3< float > translationVector = glm::tvec3<float>( translation.x,
+                                                               translation.y,
                                                                4.0);
 
     // Rotate , and then translate to keep the local rotation
@@ -274,11 +265,15 @@ void CLContext< T >::paint(  )
     inverseMatrixArray_[10] = modelViewMatrix[10];
     inverseMatrixArray_[11] = modelViewMatrix[14];
 
-    renderFrame( inverseMatrixArray_ );
+    renderFrame( inverseMatrixArray_ , volumeDensity , imageBrightness );
+    //uploadFrame();
+    //frameBufferToPixmap();
 }
 
 template< class T >
-void CLContext< T >::renderFrame( float* inverseMatrix )
+void CLContext< T >::renderFrame( const float* inverseMatrix,
+                                  const float &volumeDensity,
+                                  const float &imageBrightness)
 {
     // update the device view matrix
 
@@ -299,8 +294,8 @@ void CLContext< T >::renderFrame( float* inverseMatrix )
     // connected now to the OpenCL context.
     size_t localSize[ ] = { LOCAL_SIZE_X, LOCAL_SIZE_Y };
 
-    activeRenderingKernel_->setVolumeDensityFactor( volumeDensity_);
-    activeRenderingKernel_->setImageBrightnessFactor(imageBrightness_);
+    activeRenderingKernel_->setVolumeDensityFactor( volumeDensity);
+    activeRenderingKernel_->setImageBrightnessFactor(imageBrightness);
 
     // Enqueue the kernel for execution
     clErrorCode |= clEnqueueNDRangeKernel( commandQueue_,
@@ -314,11 +309,25 @@ void CLContext< T >::renderFrame( float* inverseMatrix )
                                            0);
     oclHWDL::Error::checkCLError(clErrorCode);
 
+
+}
+
+template< class T >
+void CLContext<T>::uploadFrame()
+{
+    // Assume everything is fine in the begnning
+    cl_int clErrorCode = CL_SUCCESS;
+
     clEnqueueReadBuffer( commandQueue_, clPixelBuffer_, CL_TRUE, 0,
                          sizeof( uint ) * gridSize_[0] * gridSize_[1],
                         frameData_, 0, NULL, NULL );
     oclHWDL::Error::checkCLError(clErrorCode);
 
+}
+
+template< class T >
+void CLContext<T>::frameBufferToPixmap()
+{
     u_int8_t r, g, b, a;
     uint rgba;
 
@@ -338,6 +347,8 @@ void CLContext< T >::renderFrame( float* inverseMatrix )
                  gridSize_[0], gridSize_[1], QImage::Format_ARGB32);
     frame_ = frame_.fromImage(image);
 }
+
+
 
 template< class T >
 void CLContext< T >::createPixelBuffer( const uint frameWidth,
@@ -367,59 +378,18 @@ void CLContext< T >::createPixelBuffer( const uint frameWidth,
     oclCheckErrorEX( error, CL_SUCCESS, 0 );
 }
 
-template < class T >
-void CLContext< T >::startRendering( )
+template< class T >
+void CLContext<T>::loadNewVolume(const Volume<T> *volume)
 {
-    paint( );
-}
+    volume_ = volume;
+    clVolume_ = new CLVolume<T>( volume_, VOLUME_CL_UNSIGNED_INT8 );
 
-template < class T >
-void CLContext< T >::updateRotationX_SLOT( int angle )
-{
-    rotation_.x = float( angle );
-    paint();
-}
+    if( volumeArray_ )
+        clReleaseMemObject( volumeArray_ );
 
-template < class T >
-void CLContext< T >::updateRotationY_SLOT( int angle )
-{
-    rotation_.y = angle;
-    paint();
-}
+    volumeArray_ = clVolume_->createDeviceVolume( context_ );
+    activeRenderingKernel_->setVolumeData(volumeArray_);
 
-template < class T >
-void CLContext< T >::updateRotationZ_SLOT( int angle )
-{
-    rotation_.z = angle;
-    paint();
-}
-
-template < class T >
-void CLContext< T >::updateTranslationX_SLOT( int distance )
-{
-    translation_.x = float( distance );
-    paint();
-}
-
-template < class T >
-void CLContext< T >::updateTranslationY_SLOT( int distance )
-{
-    translation_.y = float( distance );
-    paint();
-}
-
-template < class T >
-void CLContext< T >::updateImageBrightness_SLOT( float brightness )
-{
-    imageBrightness_ = brightness;
-    paint();
-}
-
-template < class T >
-void CLContext< T >::updateVolumeDensity_SLOT( float density )
-{
-    volumeDensity_ = density;
-    paint();
 }
 
 template< class T >

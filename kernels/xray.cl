@@ -26,7 +26,7 @@ int intersectBox( float4 rayOrigin, float4 rayDirection,
 {
     // Compute the intersection of the ray with all the six planes of the
     // bounding box.
-    float4 invR = ( float4 )( 1.0, 1.0, 1.0, 1.0) / rayDirection;
+    float4 invR = ( float4 )( 1.f, 1.f, 1.f, 1.f) / rayDirection;
     float4 tPMin = invR * ( pMin - rayOrigin );
     float4 tPMax = invR * ( pMax - rayOrigin );
 
@@ -57,14 +57,14 @@ int intersectBox( float4 rayOrigin, float4 rayDirection,
  */
 uint rgbaFloatToInt( float4 rgba )
 {
-    rgba.x = clamp( rgba.x, 0.0, 1.0);
-    rgba.y = clamp( rgba.y, 0.0, 1.0);
-    rgba.z = clamp( rgba.z, 0.0, 1.0);
-    rgba.w = clamp( rgba.w, 0.0, 1.0);
-    return (( uint )( rgba.w * 255.0 ) << 24 ) |     // Alpha
-           (( uint )( rgba.z * 255.0 ) << 16 ) |     // Blue
-           (( uint )( rgba.y * 255.0 ) << 8  ) |     // Green
-            ( uint )( rgba.x * 255.0 );              // Red
+    rgba.x = clamp( rgba.x, 0.f, 1.f);
+    rgba.y = clamp( rgba.y, 0.f, 1.f);
+    rgba.z = clamp( rgba.z, 0.f, 1.f);
+    rgba.w = clamp( rgba.w, 0.f, 1.f);
+    return (( uint )( rgba.w * 255.f ) << 24 ) |     // Alpha
+           (( uint )( rgba.z * 255.f ) << 16 ) |     // Blue
+           (( uint )( rgba.y * 255.f ) << 8  ) |     // Green
+            ( uint )( rgba.x * 255.f );              // Red
 }
 
 /**
@@ -88,12 +88,12 @@ __kernel void xray( __global    uint* frameBuffer,
     uint x = get_global_id( 0 );
     uint y = get_global_id( 1 );
 
-    float u = ( x / ( float ) width ) * 2.0 - 1.0;
-    float v = ( y / ( float ) height ) * 2.0 - 1.0;
+    float u = ( x / ( float ) width ) * 2.f - 1.f;
+    float v = ( y / ( float ) height ) * 2.f - 1.f;
 
-    // float T_STEP = 0.01f;
-    float4 boxMin = ( float4 )( -1.0f, -1.0f, -1.0f, 1.0f );
-    float4 boxMax = ( float4 )( 1.0f, 1.0f, 1.0f, 1.0f );
+    // float T_STEP = 0.f1f;
+    float4 boxMin = ( float4 )( -1.f, -1.f, -1.f, 1.f );
+    float4 boxMax = ( float4 )( 1.f, 1.f, 1.f, 1.f );
 
     // Calculate eye ray in world space
     float4 eyeRayOrigin;
@@ -102,9 +102,9 @@ __kernel void xray( __global    uint* frameBuffer,
     eyeRayOrigin = ( float4 )( invViewMatrix[ 3  ],
                                invViewMatrix[ 7  ],
                                invViewMatrix[ 11 ],
-                               1.0f );
+                               1.f );
 
-    float4 direction = normalize((( float4 )( u, v, -2.0, 0.0 )));
+    float4 direction = normalize((( float4 )( u, v, -2.f, 0.f )));
     eyeRayDirection.x = dot( direction, (( float4 )( invViewMatrix[ 0  ],
                                                      invViewMatrix[ 1  ],
                                                      invViewMatrix[ 2  ],
@@ -117,7 +117,7 @@ __kernel void xray( __global    uint* frameBuffer,
                                                      invViewMatrix[ 9  ],
                                                      invViewMatrix[ 10 ],
                                                      invViewMatrix[ 11 ] )));
-    eyeRayDirection.w = 0.0f;
+    eyeRayDirection.w = 0.f;
 
     // Find the intersection of the ray with the box
     float tNear, tFar;
@@ -137,11 +137,11 @@ __kernel void xray( __global    uint* frameBuffer,
     }
 
     // Clamp to near plane if the tNear was negative
-    if (tNear < 0.0f)
-        tNear = 0.0f;
+    if (tNear < 0.f)
+        tNear = 0.f;
 
     // March along the ray accumulating the densities
-    float4 intensityBuffer = ( float4 )( 0.0, 0.0, 0.0, 0.0 );
+    float4 intensityBuffer = ( float4 )( 0.f, 0.f, 0.f, 0.f );
     float t = tFar;
 
     for( uint i = 0; i < MAX_STEPS; i++ )
@@ -150,7 +150,7 @@ __kernel void xray( __global    uint* frameBuffer,
         float4 position = eyeRayOrigin + eyeRayDirection * t;
 
         // Center the texture at the origin, and mapping the positions
-        // between 0.0 and 1.0
+        // between 0.f and 1.f
         position = position * 0.5f + 0.5f;    // map position to [0, 1] coordinates
 
         // Sample the 3D volume data using the _volumeSampler_ at the specified
