@@ -3,10 +3,11 @@
 
 template< class T >
 Volume< T >::Volume( const std::string prefix, const bool drawBoundingBox )
+    : drawBoundingBox_( drawBoundingBox )
 {
     // Load the volume from a file
     loadVolumeData_( prefix );
-    drawBoundingBox_ = drawBoundingBox;
+
     coordinates_ = Coordinates3D( dimensions_.x / 2.f,
                                   dimensions_.y / 2.f,
                                   dimensions_.z / 2.f);
@@ -21,19 +22,18 @@ Volume< T >::Volume( const std::string prefix, const bool drawBoundingBox )
 }
 
 template< class T >
-Volume< T >::Volume( Coordinates3D brickCoordinates,
-                     Dimensions3D brickDimensions,
-                     Coordinates3D brickUnitCubeCenter,
-                     Coordinates3D brickUnitCubeScaleFactors,
+Volume< T >::Volume( const Coordinates3D brickCoordinates,
+                     const Dimensions3D brickDimensions,
+                     const Coordinates3D brickUnitCubeCenter,
+                     const Coordinates3D brickUnitCubeScaleFactors,
                      T *brickData, const bool drawBoundingBox )
-    : coordinates_( brickCoordinates ),
-      dimensions_( brickDimensions ),
-      unitCubeCenter_( brickUnitCubeCenter ),
-      unitCubeScaleFactors_( brickUnitCubeScaleFactors ),
-      data_( brickData ),
-      drawBoundingBox_( drawBoundingBox )
+    : drawBoundingBox_( drawBoundingBox )
 {
-
+    coordinates_    = brickCoordinates ;
+    dimensions_     = brickDimensions ;
+    unitCubeCenter_ = brickUnitCubeCenter ;
+    unitCubeScaleFactors_ = brickUnitCubeScaleFactors ;
+    data_ = brickData ;
 
 }
 

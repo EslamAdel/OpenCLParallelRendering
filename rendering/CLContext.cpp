@@ -23,7 +23,7 @@ CLContext< T >::CLContext(const Volume<T>* volume, const uint64_t gpuIndex )
     : volume_( volume )
     , gpuIndex_( gpuIndex )
 {
-
+    kernelInitialized_ = false;
     linearFiltering_ = true;
 
 
@@ -33,7 +33,12 @@ CLContext< T >::CLContext(const Volume<T>* volume, const uint64_t gpuIndex )
     /// platforms in the system and curious only to get the GPUs, we get a
     /// list of all the GPUs connected to the system in a list and select
     /// one of them based on the given GPU ID.
-    initalizeContext_( );
+    initializeContext_( );
+    if( volume!=nullptr )
+    {
+        initializeKernel_( );
+        kernelInitialized_ = true;
+    }
 }
 
 template< class T >
@@ -43,12 +48,21 @@ uint64_t CLContext< T >::getGPUIndex() const
 }
 
 template< class T >
-void CLContext< T >::initalizeContext_()
+void CLContext< T >::initializeContext_()
 {
     LOG_DEBUG( "Initializing an OpenCL context ... " );
 
     selectGPU_();
     createCommandQueue_();
+
+    LOG_DEBUG( "[DONE] Initializing an OpenCL context ... " );
+
+}
+
+template< class T >
+void CLContext<T>::initializeKernel_()
+{
+    LOG_DEBUG( "Initializing an OpenCL Kernel ... " );
 
     /// Add all the rendering kernel here, and set the selected to be the
     /// activeRenderingKernel_
@@ -62,7 +76,8 @@ void CLContext< T >::initalizeContext_()
     // Creating the pixel buffer that will contain the final image
     createPixelBuffer(512, 512);
 
-    LOG_DEBUG( "[DONE] Initializing an OpenCL context ... " );
+    LOG_DEBUG( "[DONE] Initializing an OpenCL Kernel ... " );
+
 }
 
 template< class T >
@@ -270,6 +285,12 @@ void CLContext< T >::paint(const Coordinates3D &rotation ,
     //frameBufferToPixmap();
 }
 
+template < class T >
+bool CLContext<T>::kernelInitialized() const
+{
+    return kernelInitialized_;
+}
+
 template< class T >
 void CLContext< T >::renderFrame( const float* inverseMatrix,
                                   const float &volumeDensity,
@@ -382,13 +403,18 @@ template< class T >
 void CLContext<T>::loadNewVolume(const Volume<T> *volume)
 {
     volume_ = volume;
-    clVolume_ = new CLVolume<T>( volume_, VOLUME_CL_UNSIGNED_INT8 );
+    if( kernelInitialized_ )
+    {
+        clVolume_ = new CLVolume<T>( volume_, VOLUME_CL_UNSIGNED_INT8 );
+        if( volumeArray_ )
+            clReleaseMemObject( volumeArray_ );
 
-    if( volumeArray_ )
-        clReleaseMemObject( volumeArray_ );
+        volumeArray_ = clVolume_->createDeviceVolume( context_ );
+        activeRenderingKernel_->setVolumeData(volumeArray_);
+    }
+    else initializeKernel_();
 
-    volumeArray_ = clVolume_->createDeviceVolume( context_ );
-    activeRenderingKernel_->setVolumeData(volumeArray_);
+    kernelInitialized_ = true;
 
 }
 

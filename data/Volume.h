@@ -18,10 +18,10 @@ public: // Constructors
     Volume( const std::string prefix,
             const bool drawBoundingBox = false );
 
-    Volume( Coordinates3D brickCoordinates,
-            Dimensions3D brickDimensions,
-            Coordinates3D brickUnitCubeCenter,
-            Coordinates3D brickUnitCubeScaleFactors,
+    Volume( const Coordinates3D brickCoordinates,
+            const Dimensions3D brickDimensions,
+            const Coordinates3D brickUnitCubeCenter,
+            const Coordinates3D brickUnitCubeScaleFactors,
             T *brickData,
             const bool drawBoundingBox = false ) ;
 
@@ -214,7 +214,7 @@ protected: // Protected (private) member variables
     /**
      * @brief drawBoundingBox_
      */
-    bool drawBoundingBox_;
+    const bool drawBoundingBox_;
 };
 
 /**

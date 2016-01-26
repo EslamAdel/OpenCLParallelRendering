@@ -106,12 +106,16 @@ public:
                 const float &volumeDensity ,
                 const float &imageBrightness);
 
+    bool kernelInitialized() const;
+
 private:
 
     /**
      * @brief initalizeContext_
      */
-    virtual void initalizeContext_( );
+    virtual void initializeContext_( );
+
+    virtual void initializeKernel_( );
 
     /**
      * @brief selectGPU_
@@ -263,6 +267,8 @@ protected:
      * @brief inverseMatrix_
      */
     float inverseMatrixArray_[ 12 ];
+
+    bool kernelInitialized_;
 };
 
 #endif // CLGPUCONTEXT_H

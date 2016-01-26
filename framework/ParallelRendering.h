@@ -38,17 +38,22 @@ public:
 
     void distributeBaseVolume1D();
 
-    //void startRendering();
+    void startRendering();
 
     void applyTransformation();
 
     void syncTransformation();
 
+    RenderingNode &getRenderingNode( const uint64_t gpuIndex );
+
+signals:
+    void framesReady_SIGNAL();
+
+
 public slots :
     void finishedRendering_SLOT(RenderingNode *finishedNode);
     void compositingTaskFinished_SLOT();
     void bufferUploaded_SLOT( RenderingNode *finishedNode);
-
 
 
     /**
@@ -100,9 +105,11 @@ private:
     oclHWDL::Devices            listGPUs_;
     RenderingNodes        renderingNodes_;
 
-    QThreadPool rendererPool_  ;
-    QThreadPool compositorPool_;
-    QThreadPool collectorPool_ ;
+    //threadpools
+    QThreadPool rendererPool_  ; //[producer] for collector pool.
+    QThreadPool compositorPool_; //[consumer] for collector pool.
+    QThreadPool collectorPool_ ; //[producer] for renderer pool AND
+                                 //[consumer] for renderer pool.
 
     RenderingTasks  renderingTasks_ ;
     CollectingTasks collectingTasks_;
@@ -110,19 +117,27 @@ private:
 
     Volume<uchar> *baseVolume_;
 
-
     Coordinates3D rotation_;
     Coordinates3D translation_;
     float brightness_;
     float volumeDensity_;
 
-    bool pendingTransformations_;
-
+    //shared data for multithreads, must not be modified during
+    //rendering threads' lives.
+    //modified using syncTransformation_()
     Coordinates3D rotationAsync_;
     Coordinates3D translationAsync_;
     float brightnessAsync_;
     float volumeDensityAsync_;
 
+    //flags
+    bool pendingTransformations_;
+    bool renderingNodesReady_;
+
+
+    //counters
+    uint8_t activeRenderingNodes_;
+    uint8_t readyPixmapsCount_;
 
 
 

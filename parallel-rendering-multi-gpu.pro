@@ -20,25 +20,16 @@ INCLUDEPATH += rendering/
 INCLUDEPATH += /usr/local/include/oclHWDL/
 INCLUDEPATH += /usr/local/cuda-7.5/include/
 INCLUDEPATH += framework/
+INCLUDEPATH += gui/
 
 LIBS += -L/usr/local/lib -loclHWDL
 LIBS += -L/usr/lib/x86_64-linux-gnu/ -lOpenCL
 
 SOURCES += main.cpp \
-    #VirtualExperiment.cpp \
-    #VirtualNode.cpp \
-    #VirtualGPU.cpp \
-    #VirtualVolume.cpp \
-    #VirtualFrameWork.cpp \
-    #VirtualImage.cpp \
-    #TaskRender.cpp \
-    #TaskCollect.cpp \
-    #TaskComposite.cpp \
     system/Logger.cpp \
     data/Image.cpp \
     data/TransferFunction.cpp \
     data/Volume.cpp \
-  #  auxillary/glm/detail/dummy.cpp \
     auxillary/glm/detail/glm.cpp \
     geometry/Vector2.cpp \
     geometry/Vector3.cpp \
@@ -48,10 +39,7 @@ SOURCES += main.cpp \
     opencl/CLVolume.cpp \
     opencl/CLXRayRenderingKernel.cpp \
     rendering/CLContext.cpp \
-    #rendering/CLGLContext.cpp \
-    #rendering/GLContext.cpp \
     system/Utilities.cpp \
- #   system/oclUtils.cpp
     system/oclUtils.cpp \
     framework/ParallelRendering.cpp \
     framework/RenderingNode.cpp \
@@ -59,19 +47,10 @@ SOURCES += main.cpp \
     framework/TaskCollect.cpp \
     framework/TaskComposite.cpp \
     auxillary/VolumeUtilities.cpp \
-    data/Transformation.cpp
+    data/Transformation.cpp \
+    gui/RenderingWindow.cpp
 
 HEADERS += \
-    #VirtualExperiment.h \
-    #VirtualNode.h \
-    #VirtualGPU.h \
-    #VirtualVolume.h \
-    #VirtualFrameWork.h \
-    #VirtualImage.h \
-    #TaskRender.h \
-    #TaskCollect.h \
-    #Transformation.h \
-    #TaskComposite.h \
     system/Colors.hh \
     system/Logger.h \
     system/LogLevel.hh \
@@ -231,10 +210,7 @@ HEADERS += \
     opencl/CLVolume.h \
     opencl/CLXRayRenderingKernel.h \
     rendering/CLContext.h \
-    #rendering/CLGLContext.h \
-    #rendering/GLContext.h \
     system/Utilities.h \
-#    system/oclUtils.h
     system/oclUtils.h \
     framework/ParallelRendering.h \
     framework/RenderingNode.h \
@@ -244,5 +220,14 @@ HEADERS += \
     framework/TaskCollect.h \
     framework/TaskComposite.h \
     auxillary/VolumeUtilities.h \
-    data/Transformation.h
+    data/Transformation.h \
+    gui/RenderingWindow.h
+
+FORMS += \
+    gui/RenderingWindow.ui
+
+DISTFILES += \
+    kernels/volumeRender.cl \
+    kernels/xray.cl
+
 

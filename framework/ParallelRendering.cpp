@@ -13,6 +13,7 @@
 
 ParallelRendering::ParallelRendering( Volume<uchar> *volume )
 {
+    renderingNodesReady_ = false ;
     loadBaseVolume( volume );
     listGPUs_ = clHardware_.getListGPUs();
 
@@ -54,6 +55,9 @@ void ParallelRendering::addRenderingNode( const uint64_t gpuIndex)
     // if device already occupied by rendering node, return.
     if( inUseGPUs_.contains( listGPUs_.at( gpuIndex ))) return;
 
+    // pass transformations by reference.
+    // ***Async_ objects will be accessed by multithreads.
+    // ***Async_ objects should not be modified during the life of the threads.
     RenderingNode *node = new RenderingNode( gpuIndex,
                                              translationAsync_,
                                              rotationAsync_,
@@ -81,8 +85,15 @@ void ParallelRendering::addRenderingNode( const uint64_t gpuIndex)
 
 void ParallelRendering::distributeBaseVolume1D()
 {
+    LOG_DEBUG("Distributing Volume");
+
+    if( baseVolume_ == nullptr )
+        LOG_ERROR( "No Base Volume to distribute!" );
 
     const int nDevices = inUseGPUs_.size();
+
+    if( nDevices == 0 )
+        LOG_ERROR( "No deployed devices to distribute volume!");
 
     const uint64_t baseXDimension = baseVolume_->getDimensions().x;
     const uint64_t newXDimension = baseXDimension / nDevices ;
@@ -113,33 +124,63 @@ void ParallelRendering::distributeBaseVolume1D()
 
     for( oclHWDL::Device *device  : inUseGPUs_ )
     {
+        LOG_DEBUG( "Loading subVolume to device" );
         auto subVolume = bricks.front();
         bricks.pop_front();
         renderingNodes_[ device ]->loadVolume( subVolume );
+        LOG_DEBUG( "[DONE] Loading subVolume to GPU <%d>",
+                   renderingNodes_[ device ]->gpuIndex( ));
     }
 
+    // space optimizations:
+    // -delete the base volume after distribution
+    // -use of memory mapping
+}
 
+void ParallelRendering::startRendering()
+{
+    activeRenderingNodes_ = inUseGPUs_.size();
+
+    LOG_INFO("Triggering Rendering Nodes");
+    //force trigger rebdering
+    applyTransformation();
+    LOG_INFO("[DONE] Triggering Rendering Nodes");
 }
 
 void ParallelRendering::applyTransformation()
 {
+    readyPixmapsCount_ = 0 ;
     syncTransformation();
     RenderingNode *node;
     for( oclHWDL::Device *device : inUseGPUs_ )
     {
         node = renderingNodes_[ device ];
-
+        //LOG_DEBUG("Triggering rendering node <%d>", node->gpuIndex() );
         rendererPool_.start( renderingTasks_[ node ]);
+
     }
     pendingTransformations_ = false;
+    renderingNodesReady_ = false;
 }
 
 void ParallelRendering::syncTransformation()
 {
+    // ***Async objects modified when no active rendering threads
     translationAsync_ = translation_;
     rotationAsync_ = rotation_;
     brightnessAsync_ = brightness_ ;
     volumeDensityAsync_ = volumeDensity_;
+}
+
+RenderingNode &ParallelRendering::getRenderingNode(const uint64_t gpuIndex)
+{
+    if(!( inUseGPUs_.contains( listGPUs_.at( gpuIndex ))))
+    {
+        LOG_ERROR("No such rendering node!");
+    }
+
+    return *renderingNodes_[ listGPUs_.at( gpuIndex )];
+
 }
 
 void ParallelRendering::finishedRendering_SLOT(RenderingNode *finishedNode)
@@ -151,11 +192,18 @@ void ParallelRendering::compositingTaskFinished_SLOT()
 {
 
 
-    if( pendingTransformations_ ) applyTransformation();
+    //if( pendingTransformations_ ) applyTransformation();
 }
 
 void ParallelRendering::bufferUploaded_SLOT(RenderingNode *finishedNode)
 {
+    LOG_DEBUG( "GPU <%d> frame ready to display" , finishedNode->gpuIndex() );
+    if( ++readyPixmapsCount_ == activeRenderingNodes_ )
+    {
+        renderingNodesReady_ = true ;
+        emit this->framesReady_SIGNAL();
+    }
+
 
 }
 
@@ -169,35 +217,41 @@ void ParallelRendering::updateRotationX_SLOT(int angle)
 void ParallelRendering::updateRotationY_SLOT(int angle)
 {
     rotation_.y = angle ;
-    pendingTransformations_ = true ;
+    if( renderingNodesReady_ ) applyTransformation();
+    else pendingTransformations_ = true ;
 }
 
 void ParallelRendering::updateRotationZ_SLOT(int angle)
 {
     rotation_.z = angle ;
-    pendingTransformations_ = true ;
+    if( renderingNodesReady_ ) applyTransformation();
+    else pendingTransformations_ = true ;
 }
 
 void ParallelRendering::updateTranslationX_SLOT(int distance)
 {
     translation_.x = distance;
-    pendingTransformations_ = true ;
+    if( renderingNodesReady_ ) applyTransformation();
+    else pendingTransformations_ = true ;
 }
 
 void ParallelRendering::updateTranslationY_SLOT(int distance)
 {
     translation_.x = distance;
-    pendingTransformations_ = true ;
+    if( renderingNodesReady_ ) applyTransformation();
+    else pendingTransformations_ = true ;
 }
 
 void ParallelRendering::updateImageBrightness_SLOT(float brightness)
 {
     brightness_ = brightness;
-    pendingTransformations_ = true ;
+    if( renderingNodesReady_ ) applyTransformation();
+    else pendingTransformations_ = true ;
 }
 
 void ParallelRendering::updateVolumeDensity_SLOT(float density)
 {
     volumeDensity_ = density;
-    pendingTransformations_ = true ;
+    if( renderingNodesReady_ ) applyTransformation();
+    else pendingTransformations_ = true ;
 }

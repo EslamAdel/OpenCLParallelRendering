@@ -25,6 +25,8 @@ public:
 
     void uploadBuffer();
 
+    void frameBufferToPixmap();
+
     const uint64_t & gpuIndex() const;
 
     bool operator==( const RenderingNode &rhs) const;
@@ -48,6 +50,7 @@ private:
     Coordinates3D &translation_ ;
     float &volumeDensity_ ;
     float &imageBrightness_ ;
+
 
 
 };

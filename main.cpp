@@ -1,16 +1,14 @@
-#include <QCoreApplication>
+#include <QApplication>
 #include <iostream>
 #include "Logger.h"
-
-#define DEMO
-#include "VirtualFrameWork.h"
+#include "RenderingWindow.h"
 
 int main(int argc, char *argv[])
 {
-    QCoreApplication a(argc, argv);
+    QApplication a(argc, argv);
 
-
-
+    RenderingWindow rw;
+    rw.show();
 
     return a.exec();
 }

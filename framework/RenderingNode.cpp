@@ -12,7 +12,7 @@ RenderingNode::RenderingNode(const uint64_t gpuIndex ,
       volumeDensity_( volumeDensity ),
       imageBrightness_( brightness )
 {
-    LOG_INFO( "Creating Context on Node with GPU <%>", gpuIndex );
+    LOG_INFO( "Creating Context on Node with GPU <%d>", gpuIndex );
 
     clContext_ = new CLContext< uint8_t >( subVolume , gpuIndex );
 
@@ -38,12 +38,19 @@ void RenderingNode::uploadBuffer()
 {
     clContext_->uploadFrame();
 
+    //emit this->bufferUploaded( this );
+}
+
+void RenderingNode::frameBufferToPixmap()
+{
+    clContext_->frameBufferToPixmap();
+
     emit this->bufferUploaded( this );
 }
 
 const uint64_t &RenderingNode::gpuIndex() const
 {
-    return gpuIndex_;
+    return clContext_->getGPUIndex();
 }
 
 bool RenderingNode::operator==( const RenderingNode &rhs) const

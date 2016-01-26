@@ -9,5 +9,6 @@ TaskCollect::TaskCollect(RenderingNode &renderingNode)
 void TaskCollect::run()
 {
     renderingNode_.uploadBuffer();
+    renderingNode_.frameBufferToPixmap();
 }
 
