@@ -17,6 +17,7 @@
 #include "Transformation.h"
 #include "oclHWDL.h"
 #include <unordered_map>
+#include "Transformation.h"
 
 typedef std::unordered_map<const oclHWDL::Device*,RenderingNode*> RenderingNodes;
 typedef std::unordered_map<const RenderingNode* ,TaskRender*> RenderingTasks;
@@ -35,16 +36,18 @@ public:
 
     void addRenderingNode( const uint64_t gpuIndex );
 
-    //void distributeBaseVolume();
+    void distributeBaseVolume1D();
 
     //void startRendering();
 
     void applyTransformation();
 
+    void syncTransformation();
+
 public slots :
-    void renderingTaskFinished_SLOT( RenderingNode *finishedNode );
+    void finishedRendering_SLOT(RenderingNode *finishedNode);
     void compositingTaskFinished_SLOT();
-    void imageUploaded_SLOT( RenderingNode *finishedNode);
+    void bufferUploaded_SLOT( RenderingNode *finishedNode);
 
 
 
@@ -108,26 +111,19 @@ private:
     Volume<uchar> *baseVolume_;
 
 
-    bool pendingTransformations_;
-
-    /** @brief rotation_
-    */
     Coordinates3D rotation_;
-
-     /**
-    * @brief translation_
-    */
     Coordinates3D translation_;
-
-    /**
-     * @brief volumeDensity_
-     */
+    float brightness_;
     float volumeDensity_;
 
-    /**
-     * @brief imageBrightness_
-     */
-    float imageBrightness_;
+    bool pendingTransformations_;
+
+    Coordinates3D rotationAsync_;
+    Coordinates3D translationAsync_;
+    float brightnessAsync_;
+    float volumeDensityAsync_;
+
+
 
 
 };

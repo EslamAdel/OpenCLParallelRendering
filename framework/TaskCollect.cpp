@@ -8,6 +8,6 @@ TaskCollect::TaskCollect(RenderingNode &renderingNode)
 
 void TaskCollect::run()
 {
-
+    renderingNode_.uploadBuffer();
 }
 

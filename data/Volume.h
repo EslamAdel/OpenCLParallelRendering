@@ -15,7 +15,16 @@ public: // Constructors
      * @brief Volume
      * @param prefix
      */
-    Volume( const std::string prefix, const bool drawBoundingBox = false );
+    Volume( const std::string prefix,
+            const bool drawBoundingBox = false );
+
+    Volume( Coordinates3D brickCoordinates,
+            Dimensions3D brickDimensions,
+            Coordinates3D brickUnitCubeCenter,
+            Coordinates3D brickUnitCubeScaleFactors,
+            T *brickData,
+            const bool drawBoundingBox = false ) ;
+
     ~Volume();
 
 public: // Public functions
@@ -140,6 +149,14 @@ public: // Public functions
      */
     Image<T>* getProjectionZ() const;
 
+
+    Volume<T> *getBrick(const u_int64_t xi,
+                        const u_int64_t xf,
+                        const u_int64_t yi,
+                        const u_int64_t yf,
+                        const u_int64_t zi,
+                        const u_int64_t zf);
+
 protected: // Protected functions
 
     /**
@@ -177,6 +194,12 @@ protected: // Protected (private) member variables
      * @brief dimensions_
      */
     Dimensions3D dimensions_;
+
+    Coordinates3D coordinates_ ;
+
+    Coordinates3D unitCubeCenter_;
+
+    Coordinates3D unitCubeScaleFactors_;
 
     /**
      * @brief sizeInBytes_

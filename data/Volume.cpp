@@ -1,4 +1,5 @@
 #include "Volume.h"
+#include "VolumeUtilities.h"
 
 template< class T >
 Volume< T >::Volume( const std::string prefix, const bool drawBoundingBox )
@@ -6,6 +7,34 @@ Volume< T >::Volume( const std::string prefix, const bool drawBoundingBox )
     // Load the volume from a file
     loadVolumeData_( prefix );
     drawBoundingBox_ = drawBoundingBox;
+    coordinates_ = Coordinates3D( dimensions_.x / 2.f,
+                                  dimensions_.y / 2.f,
+                                  dimensions_.z / 2.f);
+
+    unitCubeCenter_ = Coordinates3D( coordinates_.x / dimensions_.x,
+                                     coordinates_.y / dimensions_.y,
+                                     coordinates_.z / dimensions_.z );
+
+    unitCubeScaleFactors_ = Coordinates3D( 1.f , 1.f , 1.f );
+
+
+}
+
+template< class T >
+Volume< T >::Volume( Coordinates3D brickCoordinates,
+                     Dimensions3D brickDimensions,
+                     Coordinates3D brickUnitCubeCenter,
+                     Coordinates3D brickUnitCubeScaleFactors,
+                     T *brickData, const bool drawBoundingBox )
+    : coordinates_( brickCoordinates ),
+      dimensions_( brickDimensions ),
+      unitCubeCenter_( brickUnitCubeCenter ),
+      unitCubeScaleFactors_( brickUnitCubeScaleFactors ),
+      data_( brickData ),
+      drawBoundingBox_( drawBoundingBox )
+{
+
+
 }
 
 template< class T >
@@ -95,6 +124,69 @@ uint64_t Volume< T >::get1DIndex( const Voxel3DIndex index ) const
 {
     // Flat[x + WIDTH * (y + HEIGHT * z)] = Original[x, y, z]
     return ( index.x + dimensions_.x * ( index.y + dimensions_.y * index.z ));
+}
+
+
+template <class T>
+Volume< T >* Volume<T>::getBrick( const u_int64_t xi, const u_int64_t xf,
+                                  const u_int64_t yi, const u_int64_t yf,
+                                  const u_int64_t zi, const u_int64_t zf )
+{
+    // The dimensions of the extracted brick
+    Dimensions3D brickDimensions( xf - xi, yf - yi, zf - zi );
+
+    // The center of the extraced brick, with respect to the real base volume.
+    Coordinates3D brickCoordinates( xi + brickDimensions.x / 2.f,
+                                    yi + brickDimensions.y / 2.f,
+                                    zi + brickDimensions.z / 2.f);
+
+    // The relative center of the brick for the OpenGL unti texture,
+    // with respect to the "unity" base volume.
+    Coordinates3D brickUnitCubeCenter( brickCoordinates.x / dimensions_.x,
+                                       brickCoordinates.y / dimensions_.y,
+                                       brickCoordinates.z / dimensions_.z );
+
+    // Scale the brick in a unit cube for the OpenGL texture
+    Coordinates3D brickUnitCubeScaleFactors
+            ( float( brickDimensions.x ) / dimensions_.x,
+              float( brickDimensions.y ) / dimensions_.y,
+              float( brickDimensions.z ) / dimensions_.z );
+
+//    std::cout << "center " << brickUnitCubeCenter.x
+//              << " " << brickUnitCubeCenter.y << " "
+//              <<  brickUnitCubeCenter.z << std::endl;
+
+//    std::cout << brickUnitCubeScaleFactors.x << " "
+//              << brickUnitCubeScaleFactors.y << " "
+//              <<  brickUnitCubeScaleFactors.z << std::endl;
+
+    // The array that will be filled with the brick data
+    T* brickData = new T[brickDimensions.volumeSize()];
+
+    for( uint64_t i = 0; i < brickDimensions.x; i++ )
+    {
+        for( uint64_t j = 0; j < brickDimensions.y; j++ )
+        {
+            for( uint64_t k = 0; k < brickDimensions.z; k++ )
+            {
+                // The 1D index of the extracted brick
+                const uint64_t brickIndex =
+                        VolumeUtilities::get1DIndex( i, j, k, brickDimensions );
+
+                // The 1D index of the original 'big' volume
+                const uint64_t volumeIndex =
+                        get1DIndex( xi + i, yi + j, zi + k );
+
+                brickData[brickIndex] = data_[volumeIndex];
+            }
+        }
+    }
+
+    return new Volume< T >( brickCoordinates,
+                            brickDimensions,
+                            brickUnitCubeCenter,
+                            brickUnitCubeScaleFactors,
+                            brickData );
 }
 
 template< class T >

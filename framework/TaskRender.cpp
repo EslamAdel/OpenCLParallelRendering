@@ -9,6 +9,7 @@ TaskRender::TaskRender(RenderingNode &renderingNode)
 
 void TaskRender::run()
 {
+    renderingNode_.applyTransformation();
 
 }
 

@@ -57,7 +57,9 @@ SOURCES += main.cpp \
     framework/RenderingNode.cpp \
     framework/TaskRender.cpp \
     framework/TaskCollect.cpp \
-    framework/TaskComposite.cpp
+    framework/TaskComposite.cpp \
+    auxillary/VolumeUtilities.cpp \
+    data/Transformation.cpp
 
 HEADERS += \
     #VirtualExperiment.h \
@@ -240,5 +242,7 @@ HEADERS += \
     data/ImageVariant.hh \
     framework/TaskRender.h \
     framework/TaskCollect.h \
-    framework/TaskComposite.h
+    framework/TaskComposite.h \
+    auxillary/VolumeUtilities.h \
+    data/Transformation.h
 

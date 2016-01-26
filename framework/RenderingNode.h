@@ -13,14 +13,13 @@ class RenderingNode : public QObject
     Q_OBJECT
 public:
     RenderingNode( const uint64_t gpuIndex,
+                   Coordinates3D &globalTranslation,
+                   Coordinates3D &globalRotation,
+                   float &volumeDensity,
+                   float &brightness,
                    const Volume<uchar> *subVolume= nullptr );
 
     void loadVolume(const Volume<uchar> *subVolume);
-
-    void setTransformations( const Coordinates3D rotation ,
-                             const Coordinates3D translation,
-                             const float volumeDensity ,
-                             const float imageBrightness );
 
     void applyTransformation();
 
@@ -45,10 +44,10 @@ private:
 
     const uint64_t &gpuIndex_;
 
-    Coordinates3D rotation_ ;
-    Coordinates3D translation_ ;
-    float volumeDensity_ ;
-    float imageBrightness_ ;
+    Coordinates3D &rotation_ ;
+    Coordinates3D &translation_ ;
+    float &volumeDensity_ ;
+    float &imageBrightness_ ;
 
 
 };
