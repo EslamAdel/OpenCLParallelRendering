@@ -111,6 +111,24 @@ Dimensions3D Volume< T >::getDimensions() const
 }
 
 template< class T >
+Coordinates3D Volume<T>::getCubeCoordinates() const
+{
+    return coordinates_;
+}
+
+template< class T >
+Coordinates3D Volume<T>::getUnitCubeCoordinates() const
+{
+    return unitCubeCenter_;
+}
+
+template< class T>
+Coordinates3D Volume<T>::getUnitCubeScaleFactors() const
+{
+    return unitCubeScaleFactors_;
+}
+
+template< class T >
 uint64_t Volume< T >::get1DIndex( const uint64_t x,
                                   const uint64_t y,
                                   const uint64_t z ) const
