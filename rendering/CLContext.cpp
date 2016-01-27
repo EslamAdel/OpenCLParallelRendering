@@ -252,9 +252,25 @@ void CLContext< T >::paint(const Coordinates3D &rotation ,
                                                                translation.y,
                                                                4.0);
 
+    glm::tvec3< float > relativeCenter =
+            glm::tvec3<float>( volume_->getUnitCubeCenter().x-0.5,
+                               volume_->getUnitCubeCenter().y-0.5,
+                               volume_->getUnitCubeCenter().z-0.5);
+
+    glm::tvec3< float > relativeCenterBack =
+            glm::tvec3<float>( 4*(0.5 - volume_->getUnitCubeCenter().x) ,
+                               4*(0.5 - volume_->getUnitCubeCenter().y) ,
+                               4*(0.5 - volume_->getUnitCubeCenter().z) );
+
+    glm::tvec3< float > mirror = glm::tvec3< float >( -1.f , -1.f , -1.f);
     // Rotate , and then translate to keep the local rotation
+    glmMVMatrix = glm::translate(glmMVMatrix , relativeCenterBack);
     glmMVMatrix = glm::rotate(glmMVMatrix, angle, axis);
+//    glmMVMatrix = glm::translate(glmMVMatrix, relativeCenterBack);
+
     glmMVMatrix = glm::translate(glmMVMatrix, translationVector);
+    //glmMVMatrix = glm::scale( glmMVMatrix , mirror );
+
 
     // A GL-compatible matrix
     float modelViewMatrix[16];

@@ -3,7 +3,7 @@
 #include <Logger.h>
 
 /// TODO: Pass to arguments
-#define VOLUME_PREFIX "/projects/volume-datasets/foot/foot"
+#define VOLUME_PREFIX "/projects/volume-datasets/skull/skull"
 
 RenderingWindow::RenderingWindow( QWidget *parent ) :
     QMainWindow( parent ),
