@@ -35,6 +35,13 @@ public: // Public functions
      */
     Dimensions3D getDimensions() const;
 
+
+    Coordinates3D getCubeCenter() const;
+
+    Coordinates3D getUnitCubeCenter() const;
+
+    Coordinates3D getUnitCubeScaleFactors() const;
+
     /**
      * @brief getSizeX
      * @return Width of the volume.

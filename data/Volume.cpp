@@ -110,14 +110,15 @@ Dimensions3D Volume< T >::getDimensions() const
     return dimensions_;
 }
 
+
 template< class T >
-Coordinates3D Volume<T>::getCubeCoordinates() const
+Coordinates3D Volume<T>::getCubeCenter() const
 {
     return coordinates_;
 }
 
 template< class T >
-Coordinates3D Volume<T>::getUnitCubeCoordinates() const
+Coordinates3D Volume<T>::getUnitCubeCenter() const
 {
     return unitCubeCenter_;
 }
