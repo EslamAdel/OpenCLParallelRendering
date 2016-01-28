@@ -250,7 +250,7 @@ void ParallelRendering::updateTranslationX_SLOT(int distance)
 
 void ParallelRendering::updateTranslationY_SLOT(int distance)
 {
-    translation_.x = distance;
+    translation_.y = distance;
     if( renderingNodesReady_ ) applyTransformation();
     else pendingTransformations_ = true ;
 }
