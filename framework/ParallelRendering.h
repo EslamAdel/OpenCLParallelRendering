@@ -46,6 +46,10 @@ public:
 
     RenderingNode &getRenderingNode( const uint64_t gpuIndex );
 
+    uint8_t machineGPUsCount() const;
+
+    uint8_t activeRenderingNodesCount() const;
+
 signals:
     void framesReady_SIGNAL();
 
@@ -138,6 +142,10 @@ private:
     //counters
     uint8_t activeRenderingNodes_;
     uint8_t readyPixmapsCount_;
+
+    //facts
+    uint8_t machineGPUsCount_;
+
 
 
 

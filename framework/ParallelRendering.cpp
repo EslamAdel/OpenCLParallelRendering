@@ -17,6 +17,7 @@ ParallelRendering::ParallelRendering( Volume<uchar> *volume )
     loadBaseVolume( volume );
     listGPUs_ = clHardware_.getListGPUs();
 
+    machineGPUsCount_ = listGPUs_.size();
 
     // Translation
     translation_.x = INITIAL_VOLUME_CENTER_X;
@@ -183,6 +184,16 @@ RenderingNode &ParallelRendering::getRenderingNode(const uint64_t gpuIndex)
 
 }
 
+uint8_t ParallelRendering::machineGPUsCount() const
+{
+    return machineGPUsCount_;
+}
+
+uint8_t ParallelRendering::activeRenderingNodesCount() const
+{
+    return activeRenderingNodes_;
+}
+
 void ParallelRendering::finishedRendering_SLOT(RenderingNode *finishedNode)
 {
     collectorPool_.start( collectingTasks_[ finishedNode ]);
@@ -202,6 +213,7 @@ void ParallelRendering::bufferUploaded_SLOT(RenderingNode *finishedNode)
     {
         renderingNodesReady_ = true ;
         emit this->framesReady_SIGNAL();
+        if( pendingTransformations_ ) applyTransformation();
     }
 
 
@@ -211,6 +223,7 @@ void ParallelRendering::bufferUploaded_SLOT(RenderingNode *finishedNode)
 void ParallelRendering::updateRotationX_SLOT(int angle)
 {
     rotation_.x = angle ;
+    if( renderingNodesReady_ ) applyTransformation();
     pendingTransformations_ = true ;
 }
 

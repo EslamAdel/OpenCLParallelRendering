@@ -2,6 +2,8 @@
 #include "ui_RenderingWindow.h"
 #include <Logger.h>
 
+#define MAX_NODES 3
+
 /// TODO: Pass to arguments
 #define VOLUME_PREFIX "/projects/volume-datasets/skull/skull"
 
@@ -20,18 +22,22 @@ RenderingWindow::RenderingWindow( QWidget *parent ) :
 
     parallelRenderer_ = new ParallelRendering( volume );
 
-    LOG_DEBUG( "Deploy GPU#0" );
-    parallelRenderer_->addRenderingNode( 0 );
+    frameContainers_.push_back( ui->frameContainer0 );
+    frameContainers_.push_back( ui->frameContainer1 );
+    frameContainers_.push_back( ui->frameContainer2 );
 
-    LOG_DEBUG( "Deploy GPU#1" );
-    parallelRenderer_->addRenderingNode( 1 );
+    for( auto i = 0 ; i < parallelRenderer_->machineGPUsCount() ; i++ )
+    {
+        LOG_DEBUG( "Deploy GPU#%d" , i );
+        parallelRenderer_->addRenderingNode( i );
+    }
 
     LOG_DEBUG( "Distribute Volume" );
     parallelRenderer_->distributeBaseVolume1D();
 
 
-    connect( parallelRenderer_ , SIGNAL( framesReady_SIGNAL( )),
-            this , SLOT( framesReady_SLOT( )));
+    intializeConnections_();
+
 
     LOG_INFO( "Triggering rendering" );
     startRendering_( );
@@ -42,18 +48,50 @@ RenderingWindow::~RenderingWindow( )
     delete ui;
 }
 
+void RenderingWindow::intializeConnections_()
+{
+    //parallelRenderer_
+    connect( parallelRenderer_ , SIGNAL( framesReady_SIGNAL( )),
+            this , SLOT( framesReady_SLOT( )));
+
+
+    //sliders
+    connect( ui->xRotationSlider , SIGNAL( valueChanged( int )),
+             this , SLOT( newXRotation_SLOT( int )));
+
+    connect( ui->yRotationSlider , SIGNAL( valueChanged( int )),
+             this , SLOT( newYRotation_SLOT( int )));
+
+    connect( ui->zRotationSlider , SIGNAL( valueChanged( int )),
+             this , SLOT( newZRotation_SLOT( int )));
+
+    connect( ui->xTranslationSlider , SIGNAL( valueChanged( int )),
+             this , SLOT( newXTranslation_SLOT( int )));
+
+    connect( ui->yTranslationSlider , SIGNAL( valueChanged( int )),
+             this , SLOT( newYTranslation_SLOT( int )));
+
+    connect( ui->brightnessSlider , SIGNAL( valueChanged( int )),
+             this , SLOT( newBrightness_SLOT( int )));
+
+    connect( ui->densitySlider , SIGNAL( valueChanged( int )),
+             this , SLOT( newDensity_SLOT( int )));
+
+}
+
 void RenderingWindow::startRendering_( )
 {
     // Getting the initial values from the sliders
-    on_xSlider_valueChanged( ui->xSlider->value( ));
-    on_ySlider_valueChanged( ui->ySlider->value( ));
-    on_zSlider_valueChanged( ui->zSlider->value( ));
+    newXTranslation_SLOT( ui->xTranslationSlider->value( ));
+    newYTranslation_SLOT( ui->yTranslationSlider->value( ));
 
-    on_xTranslationSlider_valueChanged( ui->xTranslationSlider->value( ));
-    on_yTranslationSlider_valueChanged( ui->yTranslationSlider->value( ));
+    newXRotation_SLOT( ui->xRotationSlider->value( ));
+    newYRotation_SLOT( ui->yRotationSlider->value( ));
+    newZRotation_SLOT( ui->zRotationSlider->value( ));
 
-    on_brightnessSlider_valueChanged( ui->brightnessSlider->value( ));
-    on_densitySlider_valueChanged( ui->densitySlider->value( ));
+    newBrightness_SLOT( ui->brightnessSlider->value( ));
+    newDensity_SLOT( ui->densitySlider->value( ));
+
 
     parallelRenderer_->startRendering( );
 
@@ -64,19 +102,19 @@ void RenderingWindow::displayFrame_( )
 
     //LOG_DEBUG("displaying frames");
     //LOG_DEBUG("rendering node ptr:%")
-    QPixmap frame0 = *( parallelRenderer_->getRenderingNode( 0 )
-                        .getContext()->getFrame() );
-    QPixmap frame1 = *( parallelRenderer_->getRenderingNode( 1 )
-                        .getContext()->getFrame() );
 
-    ui->frameContainer0->setPixmap
-            (( frame0.scaled( ui->frameContainer0->width( ),
-                              ui->frameContainer0->height( ),
-                              Qt::KeepAspectRatio )));
-    ui->frameContainer1->setPixmap
-            (( frame1.scaled( ui->frameContainer1->width( ),
-                              ui->frameContainer1->height( ),
-                              Qt::KeepAspectRatio )));
+    for( auto i = 0 ; i < parallelRenderer_->activeRenderingNodesCount() ; i++)
+    {
+        QPixmap frame = *( parallelRenderer_->getRenderingNode( i )
+                           .getContext()->getFrame() );
+
+        frameContainers_[ i ]->setPixmap
+                (( frame.scaled( frameContainers_[ i ]->width( ),
+                                 frameContainers_[ i ]->height( ),
+                                 Qt::KeepAspectRatio )));
+
+    }
+
 }
 
 void RenderingWindow::framesReady_SLOT()
@@ -84,23 +122,21 @@ void RenderingWindow::framesReady_SLOT()
     displayFrame_();
 }
 
-void RenderingWindow::on_xSlider_valueChanged( int value )
+void RenderingWindow::newXRotation_SLOT(int value)
 {
     ui->xRotationLabel->setText( QString::number( value ));
 
     parallelRenderer_->updateRotationX_SLOT( value );
-
 }
 
-void RenderingWindow::on_ySlider_valueChanged( int value )
+void RenderingWindow::newYRotation_SLOT(int value)
 {
     ui->yRotationLabel->setText( QString::number( value ));
 
     parallelRenderer_->updateRotationY_SLOT( value );
-
 }
 
-void RenderingWindow::on_zSlider_valueChanged( int value )
+void RenderingWindow::newZRotation_SLOT(int value)
 {
     ui->zRotationLabel->setText( QString::number( value ));
 
@@ -108,23 +144,21 @@ void RenderingWindow::on_zSlider_valueChanged( int value )
 
 }
 
-void RenderingWindow::on_xTranslationSlider_valueChanged(int value)
+void RenderingWindow::newXTranslation_SLOT(int value)
 {
     ui->xTranslationLabel->setText( QString::number( value ));
 
     parallelRenderer_->updateTranslationX_SLOT( value );
-
 }
 
-void RenderingWindow::on_yTranslationSlider_valueChanged(int value)
+void RenderingWindow::newYTranslation_SLOT(int value)
 {
     ui->yTranslationLabel->setText( QString::number( value ));
 
     parallelRenderer_->updateTranslationY_SLOT( value );
-
 }
 
-void RenderingWindow::on_brightnessSlider_valueChanged( int value )
+void RenderingWindow::newBrightness_SLOT(int value)
 {
     ui->brightnessLabel->setText( QString::number( value ));
 
@@ -133,11 +167,11 @@ void RenderingWindow::on_brightnessSlider_valueChanged( int value )
 
 }
 
-void RenderingWindow::on_densitySlider_valueChanged( int value )
+void RenderingWindow::newDensity_SLOT(int value)
 {
     ui->densityLabel->setText( QString::number( value ));
 
     float density = float( value ) / 100.0;
     parallelRenderer_->updateVolumeDensity_SLOT( density );
-
 }
+

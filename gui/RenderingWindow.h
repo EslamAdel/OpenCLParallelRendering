@@ -8,6 +8,7 @@
 #include "ParallelRendering.h"
 #include "RenderingNode.h"
 #include <vector>
+#include <QLabel>
 
 namespace Ui
 {
@@ -23,6 +24,9 @@ public:
     ~RenderingWindow( );
 
 private:
+
+    void intializeConnections_();
+
     /**
      * @brief startRendering_
      */
@@ -39,52 +43,34 @@ public slots:
 
 private slots:
 
-    /**
-     * @brief on_xSlider_valueChanged
-     * @param value
-     */
-    void on_xSlider_valueChanged( int value );
 
-    /**
-     * @brief on_ySlider_valueChanged
-     * @param value
-     */
-    void on_ySlider_valueChanged( int value );
+    void newXRotation_SLOT( int value );
 
-    /**
-     * @brief on_zSlider_valueChanged
-     * @param value
-     */
-    void on_zSlider_valueChanged( int value );
 
-    /**
-     * @brief on_xTranslationSlider_valueChanged
-     * @param value
-     */
-    void on_xTranslationSlider_valueChanged( int value );
 
-    /**
-     * @brief on_yTranslationSlider_valueChanged
-     * @param value
-     */
-    void on_yTranslationSlider_valueChanged( int value );
+    void newYRotation_SLOT( int value );
 
-    /**
-     * @brief on_brightnessSlider_valueChanged
-     * @param value
-     */
-    void on_brightnessSlider_valueChanged( int value );
 
-    /**
-     * @brief on_densitySlider_valueChanged
-     * @param value
-     */
-    void on_densitySlider_valueChanged( int value );
+    void newZRotation_SLOT( int value );
+
+
+    void newXTranslation_SLOT( int value );
+
+
+    void newYTranslation_SLOT( int value );
+
+
+    void newBrightness_SLOT( int value );
+
+
+    void newDensity_SLOT( int value );
+
 
 private:
     Ui::RenderingWindow *ui;
    // CLContext< uint8_t >* clContext_;
     ParallelRendering *parallelRenderer_;
+    QVector< QLabel*  > frameContainers_;
     QVector< QPixmap* > pixmaps_;
     //std::vector
 };
