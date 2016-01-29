@@ -262,9 +262,18 @@ void CLContext< T >::paint(const Coordinates3D &rotation ,
                                4*(0.5 - volume_->getUnitCubeCenter().y) ,
                                4*(0.5 - volume_->getUnitCubeCenter().z) );
 
+    auto cubeScaleFactors =
+            glm::tvec3< float >( 1.f/volume_->getUnitCubeScaleFactors().x,
+                                 1.f/volume_->getUnitCubeScaleFactors().y,
+                                 1.f/volume_->getUnitCubeScaleFactors().z);
+
     glm::tvec3< float > mirror = glm::tvec3< float >( -1.f , -1.f , -1.f);
     // Rotate , and then translate to keep the local rotation
+
+    //if 3 GPUs uncomment next line
     glmMVMatrix = glm::translate(glmMVMatrix , relativeCenterBack);
+    glmMVMatrix = glm::scale(glmMVMatrix , cubeScaleFactors);
+
     glmMVMatrix = glm::rotate(glmMVMatrix, angle, axis);
 //    glmMVMatrix = glm::translate(glmMVMatrix, relativeCenterBack);
 

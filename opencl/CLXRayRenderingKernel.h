@@ -5,6 +5,8 @@
 
 class CLXRayRenderingKernel : public CLRenderingKernel
 {
+
+
 public:
     CLXRayRenderingKernel( cl_context clContext = NULL,
                            const std::string kernelDirectory = ".",

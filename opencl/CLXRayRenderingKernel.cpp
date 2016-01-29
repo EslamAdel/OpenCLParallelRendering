@@ -11,10 +11,10 @@
 #define X_RAY_VOLUME_ARRAY_ARG                                              6
 #define X_RAY_VOLUME_SAMPLER_ARG                                            7
 
-CLXRayRenderingKernel::CLXRayRenderingKernel( cl_context clContext,
-                                              const std::string kernelDirectory,
-                                              const std::string kernelFile,
-                                              const std::string kernelName )
+CLXRayRenderingKernel::CLXRayRenderingKernel(cl_context clContext,
+                                             const std::string kernelDirectory,
+                                             const std::string kernelFile,
+                                             const std::string kernelName )
     : CLRenderingKernel( clContext, kernelDirectory, kernelFile )
     , kernelName_( kernelName )
 {
@@ -37,7 +37,7 @@ void CLXRayRenderingKernel::setFrameBuffer( cl_mem frameBuffer )
     cl_int error = clSetKernelArg( kernelObject_, X_RAY_FRAME_BUFFER_ARG,
                                    sizeof( cl_mem ),
                                    ( void* ) &frameBuffer );
-     oclCheckErrorEX( error, CL_SUCCESS, 0 );
+    oclCheckErrorEX( error, CL_SUCCESS, 0 );
 }
 
 void CLXRayRenderingKernel::setFrameWidth( uint width )
@@ -61,7 +61,7 @@ void CLXRayRenderingKernel::setVolumeData( cl_mem data )
     cl_int error = clSetKernelArg( kernelObject_, X_RAY_VOLUME_ARRAY_ARG,
                                    sizeof( cl_mem ),
                                    ( void* ) &data );
-     oclCheckErrorEX( error, CL_SUCCESS, 0 );
+    oclCheckErrorEX( error, CL_SUCCESS, 0 );
 }
 
 void CLXRayRenderingKernel::setVolumeSampler( cl_sampler sampler )

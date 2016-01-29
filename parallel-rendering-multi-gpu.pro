@@ -21,6 +21,7 @@ INCLUDEPATH += /usr/local/include/oclHWDL/
 INCLUDEPATH += /usr/local/cuda-7.5/include/
 INCLUDEPATH += framework/
 INCLUDEPATH += gui/
+INCLUDEPATH += compositing/
 
 LIBS += -L/usr/local/lib -loclHWDL
 LIBS += -L/usr/lib/x86_64-linux-gnu/ -lOpenCL
@@ -48,7 +49,9 @@ SOURCES += main.cpp \
     framework/TaskComposite.cpp \
     auxillary/VolumeUtilities.cpp \
     data/Transformation.cpp \
-    gui/RenderingWindow.cpp
+    gui/RenderingWindow.cpp \
+    opencl/CLXRayCompositingKernel.cpp \
+    opencl/CLImage.cpp
 
 HEADERS += \
     system/Colors.hh \
@@ -221,13 +224,15 @@ HEADERS += \
     framework/TaskComposite.h \
     auxillary/VolumeUtilities.h \
     data/Transformation.h \
-    gui/RenderingWindow.h
+    gui/RenderingWindow.h \
+    opencl/CLXRayCompositingKernel.h \
+    opencl/CLImage.h
 
 FORMS += \
     gui/RenderingWindow.ui
 
 DISTFILES += \
     kernels/volumeRender.cl \
-    kernels/xray.cl
-
+    kernels/xray.cl \
+    kernels/xray-compositing.cl
 
