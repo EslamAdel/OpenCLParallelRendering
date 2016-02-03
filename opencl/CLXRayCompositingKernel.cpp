@@ -2,21 +2,11 @@
 #include "Logger.h"
 
 
-
-CLXRayCompositingKernel::CLXRayCompositingKernel(
-        const uint frameWidth,
-        const uint frameHeight,
-        const uint elementFramesCount,
-        const CLXRayCompositingKernel::Mode compositingMode,
-        const cl_context clContext,
-        const std::string kernelDirectory,
-        const std::string kernelFile,
-        const std::string kernelName)
-    : frameWidth_( frameWidth ),
-      frameHeight_( frameHeight ),
-      framesCount_( elementFramesCount ),
-      compositingMode_( compositingMode ),
-      clContext_( clContext ),
+CLXRayCompositingKernel::CLXRayCompositingKernel(const cl_context clContext,
+                                                 const std::string kernelDirectory,
+                                                 const std::string kernelFile,
+                                                 const std::string kernelName)
+    : clContext_( clContext ),
       kernelDirectory_( kernelDirectory ),
       kernelFile_( kernelFile ),
       kernelName_( kernelName )
@@ -25,28 +15,94 @@ CLXRayCompositingKernel::CLXRayCompositingKernel(
     retrieveKernelObject_();
 }
 
-
-
-void CLXRayCompositingKernel::accumulateBuffer(const cl_mem baseBuffer,
-                                               const cl_mem buffer ,
-                                               cl_command_queue cmdQueue )
+void CLXRayCompositingKernel::setCollegeFrame(const cl_mem collageImage2D)
 {
-    clSetKernelArg( kernelObject_ ,
-                    AccumulatorModeArgs::BaseBuffer ,
-                    sizeof(cl_mem),
-                    &baseBuffer );
 
-    clSetKernelArg( kernelObject_ ,
-                    AccumulatorModeArgs::StackedBuffer ,
-                    sizeof(cl_mem),
-                    &buffer );
+    cl_int error = CL_SUCCESS;
 
+    error = clSetKernelArg( kernelObject_, KernelArguments::CollageFrame,
+                            sizeof( cl_mem ),
+                            ( void* ) &collageImage2D );
 
-    static const size_t globalWorkSize[2] = { frameWidth_ , frameHeight_ } ;
+    oclHWDL::Error::checkCLError( error );
+}
 
-    clEnqueueNDRangeKernel( cmdQueue , kernelObject_ , 2 , NULL,
-                            globalWorkSize, NULL, 0, NULL, NULL);
-    clFinish( cmdQueue );
+void CLXRayCompositingKernel::setCollageWidth(const uint width)
+{
+    cl_int error = CL_SUCCESS;
+
+    error = clSetKernelArg( kernelObject_, KernelArguments::CollageWidth ,
+                            sizeof( uint ),
+                            &width );
+
+    oclHWDL::Error::checkCLError( error );
+}
+
+void CLXRayCompositingKernel::setCollageHeight(const uint height)
+{
+    cl_int error = CL_SUCCESS;
+
+    error = clSetKernelArg( kernelObject_, KernelArguments::CollageHeight ,
+                            sizeof( uint ),
+                            &height );
+
+    oclHWDL::Error::checkCLError( error );
+}
+
+void CLXRayCompositingKernel::setFrame(const cl_mem frameImage2D)
+{
+
+    cl_int error = CL_SUCCESS;
+
+    error = clSetKernelArg( kernelObject_, KernelArguments::Frame ,
+                            sizeof( cl_mem ),
+                            ( void* ) &frameImage2D );
+
+    oclHWDL::Error::checkCLError( error );
+}
+
+void CLXRayCompositingKernel::setFrameWidth(const uint width)
+{
+    cl_int error = CL_SUCCESS;
+
+    error = clSetKernelArg( kernelObject_, KernelArguments::FrameWidth ,
+                            sizeof( uint ),
+                            &width );
+
+    oclHWDL::Error::checkCLError( error );
+}
+
+void CLXRayCompositingKernel::setFrameHeight(const uint height)
+{
+    cl_int error = CL_SUCCESS;
+
+    error = clSetKernelArg( kernelObject_, KernelArguments::FrameHeight ,
+                            sizeof( uint ),
+                            &height );
+
+    oclHWDL::Error::checkCLError( error );
+}
+
+void CLXRayCompositingKernel::setFrameCenterX(const float centerX)
+{
+    cl_int error = CL_SUCCESS;
+
+    error = clSetKernelArg( kernelObject_, KernelArguments::FrameCenterX ,
+                            sizeof( float ),
+                            &centerX );
+
+    oclHWDL::Error::checkCLError( error );
+}
+
+void CLXRayCompositingKernel::setFrameCenterY(const float centerY)
+{
+    cl_int error = CL_SUCCESS;
+
+    error = clSetKernelArg( kernelObject_, KernelArguments::FrameCenterY ,
+                            sizeof( float ),
+                            &centerY );
+
+    oclHWDL::Error::checkCLError( error );
 }
 
 void CLXRayCompositingKernel::releaseKernel()
@@ -54,6 +110,12 @@ void CLXRayCompositingKernel::releaseKernel()
     if( kernelContext_->getProgram( ))
         clReleaseProgram( kernelContext_->getProgram() );
 }
+
+cl_kernel CLXRayCompositingKernel::getKernelObject() const
+{
+    return kernelObject_;
+}
+
 
 void CLXRayCompositingKernel::buildKernel_(const std::string extraBuildOptions)
 {

@@ -117,7 +117,7 @@ __kernel void xray( __global    uint* frameBuffer,
                                                      invViewMatrix[ 9  ],
                                                      invViewMatrix[ 10 ],
                                                      invViewMatrix[ 11 ] )));
-    eyeRayDirection.w = 0.f;
+    eyeRayDirection.w = 1.f;
 
     // Find the intersection of the ray with the box
     float tNear, tFar;

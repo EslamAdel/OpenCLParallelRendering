@@ -231,83 +231,66 @@ void CLContext< T >::handleKernel(std::string string)
 }
 
 template< class T >
-void CLContext< T >::paint(const Coordinates3D &rotation ,
-                           const Coordinates3D &translation,
-                           const float &volumeDensity ,
-                           const float &imageBrightness)
+void CLContext< T >::paint( const Coordinates3D &rotation ,
+                            const Coordinates3D &translation,
+                            const float &volumeDensity ,
+                            const float &imageBrightness)
 {
     // Use the GLM to create the Model View Matrix.
     // Initialize to identity.
-    glm::mat4 glmMVMatrix = glm::mat4( 1.0f );
+    static auto glmMVMatrix = glm::mat4( 1.0f );
 
     // Use quatrenions
-    glm::tvec3<float> rotationVector = glm::tvec3<float>( rotation.x,
-                                                          rotation.y,
-                                                          rotation.z );
+    auto rotationVector = glm::tvec3<float>( rotation.x ,
+                                             rotation.y ,
+                                             rotation.z );
     glm::tquat< float > quaternion =
             glm::tquat< float >(DEG_TO_RAD(rotationVector));
     float angle = glm::angle(quaternion);
     glm::tvec3< float > axis = glm::axis(quaternion);
-    glm::tvec3< float > translationVector = glm::tvec3<float>( translation.x,
-                                                               translation.y,
-                                                               4.0);
+    auto translationVector = glm::tvec3<float>( translation.x ,
+                                                translation.y ,
+                                                4.0 );
 
-    glm::tvec3< float > relativeCenter =
-            glm::tvec3<float>( volume_->getUnitCubeCenter().x-0.5,
-                               volume_->getUnitCubeCenter().y-0.5,
-                               volume_->getUnitCubeCenter().z-0.5);
 
-    glm::tvec3< float > relativeCenterBack =
-            glm::tvec3<float>( 4*(0.5 - volume_->getUnitCubeCenter().x) ,
-                               4*(0.5 - volume_->getUnitCubeCenter().y) ,
-                               4*(0.5 - volume_->getUnitCubeCenter().z) );
-
-    auto cubeScaleFactors =
-            glm::tvec3< float >( 1.f/volume_->getUnitCubeScaleFactors().x,
-                                 1.f/volume_->getUnitCubeScaleFactors().y,
-                                 1.f/volume_->getUnitCubeScaleFactors().z);
-
-    glm::tvec3< float > mirror = glm::tvec3< float >( -1.f , -1.f , -1.f);
     // Rotate , and then translate to keep the local rotation
 
-    //if 3 GPUs uncomment next line
-    glmMVMatrix = glm::translate(glmMVMatrix , relativeCenterBack);
-    glmMVMatrix = glm::scale(glmMVMatrix , cubeScaleFactors);
+    glmMVMatrix = glm::rotate( glmMVMatrix , angle , axis );
 
-    glmMVMatrix = glm::rotate(glmMVMatrix, angle, axis);
-//    glmMVMatrix = glm::translate(glmMVMatrix, relativeCenterBack);
 
-    glmMVMatrix = glm::translate(glmMVMatrix, translationVector);
-    //glmMVMatrix = glm::scale( glmMVMatrix , mirror );
+    glmMVMatrix = glm::translate( glmMVMatrix , translationVector );
+
+
 
 
     // A GL-compatible matrix
-    float modelViewMatrix[16];
-    int index = 0;
+    static float modelViewMatrix[16];
+    int index = 0 ;
     for(int i = 0; i < 4; i++)
     {
         for(int j = 0; j < 4; j++)
         {
-            modelViewMatrix[index++] = glmMVMatrix[i][j];
+            modelViewMatrix[ index++ ] = glmMVMatrix[ i ][ j ];
         }
     }
 
-    inverseMatrixArray_[0] = modelViewMatrix[0];
-    inverseMatrixArray_[1] = modelViewMatrix[4];
-    inverseMatrixArray_[2] = modelViewMatrix[8];
-    inverseMatrixArray_[3] = modelViewMatrix[12];
-    inverseMatrixArray_[4] = modelViewMatrix[1];
-    inverseMatrixArray_[5] = modelViewMatrix[5];
-    inverseMatrixArray_[6] = modelViewMatrix[9];
-    inverseMatrixArray_[7] = modelViewMatrix[13];
-    inverseMatrixArray_[8] = modelViewMatrix[2];
-    inverseMatrixArray_[9] = modelViewMatrix[6];
-    inverseMatrixArray_[10] = modelViewMatrix[10];
-    inverseMatrixArray_[11] = modelViewMatrix[14];
+    //transpose
+    inverseMatrixArray_[  0 ] = modelViewMatrix[  0 ];
+    inverseMatrixArray_[  1 ] = modelViewMatrix[  4 ];
+    inverseMatrixArray_[  2 ] = modelViewMatrix[  8 ];
+    inverseMatrixArray_[  3 ] = modelViewMatrix[ 12 ];
+    inverseMatrixArray_[  4 ] = modelViewMatrix[  1 ];
+    inverseMatrixArray_[  5 ] = modelViewMatrix[  5 ];
+    inverseMatrixArray_[  6 ] = modelViewMatrix[  9 ];
+    inverseMatrixArray_[  7 ] = modelViewMatrix[ 13 ];
+    inverseMatrixArray_[  8 ] = modelViewMatrix[  2 ];
+    inverseMatrixArray_[  9 ] = modelViewMatrix[  6 ];
+    inverseMatrixArray_[ 10 ] = modelViewMatrix[ 10 ];
+    inverseMatrixArray_[ 11 ] = modelViewMatrix[ 14 ];
+
 
     renderFrame( inverseMatrixArray_ , volumeDensity , imageBrightness );
-    //uploadFrame();
-    //frameBufferToPixmap();
+
 }
 
 template < class T >
@@ -317,9 +300,9 @@ bool CLContext<T>::kernelInitialized() const
 }
 
 template< class T >
-void CLContext< T >::renderFrame( const float* inverseMatrix,
-                                  const float &volumeDensity,
-                                  const float &imageBrightness)
+void CLContext< T >::renderFrame( const float* inverseMatrix ,
+                                  const float &volumeDensity ,
+                                  const float &imageBrightness )
 {
     // update the device view matrix
 
@@ -366,7 +349,7 @@ void CLContext<T>::uploadFrame()
 
     clEnqueueReadBuffer( commandQueue_, clPixelBuffer_, CL_TRUE, 0,
                          sizeof( uint ) * gridSize_[0] * gridSize_[1],
-                        frameData_, 0, NULL, NULL );
+            frameData_, 0, NULL, NULL );
     oclHWDL::Error::checkCLError(clErrorCode);
 
 }
@@ -392,6 +375,7 @@ void CLContext<T>::frameBufferToPixmap()
     QImage image(frameDataRGBA_,
                  gridSize_[0], gridSize_[1], QImage::Format_ARGB32);
     frame_ = frame_.fromImage(image);
+
 }
 
 

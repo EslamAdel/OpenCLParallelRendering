@@ -8,6 +8,12 @@ Image< T >::Image( const Dimensions2D dimensions, T* data )
 }
 
 template< class T >
+void Image< T >::setImageData(T *data)
+{
+    data_ = data;
+}
+
+template< class T >
 Dimensions2D Image< T >::getDimensions() const
 {
     return dimensions_;

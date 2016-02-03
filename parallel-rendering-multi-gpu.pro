@@ -51,7 +51,9 @@ SOURCES += main.cpp \
     data/Transformation.cpp \
     gui/RenderingWindow.cpp \
     opencl/CLXRayCompositingKernel.cpp \
-    opencl/CLImage.cpp
+    opencl/CLFrame.cpp \
+    framework/CompositingNode.cpp \
+    opencl/CLRewindFrameKernel.cpp
 
 HEADERS += \
     system/Colors.hh \
@@ -226,7 +228,9 @@ HEADERS += \
     data/Transformation.h \
     gui/RenderingWindow.h \
     opencl/CLXRayCompositingKernel.h \
-    opencl/CLImage.h
+    opencl/CLFrame.h \
+    framework/CompositingNode.h \
+    opencl/CLRewindFrameKernel.h
 
 FORMS += \
     gui/RenderingWindow.ui
@@ -234,5 +238,5 @@ FORMS += \
 DISTFILES += \
     kernels/volumeRender.cl \
     kernels/xray.cl \
-    kernels/xray-compositing.cl
+    kernels/xray_compositing.cl
 

@@ -1,10 +1,8 @@
 #ifndef CLIMAGE_H
 #define CLIMAGE_H
-
-#include "Image.h"
 #include <Headers.h>
-
-
+#include <QPixmap>
+#include <Typedefs.hh>
 
 enum IMAGE_PRECISION
 {
@@ -16,7 +14,7 @@ enum IMAGE_PRECISION
 };
 
 template< class T >
-class CLImage
+class CLFrame
 {
 public:
 
@@ -25,45 +23,57 @@ public:
      * @param volume
      * @param precision
      */
-    CLImage(  Image< T >* image, const IMAGE_PRECISION precision );
+    CLFrame(  uint* &image ,
+              const Dimensions2D &dimensions ,
+              const Coordinates3D &center );
 
-    ~CLImage() ;
+
+    ~CLFrame() ;
 
 public:
 
     /**
-     * @brief createDeviceVolume
+     * @brief createDeviceImage
+     * creates empty device image.
      * @param context
      * @return
      */
     cl_mem createDeviceImage( cl_context context );
 
+
+
     void writeDeviceImage( cl_command_queue cmdQueue );
 
     void readDeviceImage( cl_command_queue cmdQueue );
 
-    Image< T > *getHostImage() const;
+    uint *getHostImage() const;
+
+    QPixmap &getFrame()  ;
+
+    void setHostImage( uint * &image );
 
     cl_mem getDeviceImage() const;
 
 
 private:
 
-    /**
-     * @brief volume_
-     */
-    Image< T >* hostImage_;
+    uint *&hostImage_;
+
+    uchar *rgbaFrame_;
+
+    QPixmap frame_ ;
 
     cl_mem deviceImage_ ;
 
+    const Dimensions2D &dimensions_ ;
 
-    const uint64_t width_;
+    const Coordinates3D &center_ ;
 
-    const uint64_t height_;
+    cl_image_format imageFormat_ ;
 
-    /**
-     * @brief precision_
-     */
-    const IMAGE_PRECISION precision_;
 };
-#endif // CLIMAGE_H
+
+
+typedef CLFrame< uint > CLFrame32 ;
+
+#endif // CLFrame_H

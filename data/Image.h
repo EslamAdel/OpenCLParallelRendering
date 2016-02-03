@@ -19,6 +19,8 @@ public:
 
 public: // Public functions
 
+    void setImageData( T* data );
+
     /**
      * @brief getDimensions
      * @return The XY dimensions of the image.
