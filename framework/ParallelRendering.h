@@ -158,6 +158,7 @@ private:
     //counters
     uint8_t activeRenderingNodes_;
     uint8_t readyPixmapsCount_;
+    uint8_t compositedFramesCount_ ;
 
     //facts
     uint8_t machineGPUsCount_;

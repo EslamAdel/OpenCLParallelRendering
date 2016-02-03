@@ -129,13 +129,13 @@ void CLFrame< T >::readDeviceData( cl_command_queue cmdQueue ,
                                  ( void * ) hostData_ ,
                                  0 , NULL , NULL);
 
-    uint64_t checksum = 0;
-    for( auto i = 0 ; i < dimensions_.imageSize() ; i++ )
-        checksum+= hostData_[ i ];
+//    uint64_t checksum = 0;
+//    for( auto i = 0 ; i < dimensions_.imageSize() ; i++ )
+//        checksum+= hostData_[ i ];
 
-    LOG_DEBUG("Final Frame Size:%dx%d" , dimensions_.x , dimensions_.y );
-    LOG_DEBUG("Final Frame Size:%d " ,dimensions_.imageSize() * sizeof(T));
-    LOG_DEBUG("Final Frame Checksum:%d" , checksum );
+//    LOG_DEBUG("Final Frame Size:%dx%d" , dimensions_.x , dimensions_.y );
+//    LOG_DEBUG("Final Frame Size:%d " ,dimensions_.imageSize() * sizeof(T));
+//    LOG_DEBUG("Final Frame Checksum:%d" , checksum );
     if( error != CL_SUCCESS )
         oclHWDL::Error::checkCLError( error );
 }

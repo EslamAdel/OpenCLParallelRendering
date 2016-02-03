@@ -20,6 +20,8 @@ ParallelRendering::ParallelRendering( Volume<uchar> *volume ,
     renderingNodesReady_ = false ;
     compositingNodeSpecified_ = false ;
 
+    compositedFramesCount_ = 0 ;
+
     loadBaseVolume( volume );
     listGPUs_ = clHardware_.getListGPUs();
 
@@ -88,8 +90,8 @@ void ParallelRendering::addRenderingNode( const uint64_t gpuIndex)
     connect( node , SIGNAL( finishedRendering( RenderingNode* )),
              this , SLOT( finishedRendering_SLOT( RenderingNode* )));
 
-//    connect( node , SIGNAL( bufferUploaded( RenderingNode* )),
-//             this , SLOT( bufferUploaded_SLOT( RenderingNode* )));
+    //    connect( node , SIGNAL( bufferUploaded( RenderingNode* )),
+    //             this , SLOT( bufferUploaded_SLOT( RenderingNode* )));
 }
 
 void ParallelRendering::addCompositingNode( const uint64_t gpuIndex )
@@ -130,7 +132,8 @@ void ParallelRendering::addCompositingNode( const uint64_t gpuIndex )
         // add compositing task, that will execute concurrently to accumulate
         // a frame to the collageFrame.
         auto compositingTask =
-                new TaskComposite( compositingNode_ , frameIndex );
+                new TaskComposite( compositingNode_ , frameIndex ,
+                                   compositedFramesCount_ );
         compositingTasks_[ node ] = compositingTask ;
 
         connect( collectingTask ,
@@ -266,35 +269,22 @@ void ParallelRendering::finishedRendering_SLOT(RenderingNode *finishedNode)
 void ParallelRendering::compositingFinished_SLOT()
 {
 
-    static const uint framesCount = compositingNode_->framesCount();
-    static uint framesComposited = 0 ;
-    ++framesComposited;
-    LOG_DEBUG("Composited Frames:%d/%d" , framesComposited , framesCount );
 
-    if( framesComposited  == framesCount )
-    {
-        compositingNode_->uploadCollageFromDevice();
-        compositingNode_->rewindCollageFrame_DEVICE( CL_FALSE );
-        QPixmap &finalFrame = compositingNode_->getCollagePixmap();
 
-        emit this->finalFrameReady_SIGNAL( finalFrame );
+    QPixmap &finalFrame = compositingNode_->getCollagePixmap();
 
-        framesComposited = 0 ;
-        if( pendingTransformations_ ) applyTransformation();
+    emit this->finalFrameReady_SIGNAL( finalFrame );
+
+    if( pendingTransformations_ )
+        applyTransformation();
+    else
         renderingNodesReady_ = true ;
-    }
+
 
 }
 
 void ParallelRendering::frameLoadedToDevice_SLOT( RenderingNode *node )
 {
-    //    LOG_DEBUG( "GPU <%d> frame ready to display" , finishedNode->gpuIndex() );
-    //    if( ++readyPixmapsCount_ == activeRenderingNodes_ )
-    //    {
-    //        emit this->framesReady_SIGNAL();
-
-    //    }
-
     LOG_DEBUG( "[DONE TRANSFER] from GPU <%d>" , node->gpuIndex() );
 
     compositorPool_.start( compositingTasks_[ node ]);

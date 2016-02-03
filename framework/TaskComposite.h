@@ -11,7 +11,8 @@ class TaskComposite : public QObject , public QRunnable
     Q_OBJECT
 
 public:
-    TaskComposite( CompositingNode *compositingNode ,const uint frameIndex );
+    TaskComposite( CompositingNode *compositingNode ,const uint frameIndex ,
+                   uint8_t &compositedFramesCount );
 
 
 signals:
@@ -24,6 +25,8 @@ private:
     CompositingNode *compositingNode_;
 
     const uint frameIndex_ ;
+
+    uint8_t &compositedFramesCount_ ;
 
 
 };
