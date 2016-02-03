@@ -8,6 +8,7 @@
 #include "CLXRayCompositingKernel.h"
 #include "CLRewindFrameKernel.h"
 #include <QObject>
+#include "CLImage2D.h"
 
 class CompositingNode : public QObject
 {

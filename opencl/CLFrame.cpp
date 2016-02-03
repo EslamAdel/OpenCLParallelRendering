@@ -1,5 +1,4 @@
 #include "CLFrame.h"
-#include <oclHWDL/ErrorHandler.h>
 #include <typeinfo>
 #include <Logger.h>
 #include <Utilities.h>
@@ -25,66 +24,6 @@ CLFrame< T >::~CLFrame()
 {
     clReleaseMemObject( deviceData_ );
 }
-
-//template< class T >
-//cl_mem CLFrame< T >::createDeviceImage( cl_context context )
-//{
-//    LOG_DEBUG( "Creating an OpenCL image " );
-
-//    // Initially, assume that everything is fine
-//    cl_int error = CL_SUCCESS;
-//    deviceImage_ = clCreateImage2D( context,
-//                                    CL_MEM_READ_WRITE ,
-//                                    &imageFormat_ ,
-//                                    dimensions_.x , dimensions_.y ,
-//                                    dimensions_.x *sizeof(uint),
-//                                    NULL ,
-//                                    &error );
-//    if( error != CL_SUCCESS )
-//        oclHWDL::Error::checkCLError( error );
-
-//    LOG_DEBUG( "[DONE] Creating an OpenCL image " );
-
-//    return deviceImage_;
-//}
-
-//template< class T >
-//void CLFrame< T >::writeDeviceD(cl_command_queue cmdQueue)
-//{
-
-//    static const size_t origin[3] = { 0 , 0 , 0 };
-//    static const size_t region[3] = { dimensions_.x , dimensions_.y , 1 };
-
-//    // Initially, assume that everything is fine
-//    cl_int error = CL_SUCCESS;
-//    error = clEnqueueWriteImage( cmdQueue, deviceImage_ , CL_TRUE , origin ,
-//                                 region , dimensions_.x * sizeof(uint),
-//                                 dimensions_.imageSize() * sizeof(uint) ,
-//                                 ( const void *) hostImage_ ,
-//                                 0 , NULL , NULL );
-
-//    if( error != CL_SUCCESS )
-//        oclHWDL::Error::checkCLError( error );
-//}
-
-//template< class T >
-//void CLFrame< T >::readDeviceImage(cl_command_queue cmdQueue)
-//{
-
-//    static const size_t origin[3] = { 0 , 0 , 0 };
-//    static const size_t region[3] = { dimensions_.x , dimensions_.y , 1 };
-
-//    // Initially, assume that everything is fine
-//    cl_int error = CL_SUCCESS;
-//    error = clEnqueueReadImage( cmdQueue, deviceImage_ , CL_TRUE , origin ,
-//                                region , dimensions_.x * sizeof(uint),
-//                                dimensions_.imageSize() * sizeof(uint) ,
-//                                ( void *) hostImage_ ,
-//                                0 , NULL , NULL );
-//    if( error != CL_SUCCESS )
-//        oclHWDL::Error::checkCLError( error );
-//}
-
 
 template< class T >
 void CLFrame< T >::createDeviceData( cl_context context )

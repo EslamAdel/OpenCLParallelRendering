@@ -3,6 +3,7 @@
 #include <Headers.h>
 #include <QPixmap>
 #include <Typedefs.hh>
+#include <oclHWDL/ErrorHandler.h>
 
 template< class T >
 class CLFrame
@@ -39,16 +40,16 @@ public:
     virtual void readDeviceData( cl_command_queue cmdQueue ,
                                  const cl_bool blocking );
 
-    T *getHostData() const;
+    virtual T *getHostData() const;
 
-    QPixmap &getFramePixmap() ;
+    virtual QPixmap &getFramePixmap() ;
 
-    void setHostData( T *data );
+    virtual void setHostData( T *data );
 
-    cl_mem getDeviceData() const;
+    virtual cl_mem getDeviceData() const;
 
 
-private:
+protected:
 
     T *hostData_;
 

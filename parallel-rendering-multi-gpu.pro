@@ -53,7 +53,8 @@ SOURCES += main.cpp \
     opencl/CLXRayCompositingKernel.cpp \
     opencl/CLFrame.cpp \
     framework/CompositingNode.cpp \
-    opencl/CLRewindFrameKernel.cpp
+    opencl/CLRewindFrameKernel.cpp \
+    opencl/CLImage2D.cpp
 
 HEADERS += \
     system/Colors.hh \
@@ -230,7 +231,8 @@ HEADERS += \
     opencl/CLXRayCompositingKernel.h \
     opencl/CLFrame.h \
     framework/CompositingNode.h \
-    opencl/CLRewindFrameKernel.h
+    opencl/CLRewindFrameKernel.h \
+    opencl/CLImage2D.h
 
 FORMS += \
     gui/RenderingWindow.ui
