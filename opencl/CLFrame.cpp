@@ -95,7 +95,7 @@ uint *CLFrame<T>::getHostImage() const
 }
 
 template< class T >
- QPixmap &CLFrame<T>::getFrame()
+ QPixmap &CLFrame<T>::getFramePixmap()
 {
     u_int8_t r, g, b, a;
     uint rgba;
@@ -112,9 +112,10 @@ template< class T >
     }
 
     // Create a QImage and send it back to the rendering window.
-    QImage image(rgbaFrame_,
-                 dimensions_.x , dimensions_.y , QImage::Format_ARGB32);
+    const QImage image(rgbaFrame_,
+                       dimensions_.x , dimensions_.y , QImage::Format_ARGB32);
     frame_ = frame_.fromImage(image);
+
 
     return frame_ ;
 }

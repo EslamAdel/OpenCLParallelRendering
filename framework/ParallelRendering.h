@@ -18,6 +18,7 @@
 #include "oclHWDL.h"
 #include <unordered_map>
 #include "Transformation.h"
+#include "CompositingNode.h"
 
 typedef std::unordered_map<const oclHWDL::Device*,RenderingNode*> RenderingNodes;
 typedef std::unordered_map<const RenderingNode* ,TaskRender*> RenderingTasks;
@@ -35,6 +36,8 @@ public:
     void discoverAllNodes();
 
     void addRenderingNode( const uint64_t gpuIndex );
+
+    void addCompositingNode( const uint64_t gpuIndex );
 
     void distributeBaseVolume1D();
 
@@ -108,6 +111,7 @@ private:
     QSet< oclHWDL::Device* >   inUseGPUs_;
     oclHWDL::Devices            listGPUs_;
     RenderingNodes        renderingNodes_;
+    CompositingNode     *compositingNode_;
 
     //threadpools
     QThreadPool rendererPool_  ; //[producer] for collector pool.
@@ -120,6 +124,8 @@ private:
 
 
     Volume<uchar> *baseVolume_;
+    std::vector< Volume<uchar>* > bricks_;
+    std::vector< Coordinates3D * > framesCenters_ ;
 
     Coordinates3D rotation_;
     Coordinates3D translation_;

@@ -57,8 +57,9 @@ void ParallelRendering::addRenderingNode( const uint64_t gpuIndex)
     if( inUseGPUs_.contains( listGPUs_.at( gpuIndex ))) return;
 
     // pass transformations by reference.
-    // ***Async_ objects will be accessed by multithreads.
-    // ***Async_ objects should not be modified during the life of the threads.
+    // translationAsync_, rotationAsync_, volumeDensityAsync_, brightnessAsync_
+    // will be accessed by multithreads. So,
+    // they should not be modified during the life of the threads.
     RenderingNode *node = new RenderingNode( gpuIndex,
                                              translationAsync_,
                                              rotationAsync_,
@@ -84,6 +85,21 @@ void ParallelRendering::addRenderingNode( const uint64_t gpuIndex)
              this , SLOT(bufferUploaded_SLOT( RenderingNode* )));
 }
 
+void ParallelRendering::addCompositingNode(const uint64_t gpuIndex)
+{
+    for( Volume<uchar> *brick : bricks_ )
+    {
+        Coordinates3D *frameCenter =
+                new Coordinates3D( brick->getCubeCenter() );
+
+        framesCenters_.push_back( frameCenter );
+
+        const Dimensions3D &brickVolume = brick->getDimensions();
+
+        //float
+    }
+}
+
 void ParallelRendering::distributeBaseVolume1D()
 {
     LOG_DEBUG("Distributing Volume");
@@ -97,10 +113,9 @@ void ParallelRendering::distributeBaseVolume1D()
         LOG_ERROR( "No deployed devices to distribute volume!");
 
     const uint64_t baseXDimension = baseVolume_->getDimensions().x;
-    const uint64_t newXDimension = baseXDimension / nDevices ;
+    const uint64_t newXDimension =  baseXDimension / nDevices  ;
 
 
-    QList< Volume<uchar>* > bricks;
 
     for( auto i = 0 ; i < nDevices - 1 ; i++ )
     {
@@ -111,7 +126,7 @@ void ParallelRendering::distributeBaseVolume1D()
                                              0,
                                              baseVolume_->getDimensions().z );
 
-        bricks.push_back( brick );
+        bricks_.push_back( brick );
     }
 
     auto brick = baseVolume_->getBrick( newXDimension*( nDevices - 1 ),
@@ -121,13 +136,13 @@ void ParallelRendering::distributeBaseVolume1D()
                                         0,
                                         baseVolume_->getDimensions().z );
 
-    bricks.push_back( brick );
+    bricks_.push_back( brick );
+    int i = 0;
 
     for( oclHWDL::Device *device  : inUseGPUs_ )
     {
         LOG_DEBUG( "Loading subVolume to device" );
-        auto subVolume = bricks.front();
-        bricks.pop_front();
+        auto subVolume = bricks_[ i++ ];
         renderingNodes_[ device ]->loadVolume( subVolume );
         LOG_DEBUG( "[DONE] Loading subVolume to GPU <%d>",
                    renderingNodes_[ device ]->gpuIndex( ));

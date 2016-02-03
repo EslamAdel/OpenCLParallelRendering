@@ -90,31 +90,6 @@ void CompositingNode::accumulateFrame(const uint frameIndex)
         oclHWDL::Error::checkCLError( clErrorCode );
 }
 
-//cl_platform_id CompositingNode::getPlatformId() const
-//{
-//    return platform_;
-//}
-
-//cl_device_id CompositingNode::getDeviceId() const
-//{
-//    return device_;
-//}
-
-//cl_context CompositingNode::getContext() const
-//{
-//    return context_;
-//}
-
-//cl_command_queue CompositingNode::getCommandQueue() const
-//{
-//    return commandQueue_;
-//}
-
-//cl_kernel CompositingNode::getKernel() const
-//{
-//    return kernel_;
-//}
-
 void CompositingNode::rewindCollageFrame()
 {
     // Assume everything is fine in the begnning
@@ -138,6 +113,12 @@ void CompositingNode::rewindCollageFrame()
     if( clErrorCode != CL_SUCCESS )
         oclHWDL::Error::checkCLError( clErrorCode );
 
+}
+
+QPixmap &CompositingNode::getCollagePixmap()
+{
+    collageFrame_->readDeviceImage( commandQueue_ );
+    return collageFrame_->getFramePixmap();
 }
 
 void CompositingNode::selectGPU_()

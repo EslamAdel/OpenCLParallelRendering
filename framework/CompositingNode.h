@@ -7,9 +7,11 @@
 #include "CLFrame.h"
 #include "CLXRayCompositingKernel.h"
 #include "CLRewindFrameKernel.h"
+#include <QObject>
 
-class CompositingNode
+class CompositingNode : public QObject
 {
+    Q_OBJECT
 public:
     CompositingNode( const uint64_t gpuIndex ,
                      const std::vector< Dimensions2D* > framesDimenstions ,
@@ -28,22 +30,9 @@ public:
 
     void accumulateFrame( const uint frameIndex );
 
-//    cl_platform_id getPlatformId( ) const;
-
-
-//    cl_device_id getDeviceId( ) const;
-
-
-//    cl_context getContext( ) const;
-
-
-//    cl_command_queue getCommandQueue( ) const;
-
-
-    void handleKernel(std::string string = "");
-
-
     void rewindCollageFrame();
+
+     QPixmap &getCollagePixmap()  ;
 
 private:
     void selectGPU_( );

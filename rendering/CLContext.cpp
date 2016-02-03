@@ -238,7 +238,7 @@ void CLContext< T >::paint( const Coordinates3D &rotation ,
 {
     // Use the GLM to create the Model View Matrix.
     // Initialize to identity.
-    static auto glmMVMatrix = glm::mat4( 1.0f );
+    auto glmMVMatrix = glm::mat4( 1.0f );
 
     // Use quatrenions
     auto rotationVector = glm::tvec3<float>( rotation.x ,

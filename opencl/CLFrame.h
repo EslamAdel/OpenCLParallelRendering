@@ -48,7 +48,7 @@ public:
 
     uint *getHostImage() const;
 
-    QPixmap &getFrame()  ;
+    QPixmap &getFramePixmap() ;
 
     void setHostImage( uint * &image );
 
