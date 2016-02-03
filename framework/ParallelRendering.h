@@ -23,13 +23,19 @@
 typedef std::unordered_map<const oclHWDL::Device*,RenderingNode*> RenderingNodes;
 typedef std::unordered_map<const RenderingNode* ,TaskRender*> RenderingTasks;
 typedef std::unordered_map<const RenderingNode* ,TaskCollect*> CollectingTasks;
+typedef std::unordered_map<const RenderingNode* ,TaskComposite*> CompositingTasks;
+//typedef std::vector< RenderingNode* > RenderingNodes;
+//typedef std::vector< TaskRender* > RenderingTasks;
+//typedef std::vector< TaskCollect* > CollectingTasks;
 
 class ParallelRendering : public QObject
 {
     Q_OBJECT
 
 public:
-    ParallelRendering( Volume< uchar >* volume );
+    ParallelRendering(Volume< uchar >* volume ,
+                      const uint frameWidth = 512,
+                      const uint frameHeight = 512 );
 
     void loadBaseVolume( Volume<uchar> *volume );
 
@@ -37,7 +43,9 @@ public:
 
     void addRenderingNode( const uint64_t gpuIndex );
 
+
     void addCompositingNode( const uint64_t gpuIndex );
+
 
     void distributeBaseVolume1D();
 
@@ -53,14 +61,15 @@ public:
 
     uint8_t activeRenderingNodesCount() const;
 
+
 signals:
     void framesReady_SIGNAL();
-
+    void finalFrameReady_SIGNAL( QPixmap &finalFrame );
 
 public slots :
-    void finishedRendering_SLOT(RenderingNode *finishedNode);
-    void compositingTaskFinished_SLOT();
-    void bufferUploaded_SLOT( RenderingNode *finishedNode);
+    void finishedRendering_SLOT( RenderingNode *finishedNode );
+    void compositingFinished_SLOT( );
+    void frameLoadedToDevice_SLOT( RenderingNode *finishedNode );
 
 
     /**
@@ -121,6 +130,7 @@ private:
 
     RenderingTasks  renderingTasks_ ;
     CollectingTasks collectingTasks_;
+    CompositingTasks compositingTasks_ ;
 
 
     Volume<uchar> *baseVolume_;
@@ -143,7 +153,7 @@ private:
     //flags
     bool pendingTransformations_;
     bool renderingNodesReady_;
-
+    bool compositingNodeSpecified_;
 
     //counters
     uint8_t activeRenderingNodes_;
@@ -151,7 +161,8 @@ private:
 
     //facts
     uint8_t machineGPUsCount_;
-
+    const uint frameWidth_ ;
+    const uint frameHeight_ ;
 
 
 

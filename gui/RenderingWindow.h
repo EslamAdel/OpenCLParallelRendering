@@ -39,7 +39,7 @@ private:
 
 public slots:
     void framesReady_SLOT();
-
+    void collageFrameReady_SLOT( QPixmap &finalFrame ) ;
 
 private slots:
 

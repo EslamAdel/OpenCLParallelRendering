@@ -11,9 +11,15 @@
 #define INITIAL_VOLUME_ROTATION_Y 0.0
 #define INITIAL_VOLUME_ROTATION_Z 0.0
 
-ParallelRendering::ParallelRendering( Volume<uchar> *volume )
+ParallelRendering::ParallelRendering( Volume<uchar> *volume ,
+                                      const uint frameWidth ,
+                                      const uint frameHeight )
+    : frameWidth_( frameWidth ),
+      frameHeight_( frameHeight )
 {
     renderingNodesReady_ = false ;
+    compositingNodeSpecified_ = false ;
+
     loadBaseVolume( volume );
     listGPUs_ = clHardware_.getListGPUs();
 
@@ -28,6 +34,8 @@ ParallelRendering::ParallelRendering( Volume<uchar> *volume )
     rotation_.x = INITIAL_VOLUME_ROTATION_X;
     rotation_.y = INITIAL_VOLUME_ROTATION_Y;
     rotation_.z = INITIAL_VOLUME_ROTATION_Z;
+
+    compositorPool_.setMaxThreadCount( 1 );
 
 
 }
@@ -61,6 +69,8 @@ void ParallelRendering::addRenderingNode( const uint64_t gpuIndex)
     // will be accessed by multithreads. So,
     // they should not be modified during the life of the threads.
     RenderingNode *node = new RenderingNode( gpuIndex,
+                                             frameWidth_ ,
+                                             frameHeight_ ,
                                              translationAsync_,
                                              rotationAsync_,
                                              volumeDensityAsync_,
@@ -72,32 +82,69 @@ void ParallelRendering::addRenderingNode( const uint64_t gpuIndex)
     TaskRender *taskRender = new TaskRender( *node );
     renderingTasks_[ node ] = taskRender;
 
-    TaskCollect *taskCollect = new TaskCollect( *node );
-    collectingTasks_[ node ] = taskCollect;
+    rendererPool_.setMaxThreadCount( inUseGPUs_.size( ));
+    collectorPool_.setMaxThreadCount( inUseGPUs_.size( ));
 
-    rendererPool_.setMaxThreadCount( inUseGPUs_.size() );
-    collectorPool_.setMaxThreadCount( inUseGPUs_.size() );
+    connect( node , SIGNAL( finishedRendering( RenderingNode* )),
+             this , SLOT( finishedRendering_SLOT( RenderingNode* )));
 
-    connect( node , SIGNAL(finishedRendering( RenderingNode* )),
-             this , SLOT(finishedRendering_SLOT( RenderingNode* )));
-
-    connect( node , SIGNAL(bufferUploaded( RenderingNode* )),
-             this , SLOT(bufferUploaded_SLOT( RenderingNode* )));
+//    connect( node , SIGNAL( bufferUploaded( RenderingNode* )),
+//             this , SLOT( bufferUploaded_SLOT( RenderingNode* )));
 }
 
-void ParallelRendering::addCompositingNode(const uint64_t gpuIndex)
+void ParallelRendering::addCompositingNode( const uint64_t gpuIndex )
 {
-    for( Volume<uchar> *brick : bricks_ )
+
+    if( gpuIndex >= listGPUs_.size() )
+        LOG_ERROR("Choose GPU index from [0-%d]", listGPUs_.size() - 1 );
+
+    if( compositingNodeSpecified_ )
     {
-        Coordinates3D *frameCenter =
-                new Coordinates3D( brick->getCubeCenter() );
-
-        framesCenters_.push_back( frameCenter );
-
-        const Dimensions3D &brickVolume = brick->getDimensions();
-
-        //float
+        LOG_WARNING("Compositing Node already attached to GPU <%d>" ,
+                    compositingNode_->getGPUIndex( ));
+        return ;
     }
+
+    // add compositingNode_ that will manage compositing rendered frames.
+    compositingNode_ = new CompositingNode( gpuIndex ,
+                                            inUseGPUs_.size() ,
+                                            frameWidth_ ,
+                                            frameHeight_ );
+
+
+
+    // for each rendering task, a collecting task and compositing task will follow.
+    uint frameIndex = 0 ;
+    for( oclHWDL::Device *rendererDevice : inUseGPUs_ )
+    {
+
+        RenderingNode *node = renderingNodes_[ rendererDevice ];
+
+        //now add collectingTasks that transfer data from Device_x, where rendering performed,
+        // to Host then to Device_y where compositing performed.
+        auto collectingTask = new TaskCollect( node , compositingNode_ ,
+                                               frameIndex );
+        collectingTasks_[ node ] = collectingTask ;
+
+
+        // add compositing task, that will execute concurrently to accumulate
+        // a frame to the collageFrame.
+        auto compositingTask =
+                new TaskComposite( compositingNode_ , frameIndex );
+        compositingTasks_[ node ] = compositingTask ;
+
+        connect( collectingTask ,
+                 SIGNAL( frameLoadedToDevice_SIGNAL( RenderingNode* )) ,
+                 this , SLOT( frameLoadedToDevice_SLOT( RenderingNode* )));
+
+        connect( compositingTask , SIGNAL(compositingFinished_SIGNAL( )) ,
+                 this , SLOT(compositingFinished_SLOT( )));
+
+        frameIndex++ ;
+    }
+
+
+    compositingNodeSpecified_ = true ;
 }
 
 void ParallelRendering::distributeBaseVolume1D()
@@ -211,29 +258,47 @@ uint8_t ParallelRendering::activeRenderingNodesCount() const
 
 void ParallelRendering::finishedRendering_SLOT(RenderingNode *finishedNode)
 {
+    LOG_DEBUG( "[DONE RENDERING] on GPU <%d> " , finishedNode->gpuIndex() );
+
     collectorPool_.start( collectingTasks_[ finishedNode ]);
 }
 
-void ParallelRendering::compositingTaskFinished_SLOT()
+void ParallelRendering::compositingFinished_SLOT()
 {
 
+    static const uint framesCount = compositingNode_->framesCount();
+    static uint framesComposited = 0 ;
+    ++framesComposited;
+    LOG_DEBUG("Composited Frames:%d/%d" , framesComposited , framesCount );
 
-    //if( pendingTransformations_ ) applyTransformation();
-}
-
-void ParallelRendering::bufferUploaded_SLOT(RenderingNode *finishedNode)
-{
-    LOG_DEBUG( "GPU <%d> frame ready to display" , finishedNode->gpuIndex() );
-    if( ++readyPixmapsCount_ == activeRenderingNodes_ )
+    if( framesComposited  == framesCount )
     {
-        renderingNodesReady_ = true ;
-        emit this->framesReady_SIGNAL();
+        compositingNode_->uploadCollageFromDevice();
+        compositingNode_->rewindCollageFrame_DEVICE( CL_FALSE );
+        QPixmap &finalFrame = compositingNode_->getCollagePixmap();
+
+        emit this->finalFrameReady_SIGNAL( finalFrame );
+
+        framesComposited = 0 ;
         if( pendingTransformations_ ) applyTransformation();
+        renderingNodesReady_ = true ;
     }
 
-
 }
 
+void ParallelRendering::frameLoadedToDevice_SLOT( RenderingNode *node )
+{
+    //    LOG_DEBUG( "GPU <%d> frame ready to display" , finishedNode->gpuIndex() );
+    //    if( ++readyPixmapsCount_ == activeRenderingNodes_ )
+    //    {
+    //        emit this->framesReady_SIGNAL();
+
+    //    }
+
+    LOG_DEBUG( "[DONE TRANSFER] from GPU <%d>" , node->gpuIndex() );
+
+    compositorPool_.start( compositingTasks_[ node ]);
+}
 
 void ParallelRendering::updateRotationX_SLOT(int angle)
 {

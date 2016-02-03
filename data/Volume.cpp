@@ -1,5 +1,6 @@
 #include "Volume.h"
 #include "VolumeUtilities.h"
+#include "Logger.h"
 
 template< class T >
 Volume< T >::Volume( const std::string prefix, const bool drawBoundingBox )
@@ -17,6 +18,9 @@ Volume< T >::Volume( const std::string prefix, const bool drawBoundingBox )
                                      coordinates_.z / dimensions_.z );
 
     unitCubeScaleFactors_ = Coordinates3D( 1.f , 1.f , 1.f );
+
+    LOG_DEBUG("Volume Created: %dx%dx%d",
+              dimensions_.x , dimensions_.y , dimensions_.z );
 
 
 }

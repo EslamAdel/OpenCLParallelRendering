@@ -35,6 +35,8 @@ RenderingWindow::RenderingWindow( QWidget *parent ) :
     LOG_DEBUG( "Distribute Volume" );
     parallelRenderer_->distributeBaseVolume1D();
 
+    LOG_DEBUG("Add Compositing Node");
+    parallelRenderer_->addCompositingNode( 0 );
 
     intializeConnections_();
 
@@ -52,7 +54,10 @@ void RenderingWindow::intializeConnections_()
 {
     //parallelRenderer_
     connect( parallelRenderer_ , SIGNAL( framesReady_SIGNAL( )),
-            this , SLOT( framesReady_SLOT( )));
+             this , SLOT( framesReady_SLOT( )));
+
+    connect( parallelRenderer_ , SIGNAL( finalFrameReady_SIGNAL( QPixmap& )) ,
+             this , SLOT( collageFrameReady_SLOT( QPixmap& )));
 
 
     //sliders
@@ -120,6 +125,14 @@ void RenderingWindow::displayFrame_( )
 void RenderingWindow::framesReady_SLOT()
 {
     displayFrame_();
+}
+
+void RenderingWindow::collageFrameReady_SLOT(QPixmap &finalFrame)
+{
+    ui->frameContainerResult->
+            setPixmap( finalFrame.scaled( ui->frameContainerResult->width( ) ,
+                                          ui->frameContainerResult->height( ) ,
+                                          Qt::KeepAspectRatio ));
 }
 
 void RenderingWindow::newXRotation_SLOT(int value)

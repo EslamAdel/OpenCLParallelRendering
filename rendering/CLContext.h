@@ -21,7 +21,8 @@ public:
      * @param volume
      * @param gpuIndex
      */
-    CLContext( const Volume< T >* volume, const uint64_t gpuIndex );
+    CLContext( const Volume< T >* volume, const uint64_t gpuIndex,
+               const uint frameWidth , const uint frameHeight );
     ~CLContext( );
 
 public:
@@ -32,7 +33,7 @@ public:
     void createPixelBuffer( const uint bufferWidth,
                             const uint bufferHeight );
 
-    void loadNewVolume( const Volume< T >* volume );
+    void loadVolume( const Volume< T >* volume );
 
     /**
      * @brief getGPUIndex
@@ -100,13 +101,13 @@ public:
      */
     QPixmap* getFrame( );
 
+    uint* getFrameData( );
+
 
     void paint( const Coordinates3D &rotation ,
                 const Coordinates3D &translation,
                 const float &volumeDensity ,
                 const float &imageBrightness);
-
-    bool kernelInitialized() const;
 
 private:
 
@@ -268,7 +269,12 @@ protected:
      */
     float inverseMatrixArray_[ 12 ];
 
-    bool kernelInitialized_;
+    bool volumeLoaded_ ;
+    bool kernelInitialized_ ;
+
+
+    const uint frameWidth_ ;
+    const uint frameHeight_ ;
 };
 
 #endif // CLGPUCONTEXT_H

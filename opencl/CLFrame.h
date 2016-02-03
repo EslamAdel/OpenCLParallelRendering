@@ -4,15 +4,6 @@
 #include <QPixmap>
 #include <Typedefs.hh>
 
-enum IMAGE_PRECISION
-{
-    IMAGE_CL_UNSIGNED_INT8,
-    IMAGE_CL_UNSIGNED_INT16,
-    IMAGE_CL_UNSIGNED_INT32,
-    IMAGE_CL_HALF_FLOAT,
-    IMAGE_CL_FLOAT
-};
-
 template< class T >
 class CLFrame
 {
@@ -23,9 +14,8 @@ public:
      * @param volume
      * @param precision
      */
-    CLFrame(  uint* &image ,
-              const Dimensions2D &dimensions ,
-              const Coordinates3D &center );
+    CLFrame( const Dimensions2D dimensions ,
+             T* data = nullptr );
 
 
     ~CLFrame() ;
@@ -38,38 +28,39 @@ public:
      * @param context
      * @return
      */
-    cl_mem createDeviceImage( cl_context context );
+
+    //TODO : new class FrameImage that inherit from this class.
+    virtual void createDeviceData( cl_context context );
 
 
+    virtual void writeDeviceData(  cl_command_queue cmdQueue ,
+                                   const cl_bool blocking );
 
-    void writeDeviceImage( cl_command_queue cmdQueue );
+    virtual void readDeviceData( cl_command_queue cmdQueue ,
+                                 const cl_bool blocking );
 
-    void readDeviceImage( cl_command_queue cmdQueue );
-
-    uint *getHostImage() const;
+    T *getHostData() const;
 
     QPixmap &getFramePixmap() ;
 
-    void setHostImage( uint * &image );
+    void setHostData( T *data );
 
-    cl_mem getDeviceImage() const;
+    cl_mem getDeviceData() const;
 
 
 private:
 
-    uint *&hostImage_;
+    T *hostData_;
+
+    cl_mem deviceData_ ;
 
     uchar *rgbaFrame_;
 
     QPixmap frame_ ;
 
-    cl_mem deviceImage_ ;
+    const Dimensions2D dimensions_ ;
 
-    const Dimensions2D &dimensions_ ;
-
-    const Coordinates3D &center_ ;
-
-    cl_image_format imageFormat_ ;
+    //cl_image_format imageFormat_ ;
 
 };
 

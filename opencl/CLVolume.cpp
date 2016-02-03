@@ -14,7 +14,10 @@ CLVolume< T >::CLVolume( const Volume< T >* volume,
 template< class T >
 cl_mem CLVolume< T >::createDeviceVolume( cl_context context )
 {
-    LOG_DEBUG( "Creating an OpenCL volume " );
+    LOG_DEBUG( "Creating an OpenCL volume : %dx%dx%d ",
+               volume_->getDimensions().x ,
+               volume_->getDimensions().y ,
+               volume_->getDimensions().z  );
 
     // Initially, assume that everything is fine
     cl_int error = CL_SUCCESS;
@@ -25,6 +28,8 @@ cl_mem CLVolume< T >::createDeviceVolume( cl_context context )
     // Always use the CL_INTENSITY ( I, I, I, I ) to avoid replicating
     // the data and wasting memory.
     format.image_channel_order = CL_INTENSITY;
+
+
 
     const Dimensions3D dimensions = volume_->getDimensions();
     T* originalData = volume_->getData( );

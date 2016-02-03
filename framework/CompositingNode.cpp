@@ -11,26 +11,25 @@
 
 
 CompositingNode::CompositingNode(const uint64_t gpuIndex,
-                                 const std::vector<Dimensions2D *> framesDimenstions,
-                                 const std::vector<Coordinates3D *> framesCenters,
                                  const uint framesCount,
-                                 const Dimensions2D collageFrameDimensions)
+                                 const uint frameWidth ,
+                                 const uint frameHeight )
     : gpuIndex_( gpuIndex ) ,
-      framesDimensions_( framesDimenstions ),
-      framesCenters_( framesCenters ),
       framesCount_( framesCount ) ,
-      collageFrameDimensions_( collageFrameDimensions )
+      collageFrameDimensions_( frameWidth , frameHeight )
 {
-    if( framesCount_ != framesDimensions_.size() ||
-            framesCount_!= framesCenters_.size()  )
-        LOG_ERROR("Containers size mismatch!");
+
+    LOG_DEBUG("Constructing CompositingNode:\nFramesCount:%d\n"
+              "FrameSize:%dx%d" , framesCount_ ,
+              collageFrameDimensions_.x , collageFrameDimensions_.y );
 
     initializeContext_();
     initializeBuffers_();
     initializeKernel_();
 
-    rewindCollageFrame();
+    rewindCollageFrame_DEVICE( CL_TRUE );
 }
+
 
 CompositingNode::~CompositingNode()
 {
@@ -42,42 +41,37 @@ uint64_t CompositingNode::getGPUIndex() const
     return gpuIndex_;
 }
 
-uint *&CompositingNode::frameData(const uint frameIndex)
+void CompositingNode::setFrameData_HOST(const uint frameIndex , uint* data )
 {
-    return framesData_[ frameIndex ];
+    framesData_[ frameIndex ] = data;
+    frames_[ frameIndex ]->setHostData( data );
 }
 
-void CompositingNode::uploadFrameData(const uint frameIndex)
+void CompositingNode::loadFrameDataToDevice( const uint frameIndex ,
+                                             const cl_bool block )
 {
-    frames_[ frameIndex ]->writeDeviceImage( commandQueue_ );
+    frames_[ frameIndex ]->writeDeviceData( commandQueue_ , block );
 }
 
-void CompositingNode::accumulateFrame(const uint frameIndex)
+void CompositingNode::accumulateFrame_DEVICE( const uint frameIndex )
 {
     const CLFrame32 *currentFrame = frames_[ frameIndex ];
 
-    const cl_mem currentFrameObject = currentFrame->getDeviceImage();
+    const cl_mem currentFrameObject = currentFrame->getDeviceData();
 
-    const Dimensions2D &currentDimensions = *framesDimensions_[ frameIndex ];
-
-    const Coordinates3D &currentCenter = *framesCenters_[ frameIndex ];
 
     // Assume everything is fine in the begnning
     static cl_int clErrorCode = CL_SUCCESS;
 
     compositingKernel_->setFrame( currentFrameObject );
-    compositingKernel_->setFrameWidth( currentDimensions.x );
-    compositingKernel_->setFrameHeight( currentDimensions.y );
-    compositingKernel_->setFrameCenterX( currentCenter.x );
-    compositingKernel_->setFrameCenterY( currentCenter.y );
 
-    static const size_t localSize[ ] = { 1 , 1 } ;
-    const size_t globalSize[ ] = { currentDimensions.x , currentDimensions.y };
+    const size_t localSize[ ] = { 1 } ;
+    const size_t globalSize[ ] = { collageFrameDimensions_.imageSize() };
 
 
     clErrorCode = clEnqueueNDRangeKernel( commandQueue_ ,
                                           compositingKernel_->getKernelObject() ,
-                                          2 ,
+                                          1 ,
                                           NULL ,
                                           globalSize ,
                                           localSize ,
@@ -88,21 +82,22 @@ void CompositingNode::accumulateFrame(const uint frameIndex)
 
     if( clErrorCode != CL_SUCCESS )
         oclHWDL::Error::checkCLError( clErrorCode );
+
+    clFinish( commandQueue_ );
 }
 
-void CompositingNode::rewindCollageFrame()
+void CompositingNode::rewindCollageFrame_DEVICE(cl_bool blocking)
 {
     // Assume everything is fine in the begnning
     static cl_int clErrorCode = CL_SUCCESS;
 
 
-    static const size_t localSize[ ] = { 1 , 1 };
-    static const size_t globalSize[ ] = { collageFrameDimensions_.x ,
-                                          collageFrameDimensions_.y } ;
+    const size_t localSize[ ] = { 1 };
+    const size_t globalSize[ ] = { collageFrameDimensions_.imageSize() } ;
 
     clErrorCode = clEnqueueNDRangeKernel( commandQueue_  ,
                                           rewindFrameKernel_->getKernelObject()  ,
-                                          2 ,
+                                          1 ,
                                           NULL ,
                                           globalSize ,
                                           localSize ,
@@ -112,13 +107,23 @@ void CompositingNode::rewindCollageFrame()
 
     if( clErrorCode != CL_SUCCESS )
         oclHWDL::Error::checkCLError( clErrorCode );
-
+    if( blocking == CL_TRUE ) clFinish( commandQueue_ );
 }
+
+void CompositingNode::uploadCollageFromDevice()
+{
+    collageFrame_->readDeviceData( commandQueue_  , CL_TRUE );
+}
+
 
 QPixmap &CompositingNode::getCollagePixmap()
 {
-    collageFrame_->readDeviceImage( commandQueue_ );
-    return collageFrame_->getFramePixmap();
+    collageFrame_->getFramePixmap();
+}
+
+uint CompositingNode::framesCount() const
+{
+    return framesCount_ ;
 }
 
 void CompositingNode::selectGPU_()
@@ -157,23 +162,17 @@ void CompositingNode::initializeBuffers_()
 
     LOG_DEBUG("Initializing Buffers ...");
 
-    Coordinates3D *collageCenter = new Coordinates3D( 0.f , 0.f , 0.f );
+    collageFrame_ = new CLFrame32( collageFrameDimensions_ );
 
-    uint* collageData = new uint[ collageFrameDimensions_.imageSize() ];
-    collageFrame_ =
-            new CLFrame32( collageData , collageFrameDimensions_,  *collageCenter );
-
-    collageFrame_->createDeviceImage( context_ );
+    collageFrame_->createDeviceData( context_ );
 
     for( auto i=0 ; i < framesCount_ ; i++ )
     {
         uint* frameData ;
         framesData_.push_back( frameData );
 
-        CLFrame32 *frame = new CLFrame32( frameData ,
-                                          *framesDimensions_[i] ,
-                                          *framesCenters_[i] );
-        frame->createDeviceImage( context_ );
+        CLFrame32 *frame = new CLFrame32( collageFrameDimensions_ );
+        frame->createDeviceData( context_ );
         frames_.push_back( frame );
 
     }
@@ -192,15 +191,12 @@ void CompositingNode::initializeKernel_()
     rewindFrameKernel_ = new CLRewindFrameKernel( context_ );
 
 
-    //set arguments of rewind_image2d kernel.
-    rewindFrameKernel_->setFrame( collageFrame_->getDeviceImage() );
-    rewindFrameKernel_->setFrameWidth( collageFrameDimensions_.x );
-    rewindFrameKernel_->setFrameHeight( collageFrameDimensions_.y );
+    //set arguments of rewind_buffer kernel.
+    rewindFrameKernel_->setFrame( collageFrame_->getDeviceData() );
 
     //set arguments of xray_composite kernel.
-    compositingKernel_->setCollegeFrame( collageFrame_->getDeviceImage() );
-    compositingKernel_->setCollageWidth( collageFrameDimensions_.x );
-    compositingKernel_->setCollageHeight( collageFrameDimensions_.y );
+    compositingKernel_->setCollegeFrame( collageFrame_->getDeviceData() );
+
 
 
     LOG_DEBUG( "[DONE] Initializing an OpenCL Kernel ... " );

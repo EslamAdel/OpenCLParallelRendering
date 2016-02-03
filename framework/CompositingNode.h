@@ -14,25 +14,28 @@ class CompositingNode : public QObject
     Q_OBJECT
 public:
     CompositingNode( const uint64_t gpuIndex ,
-                     const std::vector< Dimensions2D* > framesDimenstions ,
-                     const std::vector< Coordinates3D* > framesCenters ,
                      const uint framesCount ,
-                     const Dimensions2D collageFrameDimensions );
+                     const uint frameWidth,
+                     const uint frameHeight ) ;
 
     ~CompositingNode();
 
     uint64_t getGPUIndex( ) const;
 
 
-    uint * &frameData( const uint frameIndex ) ;
+    void loadFrameDataToDevice(const uint frameIndex , const cl_bool block);
 
-    void uploadFrameData( const uint frameIndex );
+    void accumulateFrame_DEVICE( const uint frameIndex );
 
-    void accumulateFrame( const uint frameIndex );
+    void rewindCollageFrame_DEVICE( cl_bool blocking );
 
-    void rewindCollageFrame();
+    void uploadCollageFromDevice( )  ;
 
-     QPixmap &getCollagePixmap()  ;
+    void setFrameData_HOST(const uint frameIndex, uint *data);
+
+    QPixmap &getCollagePixmap();
+
+    uint framesCount() const ;
 
 private:
     void selectGPU_( );
@@ -54,9 +57,6 @@ private:
 
     const uint64_t gpuIndex_;
 
-    const std::vector< Dimensions2D* > framesDimensions_ ;
-
-    const std::vector< Coordinates3D* > framesCenters_ ;
 
     const Dimensions2D collageFrameDimensions_;
 
@@ -84,7 +84,6 @@ private:
 
 
 
-//    oclHWDL::KernelContext* kernelContext_;
 
 };
 

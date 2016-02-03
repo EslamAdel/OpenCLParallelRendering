@@ -25,27 +25,6 @@ void CLRewindFrameKernel::setFrame(const cl_mem frameImage2D )
     oclHWDL::Error::checkCLError( error );
 }
 
-void CLRewindFrameKernel::setFrameWidth(const uint width)
-{
-    cl_int error = CL_SUCCESS;
-
-    error = clSetKernelArg( kernelObject_, KernelArguments::FrameWidth ,
-                            sizeof( uint ),
-                            &width );
-
-    oclHWDL::Error::checkCLError( error );
-}
-
-void CLRewindFrameKernel::setFrameHeight(const uint height)
-{
-    cl_int error = CL_SUCCESS;
-
-    error = clSetKernelArg( kernelObject_, KernelArguments::FrameHeight ,
-                            sizeof( uint ),
-                            &height );
-
-    oclHWDL::Error::checkCLError( error );
-}
 
 void CLRewindFrameKernel::releaseKernel()
 {

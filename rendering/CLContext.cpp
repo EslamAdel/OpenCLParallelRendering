@@ -19,14 +19,18 @@
 
 
 template< class T >
-CLContext< T >::CLContext(const Volume<T>* volume, const uint64_t gpuIndex )
+CLContext< T >::CLContext(const Volume<T>* volume, const uint64_t gpuIndex ,
+                          const uint frameWidth, const uint frameHeight)
     : volume_( volume )
-    , gpuIndex_( gpuIndex )
+    , gpuIndex_( gpuIndex ) ,
+      frameWidth_( frameWidth ),
+      frameHeight_( frameHeight )
 {
-    kernelInitialized_ = false;
     linearFiltering_ = true;
 
 
+    kernelInitialized_ = false ;
+    if( volume == nullptr ) volumeLoaded_ = false ;
 
     /// @note The oclHWDL scans the entire system, and returns a list of
     /// platforms and devices. Since we don't really care about the different
@@ -34,11 +38,9 @@ CLContext< T >::CLContext(const Volume<T>* volume, const uint64_t gpuIndex )
     /// list of all the GPUs connected to the system in a list and select
     /// one of them based on the given GPU ID.
     initializeContext_( );
-    if( volume!=nullptr )
-    {
-        initializeKernel_( );
-        kernelInitialized_ = true;
-    }
+
+    if( volumeLoaded_ )initializeKernel_( );
+
 }
 
 template< class T >
@@ -74,7 +76,7 @@ void CLContext<T>::initializeKernel_()
     handleKernel();
 
     // Creating the pixel buffer that will contain the final image
-    createPixelBuffer(512, 512);
+    createPixelBuffer( frameWidth_ , frameHeight_ );
 
     LOG_DEBUG( "[DONE] Initializing an OpenCL Kernel ... " );
 
@@ -106,6 +108,12 @@ template< class T >
 QPixmap* CLContext< T >::getFrame( )
 {
     return &frame_;
+}
+
+template< class T >
+uint *CLContext< T >::getFrameData()
+{
+    return frameData_ ;
 }
 
 template< class T >
@@ -252,6 +260,26 @@ void CLContext< T >::paint( const Coordinates3D &rotation ,
                                                 translation.y ,
                                                 4.0 );
 
+    //Calculating the translate value for each brick
+    glm::tvec3< float > relativeCenterBack =
+            glm::tvec3<float>( 2.f*(0.5 - volume_->getUnitCubeCenter().x) ,
+                               2.f*(0.5 - volume_->getUnitCubeCenter().y) ,
+                               2.f*(0.5 - volume_->getUnitCubeCenter().z) );
+
+
+
+
+    //Scale all  to the unit volume
+    glm::tvec3< float > unitSccale =
+            glm::tvec3< float >(1/volume_->getUnitCubeScaleFactors().x,
+                                1/volume_->getUnitCubeScaleFactors().y,
+                                1/volume_->getUnitCubeScaleFactors().z);
+
+    //    //Scale at first
+    glmMVMatrix = glm::scale(glmMVMatrix, unitSccale);
+    //    //Translate each brick to its position
+    glmMVMatrix = glm::translate(glmMVMatrix , relativeCenterBack);
+
 
     // Rotate , and then translate to keep the local rotation
 
@@ -264,7 +292,7 @@ void CLContext< T >::paint( const Coordinates3D &rotation ,
 
 
     // A GL-compatible matrix
-    static float modelViewMatrix[16];
+    float modelViewMatrix[16];
     int index = 0 ;
     for(int i = 0; i < 4; i++)
     {
@@ -291,12 +319,6 @@ void CLContext< T >::paint( const Coordinates3D &rotation ,
 
     renderFrame( inverseMatrixArray_ , volumeDensity , imageBrightness );
 
-}
-
-template < class T >
-bool CLContext<T>::kernelInitialized() const
-{
-    return kernelInitialized_;
 }
 
 template< class T >
@@ -338,7 +360,7 @@ void CLContext< T >::renderFrame( const float* inverseMatrix ,
                                            0);
     oclHWDL::Error::checkCLError(clErrorCode);
 
-
+    clFinish( commandQueue_ );
 }
 
 template< class T >
@@ -409,21 +431,16 @@ void CLContext< T >::createPixelBuffer( const uint frameWidth,
 }
 
 template< class T >
-void CLContext<T>::loadNewVolume(const Volume<T> *volume)
+void CLContext<T>::loadVolume(const Volume<T> *volume)
 {
+
+    //TODO : leakage control
+
+
     volume_ = volume;
-    if( kernelInitialized_ )
-    {
-        clVolume_ = new CLVolume<T>( volume_, VOLUME_CL_UNSIGNED_INT8 );
-        if( volumeArray_ )
-            clReleaseMemObject( volumeArray_ );
 
-        volumeArray_ = clVolume_->createDeviceVolume( context_ );
-        activeRenderingKernel_->setVolumeData(volumeArray_);
-    }
-    else initializeKernel_();
-
-    kernelInitialized_ = true;
+    initializeKernel_();
+    kernelInitialized_ = true ;
 
 }
 

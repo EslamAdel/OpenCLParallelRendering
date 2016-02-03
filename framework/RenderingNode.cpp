@@ -2,11 +2,14 @@
 #include <Logger.h>
 
 RenderingNode::RenderingNode(const uint64_t gpuIndex ,
+                             const uint frameWidth, const uint frameHeight,
                              Coordinates3D &globalTranslation,
                              Coordinates3D &globalRotation,
                              float &volumeDensity, float &brightness,
                              const Volume<uchar> *subVolume)
     : gpuIndex_( gpuIndex ),
+      frameWidth_( frameWidth ),
+      frameHeight_( frameHeight ),
       translation_( globalTranslation ),
       rotation_( globalRotation ),
       volumeDensity_( volumeDensity ),
@@ -14,13 +17,14 @@ RenderingNode::RenderingNode(const uint64_t gpuIndex ,
 {
     LOG_INFO( "Creating Context on Node with GPU <%d>", gpuIndex );
 
-    clContext_ = new CLContext< uint8_t >( subVolume , gpuIndex );
+    clContext_ = new CLContext< uint8_t >( subVolume , gpuIndex ,
+                                           frameWidth , frameHeight );
 
 }
 
 void RenderingNode::loadVolume(const Volume<uchar> *subVolume)
 {
-    clContext_->loadNewVolume( subVolume );
+    clContext_->loadVolume( subVolume );
 }
 
 void RenderingNode::applyTransformation( )
@@ -38,14 +42,12 @@ void RenderingNode::uploadBuffer()
 {
     clContext_->uploadFrame();
 
-    //emit this->bufferUploaded( this );
 }
 
 void RenderingNode::frameBufferToPixmap()
 {
     clContext_->frameBufferToPixmap();
 
-    emit this->bufferUploaded( this );
 }
 
 const uint64_t &RenderingNode::gpuIndex() const

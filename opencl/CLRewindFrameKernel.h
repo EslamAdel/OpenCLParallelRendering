@@ -11,21 +11,15 @@ class CLRewindFrameKernel
 public:
 
     enum KernelArguments {
-        Frame = 0 ,
-        FrameWidth ,
-        FrameHeight
+        Frame = 0
     };
 
     CLRewindFrameKernel(const cl_context clContext ,
                         const std::string kernelDirectory = ".",
                         const std::string kernelFile = "xray_compositing.cl" ,
-                        const std::string kernelName = "rewind_image2d");
+                        const std::string kernelName = "rewind_buffer");
 
     void setFrame(const cl_mem frameImage2D );
-
-    void setFrameWidth( const uint width );
-
-    void setFrameHeight( const uint height );
 
     void releaseKernel( );
 

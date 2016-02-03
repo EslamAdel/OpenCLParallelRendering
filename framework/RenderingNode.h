@@ -13,6 +13,8 @@ class RenderingNode : public QObject
     Q_OBJECT
 public:
     RenderingNode( const uint64_t gpuIndex,
+                   const uint frameWidth ,
+                   const uint frameHeight ,
                    Coordinates3D &globalTranslation,
                    Coordinates3D &globalRotation,
                    float &volumeDensity,
@@ -45,6 +47,8 @@ private:
     CLContext< uint8_t >* clContext_;
 
     const uint64_t &gpuIndex_;
+    const uint frameWidth_ ;
+    const uint frameHeight_ ;
 
     Coordinates3D &rotation_ ;
     Coordinates3D &translation_ ;

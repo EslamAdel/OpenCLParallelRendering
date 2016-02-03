@@ -3,18 +3,27 @@
 
 #include <QRunnable>
 #include "RenderingNode.h"
+#include "CompositingNode.h"
+#include <QObject>
 
-class TaskComposite : public QRunnable
+class TaskComposite : public QObject , public QRunnable
 {
+    Q_OBJECT
+
 public:
-    TaskComposite();
+    TaskComposite( CompositingNode *compositingNode ,const uint frameIndex );
+
+
+signals:
+    void compositingFinished_SIGNAL() ;
 
 protected:
     void run();
 
 private:
-    RenderingNode *compositingNode_;
+    CompositingNode *compositingNode_;
 
+    const uint frameIndex_ ;
 
 
 };
