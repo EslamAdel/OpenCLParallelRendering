@@ -38,6 +38,9 @@ public:
      * @param volumeDensity
      * @param brightness
      * Keep tracking any transformation. pass by reference.
+     * Transformation is modified outside this class, modification
+     * is prohibited by 'const'ing the references, as it is accessed
+     * by many threads simultaneously.
      */
     RenderingNode( const uint64_t gpuIndex,
                    const uint frameWidth , const uint frameHeight ,
@@ -45,11 +48,20 @@ public:
                    const Coordinates3D &globalRotation,
                    const float &volumeDensity, const float &brightness );
 
+    /**
+     * @brief applyTransformation
+     * Commit any transformation and start rendering.
+     */
     void applyTransformation();
 
 signals:
+    /**
+     * @brief finishedRendering
+     * Inform the outside world if rendering is finished.
+     * @param thisPtr
+     * Pass this pointer as Identifier to this node.
+     */
     void finishedRendering( RenderingNode *thisPtr );
-    void bufferUploaded( RenderingNode *thisPtr );
 
 
 
