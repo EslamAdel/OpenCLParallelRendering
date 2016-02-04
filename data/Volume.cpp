@@ -159,9 +159,9 @@ Volume< T >* Volume<T>::getBrick( const u_int64_t xi, const u_int64_t xf,
     Dimensions3D brickDimensions( xf - xi, yf - yi, zf - zi );
 
     // The center of the extraced brick, with respect to the real base volume.
-    Coordinates3D brickCoordinates( xi + brickDimensions.x / 2.f,
-                                    yi + brickDimensions.y / 2.f,
-                                    zi + brickDimensions.z / 2.f);
+    Coordinates3D brickCoordinates( xi + brickDimensions.x / 2.f  ,
+                                    yi + brickDimensions.y / 2.f  ,
+                                    zi + brickDimensions.z / 2.f  );
 
     // The relative center of the brick for the OpenGL unti texture,
     // with respect to the "unity" base volume.

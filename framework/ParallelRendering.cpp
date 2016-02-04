@@ -193,7 +193,7 @@ void ParallelRendering::distributeBaseVolume1D()
     for( auto i = 0 ; i < nDevices - 1 ; i++ )
     {
         auto *brick = baseVolume_->getBrick( newXDimension*i ,
-                                             newXDimension*( i + 1 ) - 1,
+                                             newXDimension*( i + 1 ) - 1 ,
                                              0,
                                              baseVolume_->getDimensions().y ,
                                              0,
