@@ -6,47 +6,26 @@
 #include "Volume.h"
 
 
-class RenderingNode : public QObject
+class RenderingNode : public QObject , public CLContext< uchar >
 {
     Q_OBJECT
 public:
     RenderingNode( const uint64_t gpuIndex,
-                   const uint frameWidth ,
-                   const uint frameHeight ,
+                   const uint frameWidth , const uint frameHeight ,
                    Coordinates3D &globalTranslation,
                    Coordinates3D &globalRotation,
-                   float &volumeDensity,
-                   float &brightness,
-                   const Volume<uchar> *subVolume= nullptr );
-
-    void loadVolume(const Volume<uchar> *subVolume);
+                   float &volumeDensity, float &brightness,
+                   const Volume< uchar > *subVolume= nullptr );
 
     void applyTransformation();
 
-    void uploadBuffer();
-
-    void frameBufferToPixmap();
-
-    const uint64_t & gpuIndex() const;
-
-    bool operator==( const RenderingNode &rhs) const;
-
-    CLContext< uint8_t > *getContext() const;
-
 signals:
     void finishedRendering( RenderingNode *thisPtr );
-//    void finishedCompositing( VirtualNode *thisPtr );
     void bufferUploaded( RenderingNode *thisPtr );
 
 
 
 private:
-
-    CLContext< uint8_t >* clContext_;
-
-    const uint64_t &gpuIndex_;
-    const uint frameWidth_ ;
-    const uint frameHeight_ ;
 
     Coordinates3D &rotation_ ;
     Coordinates3D &translation_ ;

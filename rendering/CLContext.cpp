@@ -364,15 +364,17 @@ void CLContext< T >::renderFrame( const float* inverseMatrix ,
 }
 
 template< class T >
-void CLContext<T>::uploadFrame()
+void CLContext<T>::uploadFrameFromDevice( cl_bool blocking )
 {
     // Assume everything is fine in the begnning
     cl_int clErrorCode = CL_SUCCESS;
 
-    clEnqueueReadBuffer( commandQueue_, clPixelBuffer_, CL_TRUE, 0,
+    clEnqueueReadBuffer( commandQueue_, clPixelBuffer_, blocking , 0,
                          sizeof( uint ) * gridSize_[0] * gridSize_[1],
             frameData_, 0, NULL, NULL );
-    oclHWDL::Error::checkCLError(clErrorCode);
+
+    if ( clErrorCode != CL_SUCCESS )
+        oclHWDL::Error::checkCLError(clErrorCode);
 
 }
 

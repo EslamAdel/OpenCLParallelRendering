@@ -219,7 +219,7 @@ void ParallelRendering::distributeBaseVolume1D()
         renderingNodes_[ renderingDevice ]->loadVolume( subVolume );
 
         LOG_DEBUG( "[DONE] Loading subVolume to GPU <%d>",
-                   renderingNodes_[ renderingDevice ]->gpuIndex( ));
+                   renderingNodes_[ renderingDevice ]->getGPUIndex( ));
     }
 
     // space optimizations:
@@ -291,7 +291,7 @@ uint8_t ParallelRendering::activeRenderingNodesCount() const
 
 void ParallelRendering::finishedRendering_SLOT(RenderingNode *finishedNode)
 {
-    LOG_DEBUG( "[DONE RENDERING] on GPU <%d> " , finishedNode->gpuIndex() );
+    LOG_DEBUG( "[DONE RENDERING] on GPU <%d> " , finishedNode->getGPUIndex() );
 
     collectorPool_.start( collectingTasks_[ finishedNode ]);
 }
@@ -311,7 +311,7 @@ void ParallelRendering::compositingFinished_SLOT()
 
 void ParallelRendering::frameLoadedToDevice_SLOT( RenderingNode *node )
 {
-    LOG_DEBUG( "[DONE TRANSFER] from GPU <%d>" , node->gpuIndex() );
+    LOG_DEBUG( "[DONE TRANSFER] from GPU <%d>" , node->getGPUIndex() );
 
     compositorPool_.start( compositingTasks_[ node ]);
 }

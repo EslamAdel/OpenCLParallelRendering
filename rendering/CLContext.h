@@ -86,7 +86,7 @@ public:
                       const float &imageBrightness );
 
 
-    void uploadFrame();
+    void uploadFrameFromDevice( cl_bool blocking = CL_TRUE );
 
     void frameBufferToPixmap();
 

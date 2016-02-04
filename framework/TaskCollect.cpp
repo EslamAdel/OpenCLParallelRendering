@@ -12,9 +12,9 @@ TaskCollect::TaskCollect( RenderingNode *renderingNode ,
 
 void TaskCollect::run()
 {
-    renderingNode_->uploadBuffer();
+    renderingNode_->uploadFrameFromDevice( CL_TRUE );
 
-    uint* frameData = renderingNode_->getContext()->getFrameData();
+    uint* frameData = renderingNode_->getFrameData();
 
 
     compositingNode_->setFrameData_HOST( frameIndex_ , frameData );

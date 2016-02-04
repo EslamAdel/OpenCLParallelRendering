@@ -110,8 +110,8 @@ void RenderingWindow::displayFrame_( )
 
     for( auto i = 0 ; i < parallelRenderer_->activeRenderingNodesCount() ; i++)
     {
-        QPixmap frame = *( parallelRenderer_->getRenderingNode( i )
-                           .getContext()->getFrame() );
+        QPixmap &frame =
+                *( parallelRenderer_->getRenderingNode( i ).getFrame() );
 
         frameContainers_[ i ]->setPixmap
                 (( frame.scaled( frameContainers_[ i ]->width( ),
