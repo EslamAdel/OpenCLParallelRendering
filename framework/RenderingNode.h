@@ -14,8 +14,7 @@ public:
                    const uint frameWidth , const uint frameHeight ,
                    Coordinates3D &globalTranslation,
                    Coordinates3D &globalRotation,
-                   float &volumeDensity, float &brightness,
-                   const Volume< uchar > *subVolume= nullptr );
+                   float &volumeDensity, float &brightness );
 
     void applyTransformation();
 

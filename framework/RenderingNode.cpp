@@ -5,10 +5,8 @@ RenderingNode::RenderingNode(const uint64_t gpuIndex ,
                              const uint frameWidth, const uint frameHeight,
                              Coordinates3D &globalTranslation,
                              Coordinates3D &globalRotation,
-                             float &volumeDensity, float &brightness,
-                             const Volume<uchar> *subVolume)
-    :
-      CLContext< uchar >( subVolume , gpuIndex , frameWidth , frameHeight ) ,
+                             float &volumeDensity, float &brightness )
+    : CLContext< uchar >( gpuIndex , frameWidth , frameHeight , nullptr ) ,
       translation_( globalTranslation ),
       rotation_( globalRotation ),
       volumeDensity_( volumeDensity ),
@@ -24,9 +22,9 @@ void RenderingNode::applyTransformation( )
 {
 
     this->paint( rotation_,
-                       translation_,
-                       volumeDensity_,
-                       imageBrightness_ );
+                 translation_,
+                 volumeDensity_,
+                 imageBrightness_ );
 
     emit this->finishedRendering( this );
 }

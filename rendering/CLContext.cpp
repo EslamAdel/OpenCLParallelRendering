@@ -19,10 +19,12 @@
 
 
 template< class T >
-CLContext< T >::CLContext(const Volume<T>* volume, const uint64_t gpuIndex ,
-                          const uint frameWidth, const uint frameHeight)
-    : volume_( volume )
-    , gpuIndex_( gpuIndex ) ,
+CLContext< T >::CLContext( const uint64_t gpuIndex ,
+                           const uint frameWidth ,
+                           const uint frameHeight ,
+                           const Volume<T>* volume)
+    : volume_( volume ) ,
+      gpuIndex_( gpuIndex ) ,
       frameWidth_( frameWidth ),
       frameHeight_( frameHeight )
 {

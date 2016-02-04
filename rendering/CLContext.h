@@ -21,8 +21,9 @@ public:
      * @param volume
      * @param gpuIndex
      */
-    CLContext( const Volume< T >* volume, const uint64_t gpuIndex,
-               const uint frameWidth , const uint frameHeight );
+    CLContext( const uint64_t gpuIndex ,
+               const uint frameWidth , const uint frameHeight ,
+               const Volume< T >* volume );
     ~CLContext( );
 
 public:
