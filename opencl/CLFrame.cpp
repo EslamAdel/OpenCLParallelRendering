@@ -38,8 +38,10 @@ void CLFrame< T >::createDeviceData( cl_context context )
                                   NULL ,
                                   &error );
     if( error != CL_SUCCESS )
+    {
         oclHWDL::Error::checkCLError( error );
-
+        LOG_ERROR("OpenCL Error!");
+    }
     LOG_DEBUG( "[DONE] Creating an OpenCL image " );
 }
 
@@ -55,7 +57,10 @@ void CLFrame< T >::writeDeviceData( cl_command_queue cmdQueue ,
                                   0 , NULL , NULL );
 
     if( error != CL_SUCCESS )
+    {
         oclHWDL::Error::checkCLError( error );
+        LOG_ERROR("OpenCL Error!");
+    }
 }
 
 template< class T >
@@ -76,7 +81,10 @@ void CLFrame< T >::readDeviceData( cl_command_queue cmdQueue ,
 //    LOG_DEBUG("Final Frame Size:%d " ,dimensions_.imageSize() * sizeof(T));
 //    LOG_DEBUG("Final Frame Checksum:%d" , checksum );
     if( error != CL_SUCCESS )
+    {
         oclHWDL::Error::checkCLError( error );
+        LOG_ERROR("OpenCL Error!");
+    }
 }
 
 

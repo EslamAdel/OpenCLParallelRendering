@@ -112,7 +112,7 @@ signals:
      * @brief framesReady_SIGNAL
      * For each rendered frame done, emit a signal.
      */
-    void framesReady_SIGNAL();
+    void frameReady_SIGNAL( RenderingNode *node );
 
     /**
      * @brief finalFrameReady_SIGNAL

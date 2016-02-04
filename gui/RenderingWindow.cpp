@@ -53,8 +53,8 @@ RenderingWindow::~RenderingWindow( )
 void RenderingWindow::intializeConnections_()
 {
     //parallelRenderer_
-    connect( parallelRenderer_ , SIGNAL( framesReady_SIGNAL( )),
-             this , SLOT( framesReady_SLOT( )));
+    connect( parallelRenderer_ , SIGNAL( frameReady_SIGNAL( RenderingNode* )),
+             this , SLOT( frameReady_SLOT( RenderingNode* )));
 
     connect( parallelRenderer_ , SIGNAL( finalFrameReady_SIGNAL( QPixmap& )) ,
              this , SLOT( collageFrameReady_SLOT( QPixmap& )));
@@ -102,29 +102,25 @@ void RenderingWindow::startRendering_( )
 
 }
 
-void RenderingWindow::displayFrame_( )
+void RenderingWindow::displayFrame_( QPixmap &frame , uint id )
 {
 
-    //LOG_DEBUG("displaying frames");
-    //LOG_DEBUG("rendering node ptr:%")
+    frameContainers_[ id ]->setPixmap
+            (( frame.scaled( frameContainers_[ id ]->width( ),
+                             frameContainers_[ id ]->height( ),
+                             Qt::KeepAspectRatio )));
 
-    for( auto i = 0 ; i < parallelRenderer_->activeRenderingNodesCount() ; i++)
-    {
-        QPixmap &frame =
-                *( parallelRenderer_->getRenderingNode( i ).getFrame() );
 
-        frameContainers_[ i ]->setPixmap
-                (( frame.scaled( frameContainers_[ i ]->width( ),
-                                 frameContainers_[ i ]->height( ),
-                                 Qt::KeepAspectRatio )));
-
-    }
 
 }
 
-void RenderingWindow::framesReady_SLOT()
+void RenderingWindow::frameReady_SLOT( RenderingNode *node )
 {
-    displayFrame_();
+    node->frameBufferToPixmap();
+    QPixmap *frame = node->getFrame();
+    uint index = node->getGPUIndex();
+
+    displayFrame_( *frame , index );
 }
 
 void RenderingWindow::collageFrameReady_SLOT(QPixmap &finalFrame)

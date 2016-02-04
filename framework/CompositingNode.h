@@ -9,6 +9,8 @@
 #include "CLRewindFrameKernel.h"
 #include <QObject>
 #include "CLImage2D.h"
+#include "CLImage2DArray.h"
+
 
 /**
  * @brief The CompositingNode class
@@ -35,6 +37,14 @@ class CompositingNode : public QObject
 {
     Q_OBJECT
 public:
+
+    /**
+     * @brief The CompositingMode enum
+     * Accumulate: composite buffer by buffer.
+     * PatchCompositing: composite all buffers in one command.
+     */
+    enum CompositingMode{ Accumulate , PatchCompositing } ;
+
     /**
      * @brief CompositingNode
      * @param gpuIndex
@@ -49,8 +59,9 @@ public:
      */
     CompositingNode( const uint64_t gpuIndex ,
                      const uint framesCount ,
-                     const uint frameWidth,
-                     const uint frameHeight ) ;
+                     const uint frameWidth ,
+                     const uint frameHeight ,
+                     CompositingMode mode = CompositingMode::Accumulate ) ;
 
     ~CompositingNode();
 
@@ -67,7 +78,7 @@ public:
      * @param data
      * The pointer of the buffer at host.
      */
-    void setFrameData_HOST(const uint frameIndex, uint *data);
+    void setFrameData_HOST(const uint frameIndex , uint *data);
 
     /**
      * @brief loadFrameDataToDevice
@@ -81,7 +92,8 @@ public:
      * If block is set to CL_TRUE, the current thraed will wait until the
      * buffer is completely loaded to device.
      */
-    void loadFrameDataToDevice(const uint frameIndex , const cl_bool block);
+    virtual void loadFrameDataToDevice( const uint frameIndex ,
+                                        const cl_bool block );
 
     /**
      * @brief accumulateFrame_DEVICE
@@ -94,6 +106,9 @@ public:
      * the index of the corresponding compositing frame.
      */
     void accumulateFrame_DEVICE( const uint frameIndex );
+
+
+    void compositeFrames_DEVICE( );
 
     /**
      * @brief uploadCollageFromDevice
@@ -148,6 +163,7 @@ private:
      */
     void initializeContext_() ;
 
+protected:
     /**
      * @brief initializeBuffers_
      * Allocate framesCount_ buffers on the compositng device, in addition
@@ -163,12 +179,15 @@ private:
      */
     void initializeKernel_() ;
 
+private:
     /**
      * @brief createCommandQueue_
      */
     void createCommandQueue_( );
 
 private:
+
+    const CompositingMode mode_ ;
 
     //Kernel wrapped objects.
     /**
@@ -210,6 +229,8 @@ private:
      * compositing buffers.
      */
     std::vector< CLFrame32* > frames_ ;
+
+    CLImage2DArray32 *framesArray_;
 
     //empty
     /**

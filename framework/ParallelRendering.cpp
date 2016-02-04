@@ -118,7 +118,8 @@ void ParallelRendering::addCompositingNode( const uint64_t gpuIndex )
     compositingNode_ = new CompositingNode( gpuIndex ,
                                             inUseGPUs_.size() ,
                                             frameWidth_ ,
-                                            frameHeight_ );
+                                            frameHeight_ ,
+                                            CompositingNode::Accumulate );
 
 
     // Frame index will be assigned to each rendering GPU (rednering node).
@@ -314,6 +315,8 @@ void ParallelRendering::frameLoadedToDevice_SLOT( RenderingNode *node )
     LOG_DEBUG( "[DONE TRANSFER] from GPU <%d>" , node->getGPUIndex() );
 
     compositorPool_.start( compositingTasks_[ node ]);
+
+    emit this->frameReady_SIGNAL( node );
 }
 
 void ParallelRendering::updateRotationX_SLOT(int angle)

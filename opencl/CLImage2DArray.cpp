@@ -6,7 +6,7 @@ CLImage2DArray< T >::CLImage2DArray( const uint width ,
                                      const uint height ,
                                      const uint arraySize ,
                                      const cl_channel_order channelOrder ,
-                                     const cl_channel_type channelType)
+                                     const cl_channel_type channelType )
     : width_( width ) ,
       height_( height ) ,
       arraySize_( arraySize )
@@ -35,11 +35,14 @@ void CLImage2DArray< T >::createDeviceData( cl_context context )
     deviceData_ =
             clCreateImage3D( context , CL_MEM_READ_WRITE ,
                              &imageFormat_ , width_ , height_ ,
-                             arraySize_ , width_ * sizeof( T ) ,
-                             width_ * height_ * sizeof( T ) , NULL , &error ) ;
+                             arraySize_ , 0 , 0 , NULL , &error ) ;
 
 
-    oclHWDL::Error::checkCLError( error );
+    if( error != CL_SUCCESS )
+    {
+        oclHWDL::Error::checkCLError( error );
+        LOG_ERROR("OpenCL Error!");
+    }
 
 
 }
@@ -69,8 +72,8 @@ void CLImage2DArray< T >::loadFrameDataToDevice( const uint index ,
 
     cl_int error = CL_SUCCESS ;
 
-    const size_t origin = { 0 , 0 , index } ;
-    const size_t region = { width_ , height_ , 1 } ;
+    const size_t origin[] = { 0 , 0 , index } ;
+    const size_t region[] = { width_ , height_ , 1 } ;
 
     error = clEnqueueWriteImage( commandQueue , deviceData_ , blocking ,
                                  origin , region , width_ * sizeof( T ) ,
@@ -79,7 +82,11 @@ void CLImage2DArray< T >::loadFrameDataToDevice( const uint index ,
                                  NULL , NULL ) ;
 
     if( error != CL_SUCCESS )
+    {
         oclHWDL::Error::checkCLError( error );
+        LOG_ERROR("OpenCL Error!");
+    }
+
 
 }
 

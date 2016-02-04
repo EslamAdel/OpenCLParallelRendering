@@ -59,7 +59,7 @@ signals:
      * @brief finishedRendering
      * Inform the outside world if rendering is finished.
      * @param thisPtr
-     * Pass this pointer as Identifier to this node.
+     * Pass this pointer as Identifier to this node. 
      */
     void finishedRendering( RenderingNode *thisPtr );
 

@@ -7,9 +7,12 @@ template< class T >
 class CLImage2DArray
 {
 public:
+
+
     CLImage2DArray( const uint width , const uint height ,
                     const uint arraySize ,
-                    cl_channel_order channelOrder = CL_INTENSITY );
+                    const cl_channel_order channelOrder = CL_INTENSITY ,
+                    const cl_channel_type channelType = CL_UNORM_INT8 );
 
     void createDeviceData( cl_context context );
 

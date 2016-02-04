@@ -2,10 +2,10 @@
 #include "Logger.h"
 
 
-CLXRayCompositingKernel::CLXRayCompositingKernel(const cl_context clContext,
-                                                 const std::string kernelDirectory,
-                                                 const std::string kernelFile,
-                                                 const std::string kernelName)
+CLXRayCompositingKernel::CLXRayCompositingKernel( const cl_context clContext,
+                                                  const std::string kernelName,
+                                                  const std::string kernelFile,
+                                                  const std::string kernelDirectory )
     : clContext_( clContext ),
       kernelDirectory_( kernelDirectory ),
       kernelFile_( kernelFile ),

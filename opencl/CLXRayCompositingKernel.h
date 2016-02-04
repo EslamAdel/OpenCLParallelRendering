@@ -15,9 +15,9 @@ public:
     };
 
     CLXRayCompositingKernel( const cl_context clContext ,
-                             const std::string kernelDirectory = ".",
+                             const std::string kernelName = "xray_compositing_accumulate" ,
                              const std::string kernelFile = "xray_compositing.cl" ,
-                             const std::string kernelName = "xray_compositing");
+                             const std::string kernelDirectory = "." );
 
 
     void setCollegeFrame( const cl_mem collageImage2D );
@@ -26,12 +26,6 @@ public:
 
 
     void releaseKernel( );
-
-//    std::string getKernelDirectory( ) const;
-
-//    std::string getKernelFile( ) const;
-
-//    oclHWDL::KernelContext *getKernelContext( ) const;
 
     cl_kernel getKernelObject( ) const;
 

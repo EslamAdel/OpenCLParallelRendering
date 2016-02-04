@@ -35,10 +35,10 @@ private:
     /**
      * @brief displayFrame_
      */
-    void displayFrame_( );
+    void displayFrame_( QPixmap &frame , uint id );
 
 public slots:
-    void framesReady_SLOT();
+    void frameReady_SLOT( RenderingNode *node );
     void collageFrameReady_SLOT( QPixmap &finalFrame ) ;
 
 private slots:

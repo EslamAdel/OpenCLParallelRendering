@@ -12,6 +12,16 @@ TaskComposite::TaskComposite( CompositingNode *compositingNode ,
 
 void TaskComposite::run()
 {
+//    static int framesLoaded = 0 ;
+//    if( ++framesLoaded == compositingNode_->framesCount() )
+//    {
+//        framesLoaded = 0 ;
+//        compositingNode_->compositeFrames_DEVICE();
+//        compositingNode_->uploadCollageFromDevice();
+//        compositingNode_->rewindCollageFrame_DEVICE( CL_TRUE );
+//        emit this->compositingFinished_SIGNAL();
+
+//    }
 
     compositingNode_->accumulateFrame_DEVICE( frameIndex_ );
 
