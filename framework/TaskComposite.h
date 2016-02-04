@@ -14,11 +14,21 @@ class TaskComposite : public QObject , public QRunnable
     Q_OBJECT
 
 public:
+    /**
+     * @brief TaskComposite
+     * @param compositingNode
+     * @param frameIndex
+     * @param compositedFramesCount
+     */
     TaskComposite( CompositingNode *compositingNode ,const uint frameIndex ,
                    uint8_t &compositedFramesCount );
 
 
 signals:
+    /**
+     * @brief compositingFinished_SIGNAL
+     * Emit a signal when compositing is done.
+     */
     void compositingFinished_SIGNAL() ;
 
 protected:

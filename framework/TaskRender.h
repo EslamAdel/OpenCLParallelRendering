@@ -4,6 +4,10 @@
 #include <QRunnable>
 #include "RenderingNode.h"
 
+/**
+ * @brief The TaskRender class
+ * Wrap the instruction of rendering frame.
+ */
 class TaskRender : public QRunnable
 {
 public:

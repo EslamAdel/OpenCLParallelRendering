@@ -105,6 +105,13 @@ public:
     uint* getFrameData( );
 
 
+    /**
+     * @brief paint
+     * @param rotation
+     * @param translation
+     * @param volumeDensity
+     * @param imageBrightness
+     */
     void paint( const Coordinates3D &rotation ,
                 const Coordinates3D &translation,
                 const float &volumeDensity ,
