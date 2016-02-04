@@ -3,9 +3,10 @@
 
 RenderingNode::RenderingNode(const uint64_t gpuIndex ,
                              const uint frameWidth, const uint frameHeight,
-                             Coordinates3D &globalTranslation,
-                             Coordinates3D &globalRotation,
-                             float &volumeDensity, float &brightness )
+                             const Coordinates3D &globalTranslation,
+                             const Coordinates3D &globalRotation,
+                             const float &volumeDensity,
+                             const float &brightness )
     : CLContext< uchar >( gpuIndex , frameWidth , frameHeight , nullptr ) ,
       translation_( globalTranslation ),
       rotation_( globalRotation ),
