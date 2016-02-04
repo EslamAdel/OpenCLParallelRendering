@@ -52,7 +52,8 @@ SOURCES += main.cpp \
     framework/CompositingNode.cpp \
     opencl/CLRewindFrameKernel.cpp \
     opencl/CLImage2D.cpp \
-    framework/CLContext.cpp
+    framework/CLContext.cpp \
+    opencl/CLImage2DArray.cpp
 
 HEADERS += \
     system/Colors.hh \
@@ -233,7 +234,8 @@ HEADERS += \
     framework/CLContext.ipp \
     opencl/CLFrame.ipp \
     opencl/CLImage2D.ipp \
-    opencl/CLVolume.ipp
+    opencl/CLVolume.ipp \
+    opencl/CLImage2DArray.h
 
 FORMS += \
     gui/RenderingWindow.ui
@@ -241,5 +243,7 @@ FORMS += \
 DISTFILES += \
     kernels/volumeRender.cl \
     kernels/xray.cl \
-    kernels/xray_compositing.cl
+    kernels/xray_compositing.cl \
+    opencl/climage2darray.ipp \
+    opencl/CLImage2DArray.ipp
 
