@@ -171,7 +171,7 @@ void CompositingNode::initializeBuffers_()
         uint* frameData ;
         framesData_.push_back( frameData );
 
-        CLFrame32 *frame = new CLFrame32( collageFrameDimensions_ );
+        auto frame = new CLFrame32( collageFrameDimensions_ );
         frame->createDeviceData( context_ );
         frames_.push_back( frame );
 

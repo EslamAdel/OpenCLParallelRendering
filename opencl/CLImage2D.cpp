@@ -5,17 +5,15 @@ template< class T >
 CLImage2D< T >::CLImage2D(const Dimensions2D dimensions, T *data)
     : CLFrame< T >( dimensions, data )
 {
-
     imageFormat_.image_channel_order = CL_INTENSITY;
     imageFormat_.image_channel_data_type = CL_UNORM_INT8;
-
-
 }
 
 template< class T >
 void CLImage2D< T >::createDeviceData( cl_context context )
 {
-    LOG_DEBUG( "Creating an OpenCL image " );
+    LOG_DEBUG( "Creating an OpenCL image: %dx%d ",
+               this->dimensions_.x , this->dimensions_.y );
 
     // Initially, assume that everything is fine
     cl_int error = CL_SUCCESS;
@@ -24,7 +22,7 @@ void CLImage2D< T >::createDeviceData( cl_context context )
                                          &imageFormat_ ,
                                          this->dimensions_.x ,
                                          this->dimensions_.y ,
-                                         this->dimensions_.x *sizeof(uint),
+                                         0 ,
                                          NULL ,
                                          &error );
     if( error != CL_SUCCESS )
