@@ -12,6 +12,7 @@ TaskCollect::TaskCollect( RenderingNode *renderingNode ,
 
 void TaskCollect::run()
 {
+
     renderingNode_->uploadFrameFromDevice( CL_TRUE );
 
     uint* frameData = renderingNode_->getFrameData();

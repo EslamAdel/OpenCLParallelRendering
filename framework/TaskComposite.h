@@ -6,6 +6,9 @@
 #include "CompositingNode.h"
 #include <QObject>
 
+/**
+ * @brief The TaskComposite class
+ */
 class TaskComposite : public QObject , public QRunnable
 {
     Q_OBJECT
