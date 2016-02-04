@@ -4,8 +4,6 @@
 #include <QObject>
 #include "CLContext.h"
 #include "Volume.h"
-#include "Image.h"
-
 
 
 class RenderingNode : public QObject
