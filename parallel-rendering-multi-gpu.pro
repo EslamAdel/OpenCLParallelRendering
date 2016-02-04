@@ -16,7 +16,6 @@ INCLUDEPATH += auxillary/
 INCLUDEPATH += geometry/
 INCLUDEPATH += opencl/
 INCLUDEPATH += kernel/
-INCLUDEPATH += rendering/
 INCLUDEPATH += /usr/local/include/oclHWDL/
 INCLUDEPATH += /usr/local/cuda-7.5/include/
 INCLUDEPATH += framework/
@@ -39,7 +38,6 @@ SOURCES += main.cpp \
     opencl/CLTransferFunction.cpp \
     opencl/CLVolume.cpp \
     opencl/CLXRayRenderingKernel.cpp \
-    rendering/CLContext.cpp \
     system/Utilities.cpp \
     system/oclUtils.cpp \
     framework/ParallelRendering.cpp \
@@ -53,7 +51,8 @@ SOURCES += main.cpp \
     opencl/CLFrame.cpp \
     framework/CompositingNode.cpp \
     opencl/CLRewindFrameKernel.cpp \
-    opencl/CLImage2D.cpp
+    opencl/CLImage2D.cpp \
+    framework/CLContext.cpp
 
 HEADERS += \
     system/Colors.hh \
@@ -214,7 +213,6 @@ HEADERS += \
     opencl/CLTransferFunction.h \
     opencl/CLVolume.h \
     opencl/CLXRayRenderingKernel.h \
-    rendering/CLContext.h \
     system/Utilities.h \
     system/oclUtils.h \
     framework/ParallelRendering.h \
@@ -230,7 +228,12 @@ HEADERS += \
     opencl/CLFrame.h \
     framework/CompositingNode.h \
     opencl/CLRewindFrameKernel.h \
-    opencl/CLImage2D.h
+    opencl/CLImage2D.h \
+    framework/CLContext.h \
+    framework/CLContext.ipp \
+    opencl/CLFrame.ipp \
+    opencl/CLImage2D.ipp \
+    opencl/CLVolume.ipp
 
 FORMS += \
     gui/RenderingWindow.ui
