@@ -24,7 +24,7 @@
  * 1| CompositingNode::setFrameData_HOST( frameIndex , ptr );
  * 2| CompositingNode::loadFrameDataToDevice( frameIndex, block);
  * 3| CompositingNode::accumulateFrame_DEVICE( frameIndex );
- * 4| Repeat 1-3 until all compositing frames accumulated.
+ * 4| Repeat 1-3 until for each compositing frame.
  * 5| CompositingNode::uploadCollageFromDevice();
  * 6| CompositingNode::getCollagePixmap();
  * 7| CompositingNode::rewindCollageFrame_DEVICE( blocking );
@@ -106,7 +106,8 @@ public:
      * @brief rewindCollageFrame_DEVICE
      * After all compositing frames accumulated to the collage buffer,
      * and the resultant collage buffer is properly uploaded to host,
-     * this method will clear the collage buffer for the next rendering loop.
+     * this method will clear the collage buffer at device for the next
+     * rendering loop.
      *
      * @param blocking
      * If CL_TRUE, the thread will wait until the frame is completely cleared.
