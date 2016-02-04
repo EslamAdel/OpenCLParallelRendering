@@ -14,10 +14,8 @@
 #include "TaskRender.h"
 #include "TaskCollect.h"
 #include "TaskComposite.h"
-#include "Transformation.h"
 #include "oclHWDL.h"
 #include <unordered_map>
-#include "Transformation.h"
 #include "CompositingNode.h"
 
 typedef std::unordered_map<const oclHWDL::Device*,RenderingNode*> RenderingNodes;

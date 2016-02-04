@@ -48,7 +48,6 @@ SOURCES += main.cpp \
     framework/TaskCollect.cpp \
     framework/TaskComposite.cpp \
     auxillary/VolumeUtilities.cpp \
-    data/Transformation.cpp \
     gui/RenderingWindow.cpp \
     opencl/CLXRayCompositingKernel.cpp \
     opencl/CLFrame.cpp \
@@ -226,7 +225,6 @@ HEADERS += \
     framework/TaskCollect.h \
     framework/TaskComposite.h \
     auxillary/VolumeUtilities.h \
-    data/Transformation.h \
     gui/RenderingWindow.h \
     opencl/CLXRayCompositingKernel.h \
     opencl/CLFrame.h \
