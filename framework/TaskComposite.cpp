@@ -1,13 +1,13 @@
 #include "TaskComposite.h"
+#include "ProfilingExterns.h"
 
-TaskComposite::TaskComposite( CompositingNode *compositingNode ,
+
+TaskComposite::TaskComposite(CompositingNode *compositingNode ,
                               const uint frameIndex ,
-                              uint8_t &compositedFramesCount ,
-                              CompositingProfile &compositingProfile)
+                              uint8_t &compositedFramesCount )
     : frameIndex_( frameIndex ),
       compositedFramesCount_( compositedFramesCount ) ,
-      mode_( compositingNode->compositingMode() ),
-      compositingProfile_( compositingProfile )
+      mode_( compositingNode->compositingMode() )
 {
     compositingNode_ = compositingNode ;
     setAutoDelete( false );
@@ -55,32 +55,32 @@ TaskComposite::TaskComposite( CompositingNode *compositingNode ,
 
 void TaskComposite::run()
 {
-    compositingProfile_.threadSpawningTime_.stop();
+
+    compositingProfile.threadSpawningTime_.stop();
 
     if( compositedFramesCount_ == 0 )
-        compositingProfile_.compositingTime_.start();
+        compositingProfile.compositingTime_.start();
 
-
-
-    compositingProfile_.accumulatingFrameTime_.start();
+    compositingProfile.accumulatingFrameTime_.start();
     compositingNode_->accumulateFrame_DEVICE( frameIndex_ );
-    compositingProfile_.accumulatingFrameTime_.stop();
+    compositingProfile.accumulatingFrameTime_.stop();
 
     if( ++compositedFramesCount_ == compositingNode_->framesCount() )
     {
         compositedFramesCount_ = 0 ;
 
-        compositingProfile_.loadCollageFromDeviceTime_.start();
+        compositingProfile.loadCollageFromDeviceTime_.start();
         compositingNode_->uploadCollageFromDevice();
-        compositingProfile_.loadCollageFromDeviceTime_.stop();
+        compositingProfile.loadCollageFromDeviceTime_.stop();
 
-        compositingProfile_.rewindCollageTime_.start();
+        compositingProfile.rewindCollageTime_.start();
         compositingNode_->rewindCollageFrame_DEVICE( CL_TRUE );
-        compositingProfile_.rewindCollageTime_.stop();
+        compositingProfile.rewindCollageTime_.stop();
+
+        compositingProfile.compositingTime_.stop();
 
         emit this->compositingFinished_SIGNAL();
 
-        compositingProfile_.compositingTime_.stop();
     }
 }
 

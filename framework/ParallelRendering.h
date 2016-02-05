@@ -1,6 +1,7 @@
 #ifndef PARALLELRENDERING_H
 #define PARALLELRENDERING_H
 
+#include "ProfilingExterns.h"
 #include <Headers.hh>
 #include <unordered_map>
 
@@ -24,13 +25,6 @@ typedef std::unordered_map<const oclHWDL::Device*,RenderingNode*> RenderingNodes
 typedef std::unordered_map<const RenderingNode* ,TaskRender*> RenderingTasks;
 typedef std::unordered_map<const RenderingNode* ,TaskCollect*> CollectingTasks;
 typedef std::unordered_map<const RenderingNode* ,TaskComposite*> CompositingTasks;
-
-#include "Timer.h"
-
-typedef std::unordered_map<const RenderingNode* , RenderingProfile* > RenderingProfiles;
-typedef std::unordered_map<const RenderingNode* , CollectingProfile*> CollectingProfiles;
-typedef std::unordered_map<const RenderingNode* , CompositingProfile*> CompositingProfiles;
-
 
 
 /**
@@ -272,11 +266,6 @@ private:
     const uint frameWidth_ ;
     const uint frameHeight_ ;
 
-    //benchmarking
-    RenderingProfiles renderingProfiles_ ;
-    CollectingProfiles collectingProfiles_;
-    CompositingProfile compositingProfile_;
-    FrameworkProfile frameworkProfile_ ;
 
 };
 

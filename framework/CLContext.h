@@ -7,7 +7,7 @@
 #include <QPixmap>
 #include <CLVolume.h>
 #include <CLXRayRenderingKernel.h>
-#include "Timer.h"
+//#include "ProfilingExterns.hh"
 
 /**
  * @brief The CLContext class
@@ -24,8 +24,7 @@ public:
      */
     CLContext( const uint64_t gpuIndex ,
                const uint frameWidth , const uint frameHeight ,
-               const Volume< T >* volume ,
-               RenderingProfile &renderingProfile );
+               const Volume< T >* volume );
     ~CLContext( );
 
 public:
@@ -286,7 +285,6 @@ protected:
     const uint frameWidth_ ;
     const uint frameHeight_ ;
 
-    RenderingProfile &renderingProfile_ ;
 };
 
 #endif // CLGPUCONTEXT_H

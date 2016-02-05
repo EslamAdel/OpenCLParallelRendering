@@ -2,14 +2,14 @@
 
 #include <Headers.hh>
 #include <Volume.h>
-#include<oclUtils.h>
+#include <oclUtils.h>
 #include <system/Utilities.h>
 #include <Logger.h>
 
 #include <auxillary/glm/glm.hpp>
 #include <auxillary/glm/gtc/matrix_transform.hpp>
 #include <auxillary/glm/gtc/type_ptr.hpp>
-
+#include "ProfilingExterns.h"
 
 
 #define DEG_TO_RAD(x) (x * 0.0174532925199f)
@@ -19,16 +19,14 @@
 
 
 template< class T >
-CLContext< T >::CLContext( const uint64_t gpuIndex ,
+CLContext< T >::CLContext(const uint64_t gpuIndex ,
                            const uint frameWidth ,
                            const uint frameHeight ,
-                           const Volume<T>* volume ,
-                           RenderingProfile &renderingProfile )
+                           const Volume<T>* volume )
     : volume_( volume ) ,
       gpuIndex_( gpuIndex ) ,
       frameWidth_( frameWidth ),
-      frameHeight_( frameHeight ) ,
-      renderingProfile_( renderingProfile )
+      frameHeight_( frameHeight )
 {
     linearFiltering_ = true;
 
@@ -249,7 +247,9 @@ void CLContext< T >::paint( const Coordinates3D &rotation ,
                             const float &imageBrightness)
 {
 
-    renderingProfile_.transformationMatrix_.start();
+
+    RenderingProfile &profile = getRenderingProfile( renderingProfiles , gpuIndex_ );
+    profile.transformationMatrix_.start();
 
     // Use the GLM to create the Model View Matrix.
     // Initialize to identity.
@@ -323,10 +323,12 @@ void CLContext< T >::paint( const Coordinates3D &rotation ,
     inverseMatrixArray_[ 10 ] = modelViewMatrix[ 10 ];
     inverseMatrixArray_[ 11 ] = modelViewMatrix[ 14 ];
 
-    renderingProfile_.transformationMatrix_.stop();
 
+    profile.transformationMatrix_.stop();
+
+    profile.rendering_.start();
     renderFrame( inverseMatrixArray_ , volumeDensity , imageBrightness );
-
+    profile.rendering_.stop();
 }
 
 template< class T >
@@ -339,7 +341,6 @@ void CLContext< T >::renderFrame( const float* inverseMatrix ,
     // Assume everything is fine in the begnning
     cl_int clErrorCode = CL_SUCCESS;
 
-    renderingProfile_.rendering_.start();
 
     clErrorCode |= clEnqueueWriteBuffer( commandQueue_,
                                          inverseMatrix_,
@@ -373,7 +374,6 @@ void CLContext< T >::renderFrame( const float* inverseMatrix ,
 
     clFinish( commandQueue_ );
 
-    renderingProfile_.rendering_.stop();
 }
 
 template< class T >

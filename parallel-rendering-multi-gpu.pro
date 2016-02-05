@@ -56,7 +56,7 @@ SOURCES += main.cpp \
     opencl/CLImage2D.cpp \
     framework/CLContext.cpp \
     opencl/CLImage2DArray.cpp \
-    profiling/Timer.cpp
+    profiling/ProfilingExterns.cpp
 
 HEADERS += \
     system/Colors.hh \
@@ -239,7 +239,8 @@ HEADERS += \
     opencl/CLImage2D.ipp \
     opencl/CLVolume.ipp \
     opencl/CLImage2DArray.h \
-    profiling/Timer.h
+    profiling/Profiles.hh \
+    profiling/ProfilingExterns.h
 
 FORMS += \
     gui/RenderingWindow.ui
