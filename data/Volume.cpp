@@ -4,10 +4,12 @@
 
 template< class T >
 Volume< T >::Volume( const std::string prefix, const bool drawBoundingBox )
-    : drawBoundingBox_( drawBoundingBox )
+    : drawBoundingBox_( drawBoundingBox ),
+      data_(NULL),
+      mmapAddr_(NULL)
 {
-    // Load the volume from a file
-    loadVolumeData_( prefix );
+    //Map Volume instead of Loading in Memory
+    mapVolumeData( prefix );
 
     coordinates_ = Coordinates3D( dimensions_.x / 2.f,
                                   dimensions_.y / 2.f,
@@ -38,6 +40,7 @@ Volume< T >::Volume( const Coordinates3D brickCoordinates,
     unitCubeCenter_ = brickUnitCubeCenter ;
     unitCubeScaleFactors_ = brickUnitCubeScaleFactors ;
     data_ = brickData ;
+    mmapAddr_ = NULL ;
 
 }
 
@@ -106,6 +109,31 @@ void Volume< T >::loadVolumeData_( const std::string prefix )
 
     // Close the stream
     imgFileStream.close();
+}
+
+template< class T >
+void Volume< T >::mapVolumeData(const std::string prefix)
+{
+    int fd;
+
+    //Load the header file .hdr
+    loadHeaderData_( prefix );
+
+    //Get the .img file's path
+    std::string filePath = prefix + std::string( ".img" );
+
+    //Open the file
+    fd = open(filePath.c_str(), O_RDONLY);
+    if ( fd == -1 )
+    {
+        LOG_ERROR( "Could not open the volume file [%s]", filePath.c_str() );
+    }
+
+    //Map the volume to virtual addresses
+    mmapAddr_=(T* ) mmap(NULL,sizeInBytes_, PROT_READ, MAP_PRIVATE, fd, 0);
+
+    //Close the file
+    close(fd);
 }
 
 template< class T >
@@ -209,7 +237,8 @@ Volume< T >* Volume<T>::getBrick( const u_int64_t xi, const u_int64_t xf,
                 const uint64_t volumeIndex =
                         get1DIndex( xi + i, yi + j, zi + k );
 
-                brickData[brickIndex] = data_[volumeIndex];
+                //Get Brick Data From whole volume that has mapped
+                brickData[brickIndex] = mmapAddr_[volumeIndex];
             }
         }
     }
@@ -228,7 +257,7 @@ T* Volume< T >::getValue( const uint64_t x,
 {
     const uint64_t index = get1DIndex( x, y, z );
     T* value = new T[ 1 ];
-    *value = data_[ index ];
+    *value = data_ != NULL ? data_[ index ] : mmapAddr_[index];
     return value;
 }
 
@@ -237,7 +266,7 @@ T *Volume<T>::getValue( const Voxel3DIndex xyz ) const
 {
     const u_int64_t index = get1DIndex( xyz.x, xyz.y, xyz.z );
     T* value = new T[ 1 ];
-    *value = data_[ index ];
+    *value = data_ != NULL ? data_[index] : mmapAddr_[index];
     return value;
 }
 
@@ -245,6 +274,12 @@ template< class T >
 T* Volume< T >::getData() const
 {
     return data_;
+}
+
+template< class T >
+T* Volume< T >::getMampAddr() const
+{
+    return mmapAddr_;
 }
 
 template< class T >
@@ -296,7 +331,8 @@ Image<T>* Volume< T >::getSliceX( const u_int64_t x ) const
     {
         for( u_int64_t j = 0; j < dimensions_.z; j++ )
         {
-            sliceData[sliceIndex] = data_[get1DIndex( x, i, j )];
+            sliceData[sliceIndex] = data_ != NULL ? data_[get1DIndex(x, i, j)]
+                    : mmapAddr_[get1DIndex(x, i, j)];
             sliceIndex++;
         }
     }
@@ -316,7 +352,8 @@ Image<T>* Volume< T >::getSliceY( const u_int64_t y ) const
     {
         for( u_int64_t j = 0; j < dimensions_.z; j++ )
         {
-            sliceData[sliceIndex] = data_[get1DIndex( i, y, j )];
+            sliceData[sliceIndex] = data_ != NULL ? data_[get1DIndex(i, y ,j)]
+                    : mmapAddr_[get1DIndex(i, y , j)];
             sliceIndex++;
         }
     }
@@ -336,7 +373,8 @@ Image<T>* Volume< T >::getSliceZ( const u_int64_t z ) const
     {
         for( u_int64_t j = 0; j < dimensions_.y; j++ )
         {
-            sliceData[sliceIndex] = data_[get1DIndex( i, j, z )];
+            sliceData[sliceIndex] = data_ != NULL ? data_[get1DIndex(i, j ,z)]
+                    : mmapAddr_[get1DIndex(i, j ,z)];
             sliceIndex++;
         }
     }
@@ -364,7 +402,8 @@ Image< T >* Volume< T >::getProjectionX( ) const
             for( u_int64_t j = 0; j < dimensions_.z; j++ )
             {
                 sliceDataFloat[pixelIndex] +=
-                        data_[get1DIndex( sliceIdx, i, j )];
+                        data_ != NULL ? data_[get1DIndex(sliceIdx, i, j)]
+                        : mmapAddr_[get1DIndex(sliceIdx, i, j)];
                 pixelIndex++;
             }
         }
@@ -404,7 +443,9 @@ Image<T> * Volume< T >::getProjectionY() const
             for( u_int64_t j = 0; j < dimensions_.z; j++ )
             {
                 sliceDataFloat[pixelIndex] +=
-                        data_[get1DIndex( i, sliceIdx, j )];
+                        data_ != NULL ? data_[get1DIndex(i, sliceIdx , j)]
+                        : mmapAddr_[get1DIndex(i, sliceIdx , j)];
+
                 pixelIndex++;
             }
         }
@@ -444,7 +485,8 @@ Image<T>* Volume<T>::getProjectionZ() const
             for( u_int64_t j = 0; j < dimensions_.y; j++ )
             {
                 sliceDataFloat[pixelIndex] +=
-                        data_[get1DIndex( i, j, sliceIdx )];
+                        data_ != NULL ? data_[get1DIndex(i, j ,sliceIdx )]
+                        : mmapAddr_[get1DIndex(i, j ,sliceIdx)];
                 pixelIndex++;
             }
         }

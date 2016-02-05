@@ -4,6 +4,11 @@
 #include <Headers.hh>
 #include <Typedefs.hh>
 #include <Image.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <sys/mman.h>
+#include <unistd.h>
 
 template < class T >
 class Volume
@@ -88,6 +93,12 @@ public: // Public functions
      * @return A pointer to the data of the volume.
      */
     virtual T* getData() const;
+
+    /**
+     * @brief getMampAddr
+     * @return
+     */
+    virtual T* getMampAddr() const;
 
     /**
      * @brief get1DIndex
@@ -183,6 +194,12 @@ protected: // Protected functions
     virtual void loadVolumeData_( const std::string prefix );
 
     /**
+     * @brief mapVolumeData
+     * @param prefix
+     */
+     void mapVolumeData(const std::string prefix);
+
+    /**
      * @brief addBoundingBox_
      * Adds the bounding box to the data
      */
@@ -217,6 +234,11 @@ protected: // Protected (private) member variables
      * @brief data_
      */
     T* data_;
+
+    /**
+     * @brief mmapAddr_
+     */
+    T* mmapAddr_;
 
     /**
      * @brief drawBoundingBox_
