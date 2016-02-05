@@ -21,6 +21,8 @@ INCLUDEPATH += /usr/local/cuda-7.5/include/
 INCLUDEPATH += framework/
 INCLUDEPATH += gui/
 INCLUDEPATH += compositing/
+INCLUDEPATH += profiling/
+
 
 LIBS += -L/usr/local/lib -loclHWDL
 LIBS += -L/usr/lib/x86_64-linux-gnu/ -lOpenCL
@@ -53,7 +55,8 @@ SOURCES += main.cpp \
     opencl/CLRewindFrameKernel.cpp \
     opencl/CLImage2D.cpp \
     framework/CLContext.cpp \
-    opencl/CLImage2DArray.cpp
+    opencl/CLImage2DArray.cpp \
+    profiling/Timer.cpp
 
 HEADERS += \
     system/Colors.hh \
@@ -235,7 +238,8 @@ HEADERS += \
     opencl/CLFrame.ipp \
     opencl/CLImage2D.ipp \
     opencl/CLVolume.ipp \
-    opencl/CLImage2DArray.h
+    opencl/CLImage2DArray.h \
+    profiling/Timer.h
 
 FORMS += \
     gui/RenderingWindow.ui

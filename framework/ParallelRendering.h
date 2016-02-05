@@ -25,6 +25,13 @@ typedef std::unordered_map<const RenderingNode* ,TaskRender*> RenderingTasks;
 typedef std::unordered_map<const RenderingNode* ,TaskCollect*> CollectingTasks;
 typedef std::unordered_map<const RenderingNode* ,TaskComposite*> CompositingTasks;
 
+#include "Timer.h"
+
+typedef std::unordered_map<const RenderingNode* , RenderingProfile* > RenderingProfiles;
+typedef std::unordered_map<const RenderingNode* , CollectingProfile*> CollectingProfiles;
+typedef std::unordered_map<const RenderingNode* , CompositingProfile*> CompositingProfiles;
+
+
 
 /**
  * @brief The ParallelRendering class
@@ -208,6 +215,8 @@ private:
      */
     void syncTransformation_();
 
+    void benchmark_() ;
+
 private:
 
     //oclHWDl utilities
@@ -263,7 +272,11 @@ private:
     const uint frameWidth_ ;
     const uint frameHeight_ ;
 
-
+    //benchmarking
+    RenderingProfiles renderingProfiles_ ;
+    CollectingProfiles collectingProfiles_;
+    CompositingProfile compositingProfile_;
+    FrameworkProfile frameworkProfile_ ;
 
 };
 

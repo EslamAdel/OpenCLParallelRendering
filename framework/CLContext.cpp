@@ -22,11 +22,13 @@ template< class T >
 CLContext< T >::CLContext( const uint64_t gpuIndex ,
                            const uint frameWidth ,
                            const uint frameHeight ,
-                           const Volume<T>* volume)
+                           const Volume<T>* volume ,
+                           RenderingProfile &renderingProfile )
     : volume_( volume ) ,
       gpuIndex_( gpuIndex ) ,
       frameWidth_( frameWidth ),
-      frameHeight_( frameHeight )
+      frameHeight_( frameHeight ) ,
+      renderingProfile_( renderingProfile )
 {
     linearFiltering_ = true;
 
@@ -246,6 +248,9 @@ void CLContext< T >::paint( const Coordinates3D &rotation ,
                             const float &volumeDensity ,
                             const float &imageBrightness)
 {
+
+    renderingProfile_.transformationMatrix_.start();
+
     // Use the GLM to create the Model View Matrix.
     // Initialize to identity.
     auto glmMVMatrix = glm::mat4( 1.0f );
@@ -318,6 +323,7 @@ void CLContext< T >::paint( const Coordinates3D &rotation ,
     inverseMatrixArray_[ 10 ] = modelViewMatrix[ 10 ];
     inverseMatrixArray_[ 11 ] = modelViewMatrix[ 14 ];
 
+    renderingProfile_.transformationMatrix_.stop();
 
     renderFrame( inverseMatrixArray_ , volumeDensity , imageBrightness );
 
@@ -333,6 +339,8 @@ void CLContext< T >::renderFrame( const float* inverseMatrix ,
     // Assume everything is fine in the begnning
     cl_int clErrorCode = CL_SUCCESS;
 
+    renderingProfile_.rendering_.start();
+
     clErrorCode |= clEnqueueWriteBuffer( commandQueue_,
                                          inverseMatrix_,
                                          CL_FALSE,
@@ -346,6 +354,7 @@ void CLContext< T >::renderFrame( const float* inverseMatrix ,
     // Execute the OpenCL kernel, and write the results to the PBO that is
     // connected now to the OpenCL context.
     size_t localSize[ ] = { LOCAL_SIZE_X, LOCAL_SIZE_Y };
+
 
     activeRenderingKernel_->setVolumeDensityFactor( volumeDensity);
     activeRenderingKernel_->setImageBrightnessFactor(imageBrightness);
@@ -363,6 +372,8 @@ void CLContext< T >::renderFrame( const float* inverseMatrix ,
     oclHWDL::Error::checkCLError(clErrorCode);
 
     clFinish( commandQueue_ );
+
+    renderingProfile_.rendering_.stop();
 }
 
 template< class T >

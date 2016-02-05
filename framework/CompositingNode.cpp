@@ -181,6 +181,11 @@ uint CompositingNode::framesCount() const
     return framesCount_ ;
 }
 
+CompositingNode::CompositingMode CompositingNode::compositingMode() const
+{
+    return mode_ ;
+}
+
 void CompositingNode::selectGPU_()
 {
     // Scan the hardware

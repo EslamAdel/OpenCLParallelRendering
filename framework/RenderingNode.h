@@ -46,7 +46,8 @@ public:
                    const uint frameWidth , const uint frameHeight ,
                    const Coordinates3D &globalTranslation,
                    const Coordinates3D &globalRotation,
-                   const float &volumeDensity, const float &brightness );
+                   const float &volumeDensity, const float &brightness ,
+                   RenderingProfile &renderingProfile );
 
     /**
      * @brief applyTransformation

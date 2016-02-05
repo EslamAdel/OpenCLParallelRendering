@@ -5,6 +5,7 @@
 #include "RenderingNode.h"
 #include "CompositingNode.h"
 #include <QObject>
+#include "Timer.h"
 
 /**
  * @brief The TaskCollect class
@@ -28,7 +29,8 @@ public:
      */
     TaskCollect( RenderingNode *renderingNode ,
                  CompositingNode *compositingNode ,
-                 const uint frameIndex );
+                 const uint frameIndex ,
+                 CollectingProfile &collectingProfile );
 
 signals:
     /**
@@ -48,6 +50,8 @@ private:
     RenderingNode *renderingNode_;
     CompositingNode *compositingNode_;
     const uint frameIndex_;
+
+    CollectingProfile &collectingProfile_ ;
 };
 
 #endif // TASKCOLLECT_H

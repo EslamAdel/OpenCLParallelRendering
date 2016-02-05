@@ -5,6 +5,7 @@
 #include "RenderingNode.h"
 #include "CompositingNode.h"
 #include <QObject>
+#include "Timer.h"
 
 /**
  * @brief The TaskComposite class
@@ -21,8 +22,12 @@ public:
      * @param compositedFramesCount
      */
     TaskComposite( CompositingNode *compositingNode ,const uint frameIndex ,
-                   uint8_t &compositedFramesCount );
+                   uint8_t &compositedFramesCount ,
+                   CompositingProfile &compositingProfile );
 
+    void patchCompositing() ;
+
+    void accumulateCompositing() ;
 
 signals:
     /**
@@ -37,9 +42,13 @@ protected:
 private:
     CompositingNode *compositingNode_;
 
+    const CompositingNode::CompositingMode mode_ ;
+
     const uint frameIndex_ ;
 
     uint8_t &compositedFramesCount_ ;
+
+    CompositingProfile &compositingProfile_ ;
 
 
 };

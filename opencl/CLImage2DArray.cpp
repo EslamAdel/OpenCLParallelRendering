@@ -76,8 +76,8 @@ void CLImage2DArray< T >::loadFrameDataToDevice( const uint index ,
     const size_t region[] = { width_ , height_ , 1 } ;
 
     error = clEnqueueWriteImage( commandQueue , deviceData_ , blocking ,
-                                 origin , region , width_ * sizeof( T ) ,
-                                 width_ * height_ * sizeof( T ) ,
+                                 origin , region , width_ * sizeof( uint ) ,
+                                 width_ * height_ * sizeof( uint ) ,
                                  ( const void * ) framesData_[ index ] , 0 ,
                                  NULL , NULL ) ;
 

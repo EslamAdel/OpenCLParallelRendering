@@ -152,6 +152,12 @@ public:
      */
     uint framesCount() const ;
 
+    /**
+     * @brief compositingMode
+     * @return
+     */
+    CompositingMode compositingMode() const ;
+
 private:
     /**
      * @brief selectGPU_
