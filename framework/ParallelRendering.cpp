@@ -16,7 +16,7 @@
 
 #ifdef BENCH_MARKING
 #define AUTO_ROTATE
-#define TEST_FRAMES 100
+#define TEST_FRAMES 500
 #endif
 
 
@@ -319,7 +319,7 @@ uint8_t ParallelRendering::activeRenderingNodesCount() const
 
 void ParallelRendering::finishedRendering_SLOT(RenderingNode *finishedNode)
 {
-    LOG_DEBUG( "[DONE RENDERING] on GPU <%d> " , finishedNode->getGPUIndex() );
+//    LOG_DEBUG( "[DONE RENDERING] on GPU <%d> " , finishedNode->getGPUIndex() );
 
     collectingProfiles_[ finishedNode ]->threadSpawningTime_.start();
 
@@ -355,7 +355,7 @@ void ParallelRendering::compositingFinished_SLOT()
 
 void ParallelRendering::frameLoadedToDevice_SLOT( RenderingNode *node )
 {
-    LOG_DEBUG( "[DONE TRANSFER] from GPU <%d>" , node->getGPUIndex() );
+//    LOG_DEBUG( "[DONE TRANSFER] from GPU <%d>" , node->getGPUIndex() );
 
     compositingProfile_.threadSpawningTime_.start();
     compositorPool_.start( compositingTasks_[ node ]);
@@ -443,5 +443,9 @@ void ParallelRendering::benchmark_()
     compositingProfile_.accumulatingFrameTime_.print( 1 );
     compositingProfile_.loadCollageFromDeviceTime_.print( 1 );
     compositingProfile_.rewindCollageTime_.print( 1 );
+    compositingProfile_.compositingTime_.print( 1 );
+
+    printf("Statistics: framework\n");
+    frameworkProfile_.renderingLoopTime_.print( 1 );
 
 }
