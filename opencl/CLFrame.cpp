@@ -6,7 +6,7 @@
 template< class T >
 CLFrame< T >::CLFrame( const Dimensions2D dimensions ,
                        T *data )
-    : dimensions_( dimensions ) ,
+    : dimensions_( dimensions ),
       hostData_( data )
 {
     if( typeid(T) != typeid(uint) )

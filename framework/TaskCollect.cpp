@@ -16,9 +16,9 @@ void TaskCollect::run()
     renderingNode_->uploadFrameFromDevice( CL_TRUE );
 
     uint* frameData = renderingNode_->getFrameData();
+    float frameDepth = renderingNode_->getCurrentCenter().z;
 
-
-    compositingNode_->setFrameData_HOST( frameIndex_ , frameData );
+    compositingNode_->setFrameData_HOST( frameIndex_ , frameData ,frameDepth);
     compositingNode_->loadFrameDataToDevice( frameIndex_ , CL_TRUE );
 
     emit this->frameLoadedToDevice_SIGNAL( renderingNode_ );

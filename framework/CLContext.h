@@ -73,6 +73,12 @@ public:
     cl_kernel getKernel( ) const;
 
     /**
+     * @brief getCurrentCenter
+     * @return
+     */
+    Coordinates3D getCurrentCenter();
+
+    /**
      * @brief handleKernel
      * @param string
      */
@@ -152,6 +158,16 @@ protected:
      * @brief clVolume_
      */
     CLVolume< T >* clVolume_;
+
+    /**
+     * @brief originalCenter_
+     */
+    Coordinates3D originalCenter_;
+
+    /**
+     * @brief currentCenter_
+     */
+    Coordinates3D currentCenter_;
 
     /**
      * @brief gpuIndex_

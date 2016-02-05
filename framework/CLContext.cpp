@@ -149,6 +149,12 @@ cl_kernel CLContext< T >::getKernel( ) const
 }
 
 template< class T >
+Coordinates3D CLContext< T >::getCurrentCenter()
+{
+    return currentCenter_;
+}
+
+template< class T >
 void CLContext< T >::releasePixelBuffer( )
 {
     clReleaseMemObject( clPixelBuffer_ );
@@ -303,8 +309,18 @@ void CLContext< T >::paint( const Coordinates3D &rotation ,
             modelViewMatrix[ index++ ] = glmMVMatrix[ i ][ j ];
         }
     }
+    Coordinates3D center;
+    // You can then apply this matrix to your vertices with a standard matrix multiplication. Keep in mind that the matrix is arranged in row-major order. With an input vector xIn, the transformed vector xOut is:
+    center.x = modelViewMatrix[0] * volume_->getUnitCubeCenter().x + modelViewMatrix[1] * volume_->getUnitCubeCenter().y + modelViewMatrix[2] * volume_->getUnitCubeCenter().z + modelViewMatrix[12];
+    center.y = modelViewMatrix[4] * volume_->getUnitCubeCenter().x + modelViewMatrix[5] * volume_->getUnitCubeCenter().y + modelViewMatrix[6] * volume_->getUnitCubeCenter().z + modelViewMatrix[13];
+    center.z = modelViewMatrix[8] * volume_->getUnitCubeCenter().x + modelViewMatrix[9] * volume_->getUnitCubeCenter().y + modelViewMatrix[10] * volume_->getUnitCubeCenter().z+ modelViewMatrix[14];
 
-    //transpose
+    originalCenter_ = volume_->getUnitCubeCenter();
+
+    //Set he current center after transformation
+    currentCenter_ = center;
+
+    //Arrange the matrix in column-major order as expected from the rendering kernel
     inverseMatrixArray_[  0 ] = modelViewMatrix[  0 ];
     inverseMatrixArray_[  1 ] = modelViewMatrix[  4 ];
     inverseMatrixArray_[  2 ] = modelViewMatrix[  8 ];

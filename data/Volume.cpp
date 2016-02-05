@@ -156,7 +156,16 @@ Volume< T >* Volume<T>::getBrick( const u_int64_t xi, const u_int64_t xf,
                                   const u_int64_t zi, const u_int64_t zf )
 {
     // The dimensions of the extracted brick
-    Dimensions3D brickDimensions( xf - xi, yf - yi, zf - zi );
+    //Add 1 to solve the one pixel shift problem
+    Dimensions3D brickDimensions( xf - xi + 1, yf - yi + 1 , zf - zi + 1 );
+
+    //Subtract 1 in case of edge Brick
+    if(xf == dimensions_.x)
+        brickDimensions.x -= 1;
+    if(yf == dimensions_.y)
+        brickDimensions.y -= 1;
+    if(zf == dimensions_.z)
+        brickDimensions.z -= 1;
 
     // The center of the extraced brick, with respect to the real base volume.
     Coordinates3D brickCoordinates( xi + brickDimensions.x / 2.f,
@@ -175,13 +184,13 @@ Volume< T >* Volume<T>::getBrick( const u_int64_t xi, const u_int64_t xf,
               float( brickDimensions.y ) / dimensions_.y,
               float( brickDimensions.z ) / dimensions_.z );
 
-//    std::cout << "center " << brickUnitCubeCenter.x
-//              << " " << brickUnitCubeCenter.y << " "
-//              <<  brickUnitCubeCenter.z << std::endl;
+    //    std::cout << "center " << brickUnitCubeCenter.x
+    //              << " " << brickUnitCubeCenter.y << " "
+    //              <<  brickUnitCubeCenter.z << std::endl;
 
-//    std::cout << brickUnitCubeScaleFactors.x << " "
-//              << brickUnitCubeScaleFactors.y << " "
-//              <<  brickUnitCubeScaleFactors.z << std::endl;
+    //    std::cout << brickUnitCubeScaleFactors.x << " "
+    //              << brickUnitCubeScaleFactors.y << " "
+    //              <<  brickUnitCubeScaleFactors.z << std::endl;
 
     // The array that will be filled with the brick data
     T* brickData = new T[brickDimensions.volumeSize()];

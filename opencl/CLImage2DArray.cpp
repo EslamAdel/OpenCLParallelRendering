@@ -6,10 +6,12 @@ CLImage2DArray< T >::CLImage2DArray( const uint width ,
                                      const uint height ,
                                      const uint arraySize ,
                                      const cl_channel_order channelOrder ,
-                                     const cl_channel_type channelType )
+                                     const cl_channel_type channelType ,
+                                     const float depth)
     : width_( width ) ,
       height_( height ) ,
-      arraySize_( arraySize )
+      arraySize_( arraySize ) ,
+      frameDepth_(depth)
 {
 
     if( typeid( T ) != typeid( uint ) )
@@ -48,7 +50,7 @@ void CLImage2DArray< T >::createDeviceData( cl_context context )
 }
 
 template< class T >
-void CLImage2DArray< T >::setFrameData( const uint index , T *data)
+void CLImage2DArray< T >::setFrameData( const uint index , T *data ,float depth)
 {
     if( index >= arraySize_ )
         LOG_ERROR("Out of range index!");
@@ -58,6 +60,7 @@ void CLImage2DArray< T >::setFrameData( const uint index , T *data)
         delete framesData_[ index ];
         framesData_[ index ] = data;
         framesSet_[ index ] = true ;
+        frameDepth_ = depth;
     }
 }
 
@@ -94,6 +97,12 @@ template< class T >
 cl_mem CLImage2DArray< T >::getDeviceData() const
 {
     return deviceData_ ;
+}
+
+template< class T>
+float CLImage2DArray< T >::getFrameDepth()
+{
+    return frameDepth_;
 }
 
 

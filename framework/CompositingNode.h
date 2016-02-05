@@ -78,7 +78,7 @@ public:
      * @param data
      * The pointer of the buffer at host.
      */
-    void setFrameData_HOST(const uint frameIndex , uint *data);
+    void setFrameData_HOST(const uint frameIndex , uint *data ,float depth);
 
     /**
      * @brief loadFrameDataToDevice

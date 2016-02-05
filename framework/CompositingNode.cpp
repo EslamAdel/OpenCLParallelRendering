@@ -43,14 +43,15 @@ uint64_t CompositingNode::getGPUIndex() const
     return gpuIndex_;
 }
 
-void CompositingNode::setFrameData_HOST(const uint frameIndex , uint* data )
+void CompositingNode::setFrameData_HOST(const uint frameIndex , uint* data ,float depth )
 {
     framesData_[ frameIndex ] = data;
 
     if( mode_ == CompositingMode::Accumulate )
         frames_[ frameIndex ]->setHostData( data );
     else
-        framesArray_->setFrameData( frameIndex , data );
+     framesArray_->setFrameData( frameIndex , data , depth );
+
 }
 
 void CompositingNode::loadFrameDataToDevice( const uint frameIndex ,
@@ -62,6 +63,7 @@ void CompositingNode::loadFrameDataToDevice( const uint frameIndex ,
         framesArray_->loadFrameDataToDevice( frameIndex ,
                                              commandQueue_ ,
                                              block );
+
 }
 
 void CompositingNode::accumulateFrame_DEVICE( const uint frameIndex )
@@ -284,4 +286,3 @@ void CompositingNode::createCommandQueue_()
     if( clErrorCode != CL_SUCCESS )
         oclHWDL::Error::checkCLError( clErrorCode );
 }
-
