@@ -448,33 +448,31 @@ void ParallelRendering::benchmark_()
     for( auto device : inUseGPUs_ )
     {
         RenderingNode *node = renderingNodes_[ device ];
-        uint gpuIndex = node->getGPUIndex();
-        RenderingProfile *rProfile = renderingProfiles[ node ];
-        CollectingProfile *cProfile = collectingProfiles[ node ];
 
-        printf("Statistics: Rendering on GPU <%d>\n" , gpuIndex );
-        rProfile->threadSpawning_TIMER.print( 1 );
-        rProfile->mvMatrix_TIMER.print( 1 );
-        rProfile->rendering_TIMER.print( 1 );
+        printf("Statistics: Rendering on GPU <%d>\n" , node->getGPUIndex() );
+        PRINT( RENDERING_PROFILE_PASS_PTR( node ).threadSpawning_TIMER );
+        PRINT( RENDERING_PROFILE_PASS_PTR( node ).mvMatrix_TIMER );
+        PRINT( RENDERING_PROFILE_PASS_PTR( node ).rendering_TIMER );
 
         printf("Statistics: Data Transfer from GPU <%d> --> Host --> GPU <%d>\n" ,
-               gpuIndex , compositingNode_->getGPUIndex() ) ;
-        cProfile->threadSpawning_TIMER.print( 1 );
-        cProfile->loadingBufferFromDevice_TIMER.print( 1 );
-        cProfile->loadingBufferToDevice_TIMER.print( 1 );
+               node->getGPUIndex() , compositingNode_->getGPUIndex() ) ;
+        PRINT( COLLECTING_PROFILE( node ).threadSpawning_TIMER );
+        PRINT( COLLECTING_PROFILE( node ).loadingBufferFromDevice_TIMER );
+        PRINT( COLLECTING_PROFILE( node ).loadingBufferToDevice_TIMER );
 
     }
 
     printf("Statistics: Compositing on GPU <%d>\n", compositingNode_->getGPUIndex() ) ;
-    compositingProfile.threadSpawning_TIMER.print( 1 );
-    //compositingProfile_.setKernelParameters_.print( 1 );
-    compositingProfile.accumulatingFrame_TIMER.print( 1 );
-    compositingProfile.loadCollageFromDevice_TIMER.print( 1 );
-    compositingProfile.rewindCollage_TIMER.print( 1 );
-    compositingProfile.compositing_TIMER.print( 1 );
+    PRINT( compositingProfile.threadSpawning_TIMER ) ;
+    PRINT( compositingProfile.accumulatingFrame_TIMER ) ;
+    PRINT( compositingProfile.loadCollageFromDevice_TIMER ) ;
+    PRINT( compositingProfile.rewindCollage_TIMER ) ;
+    PRINT( compositingProfile.rewindCollage_TIMER ) ;
+
 
     printf("Statistics: framework\n");
-    frameworkProfile.convertToPixmap_TIMER.print( 1 );
-    frameworkProfile.renderingLoop_TIMER.print( 1 );
+    PRINT( frameworkProfile.convertToPixmap_TIMER );
+    PRINT( frameworkProfile.renderingLoop_TIMER );
+
 
 }

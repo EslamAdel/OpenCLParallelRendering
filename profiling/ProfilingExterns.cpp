@@ -9,8 +9,16 @@ RenderingProfile &getRenderingProfile( RenderingProfiles &profiles , uint gpuInd
 
 }
 
-CollectingProfile &getCollectingProfile(CollectingProfiles &profile,
-                                        RenderingNode *node)
+CollectingProfile &getCollectingProfile( CollectingProfiles &profiles ,
+                                         RenderingNode *node)
 {
-    return *profile[ node ];
+    return *profiles[ node ];
+}
+
+
+
+RenderingProfile &getRenderingProfile( RenderingProfiles &profiles,
+                                       RenderingNode *node)
+{
+    return *profiles[ node ] ;
 }
