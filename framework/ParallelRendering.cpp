@@ -189,11 +189,11 @@ void ParallelRendering::distributeBaseVolume1D()
     const uint64_t newXDimension =  baseXDimension / nDevices  ;
 
 
-
+    //Extract Brick For each node
     for( auto i = 0 ; i < nDevices - 1 ; i++ )
     {
         auto *brick = baseVolume_->getBrick( newXDimension*i ,
-                                             newXDimension*( i + 1 ) - 1,
+                                             newXDimension*( i + 1 ) ,
                                              0,
                                              baseVolume_->getDimensions().y ,
                                              0,
@@ -202,6 +202,7 @@ void ParallelRendering::distributeBaseVolume1D()
         bricks_.push_back( brick );
     }
 
+    //The Last node will have the entire remaining brick
     auto brick = baseVolume_->getBrick( newXDimension*( nDevices - 1 ),
                                         baseVolume_->getDimensions().x ,
                                         0,
