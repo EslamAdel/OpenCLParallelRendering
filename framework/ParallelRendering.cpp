@@ -137,6 +137,7 @@ void ParallelRendering::addCompositingNode( const uint64_t gpuIndex )
                                             inUseGPUs_.size() ,
                                             frameWidth_ ,
                                             frameHeight_ ,
+                                            framesCenters_ ,
                                             CompositingNode::Accumulate );
 
 

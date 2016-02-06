@@ -61,6 +61,7 @@ public:
                      const uint framesCount ,
                      const uint frameWidth ,
                      const uint frameHeight ,
+                     const std::vector< Coordinates3D > &framesCenters ,
                      CompositingMode mode = CompositingMode::Accumulate ) ;
 
     ~CompositingNode();
@@ -78,7 +79,7 @@ public:
      * @param data
      * The pointer of the buffer at host.
      */
-    void setFrameData_HOST(const uint frameIndex , uint *data ,float depth);
+    void setFrameData_HOST(const uint frameIndex , uint *data );
 
     /**
      * @brief loadFrameDataToDevice
@@ -228,6 +229,8 @@ private:
      * Collage frame object.
      */
     CLFrame32 *collageFrame_ ;
+
+    const std::vector< Coordinates3D > &framesCenters_ ;
 
     //empty
     /**

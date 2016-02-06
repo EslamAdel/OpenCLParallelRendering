@@ -12,12 +12,11 @@ public:
     CLImage2DArray( const uint width , const uint height ,
                     const uint arraySize ,
                     const cl_channel_order channelOrder = CL_INTENSITY ,
-                    const cl_channel_type channelType = CL_UNORM_INT8 ,
-                    const float depth = 0);
+                    const cl_channel_type channelType = CL_UNORM_INT8  );
 
     void createDeviceData( cl_context context );
 
-    void setFrameData( const uint index , T *data ,float depth);
+    void setFrameData( const uint index , T *data );
 
     void loadFrameDataToDevice( const uint index ,
                                 cl_command_queue commandQueue,

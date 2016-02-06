@@ -243,6 +243,9 @@ private:
     float brightness_;
     float volumeDensity_;
 
+    //frames centers in space
+    std::vector< Coordinates3D > framesCenters_;
+
     //shared data for multithreads, must not be modified during
     //the activity rendering threads.
     //modified using syncTransformation_()

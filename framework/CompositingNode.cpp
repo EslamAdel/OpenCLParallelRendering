@@ -14,10 +14,12 @@ CompositingNode::CompositingNode( const uint64_t gpuIndex,
                                   const uint framesCount,
                                   const uint frameWidth ,
                                   const uint frameHeight ,
+                                  const std::vector<Coordinates3D> &framesCenters,
                                   CompositingMode mode)
     : gpuIndex_( gpuIndex ) ,
       framesCount_( framesCount ) ,
       collageFrameDimensions_( frameWidth , frameHeight ) ,
+      framesCenters_( framesCenters ) ,
       mode_( mode )
 {
 
@@ -43,14 +45,14 @@ uint64_t CompositingNode::getGPUIndex() const
     return gpuIndex_;
 }
 
-void CompositingNode::setFrameData_HOST(const uint frameIndex , uint* data ,float depth )
+void CompositingNode::setFrameData_HOST(const uint frameIndex , uint* data  )
 {
     framesData_[ frameIndex ] = data;
 
     if( mode_ == CompositingMode::Accumulate )
         frames_[ frameIndex ]->setHostData( data );
     else
-     framesArray_->setFrameData( frameIndex , data , depth );
+     framesArray_->setFrameData( frameIndex , data  );
 
 }
 
