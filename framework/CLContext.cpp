@@ -149,12 +149,6 @@ cl_kernel CLContext< T >::getKernel( ) const
 }
 
 template< class T >
-Coordinates3D CLContext< T >::getCurrentCenter()
-{
-    return currentCenter_;
-}
-
-template< class T >
 void CLContext< T >::releasePixelBuffer( )
 {
     clReleaseMemObject( clPixelBuffer_ );
@@ -250,7 +244,8 @@ template< class T >
 void CLContext< T >::paint( const Coordinates3D &rotation ,
                             const Coordinates3D &translation,
                             const float &volumeDensity ,
-                            const float &imageBrightness)
+                            const float &imageBrightness ,
+                            Coordinates3D &currentCenter )
 {
 
 
@@ -316,14 +311,24 @@ void CLContext< T >::paint( const Coordinates3D &rotation ,
     }
     Coordinates3D center;
     // You can then apply this matrix to your vertices with a standard matrix multiplication. Keep in mind that the matrix is arranged in row-major order. With an input vector xIn, the transformed vector xOut is:
-    center.x = modelViewMatrix[0] * volume_->getUnitCubeCenter().x + modelViewMatrix[1] * volume_->getUnitCubeCenter().y + modelViewMatrix[2] * volume_->getUnitCubeCenter().z + modelViewMatrix[12];
-    center.y = modelViewMatrix[4] * volume_->getUnitCubeCenter().x + modelViewMatrix[5] * volume_->getUnitCubeCenter().y + modelViewMatrix[6] * volume_->getUnitCubeCenter().z + modelViewMatrix[13];
-    center.z = modelViewMatrix[8] * volume_->getUnitCubeCenter().x + modelViewMatrix[9] * volume_->getUnitCubeCenter().y + modelViewMatrix[10] * volume_->getUnitCubeCenter().z+ modelViewMatrix[14];
+    center.x = modelViewMatrix[0] * volume_->getUnitCubeCenter().x +
+               modelViewMatrix[1] * volume_->getUnitCubeCenter().y +
+               modelViewMatrix[2] * volume_->getUnitCubeCenter().z +
+               modelViewMatrix[12];
 
-    originalCenter_ = volume_->getUnitCubeCenter();
+    center.y = modelViewMatrix[4] * volume_->getUnitCubeCenter().x +
+               modelViewMatrix[5] * volume_->getUnitCubeCenter().y +
+               modelViewMatrix[6] * volume_->getUnitCubeCenter().z +
+               modelViewMatrix[13];
+
+    center.z = modelViewMatrix[8] * volume_->getUnitCubeCenter().x +
+               modelViewMatrix[9] * volume_->getUnitCubeCenter().y +
+               modelViewMatrix[10] * volume_->getUnitCubeCenter().z+
+               modelViewMatrix[14];
+
 
     //Set he current center after transformation
-    currentCenter_ = center;
+    currentCenter = center;
 
     //Arrange the matrix in column-major order as expected from the rendering kernel
     inverseMatrixArray_[  0 ] = modelViewMatrix[  0 ];
@@ -462,7 +467,7 @@ void CLContext< T >::createPixelBuffer( const uint frameWidth,
 }
 
 template< class T >
-void CLContext<T>::loadVolume(const Volume<T> *volume)
+void CLContext<T>::loadVolume_(const Volume<T> *volume)
 {
 
     //TODO : leakage control

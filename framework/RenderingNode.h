@@ -54,6 +54,15 @@ public:
      */
     void applyTransformation();
 
+    /**
+     * @brief getCurrentCenter
+     * @return
+     */
+    const Coordinates3D &getCurrentCenter() const ;
+
+    void setFrameCenter(  const Coordinates3D center );
+
+    void loadVolume( const Volume< uchar >* volume );
 signals:
     /**
      * @brief finishedRendering
@@ -65,6 +74,7 @@ signals:
 
 
 
+
 private:
 
     const Coordinates3D &rotation_ ;
@@ -73,6 +83,11 @@ private:
     const float &imageBrightness_ ;
 
 
+
+    /**
+     * @brief currentCenter_
+     */
+    Coordinates3D currentCenter_ ;
 
 };
 

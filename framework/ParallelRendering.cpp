@@ -133,6 +133,11 @@ void ParallelRendering::addCompositingNode( const uint64_t gpuIndex )
     }
 
     // add compositingNode_ that will manage compositing rendered frames.
+    std::vector< const Coordinates3D *> framesCenters_ ;
+    for( auto device : inUseGPUs_ )
+        framesCenters_.push_back( &renderingNodes_[ device ]->getCurrentCenter() );
+
+
     compositingNode_ = new CompositingNode( gpuIndex ,
                                             inUseGPUs_.size() ,
                                             frameWidth_ ,

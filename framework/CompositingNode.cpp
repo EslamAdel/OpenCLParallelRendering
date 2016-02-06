@@ -14,7 +14,7 @@ CompositingNode::CompositingNode( const uint64_t gpuIndex,
                                   const uint framesCount,
                                   const uint frameWidth ,
                                   const uint frameHeight ,
-                                  const std::vector<Coordinates3D> &framesCenters,
+                                  const std::vector< const Coordinates3D *> framesCenters,
                                   CompositingMode mode)
     : gpuIndex_( gpuIndex ) ,
       framesCount_( framesCount ) ,
@@ -22,6 +22,9 @@ CompositingNode::CompositingNode( const uint64_t gpuIndex,
       framesCenters_( framesCenters ) ,
       mode_( mode )
 {
+
+    if( framesCount != framesCenters.size() )
+        LOG_ERROR("Size Mismatch in framesCount and framesCenters count");
 
     LOG_DEBUG("Constructing CompositingNode:\nFramesCount:%d\n"
               "FrameSize:%dx%d" , framesCount_ ,

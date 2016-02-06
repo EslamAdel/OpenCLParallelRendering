@@ -168,12 +168,12 @@ public: // Public functions
     Image<T>* getProjectionZ() const;
 
 
-    Volume<T> *getBrick(const u_int64_t xi,
-                        const u_int64_t xf,
-                        const u_int64_t yi,
-                        const u_int64_t yf,
-                        const u_int64_t zi,
-                        const u_int64_t zf);
+    Volume<T> *getBrick( const u_int64_t xi ,
+                         const u_int64_t xf ,
+                         const u_int64_t yi ,
+                         const u_int64_t yf ,
+                         const u_int64_t zi ,
+                         const u_int64_t zf );
 
 protected: // Protected functions
 
@@ -197,7 +197,7 @@ protected: // Protected functions
      * @brief mapVolumeData
      * @param prefix
      */
-     void mapVolumeData(const std::string prefix);
+    void mapVolumeData(const std::string prefix);
 
     /**
      * @brief addBoundingBox_

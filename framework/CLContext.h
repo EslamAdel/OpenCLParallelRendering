@@ -35,8 +35,6 @@ public:
     void createPixelBuffer( const uint bufferWidth,
                             const uint bufferHeight );
 
-    void loadVolume( const Volume< T >* volume );
-
     /**
      * @brief getGPUIndex
      * @return
@@ -73,11 +71,6 @@ public:
       */
     cl_kernel getKernel( ) const;
 
-    /**
-     * @brief getCurrentCenter
-     * @return
-     */
-    Coordinates3D getCurrentCenter();
 
     /**
      * @brief handleKernel
@@ -122,7 +115,8 @@ public:
     void paint( const Coordinates3D &rotation ,
                 const Coordinates3D &translation,
                 const float &volumeDensity ,
-                const float &imageBrightness);
+                const float &imageBrightness ,
+                Coordinates3D &currentCenter);
 
 private:
 
@@ -149,6 +143,7 @@ private:
     void freeBuffers_( );
 
 protected:
+    void loadVolume_( const Volume< T >* volume );
 
     /**
      * @brief volume_
@@ -159,16 +154,6 @@ protected:
      * @brief clVolume_
      */
     CLVolume< T >* clVolume_;
-
-    /**
-     * @brief originalCenter_
-     */
-    Coordinates3D originalCenter_;
-
-    /**
-     * @brief currentCenter_
-     */
-    Coordinates3D currentCenter_;
 
     /**
      * @brief gpuIndex_

@@ -25,7 +25,20 @@ void RenderingNode::applyTransformation( )
     this->paint( rotation_,
                  translation_,
                  volumeDensity_,
-                 imageBrightness_ );
+                 imageBrightness_ ,
+                 currentCenter_ );
 
     emit this->finishedRendering( this );
+}
+
+const Coordinates3D &RenderingNode::getCurrentCenter() const
+{
+    return currentCenter_ ;
+}
+
+
+void RenderingNode::loadVolume(const Volume<uchar> *volume)
+{
+    this->loadVolume_( volume );
+    currentCenter_ = volume->getUnitCubeCenter();
 }

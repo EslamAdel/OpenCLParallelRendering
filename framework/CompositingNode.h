@@ -61,7 +61,7 @@ public:
                      const uint framesCount ,
                      const uint frameWidth ,
                      const uint frameHeight ,
-                     const std::vector< Coordinates3D > &framesCenters ,
+                     const std::vector< const Coordinates3D* > framesCenters ,
                      CompositingMode mode = CompositingMode::Accumulate ) ;
 
     ~CompositingNode();
@@ -230,7 +230,7 @@ private:
      */
     CLFrame32 *collageFrame_ ;
 
-    const std::vector< Coordinates3D > &framesCenters_ ;
+    const std::vector< const Coordinates3D* > &framesCenters_ ;
 
     //empty
     /**
