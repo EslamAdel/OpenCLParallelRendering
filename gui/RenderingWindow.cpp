@@ -1,6 +1,10 @@
 #include "RenderingWindow.h"
 #include "ui_RenderingWindow.h"
 #include <Logger.h>
+#include <QFileDialog>
+#include <QDateTime>
+#include <QDir>
+#include <QPicture>
 
 #define MAX_NODES 3
 
@@ -25,11 +29,12 @@ RenderingWindow::RenderingWindow( QWidget *parent ) :
     frameContainers_.push_back( ui->frameContainer0 );
     frameContainers_.push_back( ui->frameContainer1 );
     frameContainers_.push_back( ui->frameContainer2 );
-
     for( auto i = 0 ; i < parallelRenderer_->machineGPUsCount() ; i++ )
     {
         LOG_DEBUG( "Deploy GPU#%d" , i );
         parallelRenderer_->addRenderingNode( i );
+        if( i < frameContainers_.size())
+            frameContainers_[ i ]->setEnabled( true );
     }
 
     LOG_DEBUG( "Distribute Volume" );
@@ -82,6 +87,9 @@ void RenderingWindow::intializeConnections_()
     connect( ui->densitySlider , SIGNAL( valueChanged( int )),
              this , SLOT( newDensity_SLOT( int )));
 
+    //capture button
+    connect( ui->captureButton , SIGNAL( released( )) ,
+             this , SLOT( captureView_SLOT( )));
 }
 
 void RenderingWindow::startRendering_( )
@@ -109,7 +117,6 @@ void RenderingWindow::displayFrame_( QPixmap &frame , uint id )
             (( frame.scaled( frameContainers_[ id ]->width( ),
                              frameContainers_[ id ]->height( ),
                              Qt::KeepAspectRatio )));
-
 
 
 }
@@ -182,5 +189,35 @@ void RenderingWindow::newDensity_SLOT(int value)
 
     float density = float( value ) / 100.0;
     parallelRenderer_->updateVolumeDensity_SLOT( density );
+}
+
+void RenderingWindow::captureView_SLOT()
+{
+    QString dir = QFileDialog::getExistingDirectory(this, tr("Open Directory"),
+                                                    "/home",
+                                                    QFileDialog::ShowDirsOnly
+                                                    | QFileDialog::DontResolveSymlinks);
+
+
+    QString date = QDateTime::currentDateTime().toString();
+
+    QString newDir = dir + QString("/") + date ;
+    QDir createDir;
+    createDir.mkdir( newDir );
+    LOG_DEBUG("New Dir:%s" , newDir.toStdString().c_str() );
+
+
+    QPixmap pic( ui->frameContainerResult->pixmap( )->scaledToHeight(512).scaledToWidth(512));
+    pic.save( newDir + "/result.jpg");
+
+    int i = 0;
+    for( const QLabel *frame : frameContainers_ )
+    {
+        if( frame->isEnabled() )
+        {
+            QPixmap framePixmap( frame->pixmap()->scaledToHeight(512).scaledToWidth(512) );
+            framePixmap.save( newDir + QString("/GPU%1.jpg").arg(i++) );
+        }
+    }
 }
 

@@ -65,6 +65,7 @@ private slots:
 
     void newDensity_SLOT( int value );
 
+    void captureView_SLOT() ;
 
 private:
     Ui::RenderingWindow *ui;
