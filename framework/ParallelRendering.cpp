@@ -12,7 +12,7 @@
 #define INITIAL_VOLUME_ROTATION_Z 0.0
 
 
-#define BENCH_MARKING
+//#define BENCH_MARKING
 
 #ifdef BENCH_MARKING
 #define AUTO_ROTATE
@@ -211,7 +211,7 @@ void ParallelRendering::distributeBaseVolume1D()
     for( auto i = 0 ; i < nDevices - 1 ; i++ )
     {
         auto *brick = baseVolume_->getBrick( newXDimension*i ,
-                                             newXDimension*( i + 1 ) - 1 ,
+                                             newXDimension*( i + 1 ) ,
                                              0,
                                              baseVolume_->getDimensions().y ,
                                              0,
