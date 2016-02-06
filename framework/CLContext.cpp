@@ -244,9 +244,9 @@ void CLContext< T >::paint( const Coordinates3D &rotation ,
 {
 
 
-    RenderingProfile &profile = getRenderingProfile( renderingProfiles , gpuIndex_ );
-    profile.transformationMatrix_.start();
-
+//    RenderingProfile &profile = getRenderingProfile( renderingProfiles , gpuIndex_ );
+//    profile.transformationMatrix_.start();
+    TIC( RENDERING_PROFILE( gpuIndex_ ).mvMatrix_TIMER );
     // Use the GLM to create the Model View Matrix.
     // Initialize to identity.
     auto glmMVMatrix = glm::mat4( 1.0f );
@@ -339,12 +339,15 @@ void CLContext< T >::paint( const Coordinates3D &rotation ,
     inverseMatrixArray_[ 10 ] = modelViewMatrix[ 10 ];
     inverseMatrixArray_[ 11 ] = modelViewMatrix[ 14 ];
 
+    TOC( RENDERING_PROFILE( gpuIndex_ ).mvMatrix_TIMER );
 
-    profile.transformationMatrix_.stop();
+//    profile.transformationMatrix_.stop();
 
-    profile.rendering_.start();
+//    profile.rendering_.start();
+    TIC( RENDERING_PROFILE( gpuIndex_ ).rendering_TIMER );
     renderFrame( inverseMatrixArray_ , volumeDensity , imageBrightness );
-    profile.rendering_.stop();
+    TOC( RENDERING_PROFILE( gpuIndex_ ).rendering_TIMER );
+//    profile.rendering_.stop();
 }
 
 template< class T >

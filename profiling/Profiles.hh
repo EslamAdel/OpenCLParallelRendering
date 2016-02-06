@@ -7,51 +7,49 @@
 
 typedef oclHWDL::Timer64 Timer64 ;
 
-struct RenderingProfile
+struct GeneralProfile
 {
-    RenderingProfile() : threadSpawningTime_("Thread Spawning on Host") ,
-                         transformationMatrix_("Transformation Matrix Calculation on Host") ,
-                         rendering_("Rendering Frame on Device") {}
-
-    Timer64 threadSpawningTime_ ;
-    Timer64 transformationMatrix_ ;
-    Timer64 rendering_ ;
+    GeneralProfile() : threadSpawning_TIMER("Thread Spawning on Host") {}
+    Timer64 threadSpawning_TIMER ;
 };
 
-struct CollectingProfile
+struct RenderingProfile : public GeneralProfile
 {
-    CollectingProfile() : threadSpawningTime_("Thread Spawning on Host") ,
-                          loadingBufferFromDevice_("Loading Buffer From Device") ,
-                          loadingBufferToDevice_("Loading Buffer To Device") {}
-    Timer64 threadSpawningTime_ ;
-    Timer64 loadingBufferFromDevice_ ;
-    Timer64 loadingBufferToDevice_ ;
+    RenderingProfile() : mvMatrix_TIMER("Transformation Matrix Calculation on Host") ,
+                         rendering_TIMER("Rendering Frame on Device") {}
+    Timer64 mvMatrix_TIMER ;
+    Timer64 rendering_TIMER ;
+};
+
+struct CollectingProfile : public GeneralProfile
+{
+    CollectingProfile() : loadingBufferFromDevice_TIMER("Loading Buffer From Device") ,
+                          loadingBufferToDevice_TIMER("Loading Buffer To Device") {}
+    Timer64 loadingBufferFromDevice_TIMER ;
+    Timer64 loadingBufferToDevice_TIMER ;
 
 };
 
-struct CompositingProfile
+struct CompositingProfile : public GeneralProfile
 {
-    CompositingProfile() : threadSpawningTime_("Thread Spawning on Host") ,
-                           setKernelParameters_("Setting Kernel Arguments") ,
-                           accumulatingFrameTime_("Accumulating Frame on Device") ,
-                           compositingTime_("Total Compositing Time on Device") ,
-                           loadCollageFromDeviceTime_("Loading Collage Buffer from Device") ,
-                           rewindCollageTime_("Rewind Collage Buffer") {}
-    Timer64 threadSpawningTime_;
-    Timer64 setKernelParameters_;
-    Timer64 accumulatingFrameTime_;
-    Timer64 compositingTime_ ;
-    Timer64 loadCollageFromDeviceTime_ ;
-    Timer64 rewindCollageTime_;
+    CompositingProfile() : accumulatingFrame_TIMER("Accumulating Frame on Device") ,
+                           compositing_TIMER("Total Compositing Time on Device") ,
+                           loadCollageFromDevice_TIMER("Loading Collage Buffer from Device") ,
+                           rewindCollage_TIMER("Rewind Collage Buffer") {}
+    Timer64 threadSpawning_TIMER;
+    Timer64 accumulatingFrame_TIMER;
+    Timer64 compositing_TIMER ;
+    Timer64 loadCollageFromDevice_TIMER ;
+    Timer64 rewindCollage_TIMER;
 };
 
 
 struct FrameworkProfile
 {
-    FrameworkProfile() : convertToPixmapTime_("Converting to Pixmap on Host") ,
-                         renderingLoopTime_("Rendering Loop") {}
-    Timer64 convertToPixmapTime_;
-    Timer64 renderingLoopTime_;
+    FrameworkProfile() : convertToPixmap_TIMER("Converting to Pixmap on Host") ,
+                         renderingLoop_TIMER("Rendering Loop") {}
+    Timer64 convertToPixmap_TIMER;
+    Timer64 renderingLoop_TIMER;
 };
 
 

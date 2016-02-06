@@ -17,28 +17,29 @@ TaskComposite::TaskComposite(CompositingNode *compositingNode ,
 void TaskComposite::run()
 {
 
-    compositingProfile.threadSpawningTime_.stop();
+    TOC( compositingProfile.threadSpawning_TIMER ) ;
 
     if( compositedFramesCount_ == 0 )
-        compositingProfile.compositingTime_.start();
+        TIC( compositingProfile.compositing_TIMER );
 
-    compositingProfile.accumulatingFrameTime_.start();
+
+    TIC( compositingProfile.accumulatingFrame_TIMER );
     compositingNode_->accumulateFrame_DEVICE( frameIndex_ );
-    compositingProfile.accumulatingFrameTime_.stop();
+    TOC( compositingProfile.accumulatingFrame_TIMER );
 
     if( ++compositedFramesCount_ == compositingNode_->framesCount() )
     {
         compositedFramesCount_ = 0 ;
 
-        compositingProfile.loadCollageFromDeviceTime_.start();
+        TIC( compositingProfile.loadCollageFromDevice_TIMER );
         compositingNode_->uploadCollageFromDevice();
-        compositingProfile.loadCollageFromDeviceTime_.stop();
+        TOC( compositingProfile.loadCollageFromDevice_TIMER );
 
-        compositingProfile.rewindCollageTime_.start();
+        TIC( compositingProfile.rewindCollage_TIMER );
         compositingNode_->rewindCollageFrame_DEVICE( CL_TRUE );
-        compositingProfile.rewindCollageTime_.stop();
+        TOC( compositingProfile.rewindCollage_TIMER );
 
-        compositingProfile.compositingTime_.stop();
+        TOC( compositingProfile.compositing_TIMER );
 
         emit this->compositingFinished_SIGNAL();
 

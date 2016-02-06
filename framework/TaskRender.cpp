@@ -10,7 +10,8 @@ TaskRender::TaskRender( RenderingNode &renderingNode )
 void TaskRender::run()
 {
 
-    renderingProfiles[ &renderingNode_ ]->threadSpawningTime_.stop();
+//    renderingProfiles[ &renderingNode_ ]->threadSpawning_TIMER.stop();
+    TOC( renderingProfiles[ &renderingNode_ ]->threadSpawning_TIMER );
     renderingNode_.applyTransformation();
 
 }

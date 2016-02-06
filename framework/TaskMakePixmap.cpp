@@ -13,7 +13,9 @@ TaskMakePixmap::TaskMakePixmap( CLFrame32 *&frame ,
 
 void TaskMakePixmap::run()
 {
-    frameworkProfile.convertToPixmapTime_.start();
+
+    TIC( frameworkProfile.convertToPixmap_TIMER );
     emit this->pixmapReady_SIGNAL( &frame_->getFramePixmap() , node_ );
-    frameworkProfile.convertToPixmapTime_.stop();
+    TOC( frameworkProfile.convertToPixmap_TIMER );
+
 }

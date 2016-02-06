@@ -280,7 +280,7 @@ void ParallelRendering::applyTransformation_()
 {
     readyPixmapsCount_ = 0 ;
 
-    frameworkProfile.renderingLoopTime_.start();
+    TIC( frameworkProfile.renderingLoop_TIMER );
 
     // fetch new transformations if exists.
     syncTransformation_();
@@ -289,7 +289,7 @@ void ParallelRendering::applyTransformation_()
     {
         auto node = renderingNodes_[ renderingDevice ];
 
-        renderingProfiles[ node ]->threadSpawningTime_.start();
+        renderingProfiles[ node ]->threadSpawning_TIMER.start();
         // Spawn threads and start rendering on each rendering node.
         rendererPool_.start( renderingTasks_[ node ]);
     }
@@ -334,7 +334,7 @@ uint8_t ParallelRendering::activeRenderingNodesCount() const
 void ParallelRendering::finishedRendering_SLOT( RenderingNode *finishedNode )
 {
 
-    collectingProfiles[ finishedNode ]->threadSpawningTime_.start();
+    collectingProfiles[ finishedNode ]->threadSpawning_TIMER.start();
 
     collectorPool_.start( collectingTasks_[ finishedNode ]);
 }
@@ -342,7 +342,7 @@ void ParallelRendering::finishedRendering_SLOT( RenderingNode *finishedNode )
 void ParallelRendering::compositingFinished_SLOT()
 {
 
-    frameworkProfile.renderingLoopTime_.stop();
+    frameworkProfile.renderingLoop_TIMER.stop();
 
     pixmapMakerPool_.start( collagePixmapTask_ );
 
@@ -370,7 +370,7 @@ void ParallelRendering::frameLoadedToDevice_SLOT( RenderingNode *node )
 {
     //    LOG_DEBUG( "[DONE TRANSFER] from GPU <%d>" , node->getGPUIndex() );
 
-    compositingProfile.threadSpawningTime_.start();
+    compositingProfile.threadSpawning_TIMER.start();
 
     //accumulate the recently loaded frame to the collage frame.
     compositorPool_.start( compositingTasks_[ node ]);
@@ -453,28 +453,28 @@ void ParallelRendering::benchmark_()
         CollectingProfile *cProfile = collectingProfiles[ node ];
 
         printf("Statistics: Rendering on GPU <%d>\n" , gpuIndex );
-        rProfile->threadSpawningTime_.print( 1 );
-        rProfile->transformationMatrix_.print( 1 );
-        rProfile->rendering_.print( 1 );
+        rProfile->threadSpawning_TIMER.print( 1 );
+        rProfile->mvMatrix_TIMER.print( 1 );
+        rProfile->rendering_TIMER.print( 1 );
 
         printf("Statistics: Data Transfer from GPU <%d> --> Host --> GPU <%d>\n" ,
                gpuIndex , compositingNode_->getGPUIndex() ) ;
-        cProfile->threadSpawningTime_.print( 1 );
-        cProfile->loadingBufferFromDevice_.print( 1 );
-        cProfile->loadingBufferToDevice_.print( 1 );
+        cProfile->threadSpawning_TIMER.print( 1 );
+        cProfile->loadingBufferFromDevice_TIMER.print( 1 );
+        cProfile->loadingBufferToDevice_TIMER.print( 1 );
 
     }
 
     printf("Statistics: Compositing on GPU <%d>\n", compositingNode_->getGPUIndex() ) ;
-    compositingProfile.threadSpawningTime_.print( 1 );
+    compositingProfile.threadSpawning_TIMER.print( 1 );
     //compositingProfile_.setKernelParameters_.print( 1 );
-    compositingProfile.accumulatingFrameTime_.print( 1 );
-    compositingProfile.loadCollageFromDeviceTime_.print( 1 );
-    compositingProfile.rewindCollageTime_.print( 1 );
-    compositingProfile.compositingTime_.print( 1 );
+    compositingProfile.accumulatingFrame_TIMER.print( 1 );
+    compositingProfile.loadCollageFromDevice_TIMER.print( 1 );
+    compositingProfile.rewindCollage_TIMER.print( 1 );
+    compositingProfile.compositing_TIMER.print( 1 );
 
     printf("Statistics: framework\n");
-    frameworkProfile.convertToPixmapTime_.print( 1 );
-    frameworkProfile.renderingLoopTime_.print( 1 );
+    frameworkProfile.convertToPixmap_TIMER.print( 1 );
+    frameworkProfile.renderingLoop_TIMER.print( 1 );
 
 }

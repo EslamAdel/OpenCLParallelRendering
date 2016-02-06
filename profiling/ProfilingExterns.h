@@ -13,34 +13,46 @@ extern CompositingProfile compositingProfile;
 extern FrameworkProfile frameworkProfile;
 
 
-RenderingProfile &getRenderingProfile( RenderingProfiles &profiles , uint gpuIndex );
+RenderingProfile &getRenderingProfile( RenderingProfiles &profiles ,
+                                       uint gpuIndex );
+
+CollectingProfile &getCollectingProfile( CollectingProfiles &profile ,
+                                         RenderingNode* node );
 
 #ifdef BENCHMARKING
 
-#define RENDERING_THREAD_START( RenderingNodePtr ) \
-    do{ renderingProfiles[ RenderingNodePtr ]->threadSpawningTime_.start(); } \
+#define TIC( timer ) \
+    do{ timer.start(); } \
     while( 0 )
 
-#define RENDERING_THREAD_STOP( RenderingNodePtr ) \
-    do{ renderingProfiles[ RenderingNodePtr ]->threadSpawningTime_.stop(); } \
+#define TOC( timer ) \
+    do{ timer.stop(); } \
     while( 0 )
+#define RENDERING_PROFILE( gpuIndex )\
+    getRenderingProfile( renderingProfiles , gpuIndex )
 
-#define RENDERIN_MATRIX_START( RenderingNodePtr )\
-    do{ renderingProfiles[ RenderingNodePtr ]->transformationMatrix_.start(); } \
-    while( 0 )
+#define COLLECTING_PROFILE( renderingNode )\
+    getCollectingProfile( collectingProfiles , renderingNode )
 
-#define RENDERIN_MATRIX_STOP( RenderingNodePtr )\
-    do{ renderingProfiles[ RenderingNodePtr ]->transformationMatrix_.stop(); } \
-    while( 0 )
 #else
-#define RENDERING_PROF_THREAD_START( RenderingNodePtr ) \
-    do{ } while( 0 )
+#define TIC( timer ) \
+    do{  } \
+    while( 0 )
+
+#define TOC( timer ) \
+    do{  } \
+    while( 0 )
+
+#define RENDERING_PROFILE( gpuIndex )\
+    do{  } \
+    while( 0 )
+
+#define COLLECTING_PROFILE( renderingNode )\
+    do{  } \
+    while( 0 )
 
 #endif
 
-#ifdef BEN
-
-#endif
 
 #endif // PROFILINGEXTERNS_HH
 
