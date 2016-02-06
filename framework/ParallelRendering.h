@@ -1,6 +1,7 @@
 #ifndef PARALLELRENDERING_H
 #define PARALLELRENDERING_H
 
+#include "ProfilingExterns.h"
 #include <Headers.hh>
 #include <unordered_map>
 
@@ -208,6 +209,8 @@ private:
      */
     void syncTransformation_();
 
+    void benchmark_() ;
+
 private:
 
     //oclHWDl utilities
@@ -262,7 +265,6 @@ private:
     uint8_t machineGPUsCount_;
     const uint frameWidth_ ;
     const uint frameHeight_ ;
-
 
 
 };

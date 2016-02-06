@@ -2,14 +2,14 @@
 
 #include <Headers.hh>
 #include <Volume.h>
-#include<oclUtils.h>
+#include <oclUtils.h>
 #include <system/Utilities.h>
 #include <Logger.h>
 
 #include <auxillary/glm/glm.hpp>
 #include <auxillary/glm/gtc/matrix_transform.hpp>
 #include <auxillary/glm/gtc/type_ptr.hpp>
-
+#include "ProfilingExterns.h"
 
 
 #define DEG_TO_RAD(x) (x * 0.0174532925199f)
@@ -19,10 +19,10 @@
 
 
 template< class T >
-CLContext< T >::CLContext( const uint64_t gpuIndex ,
+CLContext< T >::CLContext(const uint64_t gpuIndex ,
                            const uint frameWidth ,
                            const uint frameHeight ,
-                           const Volume<T>* volume)
+                           const Volume<T>* volume )
     : volume_( volume ) ,
       gpuIndex_( gpuIndex ) ,
       frameWidth_( frameWidth ),
@@ -252,6 +252,11 @@ void CLContext< T >::paint( const Coordinates3D &rotation ,
                             const float &volumeDensity ,
                             const float &imageBrightness)
 {
+
+
+    RenderingProfile &profile = getRenderingProfile( renderingProfiles , gpuIndex_ );
+    profile.transformationMatrix_.start();
+
     // Use the GLM to create the Model View Matrix.
     // Initialize to identity.
     auto glmMVMatrix = glm::mat4( 1.0f );
@@ -335,8 +340,11 @@ void CLContext< T >::paint( const Coordinates3D &rotation ,
     inverseMatrixArray_[ 11 ] = modelViewMatrix[ 14 ];
 
 
-    renderFrame( inverseMatrixArray_ , volumeDensity , imageBrightness );
+    profile.transformationMatrix_.stop();
 
+    profile.rendering_.start();
+    renderFrame( inverseMatrixArray_ , volumeDensity , imageBrightness );
+    profile.rendering_.stop();
 }
 
 template< class T >
@@ -348,6 +356,7 @@ void CLContext< T >::renderFrame( const float* inverseMatrix ,
 
     // Assume everything is fine in the begnning
     cl_int clErrorCode = CL_SUCCESS;
+
 
     clErrorCode |= clEnqueueWriteBuffer( commandQueue_,
                                          inverseMatrix_,
@@ -362,6 +371,7 @@ void CLContext< T >::renderFrame( const float* inverseMatrix ,
     // Execute the OpenCL kernel, and write the results to the PBO that is
     // connected now to the OpenCL context.
     size_t localSize[ ] = { LOCAL_SIZE_X, LOCAL_SIZE_Y };
+
 
     activeRenderingKernel_->setVolumeDensityFactor( volumeDensity);
     activeRenderingKernel_->setImageBrightnessFactor(imageBrightness);
@@ -379,6 +389,7 @@ void CLContext< T >::renderFrame( const float* inverseMatrix ,
     oclHWDL::Error::checkCLError(clErrorCode);
 
     clFinish( commandQueue_ );
+
 }
 
 template< class T >

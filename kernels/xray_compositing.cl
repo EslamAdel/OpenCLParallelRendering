@@ -48,6 +48,12 @@ void xray_compositing_accumulate(   __global uint* collageFrame ,
 }
 
 
+
+
+const sampler_t sampler   = CLK_NORMALIZED_COORDS_FALSE |
+                            CLK_ADDRESS_NONE |
+                            CLK_FILTER_LINEAR ;
+
 __kernel
 void xray_compositing_patch( __global uint* collageFrame ,
                              __read_only image3d_t framesArray )
@@ -59,20 +65,19 @@ void xray_compositing_patch( __global uint* collageFrame ,
     const uint imageWidth = get_image_width( framesArray );
     const uint framesCount = get_image_depth( framesArray );
 
-    int4 locate = (int4)( x , y , 0 , 1 );
-
+    float4 locate = (float4)( x , y , 0 , 0 );
 
     float4 color = (float4)( 0.f , 0.f , 0.f , 0.f );
 
-    uint index = 0 ;
-    for( index = 0 ; index < framesCount ; index++ )
+    for( int i = 0 ; i < framesCount ; i++ )
     {
-        locate.z = index ;
-        color = clamp( color + read_imagef( framesArray , locate ) , 0.f , 1.f ) ;
+        //color = clamp( color + read_imagef( framesArray , sampler , locate ) , 0.f , 1.f ) ;
+        int4 location = (int4)( get_global_id(0) , get_global_id(1) , i , 0 );
+        color += read_imagef( framesArray , sampler , location ) ;
     }
 
-    index = imageWidth * y + x ;
-    collageFrame[ index ] =  rgbaFloatToInt( color );
+
+    collageFrame[ ( imageWidth * y ) + x ] =  rgbaFloatToInt( color );
 }
 
 

@@ -7,6 +7,7 @@
 #include <QPixmap>
 #include <CLVolume.h>
 #include <CLXRayRenderingKernel.h>
+//#include "ProfilingExterns.hh"
 
 /**
  * @brief The CLContext class
@@ -299,6 +300,7 @@ protected:
 
     const uint frameWidth_ ;
     const uint frameHeight_ ;
+
 };
 
 #endif // CLGPUCONTEXT_H

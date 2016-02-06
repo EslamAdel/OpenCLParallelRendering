@@ -1,6 +1,6 @@
 #include "TaskRender.h"
 
-TaskRender::TaskRender(RenderingNode &renderingNode)
+TaskRender::TaskRender( RenderingNode &renderingNode )
     : renderingNode_( renderingNode )
 {
     setAutoDelete( false );
@@ -9,6 +9,8 @@ TaskRender::TaskRender(RenderingNode &renderingNode)
 
 void TaskRender::run()
 {
+
+    renderingProfiles[ &renderingNode_ ]->threadSpawningTime_.stop();
     renderingNode_.applyTransformation();
 
 }

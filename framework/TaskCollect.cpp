@@ -1,6 +1,6 @@
 #include "TaskCollect.h"
 
-TaskCollect::TaskCollect( RenderingNode *renderingNode ,
+TaskCollect::TaskCollect(RenderingNode *renderingNode ,
                           CompositingNode *compositingNode,
                           const uint frameIndex )
     : renderingNode_( renderingNode ) ,
@@ -12,17 +12,26 @@ TaskCollect::TaskCollect( RenderingNode *renderingNode ,
 
 void TaskCollect::run()
 {
+    CollectingProfile &collectingProfile = *collectingProfiles[ renderingNode_ ];
 
+    collectingProfile.threadSpawningTime_.stop();
+
+
+    collectingProfile.loadingBufferFromDevice_.start();
     renderingNode_->uploadFrameFromDevice( CL_TRUE );
+    collectingProfile.loadingBufferFromDevice_.stop();
+
 
     uint* frameData = renderingNode_->getFrameData();
-    float frameDepth = renderingNode_->getCurrentCenter().z;
 
-    compositingNode_->setFrameData_HOST( frameIndex_ , frameData ,frameDepth);
+    compositingNode_->setFrameData_HOST( frameIndex_ , frameData );
+
+
+    collectingProfile.loadingBufferToDevice_.start();
     compositingNode_->loadFrameDataToDevice( frameIndex_ , CL_TRUE );
+    collectingProfile.loadingBufferToDevice_.stop();
 
     emit this->frameLoadedToDevice_SIGNAL( renderingNode_ );
-
 
 }
 

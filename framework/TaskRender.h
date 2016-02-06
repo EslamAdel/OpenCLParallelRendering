@@ -3,6 +3,7 @@
 
 #include <QRunnable>
 #include "RenderingNode.h"
+#include "ProfilingExterns.h"
 
 /**
  * @brief The TaskRender class
@@ -11,7 +12,7 @@
 class TaskRender : public QRunnable
 {
 public:
-    TaskRender( RenderingNode &renderingNode );
+    TaskRender( RenderingNode &renderingNode  );
 
 protected:
     void run();

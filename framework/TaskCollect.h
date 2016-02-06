@@ -5,6 +5,10 @@
 #include "RenderingNode.h"
 #include "CompositingNode.h"
 #include <QObject>
+#include "Profiles.hh"
+#include "ProfilingExterns.h"
+
+
 
 /**
  * @brief The TaskCollect class
@@ -48,6 +52,7 @@ private:
     RenderingNode *renderingNode_;
     CompositingNode *compositingNode_;
     const uint frameIndex_;
+
 };
 
 #endif // TASKCOLLECT_H

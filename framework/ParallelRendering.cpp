@@ -11,6 +11,21 @@
 #define INITIAL_VOLUME_ROTATION_Y 0.0
 #define INITIAL_VOLUME_ROTATION_Z 0.0
 
+
+//#define BENCH_MARKING
+
+#ifdef BENCH_MARKING
+#define AUTO_ROTATE
+#define TEST_FRAMES 500
+#endif
+
+
+//Profiles Difinitions
+RenderingProfiles renderingProfiles = RenderingProfiles() ;
+CollectingProfiles collectingProfiles = CollectingProfiles() ;
+CompositingProfile compositingProfile = CompositingProfile() ;
+FrameworkProfile frameworkProfile = FrameworkProfile() ;
+
 ParallelRendering::ParallelRendering( Volume<uchar> *volume ,
                                       const uint frameWidth ,
                                       const uint frameHeight )
@@ -43,8 +58,6 @@ ParallelRendering::ParallelRendering( Volume<uchar> *volume ,
     at host for the next round.
       **/
     compositorPool_.setMaxThreadCount( 1 );
-
-
 }
 
 void ParallelRendering::discoverAllNodes()
@@ -60,17 +73,22 @@ void ParallelRendering::addRenderingNode( const uint64_t gpuIndex)
     // if device already occupied by a rendering node, return.
     if( inUseGPUs_.contains( listGPUs_.at( gpuIndex ))) return;
 
+
     // pass transformations by reference.
     // translationAsync_, rotationAsync_, volumeDensityAsync_, brightnessAsync_
     // will be accessed by multithreads. So,
     // they should not be modified during the life of the threads.
+
     RenderingNode *node = new RenderingNode( gpuIndex,
                                              frameWidth_ ,
                                              frameHeight_ ,
                                              translationAsync_,
                                              rotationAsync_,
                                              volumeDensityAsync_,
-                                             brightnessAsync_ );
+                                             brightnessAsync_  );
+
+    renderingProfiles[ node ] = new RenderingProfile;
+    collectingProfiles[ node ] = new CollectingProfile;
 
     auto attachedGPU = listGPUs_.at( gpuIndex );
 
@@ -82,7 +100,7 @@ void ParallelRendering::addRenderingNode( const uint64_t gpuIndex)
 
     // Create the TaskRender that wrap the rendering instruction,
     // to be executed concurrently on each device.
-    TaskRender *taskRender = new TaskRender( *node );
+    TaskRender *taskRender = new TaskRender( *node  );
 
     // Add the new task object to
     // the map < rendering node , corresponding rendering task >
@@ -245,6 +263,9 @@ void ParallelRendering::applyTransformation_()
 {
     readyPixmapsCount_ = 0 ;
 
+    frameworkProfile.renderingLoopTime_.start();
+    frameworkProfile.renderingLoopTimeWithoutPixmap_.start();
+
     // fetch new transformations if exists.
     syncTransformation_();
 
@@ -252,6 +273,7 @@ void ParallelRendering::applyTransformation_()
     {
         auto node = renderingNodes_[ renderingDevice ];
 
+        renderingProfiles[ node ]->threadSpawningTime_.start();
         // Spawn threads and start rendering on each rendering node.
         rendererPool_.start( renderingTasks_[ node ]);
     }
@@ -268,6 +290,8 @@ void ParallelRendering::syncTransformation_()
     brightnessAsync_ = brightness_ ;
     volumeDensityAsync_ = volumeDensity_;
 }
+
+
 
 RenderingNode &ParallelRendering::getRenderingNode(const uint64_t gpuIndex)
 {
@@ -293,28 +317,51 @@ uint8_t ParallelRendering::activeRenderingNodesCount() const
 
 void ParallelRendering::finishedRendering_SLOT(RenderingNode *finishedNode)
 {
-    LOG_DEBUG( "[DONE RENDERING] on GPU <%d> " , finishedNode->getGPUIndex() );
+
+    collectingProfiles[ finishedNode ]->threadSpawningTime_.start();
 
     collectorPool_.start( collectingTasks_[ finishedNode ]);
 }
 
 void ParallelRendering::compositingFinished_SLOT()
 {
+
+    frameworkProfile.renderingLoopTimeWithoutPixmap_.stop();
+
+    frameworkProfile.convertToPixmapTime_.start();
+
     QPixmap &finalFrame = compositingNode_->getCollagePixmap();
+
+    frameworkProfile.convertToPixmapTime_.stop();
+
+    frameworkProfile.renderingLoopTime_.stop();
 
     emit this->finalFrameReady_SIGNAL( finalFrame );
 
     if( pendingTransformations_ )
         applyTransformation_();
     else
+    {
         renderingNodesReady_ = true ;
+#ifdef BENCH_MARKING
+        static uint testFrames = 0 ;
+        if( ++testFrames < TEST_FRAMES )
+            updateRotationX_SLOT( rotation_.x + 1 );
+
+        else
+            benchmark_();
+
+#endif
+
+    }
 
 }
 
 void ParallelRendering::frameLoadedToDevice_SLOT( RenderingNode *node )
 {
-    LOG_DEBUG( "[DONE TRANSFER] from GPU <%d>" , node->getGPUIndex() );
+//    LOG_DEBUG( "[DONE TRANSFER] from GPU <%d>" , node->getGPUIndex() );
 
+    compositingProfile.threadSpawningTime_.start();
     compositorPool_.start( compositingTasks_[ node ]);
 
     emit this->frameReady_SIGNAL( node );
@@ -367,4 +414,44 @@ void ParallelRendering::updateVolumeDensity_SLOT(float density)
     volumeDensity_ = density;
     if( renderingNodesReady_ ) applyTransformation_();
     else pendingTransformations_ = true ;
+}
+
+
+
+void ParallelRendering::benchmark_()
+{
+
+    for( auto device : inUseGPUs_ )
+    {
+        RenderingNode *node = renderingNodes_[ device ];
+        uint gpuIndex = node->getGPUIndex();
+        RenderingProfile *rProfile = renderingProfiles[ node ];
+        CollectingProfile *cProfile = collectingProfiles[ node ];
+
+        printf("Statistics: Rendering on GPU <%d>\n" , gpuIndex );
+        rProfile->threadSpawningTime_.print( 1 );
+        rProfile->transformationMatrix_.print( 1 );
+        rProfile->rendering_.print( 1 );
+
+        printf("Statistics: Data Transfer from GPU <%d> --> Host --> GPU <%d>\n" ,
+               gpuIndex , compositingNode_->getGPUIndex() ) ;
+        cProfile->threadSpawningTime_.print( 1 );
+        cProfile->loadingBufferFromDevice_.print( 1 );
+        cProfile->loadingBufferToDevice_.print( 1 );
+
+    }
+
+    printf("Statistics: Compositing on GPU <%d>\n", compositingNode_->getGPUIndex() ) ;
+    compositingProfile.threadSpawningTime_.print( 1 );
+    //compositingProfile_.setKernelParameters_.print( 1 );
+    compositingProfile.accumulatingFrameTime_.print( 1 );
+    compositingProfile.loadCollageFromDeviceTime_.print( 1 );
+    compositingProfile.rewindCollageTime_.print( 1 );
+    compositingProfile.compositingTime_.print( 1 );
+
+    printf("Statistics: framework\n");
+    frameworkProfile.renderingLoopTimeWithoutPixmap_.print( 1 );
+    frameworkProfile.convertToPixmapTime_.print( 1 );
+    frameworkProfile.renderingLoopTime_.print( 1 );
+
 }
