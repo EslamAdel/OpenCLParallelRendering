@@ -15,6 +15,7 @@
 #include "TaskRender.h"
 #include "TaskCollect.h"
 #include "TaskComposite.h"
+#include "TaskMakePixmap.h"
 
 #include "RenderingNode.h"
 #include "CompositingNode.h"
@@ -25,7 +26,7 @@ typedef std::unordered_map<const oclHWDL::Device*,RenderingNode*> RenderingNodes
 typedef std::unordered_map<const RenderingNode* ,TaskRender*> RenderingTasks;
 typedef std::unordered_map<const RenderingNode* ,TaskCollect*> CollectingTasks;
 typedef std::unordered_map<const RenderingNode* ,TaskComposite*> CompositingTasks;
-
+typedef std::unordered_map<const RenderingNode* ,TaskMakePixmap*> MakePixmapTasks;
 
 /**
  * @brief The ParallelRendering class
@@ -113,7 +114,7 @@ signals:
      * @brief framesReady_SIGNAL
      * For each rendered frame done, emit a signal.
      */
-    void frameReady_SIGNAL( RenderingNode *node );
+    void frameReady_SIGNAL( QPixmap *pixmap , const RenderingNode * node );
 
     /**
      * @brief finalFrameReady_SIGNAL
@@ -123,7 +124,7 @@ signals:
      * @param finalFrame
      * Composited collage frame as a pixmap.
      */
-    void finalFrameReady_SIGNAL( QPixmap &finalFrame );
+    void finalFrameReady_SIGNAL( QPixmap *finalFrame );
 
 public slots :
 
@@ -152,6 +153,19 @@ public slots :
      */
     void frameLoadedToDevice_SLOT( RenderingNode *finishedNode );
 
+
+    /**
+     * @brief pixmapReady_SLOT
+     * When a thread is done with converting a raw frame to pixmap a signal
+     * emitted will be mapped to this slot.
+     * @param pixmap
+     * produced pixmap.
+     * @param node
+     * JUST IDENTIFIER for whom this pixmap belongs!
+     * if it is nullptr then it belongs to the CompositorNode,
+     * otherwise, it belongs to RenderingNode referenced by the pointer.
+     */
+    void pixmapReady_SLOT( QPixmap *pixmap , const RenderingNode * node );
 
     /**
      * @brief updateRotationX_SLOT
@@ -227,11 +241,14 @@ private:
     QThreadPool compositorPool_; //[consumer] for collector pool.
     QThreadPool collectorPool_ ; //[producer] for renderer pool AND
                                  //[consumer] for renderer pool.
+    QThreadPool pixmapMakerPool_;
 
     //QRunnables to be executed concurrently.
     RenderingTasks  renderingTasks_ ;
-    CollectingTasks collectingTasks_;
+    CollectingTasks collectingTasks_ ;
     CompositingTasks compositingTasks_ ;
+    MakePixmapTasks makePixmapTasks_ ;
+    TaskMakePixmap *collagePixmapTask_;
 
     //Volume Data
     Volume<uchar> *baseVolume_;

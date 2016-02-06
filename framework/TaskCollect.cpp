@@ -1,8 +1,8 @@
 #include "TaskCollect.h"
 
 TaskCollect::TaskCollect(RenderingNode *renderingNode ,
-                          CompositingNode *compositingNode,
-                          const uint frameIndex )
+                         CompositingNode *compositingNode,
+                         const uint frameIndex )
     : renderingNode_( renderingNode ) ,
       compositingNode_( compositingNode ) ,
       frameIndex_( frameIndex )
@@ -13,18 +13,22 @@ TaskCollect::TaskCollect(RenderingNode *renderingNode ,
 void TaskCollect::run()
 {
     CollectingProfile &collectingProfile = *collectingProfiles[ renderingNode_ ];
-
     collectingProfile.threadSpawningTime_.stop();
 
 
+
+    CLFrame32 *sourceFrame = renderingNode_->getCLFrame();
+
+
     collectingProfile.loadingBufferFromDevice_.start();
-    renderingNode_->uploadFrameFromDevice( CL_TRUE );
+    //upload frame from rendering GPU to HOST.
+    sourceFrame->readDeviceData( renderingNode_->getCommandQueue() ,
+                                 CL_TRUE );
     collectingProfile.loadingBufferFromDevice_.stop();
 
-
-    uint* frameData = renderingNode_->getFrameData();
-
-    compositingNode_->setFrameData_HOST( frameIndex_ , frameData );
+    //now sourceFrame points to recently uploaded data.
+    compositingNode_->setFrameData_HOST( frameIndex_ ,
+                                         sourceFrame->getHostData( ));
 
 
     collectingProfile.loadingBufferToDevice_.start();

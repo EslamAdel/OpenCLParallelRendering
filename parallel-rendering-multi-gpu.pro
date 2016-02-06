@@ -56,7 +56,8 @@ SOURCES += main.cpp \
     opencl/CLImage2D.cpp \
     framework/CLContext.cpp \
     opencl/CLImage2DArray.cpp \
-    profiling/ProfilingExterns.cpp
+    profiling/ProfilingExterns.cpp \
+    framework/TaskMakePixmap.cpp
 
 HEADERS += \
     system/Colors.hh \
@@ -240,7 +241,8 @@ HEADERS += \
     opencl/CLVolume.ipp \
     opencl/CLImage2DArray.h \
     profiling/Profiles.hh \
-    profiling/ProfilingExterns.h
+    profiling/ProfilingExterns.h \
+    framework/TaskMakePixmap.h
 
 FORMS += \
     gui/RenderingWindow.ui

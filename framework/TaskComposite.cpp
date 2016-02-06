@@ -13,45 +13,6 @@ TaskComposite::TaskComposite(CompositingNode *compositingNode ,
     setAutoDelete( false );
 }
 
-//void TaskComposite::patchCompositing()
-//{
-//    static int framesLoaded = 0 ;
-//    if( ++framesLoaded == compositingNode_->framesCount() )
-//    {
-//        framesLoaded = 0 ;
-//        compositingNode_->compositeFrames_DEVICE();
-//        compositingNode_->uploadCollageFromDevice();
-//        compositingNode_->rewindCollageFrame_DEVICE( CL_TRUE );
-//        emit this->compositingFinished_SIGNAL();
-
-//    }
-//}
-
-//void TaskComposite::accumulateCompositing()
-//{
-//    compositingNode_->accumulateFrame_DEVICE( frameIndex_ );
-
-//    if( ++compositedFramesCount_ == compositingNode_->framesCount() )
-//    {
-//        compositedFramesCount_ = 0 ;
-//        compositingNode_->uploadCollageFromDevice();
-//        compositingNode_->rewindCollageFrame_DEVICE( CL_TRUE );
-//        emit this->compositingFinished_SIGNAL();
-
-//    }
-//}
-
-
-//void TaskComposite::run()
-//{
-    //    if( mode_ == CompositingNode::CompositingMode::Accumulate )
-    //        accumulateCompositing();
-    //    else
-    //        patchCompositing();
-
-//}
-
-
 
 void TaskComposite::run()
 {

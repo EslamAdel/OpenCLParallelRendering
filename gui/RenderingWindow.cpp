@@ -7,7 +7,8 @@
 #include <QPicture>
 
 #define MAX_NODES 3
-
+#define WIDTH 2048
+#define HEIGHT 2048
 /// TODO: Pass to arguments
 #define VOLUME_PREFIX "/projects/volume-datasets/skull/skull"
 
@@ -24,7 +25,7 @@ RenderingWindow::RenderingWindow( QWidget *parent ) :
 
     LOG_DEBUG( "Creating Parallel Rendering Framework!..." );
 
-    parallelRenderer_ = new ParallelRendering( volume );
+    parallelRenderer_ = new ParallelRendering( volume , WIDTH , HEIGHT);
 
     frameContainers_.push_back( ui->frameContainer0 );
     frameContainers_.push_back( ui->frameContainer1 );
@@ -41,7 +42,7 @@ RenderingWindow::RenderingWindow( QWidget *parent ) :
     parallelRenderer_->distributeBaseVolume1D();
 
     LOG_DEBUG("Add Compositing Node");
-    parallelRenderer_->addCompositingNode( 0 );
+    parallelRenderer_->addCompositingNode( 1 );
 
     intializeConnections_();
 
@@ -58,11 +59,14 @@ RenderingWindow::~RenderingWindow( )
 void RenderingWindow::intializeConnections_()
 {
     //parallelRenderer_
-    connect( parallelRenderer_ , SIGNAL( frameReady_SIGNAL( RenderingNode* )),
-             this , SLOT( frameReady_SLOT( RenderingNode* )));
+    connect( parallelRenderer_ ,
+             SIGNAL( frameReady_SIGNAL( QPixmap * ,
+                                        const RenderingNode* )),
+             this , SLOT( frameReady_SLOT( QPixmap * ,
+                                           const RenderingNode* )));
 
-    connect( parallelRenderer_ , SIGNAL( finalFrameReady_SIGNAL( QPixmap& )) ,
-             this , SLOT( collageFrameReady_SLOT( QPixmap& )));
+    connect( parallelRenderer_ , SIGNAL( finalFrameReady_SIGNAL( QPixmap* )) ,
+             this , SLOT( collageFrameReady_SLOT( QPixmap* )));
 
 
     //sliders
@@ -110,30 +114,30 @@ void RenderingWindow::startRendering_( )
 
 }
 
-void RenderingWindow::displayFrame_( QPixmap &frame , uint id )
+void RenderingWindow::displayFrame_( QPixmap *frame , uint id )
 {
 
     frameContainers_[ id ]->setPixmap
-            (( frame.scaled( frameContainers_[ id ]->width( ),
+            (( frame->scaled( frameContainers_[ id ]->width( ),
                              frameContainers_[ id ]->height( ),
                              Qt::KeepAspectRatio )));
 
 
 }
 
-void RenderingWindow::frameReady_SLOT( RenderingNode *node )
+void RenderingWindow::frameReady_SLOT( QPixmap *frame ,
+                                       const RenderingNode *node )
 {
-    node->frameBufferToPixmap();
-    QPixmap *frame = node->getFrame();
     uint index = node->getGPUIndex();
 
-    displayFrame_( *frame , index );
+    displayFrame_( frame , index );
 }
 
-void RenderingWindow::collageFrameReady_SLOT(QPixmap &finalFrame)
+void RenderingWindow::collageFrameReady_SLOT( QPixmap *finalFrame )
 {
+    finalFrame_ = finalFrame;
     ui->frameContainerResult->
-            setPixmap( finalFrame.scaled( ui->frameContainerResult->width( ) ,
+            setPixmap( finalFrame->scaled( ui->frameContainerResult->width( ) ,
                                           ui->frameContainerResult->height( ) ,
                                           Qt::KeepAspectRatio ));
 }
@@ -193,21 +197,26 @@ void RenderingWindow::newDensity_SLOT(int value)
 
 void RenderingWindow::captureView_SLOT()
 {
-    QString dir = QFileDialog::getExistingDirectory(this, tr("Open Directory"),
-                                                    "/home",
-                                                    QFileDialog::ShowDirsOnly
-                                                    | QFileDialog::DontResolveSymlinks);
+    QString dir =
+            QFileDialog::
+            getExistingDirectory( this , tr( "Open Directory" ) ,
+                                  "/home" ,
+                                  QFileDialog::ShowDirsOnly
+                                  | QFileDialog::DontResolveSymlinks);
 
 
-    QString date = QDateTime::currentDateTime().toString();
+    QString date = QDateTime::currentDateTime().toString( "hh-mm-ss" );
 
-    QString newDir = dir + QString("/") + date ;
+    QString newDir = dir + QString( "/" ) + date +
+                     QString( "[%1x%2]" ).arg( QString::number( WIDTH ) ,
+                                               QString::number( HEIGHT ));
     QDir createDir;
     createDir.mkdir( newDir );
     LOG_DEBUG("New Dir:%s" , newDir.toStdString().c_str() );
 
 
-    QPixmap pic( ui->frameContainerResult->pixmap( )->scaledToHeight(512).scaledToWidth(512));
+    QPixmap pic( finalFrame_->
+                 scaledToHeight( WIDTH ).scaledToWidth( HEIGHT ));
     pic.save( newDir + "/result.jpg");
 
     int i = 0;
@@ -215,7 +224,11 @@ void RenderingWindow::captureView_SLOT()
     {
         if( frame->isEnabled() )
         {
-            QPixmap framePixmap( frame->pixmap()->scaledToHeight(512).scaledToWidth(512) );
+            QPixmap framePixmap( parallelRenderer_->getRenderingNode( i ).
+                                 getCLFrame()->getFramePixmap().
+                                 scaledToHeight( WIDTH ).
+                                 scaledToWidth( HEIGHT ));
+
             framePixmap.save( newDir + QString("/GPU%1.jpg").arg(i++) );
         }
     }

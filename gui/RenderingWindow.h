@@ -35,11 +35,11 @@ private:
     /**
      * @brief displayFrame_
      */
-    void displayFrame_( QPixmap &frame , uint id );
+    void displayFrame_( QPixmap *frame , uint id );
 
 public slots:
-    void frameReady_SLOT( RenderingNode *node );
-    void collageFrameReady_SLOT( QPixmap &finalFrame ) ;
+    void frameReady_SLOT(QPixmap *frame, const RenderingNode *node );
+    void collageFrameReady_SLOT( QPixmap *finalFrame ) ;
 
 private slots:
 
@@ -73,6 +73,7 @@ private:
     ParallelRendering *parallelRenderer_;
     QVector< QLabel*  > frameContainers_;
     QVector< QPixmap* > pixmaps_;
+    QPixmap *finalFrame_;
     //std::vector
 };
 

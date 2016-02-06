@@ -48,6 +48,11 @@ uint64_t CompositingNode::getGPUIndex() const
     return gpuIndex_;
 }
 
+CLFrame32 *&CompositingNode::getCLFrameCollage()
+{
+    return collageFrame_;
+}
+
 void CompositingNode::setFrameData_HOST(const uint frameIndex , uint* data  )
 {
     framesData_[ frameIndex ] = data;
@@ -175,12 +180,6 @@ void CompositingNode::rewindCollageFrame_DEVICE(cl_bool blocking)
 void CompositingNode::uploadCollageFromDevice()
 {
     collageFrame_->readDeviceData( commandQueue_  , CL_TRUE );
-}
-
-
-QPixmap &CompositingNode::getCollagePixmap()
-{
-    collageFrame_->getFramePixmap();
 }
 
 uint CompositingNode::framesCount() const

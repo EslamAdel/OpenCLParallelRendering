@@ -7,6 +7,8 @@
 #include <QPixmap>
 #include <CLVolume.h>
 #include <CLXRayRenderingKernel.h>
+#include <CLFrame.h>
+
 //#include "ProfilingExterns.hh"
 
 /**
@@ -86,11 +88,6 @@ public:
                       const float &volumeDensity ,
                       const float &imageBrightness );
 
-
-    void uploadFrameFromDevice( cl_bool blocking = CL_TRUE );
-
-    void frameBufferToPixmap();
-
     /**
       * @brief releasePixelBuffer
       */
@@ -100,9 +97,8 @@ public:
      * @brief getFrame
      * @return
      */
-    QPixmap* getFrame( );
+    CLFrame32* &getCLFrame( );
 
-    uint* getFrameData( );
 
 
     /**
@@ -260,19 +256,9 @@ protected:
     CLRenderingKernel* activeRenderingKernel_;
 
     /**
-     * @brief frameData_
+     * @brief clFrame_
      */
-    uint* frameData_;
-
-    /**
-     * @brief frameDataRGBA_
-     */
-    uchar* frameDataRGBA_;
-
-    /**
-     * @brief frame_
-     */
-    QPixmap frame_;
+    CLFrame32 *clFrame_ ;
 
     /**
      * @brief inverseMatrix_

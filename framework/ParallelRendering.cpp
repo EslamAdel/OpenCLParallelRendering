@@ -12,11 +12,11 @@
 #define INITIAL_VOLUME_ROTATION_Z 0.0
 
 
-//#define BENCH_MARKING
+#define BENCH_MARKING
 
 #ifdef BENCH_MARKING
 #define AUTO_ROTATE
-#define TEST_FRAMES 500
+#define TEST_FRAMES 100
 #endif
 
 
@@ -105,16 +105,22 @@ void ParallelRendering::addRenderingNode( const uint64_t gpuIndex)
     // Add the new task object to
     // the map < rendering node , corresponding rendering task >
     renderingTasks_[ node ] = taskRender;
+    makePixmapTasks_[ node ] = new TaskMakePixmap( node->getCLFrame() , node );
 
     // Set the maximum number of active threads of the rendering thread pool and
     // the collector thread pool  to the current number of deployed GPUs.
     rendererPool_.setMaxThreadCount( inUseGPUs_.size( ));
     collectorPool_.setMaxThreadCount( inUseGPUs_.size( ));
+    pixmapMakerPool_.setMaxThreadCount( inUseGPUs_.size());
 
     // Map the signal emitted from rendering node after rendering is finished
     // to the corresponding slot.
     connect( node , SIGNAL( finishedRendering( RenderingNode* )),
              this , SLOT( finishedRendering_SLOT( RenderingNode* )));
+
+    connect( makePixmapTasks_[ node ] ,
+             SIGNAL( pixmapReady_SIGNAL(  QPixmap* , const RenderingNode* )) ,
+             this , SLOT( pixmapReady_SLOT( QPixmap* , const RenderingNode* )));
 
 }
 
@@ -145,7 +151,12 @@ void ParallelRendering::addCompositingNode( const uint64_t gpuIndex )
                                             framesCenters_ ,
                                             CompositingNode::Accumulate );
 
+    collagePixmapTask_ =
+            new TaskMakePixmap( compositingNode_->getCLFrameCollage() );
 
+    connect( collagePixmapTask_ ,
+             SIGNAL( pixmapReady_SIGNAL( QPixmap* , const RenderingNode* )) ,
+             this , SLOT(pixmapReady_SLOT( QPixmap* , const RenderingNode* )));
     // Frame index will be assigned to each rendering GPU (rednering node).
     // As a start, consider each frame will be indexed in the next for-loop.
     uint frameIndex = 0 ;
@@ -227,7 +238,7 @@ void ParallelRendering::distributeBaseVolume1D()
     }
 
     //The Last node will have the entire remaining brick
-    auto brick = baseVolume_->getBrick( newXDimension*( nDevices - 1 ),
+    auto brick = baseVolume_->getBrick( newXDimension*( nDevices - 1 ) ,
                                         baseVolume_->getDimensions().x ,
                                         0,
                                         baseVolume_->getDimensions().y ,
@@ -270,7 +281,6 @@ void ParallelRendering::applyTransformation_()
     readyPixmapsCount_ = 0 ;
 
     frameworkProfile.renderingLoopTime_.start();
-    frameworkProfile.renderingLoopTimeWithoutPixmap_.start();
 
     // fetch new transformations if exists.
     syncTransformation_();
@@ -321,7 +331,7 @@ uint8_t ParallelRendering::activeRenderingNodesCount() const
     return activeRenderingNodes_;
 }
 
-void ParallelRendering::finishedRendering_SLOT(RenderingNode *finishedNode)
+void ParallelRendering::finishedRendering_SLOT( RenderingNode *finishedNode )
 {
 
     collectingProfiles[ finishedNode ]->threadSpawningTime_.start();
@@ -332,17 +342,10 @@ void ParallelRendering::finishedRendering_SLOT(RenderingNode *finishedNode)
 void ParallelRendering::compositingFinished_SLOT()
 {
 
-    frameworkProfile.renderingLoopTimeWithoutPixmap_.stop();
-
-    frameworkProfile.convertToPixmapTime_.start();
-
-    QPixmap &finalFrame = compositingNode_->getCollagePixmap();
-
-    frameworkProfile.convertToPixmapTime_.stop();
-
     frameworkProfile.renderingLoopTime_.stop();
 
-    emit this->finalFrameReady_SIGNAL( finalFrame );
+    pixmapMakerPool_.start( collagePixmapTask_ );
+
 
     if( pendingTransformations_ )
         applyTransformation_();
@@ -365,12 +368,27 @@ void ParallelRendering::compositingFinished_SLOT()
 
 void ParallelRendering::frameLoadedToDevice_SLOT( RenderingNode *node )
 {
-//    LOG_DEBUG( "[DONE TRANSFER] from GPU <%d>" , node->getGPUIndex() );
+    //    LOG_DEBUG( "[DONE TRANSFER] from GPU <%d>" , node->getGPUIndex() );
 
     compositingProfile.threadSpawningTime_.start();
+
+    //accumulate the recently loaded frame to the collage frame.
     compositorPool_.start( compositingTasks_[ node ]);
 
-    emit this->frameReady_SIGNAL( node );
+    //make pixmap from the recently uploaded frame to host.
+    pixmapMakerPool_.start( makePixmapTasks_[ node ]);
+
+}
+
+void ParallelRendering::pixmapReady_SLOT( QPixmap *pixmap,
+                                          const RenderingNode *node)
+{
+    //if node=null then this frame is actually the collage frame.
+    if( node == nullptr )
+        emit this->finalFrameReady_SIGNAL( pixmap );
+
+    else
+        emit this->frameReady_SIGNAL( pixmap , node  );
 }
 
 void ParallelRendering::updateRotationX_SLOT(int angle)
@@ -456,7 +474,6 @@ void ParallelRendering::benchmark_()
     compositingProfile.compositingTime_.print( 1 );
 
     printf("Statistics: framework\n");
-    frameworkProfile.renderingLoopTimeWithoutPixmap_.print( 1 );
     frameworkProfile.convertToPixmapTime_.print( 1 );
     frameworkProfile.renderingLoopTime_.print( 1 );
 

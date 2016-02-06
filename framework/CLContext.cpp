@@ -106,17 +106,6 @@ void CLContext< T >::selectGPU_()
     context_ = clContext->getContext();
 }
 
-template< class T >
-QPixmap* CLContext< T >::getFrame( )
-{
-    return &frame_;
-}
-
-template< class T >
-uint *CLContext< T >::getFrameData()
-{
-    return frameData_ ;
-}
 
 template< class T >
 cl_platform_id CLContext< T >::getPlatformId( ) const
@@ -151,7 +140,13 @@ cl_kernel CLContext< T >::getKernel( ) const
 template< class T >
 void CLContext< T >::releasePixelBuffer( )
 {
-    clReleaseMemObject( clPixelBuffer_ );
+    delete clFrame_;
+}
+
+template< class T >
+CLFrame32 *&CLContext< T >::getCLFrame()
+{
+    return clFrame_;
 }
 
 template< class T >
@@ -397,77 +392,28 @@ void CLContext< T >::renderFrame( const float* inverseMatrix ,
 
 }
 
-template< class T >
-void CLContext<T>::uploadFrameFromDevice( cl_bool blocking )
-{
-    // Assume everything is fine in the begnning
-    cl_int clErrorCode = CL_SUCCESS;
-
-    clEnqueueReadBuffer( commandQueue_, clPixelBuffer_, blocking , 0,
-                         sizeof( uint ) * gridSize_[0] * gridSize_[1],
-            frameData_, 0, NULL, NULL );
-
-    if ( clErrorCode != CL_SUCCESS )
-        oclHWDL::Error::checkCLError(clErrorCode);
-
-}
-
-template< class T >
-void CLContext<T>::frameBufferToPixmap()
-{
-    u_int8_t r, g, b, a;
-    uint rgba;
-
-    for(int i = 0; i < gridSize_[0] * gridSize_[1]; i++)
-    {
-        rgba = frameData_[i];
-        SystemUtilities::convertColorToRGBA( rgba, r, g, b, a );
-
-        frameDataRGBA_[4*i] = r;
-        frameDataRGBA_[4*i + 1] = g;
-        frameDataRGBA_[4*i + 2] = b;
-        frameDataRGBA_[4*i + 3] = a;
-    }
-
-    // Create a QImage and send it back to the rendering window.
-    QImage image(frameDataRGBA_,
-                 gridSize_[0], gridSize_[1], QImage::Format_ARGB32);
-    frame_ = frame_.fromImage(image);
-
-}
-
 
 
 template< class T >
 void CLContext< T >::createPixelBuffer( const uint frameWidth,
                                         const uint frameHeight )
 {
-    const size_t bufferSize = frameWidth * frameWidth * sizeof(u_int8_t) * 4;
-
-    cl_int error = CL_SUCCESS;
-    clPixelBuffer_ = clCreateBuffer( context_,
-                                     CL_MEM_WRITE_ONLY,
-                                     bufferSize,
-                                     NULL, &error );
-    oclHWDL::Error::checkCLError(error);
 
     gridSize_[0] = SystemUtilities::roundUp(LOCAL_SIZE_X, frameWidth );
     gridSize_[1] = SystemUtilities::roundUp( LOCAL_SIZE_Y, frameHeight );
 
-    frameDataRGBA_ = new uchar[gridSize_[0] * gridSize_[1] * 4];
-    frameData_ = new uint[gridSize_[0] * gridSize_[1]];
-    for(int i = 0; i < gridSize_[0] * gridSize_[1]; i++)
-        frameData_[i] = 0;
+    Dimensions2D dimensions( gridSize_[0] , gridSize_[1]);
+    clFrame_ = new CLFrame< uint >( dimensions );
+    clFrame_->createDeviceData( context_ );
 
-    activeRenderingKernel_->setFrameBuffer(clPixelBuffer_);
+    activeRenderingKernel_->setFrameBuffer( clFrame_->getDeviceData() );
     activeRenderingKernel_->setFrameWidth(frameWidth);
     activeRenderingKernel_->setFrameHeight(frameHeight);
 
-    oclCheckErrorEX( error, CL_SUCCESS, 0 );
 }
 
 template< class T >
-void CLContext<T>::loadVolume_(const Volume<T> *volume)
+void CLContext<T>::loadVolume_( const Volume<T> *volume )
 {
 
     //TODO : leakage control

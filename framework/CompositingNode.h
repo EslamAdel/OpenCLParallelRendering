@@ -145,7 +145,8 @@ public:
      * @return
      * return the collage Pixmap.
      */
-    QPixmap &getCollagePixmap();
+    CLFrame32 *&getCLFrameCollage();
+
 
     /**
      * @brief framesCount

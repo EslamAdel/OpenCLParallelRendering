@@ -49,10 +49,8 @@ struct CompositingProfile
 struct FrameworkProfile
 {
     FrameworkProfile() : convertToPixmapTime_("Converting to Pixmap on Host") ,
-                         renderingLoopTimeWithoutPixmap_("Rendering Loop W/O Converting to Pixmap on Host"),
                          renderingLoopTime_("Rendering Loop") {}
     Timer64 convertToPixmapTime_;
-    Timer64 renderingLoopTimeWithoutPixmap_ ;
     Timer64 renderingLoopTime_;
 };
 

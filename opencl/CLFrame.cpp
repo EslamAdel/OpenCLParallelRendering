@@ -7,7 +7,8 @@ template< class T >
 CLFrame< T >::CLFrame( const Dimensions2D dimensions ,
                        T *data )
     : dimensions_( dimensions ),
-      hostData_( data )
+      hostData_( data ) ,
+      pixmapSynchronized_( false )
 {
     if( typeid(T) != typeid(uint) )
         LOG_ERROR("Images other than uint/pixel is not supported!");
@@ -85,6 +86,8 @@ void CLFrame< T >::readDeviceData( cl_command_queue cmdQueue ,
         oclHWDL::Error::checkCLError( error );
         LOG_ERROR("OpenCL Error!");
     }
+    //Now, neither QPixmap frame_ nor rgbaFrame represents the recent raw data.
+    pixmapSynchronized_ = false ;
 }
 
 
@@ -97,6 +100,8 @@ T *CLFrame<T>::getHostData() const
 template< class T >
 QPixmap &CLFrame<T>::getFramePixmap()
 {
+    if( pixmapSynchronized_ ) return frame_ ;
+
     u_int8_t r, g, b, a;
     uint rgba;
 
@@ -116,8 +121,8 @@ QPixmap &CLFrame<T>::getFramePixmap()
                        dimensions_.x , dimensions_.y , QImage::Format_ARGB32);
     frame_ = frame_.fromImage(image);
 
-
     return frame_ ;
+
 }
 
 template< class T >
@@ -136,6 +141,13 @@ template< class T >
 cl_mem CLFrame< T >::getDeviceData() const
 {
     return deviceData_ ;
+}
+
+template< class T >
+void CLFrame< T >::releaseDeviceData_()
+{
+    clReleaseMemObject( deviceData_ );
+
 }
 
 #include <CLFrame.ipp>

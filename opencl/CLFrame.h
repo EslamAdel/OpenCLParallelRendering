@@ -48,6 +48,9 @@ public:
 
     virtual cl_mem getDeviceData() const;
 
+private:
+    void releaseDeviceData_();
+
 
 protected:
 
@@ -61,8 +64,9 @@ protected:
 
     const Dimensions2D dimensions_ ;
 
-    //cl_image_format imageFormat_ ;
 
+    //flags
+    bool pixmapSynchronized_ ;
 };
 
 
