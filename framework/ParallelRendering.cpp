@@ -19,9 +19,6 @@ DEFINE_PROFILES
 
 #define AUTO_ROTATE
 
-// As you increase TEST_FRAMES, standard deviations decrease.
-#define TEST_FRAMES 1000
-
 #endif
 
 

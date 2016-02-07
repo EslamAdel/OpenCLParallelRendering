@@ -7,10 +7,9 @@
 #define BENCHMARKING
 
 //use: 256, 384, 512, 640, 768, 896, 1024
-#define VOLUME_SIZE 384
+#define VOLUME_SIZE 768
 
 #define PROFILE_SINGLE_GPU
-
 
 
 #ifdef PROFILE_SINGLE_GPU
@@ -22,7 +21,8 @@
 #endif
 
 
-
+// As you increase TEST_FRAMES, standard deviations decrease.
+#define TEST_FRAMES 5*360
 
 #ifdef BENCHMARKING
 
