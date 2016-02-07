@@ -445,32 +445,31 @@ void ParallelRendering::updateVolumeDensity_SLOT(float density)
 void ParallelRendering::benchmark_()
 {
 
-    for( auto device : inUseGPUs_ )
+    for( auto it : renderingNodes_ )
     {
-        RenderingNode *node = renderingNodes_[ device ];
+        RenderingNode *node = it.second ;
 
-        printf("Statistics: Rendering on GPU <%d>\n" , node->getGPUIndex() );
+        RENDERING_PROFILE_TAG( node );
         PRINT( RENDERING_PROFILE_PASS_PTR( node ).threadSpawning_TIMER );
         PRINT( RENDERING_PROFILE_PASS_PTR( node ).mvMatrix_TIMER );
         PRINT( RENDERING_PROFILE_PASS_PTR( node ).rendering_TIMER );
 
-        printf("Statistics: Data Transfer from GPU <%d> --> Host --> GPU <%d>\n" ,
-               node->getGPUIndex() , compositingNode_->getGPUIndex() ) ;
+        COLLECTING_PROFILE_TAG( node , compositingNode_ );
         PRINT( COLLECTING_PROFILE( node ).threadSpawning_TIMER );
         PRINT( COLLECTING_PROFILE( node ).loadingBufferFromDevice_TIMER );
         PRINT( COLLECTING_PROFILE( node ).loadingBufferToDevice_TIMER );
 
     }
 
-    printf("Statistics: Compositing on GPU <%d>\n", compositingNode_->getGPUIndex() ) ;
+    COMPOSITING_PROFILE_TAG( compositingNode_ );
     PRINT( compositingProfile.threadSpawning_TIMER ) ;
     PRINT( compositingProfile.accumulatingFrame_TIMER ) ;
     PRINT( compositingProfile.loadCollageFromDevice_TIMER ) ;
     PRINT( compositingProfile.rewindCollage_TIMER ) ;
-    PRINT( compositingProfile.rewindCollage_TIMER ) ;
+    PRINT( compositingProfile.compositing_TIMER ) ;
 
 
-    printf("Statistics: framework\n");
+    FRAMEWORK_PROFILE_TAG();
     PRINT( frameworkProfile.convertToPixmap_TIMER );
     PRINT( frameworkProfile.renderingLoop_TIMER );
 

@@ -1,7 +1,7 @@
 #ifndef PROFILINGEXTERNS_HH
 #define PROFILINGEXTERNS_HH
 
-#define BENCHMARKING
+//#define BENCHMARKING
 
 #include "Profiles.hh"
 
@@ -22,6 +22,8 @@ RenderingProfile &getRenderingProfile( RenderingProfiles &profiles ,
 CollectingProfile &getCollectingProfile( CollectingProfiles &profile ,
                                          RenderingNode* node );
 
+
+
 #ifdef BENCHMARKING
 
 #define TIC( timer ) \
@@ -31,10 +33,11 @@ CollectingProfile &getCollectingProfile( CollectingProfiles &profile ,
 #define TOC( timer ) \
     do{ timer.stop(); } \
     while( 0 )
+
 #define RENDERING_PROFILE( gpuIndex )\
     getRenderingProfile( renderingProfiles , gpuIndex )
 
-#define RENDERING_PROFILE_PASS_PTR( renderingNode )\
+#define RENDERING_PROFILE_PASS_PTR( renderingNode ) \
     getRenderingProfile( renderingProfiles , renderingNode )
 
 
@@ -45,6 +48,26 @@ CollectingProfile &getCollectingProfile( CollectingProfiles &profile ,
     do{ timer.print( 1 );  \
     }while( 0 )
 
+#define RENDERING_PROFILE_TAG( node )\
+    do{ printf("Statistics: Rendering on GPU <%d>\n" , node->getGPUIndex() ); }\
+    while( 0 )
+
+#define COLLECTING_PROFILE_TAG( node , compositingNode )\
+    do{\
+    printf("Statistics: Data Transfer from GPU <%d> --> Host --> GPU <%d>\n" ,\
+    node->getGPUIndex() , compositingNode_->getGPUIndex() ) ; }\
+    while( 0 )
+
+#define COMPOSITING_PROFILE_TAG( compositingNode )\
+    do{\
+    printf("Statistics: Compositing on GPU <%d>\n", compositingNode_->getGPUIndex() ) ;}\
+    while( 0 )
+
+#define FRAMEWORK_PROFILE_TAG()\
+    do{\
+    printf("Statistics: framework\n"); }\
+    while( 0 )
+
 
 #else
 #define TIC( timer ) \
@@ -54,7 +77,6 @@ CollectingProfile &getCollectingProfile( CollectingProfiles &profile ,
 #define TOC( timer ) \
     do{  } \
     while( 0 )
-
 
 #define RENDERING_PROFILE( gpuIndex )\
     do{  } \
@@ -69,6 +91,22 @@ CollectingProfile &getCollectingProfile( CollectingProfiles &profile ,
     while( 0 )
 
 #define PRINT( timer )\
+    do{  }\
+    while( 0 )
+
+#define RENDERING_PROFILE_TAG( node )\
+    do{  }\
+    while( 0 )
+
+#define COLLECTING_PROFILE_TAG( node , compositingNode )\
+    do{  }\
+    while( 0 )
+
+#define COMPOSITING_PROFILE_TAG( compositingNode )\
+    do{  }\
+    while( 0 )
+
+#define FRAMEWORK_PROFILE_TAG()\
     do{  }\
     while( 0 )
 
