@@ -82,7 +82,13 @@ CollectingProfile &getCollectingProfile( CollectingProfiles &profile ,
     RenderingProfiles renderingProfiles = RenderingProfiles() ; \
     CollectingProfiles collectingProfiles = CollectingProfiles() ; \
     CompositingProfile compositingProfile = CompositingProfile() ; \
-    FrameworkProfile frameworkProfile = FrameworkProfile() ; \
+    FrameworkProfile frameworkProfile = FrameworkProfile();
+
+#define EXIT_PROFILING()\
+    do{\
+    exit(EXIT_SUCCESS);}\
+    while( 0 )
+
 
 #else
 #define TIC( timer ) \
@@ -135,6 +141,10 @@ CollectingProfile &getCollectingProfile( CollectingProfiles &profile ,
 
 #define DEFINE_PROFILES
 
+
+#define EXIT_PROFILING()\
+    do{  }\
+    while( 0 )
 #endif
 
 

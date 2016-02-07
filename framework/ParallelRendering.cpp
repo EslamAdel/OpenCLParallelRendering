@@ -16,8 +16,12 @@
 #ifdef BENCHMARKING
 //Profiles Difinitions
 DEFINE_PROFILES
+
 #define AUTO_ROTATE
-#define TEST_FRAMES 100
+
+// As you increase TEST_FRAMES, standard deviations decrease.
+#define TEST_FRAMES 1000
+
 #endif
 
 
@@ -469,5 +473,5 @@ void ParallelRendering::benchmark_()
     PRINT( frameworkProfile.convertToPixmap_TIMER );
     PRINT( frameworkProfile.renderingLoop_TIMER );
 
-
+    EXIT_PROFILING();
 }
