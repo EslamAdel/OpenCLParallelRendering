@@ -1,7 +1,7 @@
 #ifndef PROFILINGEXTERNS_HH
 #define PROFILINGEXTERNS_HH
 
-//#define BENCHMARKING
+#define BENCHMARKING
 
 #include "Profiles.hh"
 
@@ -34,13 +34,12 @@ CollectingProfile &getCollectingProfile( CollectingProfiles &profile ,
     do{ timer.stop(); } \
     while( 0 )
 
-#define RENDERING_PROFILE( gpuIndex )\
-    getRenderingProfile( renderingProfiles , gpuIndex )
 
-#define RENDERING_PROFILE_PASS_PTR( renderingNode ) \
+//return rendering profile by passing pointer of rendering node attached to.
+#define RENDERING_PROFILE( renderingNode ) \
     getRenderingProfile( renderingProfiles , renderingNode )
 
-
+//return collecting profile by passing pointer of rendering node attached to.
 #define COLLECTING_PROFILE( renderingNode )\
     getCollectingProfile( collectingProfiles , renderingNode )
 
@@ -68,6 +67,22 @@ CollectingProfile &getCollectingProfile( CollectingProfiles &profile ,
     printf("Statistics: framework\n"); }\
     while( 0 )
 
+#define ATTACH_RENDERING_PROFILE( renderingNode )\
+    do{\
+    renderingProfiles[ renderingNode ] = new RenderingProfile ; }\
+    while( 0 )
+
+#define ATTACH_COLLECTING_PROFILE( renderingNode )\
+    do{\
+    collectingProfiles[ renderingNode ] = new CollectingProfile ; }\
+    while( 0 )
+
+
+#define DEFINE_PROFILES\
+    RenderingProfiles renderingProfiles = RenderingProfiles() ; \
+    CollectingProfiles collectingProfiles = CollectingProfiles() ; \
+    CompositingProfile compositingProfile = CompositingProfile() ; \
+    FrameworkProfile frameworkProfile = FrameworkProfile() ; \
 
 #else
 #define TIC( timer ) \
@@ -109,6 +124,16 @@ CollectingProfile &getCollectingProfile( CollectingProfiles &profile ,
 #define FRAMEWORK_PROFILE_TAG()\
     do{  }\
     while( 0 )
+
+#define ATTACH_RENDERING_PROFILE( renderingNode )\
+    do{  }\
+    while( 0 )
+
+#define ATTACH_COLLECTING_PROFILE( renderingNode )\
+    do{  }\
+    while( 0 )
+
+#define DEFINE_PROFILES
 
 #endif
 

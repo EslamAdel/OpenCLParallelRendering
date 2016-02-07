@@ -12,19 +12,16 @@
 #define INITIAL_VOLUME_ROTATION_Z 0.0
 
 
-#define BENCH_MARKING
 
-#ifdef BENCH_MARKING
+#ifdef BENCHMARKING
+//Profiles Difinitions
+DEFINE_PROFILES
 #define AUTO_ROTATE
 #define TEST_FRAMES 100
 #endif
 
 
-//Profiles Difinitions
-RenderingProfiles renderingProfiles = RenderingProfiles() ;
-CollectingProfiles collectingProfiles = CollectingProfiles() ;
-CompositingProfile compositingProfile = CompositingProfile() ;
-FrameworkProfile frameworkProfile = FrameworkProfile() ;
+
 
 ParallelRendering::ParallelRendering( Volume<uchar> *volume ,
                                       const uint frameWidth ,
@@ -87,8 +84,8 @@ void ParallelRendering::addRenderingNode( const uint64_t gpuIndex)
                                              volumeDensityAsync_,
                                              brightnessAsync_  );
 
-    renderingProfiles[ node ] = new RenderingProfile;
-    collectingProfiles[ node ] = new CollectingProfile;
+    ATTACH_RENDERING_PROFILE( node );
+    ATTACH_COLLECTING_PROFILE( node );
 
     auto attachedGPU = listGPUs_.at( gpuIndex );
 
@@ -228,7 +225,7 @@ void ParallelRendering::distributeBaseVolume1D()
     for( auto i = 0 ; i < nDevices - 1 ; i++ )
     {
         auto *brick = baseVolume_->getBrick( newXDimension*i ,
-                                             newXDimension*( i + 1 ) ,
+                                             newXDimension*( i + 1 )  ,
                                              0,
                                              baseVolume_->getDimensions().y ,
                                              0,
@@ -289,7 +286,7 @@ void ParallelRendering::applyTransformation_()
     {
         auto node = renderingNodes_[ renderingDevice ];
 
-        renderingProfiles[ node ]->threadSpawning_TIMER.start();
+        TIC( renderingProfiles[ node ]->threadSpawning_TIMER );
         // Spawn threads and start rendering on each rendering node.
         rendererPool_.start( renderingTasks_[ node ]);
     }
@@ -334,7 +331,7 @@ uint8_t ParallelRendering::activeRenderingNodesCount() const
 void ParallelRendering::finishedRendering_SLOT( RenderingNode *finishedNode )
 {
 
-    collectingProfiles[ finishedNode ]->threadSpawning_TIMER.start();
+    TIC( collectingProfiles[ finishedNode ]->threadSpawning_TIMER );
 
     collectorPool_.start( collectingTasks_[ finishedNode ]);
 }
@@ -342,8 +339,7 @@ void ParallelRendering::finishedRendering_SLOT( RenderingNode *finishedNode )
 void ParallelRendering::compositingFinished_SLOT()
 {
 
-    frameworkProfile.renderingLoop_TIMER.stop();
-
+    TOC( frameworkProfile.renderingLoop_TIMER );
     pixmapMakerPool_.start( collagePixmapTask_ );
 
 
@@ -352,7 +348,7 @@ void ParallelRendering::compositingFinished_SLOT()
     else
     {
         renderingNodesReady_ = true ;
-#ifdef BENCH_MARKING
+#ifdef BENCHMARKING
         static uint testFrames = 0 ;
         if( ++testFrames < TEST_FRAMES )
             updateRotationX_SLOT( rotation_.x + 1 );
@@ -370,7 +366,7 @@ void ParallelRendering::frameLoadedToDevice_SLOT( RenderingNode *node )
 {
     //    LOG_DEBUG( "[DONE TRANSFER] from GPU <%d>" , node->getGPUIndex() );
 
-    compositingProfile.threadSpawning_TIMER.start();
+    TIC( compositingProfile.threadSpawning_TIMER );
 
     //accumulate the recently loaded frame to the collage frame.
     compositorPool_.start( compositingTasks_[ node ]);
@@ -450,9 +446,9 @@ void ParallelRendering::benchmark_()
         RenderingNode *node = it.second ;
 
         RENDERING_PROFILE_TAG( node );
-        PRINT( RENDERING_PROFILE_PASS_PTR( node ).threadSpawning_TIMER );
-        PRINT( RENDERING_PROFILE_PASS_PTR( node ).mvMatrix_TIMER );
-        PRINT( RENDERING_PROFILE_PASS_PTR( node ).rendering_TIMER );
+        PRINT( RENDERING_PROFILE( node ).threadSpawning_TIMER );
+        PRINT( RENDERING_PROFILE( node ).mvMatrix_TIMER );
+        PRINT( RENDERING_PROFILE( node ).rendering_TIMER );
 
         COLLECTING_PROFILE_TAG( node , compositingNode_ );
         PRINT( COLLECTING_PROFILE( node ).threadSpawning_TIMER );
@@ -469,7 +465,7 @@ void ParallelRendering::benchmark_()
     PRINT( compositingProfile.compositing_TIMER ) ;
 
 
-    FRAMEWORK_PROFILE_TAG();
+    FRAMEWORK_PROFILE_TAG( );
     PRINT( frameworkProfile.convertToPixmap_TIMER );
     PRINT( frameworkProfile.renderingLoop_TIMER );
 

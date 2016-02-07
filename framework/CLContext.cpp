@@ -243,9 +243,6 @@ void CLContext< T >::paint( const Coordinates3D &rotation ,
                             Coordinates3D &currentCenter )
 {
 
-
-//    RenderingProfile &profile = getRenderingProfile( renderingProfiles , gpuIndex_ );
-//    profile.transformationMatrix_.start();
     TIC( RENDERING_PROFILE( gpuIndex_ ).mvMatrix_TIMER );
     // Use the GLM to create the Model View Matrix.
     // Initialize to identity.
@@ -341,13 +338,9 @@ void CLContext< T >::paint( const Coordinates3D &rotation ,
 
     TOC( RENDERING_PROFILE( gpuIndex_ ).mvMatrix_TIMER );
 
-//    profile.transformationMatrix_.stop();
-
-//    profile.rendering_.start();
     TIC( RENDERING_PROFILE( gpuIndex_ ).rendering_TIMER );
     renderFrame( inverseMatrixArray_ , volumeDensity , imageBrightness );
     TOC( RENDERING_PROFILE( gpuIndex_ ).rendering_TIMER );
-//    profile.rendering_.stop();
 }
 
 template< class T >
@@ -420,7 +413,6 @@ void CLContext<T>::loadVolume_( const Volume<T> *volume )
 {
 
     //TODO : leakage control
-
 
     volume_ = volume;
 

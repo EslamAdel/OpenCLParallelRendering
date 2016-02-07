@@ -16,11 +16,11 @@ void TaskCollect::run()
     TOC( COLLECTING_PROFILE(renderingNode_).threadSpawning_TIMER );
 
     CLFrame32 *sourceFrame = renderingNode_->getCLFrame();
-    TIC( COLLECTING_PROFILE(renderingNode_).loadingBufferFromDevice_TIMER );
+
     //upload frame from rendering GPU to HOST.
-    sourceFrame->readDeviceData( renderingNode_->getCommandQueue() ,
-                                 CL_TRUE );
-    TOC( COLLECTING_PROFILE(renderingNode_).loadingBufferFromDevice_TIMER );
+    TIC( COLLECTING_PROFILE( renderingNode_ ).loadingBufferFromDevice_TIMER );
+    sourceFrame->readDeviceData( renderingNode_->getCommandQueue() , CL_TRUE );
+    TOC( COLLECTING_PROFILE( renderingNode_ ).loadingBufferFromDevice_TIMER );
 
     //now sourceFrame points to recently uploaded data.
     compositingNode_->setFrameData_HOST( frameIndex_ ,
