@@ -19,8 +19,8 @@ void TaskComposite::run()
 
     TOC( compositingProfile.threadSpawning_TIMER ) ;
 
-    if( compositedFramesCount_ == 0 )
-        TIC( compositingProfile.compositing_TIMER );
+//    if( compositedFramesCount_ == 0 )
+//        TIC( compositingProfile.compositing_TIMER );
 
 
     TIC( compositingProfile.accumulatingFrame_TIMER );
@@ -39,7 +39,7 @@ void TaskComposite::run()
         compositingNode_->rewindCollageFrame_DEVICE( CL_TRUE );
         TOC( compositingProfile.rewindCollage_TIMER );
 
-        TOC( compositingProfile.compositing_TIMER );
+//        TOC( compositingProfile.compositing_TIMER );
 
         emit this->compositingFinished_SIGNAL();
 
