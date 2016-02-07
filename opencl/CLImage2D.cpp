@@ -2,11 +2,13 @@
 #include "Logger.h"
 
 template< class T >
-CLImage2D< T >::CLImage2D(const Dimensions2D dimensions, T *data)
-    : CLFrame< T >( dimensions, data )
+CLImage2D< T >::CLImage2D(const Dimensions2D dimensions,
+                          const cl_channel_order channelOrder,
+                          const cl_channel_type channelType)
+    : CLFrame< T >( dimensions )
 {
-    imageFormat_.image_channel_order = CL_INTENSITY;
-    imageFormat_.image_channel_data_type = CL_UNORM_INT8;
+    imageFormat_.image_channel_order = channelOrder;
+    imageFormat_.image_channel_data_type = channelType;
 }
 
 template< class T >
@@ -33,10 +35,10 @@ void CLImage2D< T >::createDeviceData( cl_context context )
 }
 
 template< class T >
-void CLImage2D< T >::writeDeviceData(cl_command_queue cmdQueue,
-                                     const cl_bool blocking)
+void CLImage2D< T >::writeDeviceData( cl_command_queue cmdQueue,
+                                      const cl_bool blocking )
 {
-    static const size_t origin[3] = { 0 , 0 , 0 };
+    const size_t origin[3] = { 0 , 0 , 0 };
     const size_t region[3] = { this->dimensions_.x , this->dimensions_.y , 1 };
 
     // Initially, assume that everything is fine
@@ -53,10 +55,10 @@ void CLImage2D< T >::writeDeviceData(cl_command_queue cmdQueue,
 }
 
 template< class T >
-void CLImage2D< T >::readDeviceData(cl_command_queue cmdQueue,
-                                    const cl_bool blocking)
+void CLImage2D< T >::readDeviceData( cl_command_queue cmdQueue ,
+                                     const cl_bool blocking )
 {
-    static const size_t origin[3] = { 0 , 0 , 0 };
+    const size_t origin[3] = { 0 , 0 , 0 };
     const size_t
             region[3] = { this->dimensions_.x , this->dimensions_.y , 1 };
 
