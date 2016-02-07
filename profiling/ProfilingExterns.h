@@ -1,26 +1,26 @@
 #ifndef PROFILINGEXTERNS_HH
 #define PROFILINGEXTERNS_HH
 
-#define BENCHMARKING
-
 #include "Profiles.hh"
 
 
+#define BENCHMARKING
 
-extern RenderingProfiles renderingProfiles ;
-extern CollectingProfiles collectingProfiles ;
-extern CompositingProfile compositingProfile;
-extern FrameworkProfile frameworkProfile;
+//use: 256, 384, 512, 640, 768, 896, 1024
+#define VOLUME_SIZE 384
+
+#define PROFILE_SINGLE_GPU
 
 
-RenderingProfile &getRenderingProfile( RenderingProfiles &profiles ,
-                                       uint gpuIndex );
 
-RenderingProfile &getRenderingProfile( RenderingProfiles &profiles ,
-                                       RenderingNode *node  );
+#ifdef PROFILE_SINGLE_GPU
+#define DEPLOY_GPU_INDEX 1
 
-CollectingProfile &getCollectingProfile( CollectingProfiles &profile ,
-                                         RenderingNode* node );
+#else
+#define PROFILE_ALL_GPUS
+
+#endif
+
 
 
 
@@ -146,6 +146,25 @@ CollectingProfile &getCollectingProfile( CollectingProfiles &profile ,
     do{  }\
     while( 0 )
 #endif
+
+
+
+
+extern RenderingProfiles renderingProfiles ;
+extern CollectingProfiles collectingProfiles ;
+extern CompositingProfile compositingProfile;
+extern FrameworkProfile frameworkProfile;
+
+
+RenderingProfile &getRenderingProfile( RenderingProfiles &profiles ,
+                                       uint gpuIndex );
+
+RenderingProfile &getRenderingProfile( RenderingProfiles &profiles ,
+                                       RenderingNode *node  );
+
+CollectingProfile &getCollectingProfile( CollectingProfiles &profile ,
+                                         RenderingNode* node );
+
 
 
 #endif // PROFILINGEXTERNS_HH

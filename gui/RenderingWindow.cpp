@@ -6,12 +6,12 @@
 #include <QDir>
 #include <QPicture>
 
-#define MAX_NODES 3
+#include "ProfilingExterns.h"
+
 #define WIDTH 512
 #define HEIGHT 512
 /// TODO: Pass to arguments
 
-#define VOLUME_SIZE 256
 
 //IMPORTANT: Check the MAX_ALLOC_SIZE first. (using clinfo)
 
@@ -64,6 +64,13 @@ RenderingWindow::RenderingWindow( QWidget *parent ) :
     frameContainers_.push_back( ui->frameContainer0 );
     frameContainers_.push_back( ui->frameContainer1 );
     frameContainers_.push_back( ui->frameContainer2 );
+
+#ifdef PROFILE_SINGLE_GPU
+
+    parallelRenderer_->addRenderingNode( DEPLOY_GPU_INDEX );
+    frameContainers_[ DEPLOY_GPU_INDEX ]->setEnabled(true);
+
+#else
     for( auto i = 0 ; i < parallelRenderer_->machineGPUsCount() ; i++ )
     {
         LOG_DEBUG( "Deploy GPU#%d" , i );
@@ -71,12 +78,14 @@ RenderingWindow::RenderingWindow( QWidget *parent ) :
         if( i < frameContainers_.size())
             frameContainers_[ i ]->setEnabled( true );
     }
+#endif
 
     LOG_DEBUG( "Distribute Volume" );
     parallelRenderer_->distributeBaseVolume1D();
 
     LOG_DEBUG("Add Compositing Node");
-    parallelRenderer_->addCompositingNode( 1 );
+    //The Compositing GPU will be the RenderingGPU with index 0 .
+    parallelRenderer_->addCompositingNode( 0 );
 
     intializeConnections_();
 
