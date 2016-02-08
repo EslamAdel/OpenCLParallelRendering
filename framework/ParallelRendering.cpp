@@ -342,7 +342,6 @@ void ParallelRendering::compositingFinished_SLOT()
 
     TOC( frameworkProfile.renderingLoop_TIMER );
 
-    TIC( frameworkProfile.convertToPixmap_TIMER );
     pixmapMakerPool_.start( collagePixmapTask_ );
 
 
@@ -374,7 +373,6 @@ void ParallelRendering::frameLoadedToDevice_SLOT( RenderingNode *node )
     //accumulate the recently loaded frame to the collage frame.
     compositorPool_.start( compositingTasks_[ node ]);
 
-    TIC( frameworkProfile.convertToPixmap_TIMER );
     //make pixmap from the recently uploaded frame to host.
     pixmapMakerPool_.start( makePixmapTasks_[ node ]);
 
@@ -384,7 +382,6 @@ void ParallelRendering::pixmapReady_SLOT( QPixmap *pixmap,
                                           const RenderingNode *node)
 {
 
-    TOC( frameworkProfile.convertToPixmap_TIMER );
     //if node=null then this frame is actually the collage frame.
     if( node == nullptr )
         emit this->finalFrameReady_SIGNAL( pixmap );
@@ -468,11 +465,10 @@ void ParallelRendering::benchmark_()
     PRINT( compositingProfile.accumulatingFrame_TIMER ) ;
     PRINT( compositingProfile.loadCollageFromDevice_TIMER ) ;
     PRINT( compositingProfile.rewindCollage_TIMER ) ;
-    //PRINT( compositingProfile.compositing_TIMER ) ;
+    PRINT( compositingProfile.compositing_TIMER ) ;
 
 
     FRAMEWORK_PROFILE_TAG( );
-    PRINT( frameworkProfile.convertToPixmap_TIMER );
     PRINT( frameworkProfile.renderingLoop_TIMER );
 
     EXIT_PROFILING();

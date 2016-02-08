@@ -8,8 +8,8 @@
 
 #include "ProfilingExterns.h"
 
-#define WIDTH 512
-#define HEIGHT 512
+#define WIDTH 2048
+#define HEIGHT 2048
 /// TODO: Pass to arguments
 
 

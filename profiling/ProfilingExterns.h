@@ -4,12 +4,12 @@
 #include "Profiles.hh"
 
 
-#define BENCHMARKING
+//#define BENCHMARKING
 
 //use: 256, 384, 512, 640, 768, 896, 1024
-#define VOLUME_SIZE 896
+#define VOLUME_SIZE 384
 
-//#define PROFILE_SINGLE_GPU
+#define PROFILE_SINGLE_GPU
 
 
 #ifdef PROFILE_SINGLE_GPU
