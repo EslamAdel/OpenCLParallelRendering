@@ -7,13 +7,13 @@
 #define BENCHMARKING
 
 //use: 256, 384, 512, 640, 768, 896, 1024
-#define VOLUME_SIZE 384
+#define VOLUME_SIZE 256
 
 #define PROFILE_SINGLE_GPU
 
 
 #ifdef PROFILE_SINGLE_GPU
-#define DEPLOY_GPU_INDEX 1
+#define DEPLOY_GPU_INDEX 0
 
 #else
 #define PROFILE_ALL_GPUS

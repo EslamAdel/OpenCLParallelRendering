@@ -40,13 +40,23 @@ public:
     virtual void readDeviceData( cl_command_queue cmdQueue ,
                                  const cl_bool blocking );
 
+    virtual void readDeviceData( cl_command_queue cmdQueue ,
+                                 const CLFrame< T > &frame ,
+                                 const cl_bool blocking );
+
     virtual T *getHostData() const;
 
     virtual QPixmap &getFramePixmap() ;
 
     virtual void setHostData( T *data );
 
+    virtual void copyHostData( T *data );
+
+    virtual void copyHostData( CLFrame< T > &sourceFrame );
+
     virtual cl_mem getDeviceData() const;
+
+    const Dimensions2D &getFrameDimensions() const;
 
 private:
     void releaseDeviceData_();

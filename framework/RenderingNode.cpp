@@ -42,3 +42,13 @@ void RenderingNode::loadVolume(const Volume<uchar> *volume)
     this->loadVolume_( volume );
     currentCenter_ = volume->getUnitCubeCenter();
 }
+
+void RenderingNode::setFrameIndex(const uint8_t frameIndex)
+{
+    frameIndex_ = frameIndex;
+}
+
+uint8_t RenderingNode::getFrameIndex() const
+{
+    return frameIndex_;
+}

@@ -21,7 +21,8 @@ public:
      * @param frameIndex
      * @param compositedFramesCount
      */
-    TaskComposite( CompositingNode *compositingNode );
+    TaskComposite( CompositingNode *compositingNode ,
+                   uint8_t frameIndex );
 
 signals:
     /**
@@ -34,7 +35,8 @@ protected:
     void run();
 
 private:
-    CompositingNode *compositingNode_;
+    CompositingNode *compositingNode_ ;
+    const uint8_t frameIndex_ ;
 
 
 };

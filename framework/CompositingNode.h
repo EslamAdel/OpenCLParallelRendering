@@ -71,7 +71,7 @@ public:
      * @param data
      * The pointer of the buffer at host.
      */
-    void setFrameData_HOST( uint *data );
+    void setFrameData_HOST( uint *data , const uint8_t frameIndex );
 
     /**
      * @brief loadFrameDataToDevice
@@ -85,7 +85,8 @@ public:
      * If block is set to CL_TRUE, the current thraed will wait until the
      * buffer is completely loaded to device.
      */
-    virtual void loadFrameDataToDevice(const cl_bool block );
+    virtual void loadFrameDataToDevice( const uint8_t frameIndex ,
+                                        const cl_bool block );
 
     /**
      * @brief accumulateFrame_DEVICE
@@ -97,7 +98,7 @@ public:
      * @param frameIndex
      * the index of the corresponding compositing frame.
      */
-    void accumulateFrame_DEVICE( );
+    void accumulateFrame_DEVICE( const uint frameIndex );
 
 
     void compositeFrames_DEVICE( );
@@ -106,7 +107,7 @@ public:
      * @brief uploadCollageFromDevice
      * Called after all compositing buffers accumulated to collage buffer.
      */
-    void uploadCollageFromDevice( )  ;
+    void loadCollageFromDevice( )  ;
 
 
     /**
@@ -131,7 +132,7 @@ public:
      */
     uint framesCount() const ;
 
-    uint8_t &getCompositedFramesCount();
+    uint8_t getCompositedFramesCount() const;
 
 
 
@@ -206,6 +207,10 @@ private:
      * Collage frame object.
      */
     CLFrame32 *collageFrame_ ;
+
+    CLFrame32 *collageFrameReadout_ ;
+
+    uint8_t collageBufferFrameIndex_ ;
 
     const std::vector< const Coordinates3D* > &framesCenters_ ;
 

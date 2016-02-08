@@ -74,13 +74,29 @@ void CLFrame< T >::readDeviceData( cl_command_queue cmdQueue ,
                                  ( void * ) hostData_ ,
                                  0 , NULL , NULL);
 
-//    uint64_t checksum = 0;
-//    for( auto i = 0 ; i < dimensions_.imageSize() ; i++ )
-//        checksum+= hostData_[ i ];
+    if( error != CL_SUCCESS )
+    {
+        oclHWDL::Error::checkCLError( error );
+        LOG_ERROR("OpenCL Error!");
+    }
+    //Now, neither QPixmap frame_ nor rgbaFrame represents the recent raw data.
+    pixmapSynchronized_ = false ;
+}
 
-//    LOG_DEBUG("Final Frame Size:%dx%d" , dimensions_.x , dimensions_.y );
-//    LOG_DEBUG("Final Frame Size:%d " ,dimensions_.imageSize() * sizeof(T));
-//    LOG_DEBUG("Final Frame Checksum:%d" , checksum );
+template< class T >
+void CLFrame< T >::readDeviceData( cl_command_queue cmdQueue ,
+                                   const CLFrame<T> &frame,
+                                   const cl_bool blocking )
+{
+    if( frame.getFrameDimensions() != dimensions_ )
+        LOG_ERROR("Dimensions mismatch!");
+
+    static cl_int error = CL_SUCCESS;
+    error = clEnqueueReadBuffer( cmdQueue, frame.getDeviceData() , blocking ,
+                                 0 , dimensions_.imageSize() * sizeof(T) ,
+                                 ( void * ) hostData_ ,
+                                 0 , NULL , NULL);
+
     if( error != CL_SUCCESS )
     {
         oclHWDL::Error::checkCLError( error );
@@ -136,11 +152,37 @@ void CLFrame< T >::setHostData( T *data)
 
 }
 
+template< class T >
+void CLFrame< T >::copyHostData( T *data )
+{
+    std::copy( &data[ 0 ] , &data[ dimensions_.imageSize() - 1 ] , hostData_ );
+    pixmapSynchronized_ = false ;
+}
+
+template< class T >
+void CLFrame< T >::copyHostData( CLFrame<T> &sourceFrame )
+{
+    const T *hostData_SOURCE = sourceFrame.getHostData();
+    const uint64_t frameSize = sourceFrame.getFrameDimensions().imageSize() ;
+
+    std::copy( &hostData_SOURCE[ 0 ] ,
+            &hostData_SOURCE[ frameSize - 1 ] ,  hostData_ );
+
+    pixmapSynchronized_ = false ;
+
+}
+
 
 template< class T >
 cl_mem CLFrame< T >::getDeviceData() const
 {
     return deviceData_ ;
+}
+
+template< class T >
+const Dimensions2D &CLFrame< T >::getFrameDimensions() const
+{
+    return dimensions_;
 }
 
 template< class T >

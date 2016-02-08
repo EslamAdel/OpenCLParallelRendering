@@ -148,6 +148,9 @@ void ParallelRendering::addCompositingNode( const uint64_t gpuIndex )
                                             frameHeight_ ,
                                             framesCenters_ );
 
+
+
+
     collagePixmapTask_ =
             new TaskMakePixmap( compositingNode_->getCLFrameCollage() );
 
@@ -156,6 +159,12 @@ void ParallelRendering::addCompositingNode( const uint64_t gpuIndex )
              this , SLOT(pixmapReady_SLOT( QPixmap* , const RenderingNode* )));
     // Frame index will be assigned to each rendering GPU (rednering node).
     // As a start, consider each frame will be indexed in the next for-loop.
+
+
+
+
+
+
     uint frameIndex = 0 ;
 
     // for each rendering task finished, a collecting task and a
@@ -165,25 +174,23 @@ void ParallelRendering::addCompositingNode( const uint64_t gpuIndex )
 
         auto renderingNode = renderingNodes_[ renderingDevice ];
 
+        renderingNode->setFrameIndex( frameIndex );
+
+        TaskComposite *compositingTask =
+                new TaskComposite( compositingNode_ ,
+                                   frameIndex );
+
+        compositingTasks_[ renderingNode ] = compositingTask ;
+
         // Now add collectingTasks that transfer buffer from The rendering device
         // (rendering node) to the compositing device (compositing node),
         auto collectingTask =
-                new TaskCollect( renderingNode , compositingNode_ ,
-                                 frameIndex );
+                new TaskCollect( renderingNode , compositingNode_ );
 
         // Add the collecting task to
         // the map < rendering node , collecting task >
         collectingTasks_[ renderingNode ] = collectingTask ;
 
-
-        // Add compositing task, that will wrap instructions to accumulate
-        // a frame to the collageFrame.
-        auto compositingTask =
-                new TaskComposite( compositingNode_ );
-
-        // Add the compositing task to
-        // the map < rendering node , compositing task >.
-        compositingTasks_[ renderingNode ] = compositingTask ;
 
         // Map signals from collecting tasks and compositing tasks to the
         // correspondint slots.
@@ -255,9 +262,6 @@ void ParallelRendering::distributeBaseVolume1D()
                    renderingNodes_[ renderingDevice ]->getGPUIndex( ));
     }
 
-    // space optimizations:
-    // -delete the base volume after distribution
-    // -use of memory mapping
 }
 
 void ParallelRendering::startRendering()
@@ -340,6 +344,7 @@ void ParallelRendering::compositingFinished_SLOT()
 
     TOC( frameworkProfile.renderingLoop_TIMER );
 
+
     pixmapMakerPool_.start( collagePixmapTask_ );
 
 
@@ -360,32 +365,24 @@ void ParallelRendering::compositingFinished_SLOT()
 
     }
 
+
 }
 
 void ParallelRendering::frameLoadedToDevice_SLOT( RenderingNode *node )
 {
-    //    LOG_DEBUG( "[DONE TRANSFER] from GPU <%d>" , node->getGPUIndex() );
-
     TIC( compositingProfile.threadSpawning_TIMER );
 
-    //accumulate the recently loaded frame to the collage frame.
-    compositorPool_.start( compositingTasks_[ node ]);
 
-    //make pixmap from the recently uploaded frame to host.
-    pixmapMakerPool_.start( makePixmapTasks_[ node ]);
+    //accumulate the recently loaded frame to the collage frame.
+    compositorPool_.start( compositingTasks_[ node ] );
 
 }
 
 void ParallelRendering::pixmapReady_SLOT( QPixmap *pixmap,
                                           const RenderingNode *node)
 {
+    emit this->finalFrameReady_SIGNAL( pixmap );
 
-    //if node=null then this frame is actually the collage frame.
-    if( node == nullptr )
-        emit this->finalFrameReady_SIGNAL( pixmap );
-
-    else
-        emit this->frameReady_SIGNAL( pixmap , node  );
 }
 
 void ParallelRendering::updateRotationX_SLOT(int angle)

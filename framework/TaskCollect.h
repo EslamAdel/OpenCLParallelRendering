@@ -31,8 +31,7 @@ public:
      * The index of the rendered frame.
      */
     TaskCollect( RenderingNode *renderingNode ,
-                 CompositingNode *compositingNode ,
-                 const uint frameIndex );
+                 CompositingNode *compositingNode );
 
 signals:
     /**
@@ -51,7 +50,6 @@ protected:
 private:
     RenderingNode *renderingNode_;
     CompositingNode *compositingNode_;
-    const uint frameIndex_;
 
 };
 

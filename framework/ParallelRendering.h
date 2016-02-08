@@ -24,8 +24,8 @@
 
 typedef std::unordered_map<const oclHWDL::Device*,RenderingNode*> RenderingNodes;
 typedef std::unordered_map<const RenderingNode* ,TaskRender*> RenderingTasks;
-typedef std::unordered_map<const RenderingNode* ,TaskCollect*> CollectingTasks;
 typedef std::unordered_map<const RenderingNode* ,TaskComposite*> CompositingTasks;
+typedef std::unordered_map<const RenderingNode* ,TaskCollect*> CollectingTasks;
 typedef std::unordered_map<const RenderingNode* ,TaskMakePixmap*> MakePixmapTasks;
 
 /**

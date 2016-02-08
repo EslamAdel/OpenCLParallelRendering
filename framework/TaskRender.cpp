@@ -12,6 +12,5 @@ void TaskRender::run()
 
     TOC( renderingProfiles[ &renderingNode_ ]->threadSpawning_TIMER );
     renderingNode_.applyTransformation();
-
 }
 

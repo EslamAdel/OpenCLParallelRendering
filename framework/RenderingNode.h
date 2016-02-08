@@ -63,6 +63,11 @@ public:
     void setFrameCenter(  const Coordinates3D center );
 
     void loadVolume( const Volume< uchar >* volume );
+
+    void setFrameIndex( const uint8_t frameIndex  );
+
+    uint8_t getFrameIndex() const ;
+
 signals:
     /**
      * @brief finishedRendering
@@ -83,11 +88,12 @@ private:
     const float &imageBrightness_ ;
 
 
-
     /**
      * @brief currentCenter_
      */
     Coordinates3D currentCenter_ ;
+
+    uint8_t frameIndex_ ;
 
 };
 
