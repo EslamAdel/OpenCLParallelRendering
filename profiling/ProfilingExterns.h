@@ -13,7 +13,7 @@
 
 
 #ifdef PROFILE_SINGLE_GPU
-#define DEPLOY_GPU_INDEX 0
+#define DEPLOY_GPU_INDEX 1
 
 #else
 #define PROFILE_ALL_GPUS

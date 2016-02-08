@@ -27,19 +27,12 @@ void TaskCollect::run()
                                          renderingNode_->getFrameIndex() );
 
 
-//    LOG_DEBUG("Writing Rendered frame[%d] from GPU<%d> to compositor" ,
-//              renderingNode_->getFrameIndex() ,
-//              renderingNode_->getGPUIndex() );
 
     TIC( COLLECTING_PROFILE(renderingNode_).loadingBufferToDevice_TIMER ) ;
     compositingNode_->loadFrameDataToDevice( renderingNode_->getFrameIndex() ,
                                              CL_TRUE );
     TOC( COLLECTING_PROFILE(renderingNode_).loadingBufferToDevice_TIMER ) ;
 
-
-//    LOG_DEBUG("[DONE] Writing Rendered frame[%d] from GPU<%d> to compositor" ,
-//              renderingNode_->getFrameIndex() ,
-//              renderingNode_->getGPUIndex() );
 
     emit this->frameLoadedToDevice_SIGNAL( renderingNode_ );
 

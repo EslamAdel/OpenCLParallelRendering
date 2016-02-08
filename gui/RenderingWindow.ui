@@ -322,12 +322,12 @@
     <property name="title">
      <string>Display</string>
     </property>
-    <widget class="QLabel" name="label">
+    <widget class="QLabel" name="labelGPU0">
      <property name="geometry">
       <rect>
        <x>60</x>
        <y>30</y>
-       <width>67</width>
+       <width>121</width>
        <height>17</height>
       </rect>
      </property>
@@ -391,12 +391,12 @@
       <string/>
      </property>
     </widget>
-    <widget class="QLabel" name="label_2">
+    <widget class="QLabel" name="labelGPU1">
      <property name="geometry">
       <rect>
        <x>260</x>
        <y>30</y>
-       <width>67</width>
+       <width>121</width>
        <height>17</height>
       </rect>
      </property>
@@ -404,12 +404,12 @@
       <string>GPU#1</string>
      </property>
     </widget>
-    <widget class="QLabel" name="label_3">
+    <widget class="QLabel" name="labelGPU2">
      <property name="geometry">
       <rect>
        <x>50</x>
        <y>270</y>
-       <width>67</width>
+       <width>121</width>
        <height>17</height>
       </rect>
      </property>

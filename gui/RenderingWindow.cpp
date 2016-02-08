@@ -46,6 +46,9 @@
 
 #endif
 
+
+#define min( a , b ) ( a < b )? a : b
+
 RenderingWindow::RenderingWindow( QWidget *parent ) :
     QMainWindow( parent ),
     ui( new Ui::RenderingWindow )
@@ -61,22 +64,40 @@ RenderingWindow::RenderingWindow( QWidget *parent ) :
 
     parallelRenderer_ = new ParallelRendering( volume , WIDTH , HEIGHT);
 
+    QVector< QLabel* > labels ;
+
+    ui->frameContainer0->setEnabled( false );
     frameContainers_.push_back( ui->frameContainer0 );
+    labels.push_back( ui->labelGPU0 );
+
+    ui->frameContainer1->setEnabled( false );
     frameContainers_.push_back( ui->frameContainer1 );
+    labels.push_back( ui->labelGPU1 );
+
+    ui->frameContainer2->setEnabled( false );
     frameContainers_.push_back( ui->frameContainer2 );
+    labels.push_back( ui->labelGPU2 );
 
 #ifdef PROFILE_SINGLE_GPU
 
     parallelRenderer_->addRenderingNode( DEPLOY_GPU_INDEX );
-    frameContainers_[ DEPLOY_GPU_INDEX ]->setEnabled(true);
+    frameContainers_[ DEPLOY_GPU_INDEX ]->setEnabled( true );
+    labels[ DEPLOY_GPU_INDEX ]->
+            setText( QString( labels[ DEPLOY_GPU_INDEX ]->text() )
+                     + QString( "(active)" ));
 
 #else
-    for( auto i = 0 ; i < parallelRenderer_->machineGPUsCount() ; i++ )
+
+    int upTo =  min( frameContainers_.size() ,
+                     parallelRenderer_->machineGPUsCount() );
+
+    for( auto i = 0 ; i < upTo  ; i++ )
     {
         LOG_DEBUG( "Deploy GPU#%d" , i );
         parallelRenderer_->addRenderingNode( i );
-        if( i < frameContainers_.size())
-            frameContainers_[ i ]->setEnabled( true );
+        frameContainers_[ i ]->setEnabled( true );
+        labels[ i ]->setText( QString( labels[ i ]->text( ))
+                              + QString( "(active)" ));
     }
 #endif
 
@@ -162,8 +183,8 @@ void RenderingWindow::displayFrame_( QPixmap *frame , uint id )
 
     frameContainers_[ id ]->setPixmap
             (( frame->scaled( frameContainers_[ id ]->width( ),
-                             frameContainers_[ id ]->height( ),
-                             Qt::KeepAspectRatio )));
+                              frameContainers_[ id ]->height( ),
+                              Qt::KeepAspectRatio )));
 
 
 }
@@ -181,8 +202,8 @@ void RenderingWindow::collageFrameReady_SLOT( QPixmap *finalFrame )
     finalFrame_ = finalFrame;
     ui->frameContainerResult->
             setPixmap( finalFrame->scaled( ui->frameContainerResult->width( ) ,
-                                          ui->frameContainerResult->height( ) ,
-                                          Qt::KeepAspectRatio ));
+                                           ui->frameContainerResult->height( ) ,
+                                           Qt::KeepAspectRatio ));
 }
 
 void RenderingWindow::newXRotation_SLOT(int value)

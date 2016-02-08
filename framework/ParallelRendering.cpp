@@ -464,6 +464,7 @@ void ParallelRendering::benchmark_()
 
     FRAMEWORK_PROFILE_TAG( );
     PRINT( frameworkProfile.renderingLoop_TIMER );
+    PRINT( frameworkProfile.convertToPixmap_TIMER );
 
     EXIT_PROFILING();
 }
