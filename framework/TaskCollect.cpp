@@ -23,12 +23,11 @@ void TaskCollect::run()
     TOC( COLLECTING_PROFILE( renderingNode_ ).loadingBufferFromDevice_TIMER );
 
     //now sourceFrame points to recently uploaded data.
-    compositingNode_->setFrameData_HOST( frameIndex_ ,
-                                         sourceFrame->getHostData( ));
+    compositingNode_->setFrameData_HOST( sourceFrame->getHostData( ));
 
 
     TIC( COLLECTING_PROFILE(renderingNode_).loadingBufferToDevice_TIMER ) ;
-    compositingNode_->loadFrameDataToDevice( frameIndex_ , CL_TRUE );
+    compositingNode_->loadFrameDataToDevice( CL_TRUE );
     TOC( COLLECTING_PROFILE(renderingNode_).loadingBufferToDevice_TIMER ) ;
 
     emit this->frameLoadedToDevice_SIGNAL( renderingNode_ );

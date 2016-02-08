@@ -10,18 +10,17 @@
 
 
 
-CompositingNode::CompositingNode( const uint64_t gpuIndex,
-                                  const uint framesCount,
-                                  const uint frameWidth ,
-                                  const uint frameHeight ,
-                                  const std::vector< const Coordinates3D *> framesCenters,
-                                  CompositingMode mode)
+CompositingNode::CompositingNode(const uint64_t gpuIndex,
+                                 const uint framesCount,
+                                 const uint frameWidth ,
+                                 const uint frameHeight ,
+                                 const std::vector< const Coordinates3D *> framesCenters)
     : gpuIndex_( gpuIndex ) ,
       framesCount_( framesCount ) ,
       collageFrameDimensions_( frameWidth , frameHeight ) ,
-      framesCenters_( framesCenters ) ,
-      mode_( mode )
+      framesCenters_( framesCenters )
 {
+    compositedFramesCount_ = 0 ;
 
     if( framesCount != framesCenters.size() )
         LOG_ERROR("Size Mismatch in framesCount and framesCenters count");
@@ -34,7 +33,6 @@ CompositingNode::CompositingNode( const uint64_t gpuIndex,
     initializeBuffers_();
     initializeKernel_();
 
-    rewindCollageFrame_DEVICE( CL_TRUE );
 }
 
 
@@ -53,35 +51,28 @@ CLFrame32 *&CompositingNode::getCLFrameCollage()
     return collageFrame_;
 }
 
-void CompositingNode::setFrameData_HOST(const uint frameIndex , uint* data  )
+void CompositingNode::setFrameData_HOST( uint* data  )
 {
-    framesData_[ frameIndex ] = data;
 
-    if( mode_ == CompositingMode::Accumulate )
-        frames_[ frameIndex ]->setHostData( data );
-    else
-     framesArray_->setFrameData( frameIndex , data  );
+    frames_[ compositedFramesCount_ ]->setHostData( data );
 
 }
 
-void CompositingNode::loadFrameDataToDevice( const uint frameIndex ,
-                                             const cl_bool block )
+void CompositingNode::loadFrameDataToDevice( const cl_bool block )
 {
-    if( mode_ == CompositingMode::Accumulate)
-        frames_[ frameIndex ]->writeDeviceData( commandQueue_ , block );
-    else
-        framesArray_->loadFrameDataToDevice( frameIndex ,
-                                             commandQueue_ ,
-                                             block );
+    frames_[ compositedFramesCount_ ]->
+            writeDeviceData( commandQueue_ , block );
 
 }
 
-void CompositingNode::accumulateFrame_DEVICE( const uint frameIndex )
-{
-    if( mode_ != CompositingMode::Accumulate )
-        LOG_ERROR("Compositing mode should be Accumulate!");
+void CompositingNode::accumulateFrame_DEVICE(  )
+{   
+    //if first frame, it is already written to collageFrame, return.
+    if( compositedFramesCount_ == 0 )
+        return ;
 
-    const CLFrame32 *currentFrame = frames_[ frameIndex ];
+
+    const CLFrame32 *currentFrame = frames_[ compositedFramesCount_ ];
 
     const cl_mem currentFrameObject = currentFrame->getDeviceData();
 
@@ -117,8 +108,6 @@ void CompositingNode::accumulateFrame_DEVICE( const uint frameIndex )
 
 void CompositingNode::compositeFrames_DEVICE()
 {
-    if( mode_ != CompositingMode::PatchCompositing )
-        LOG_ERROR("Compositing mode should be PatchCompositng");
 
     // Assume everything is fine in the begnning
     cl_int clErrorCode = CL_SUCCESS;
@@ -144,37 +133,8 @@ void CompositingNode::compositeFrames_DEVICE()
         LOG_ERROR("OpenCL Error!");
     }
 
-
     clFinish( commandQueue_ );
 
-}
-
-void CompositingNode::rewindCollageFrame_DEVICE(cl_bool blocking)
-{
-    // Assume everything is fine in the begnning
-    cl_int clErrorCode = CL_SUCCESS;
-
-
-    const size_t localSize[ ] = { 1 };
-    const size_t globalSize[ ] = { collageFrameDimensions_.imageSize() } ;
-
-    clErrorCode = clEnqueueNDRangeKernel( commandQueue_  ,
-                                          rewindFrameKernel_->getKernelObject()  ,
-                                          1 ,
-                                          NULL ,
-                                          globalSize ,
-                                          localSize ,
-                                          0 ,
-                                          NULL ,
-                                          NULL ) ;
-
-    if( clErrorCode != CL_SUCCESS )
-    {
-        oclHWDL::Error::checkCLError( clErrorCode );
-        LOG_ERROR("OpenCL Error!");
-    }
-
-    if( blocking == CL_TRUE ) clFinish( commandQueue_ );
 }
 
 void CompositingNode::uploadCollageFromDevice()
@@ -187,9 +147,9 @@ uint CompositingNode::framesCount() const
     return framesCount_ ;
 }
 
-CompositingNode::CompositingMode CompositingNode::compositingMode() const
+uint8_t &CompositingNode::getCompositedFramesCount()
 {
-    return mode_ ;
+    return compositedFramesCount_ ;
 }
 
 void CompositingNode::selectGPU_()
@@ -228,31 +188,16 @@ void CompositingNode::initializeBuffers_()
 
     LOG_DEBUG("Initializing Buffers ...");
 
-    collageFrame_ = new CLFrame32( collageFrameDimensions_ );
-
-    collageFrame_->createDeviceData( context_ );
-
-    uint* frameData ;
-    framesData_.push_back( frameData );
-
-
-    if( mode_ == CompositingMode::Accumulate )
-        for( auto i = 0 ; i < framesCount_ ; i++ )
-        {
-            auto frame = new CLFrame32( collageFrameDimensions_ );
-            frame->createDeviceData( context_ );
-            frames_.push_back( frame );
-        }
-
-    else if( mode_ == CompositingMode::PatchCompositing )
+    for( auto i = 0 ; i < framesCount_ ; i++ )
     {
-        framesArray_ = new CLImage2DArray32( collageFrameDimensions_.x ,
-                                             collageFrameDimensions_.y ,
-                                             framesCount_ ) ;
-        framesArray_->createDeviceData( context_ );
+        auto frame = new CLFrame32( collageFrameDimensions_ );
+        frame->createDeviceData( context_ );
+        frames_.push_back( frame );
     }
 
 
+    //set CollageFrame to the first frame
+    collageFrame_ = frames_[ 0 ] ;
 
     LOG_DEBUG("[DONE] Initializing Buffers ...");
 
@@ -262,24 +207,12 @@ void CompositingNode::initializeKernel_()
 {
     LOG_DEBUG( "Initializing an OpenCL Kernel ... " );
 
-    std::string kernelName ;
-    if( mode_ == CompositingMode::Accumulate )
-        kernelName = "xray_compositing_accumulate";
-    else
-        kernelName = "xray_compositing_patch";
-
-    compositingKernel_ = new CLXRayCompositingKernel( context_ , kernelName );
-    rewindFrameKernel_ = new CLRewindFrameKernel( context_ );
-
-
-    //set arguments of rewind_buffer kernel.
-    rewindFrameKernel_->setFrame( collageFrame_->getDeviceData() );
+    compositingKernel_ =
+            new CLXRayCompositingKernel( context_ ,
+                                         "xray_compositing_accumulate" );
 
     //set arguments of xray_composite kernel.
     compositingKernel_->setCollegeFrame( collageFrame_->getDeviceData() );
-
-    if( mode_ == CompositingMode::PatchCompositing )
-        compositingKernel_->setFrame( framesArray_->getDeviceData() );
 
 
     LOG_DEBUG( "[DONE] Initializing an OpenCL Kernel ... " );

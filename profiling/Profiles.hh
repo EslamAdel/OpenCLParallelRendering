@@ -34,13 +34,11 @@ struct CompositingProfile : public GeneralProfile
 {
     CompositingProfile() : accumulatingFrame_TIMER("Accumulating Frame on Device") ,
                            compositing_TIMER("Total Compositing Time on Device") ,
-                           loadCollageFromDevice_TIMER("Loading Collage Buffer from Device") ,
-                           rewindCollage_TIMER("Rewind Collage Buffer") {}
+                           loadCollageFromDevice_TIMER("Loading Collage Buffer from Device"){}
     Timer64 threadSpawning_TIMER;
     Timer64 accumulatingFrame_TIMER;
     Timer64 compositing_TIMER ;
     Timer64 loadCollageFromDevice_TIMER ;
-    Timer64 rewindCollage_TIMER;
 };
 
 

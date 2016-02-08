@@ -39,13 +39,6 @@ class CompositingNode : public QObject
 public:
 
     /**
-     * @brief The CompositingMode enum
-     * Accumulate: composite buffer by buffer.
-     * PatchCompositing: composite all buffers in one command.
-     */
-    enum CompositingMode{ Accumulate , PatchCompositing } ;
-
-    /**
      * @brief CompositingNode
      * @param gpuIndex
      * The worker device.
@@ -61,8 +54,7 @@ public:
                      const uint framesCount ,
                      const uint frameWidth ,
                      const uint frameHeight ,
-                     const std::vector< const Coordinates3D* > framesCenters ,
-                     CompositingMode mode = CompositingMode::Accumulate ) ;
+                     const std::vector< const Coordinates3D* > framesCenters ) ;
 
     ~CompositingNode();
 
@@ -79,7 +71,7 @@ public:
      * @param data
      * The pointer of the buffer at host.
      */
-    void setFrameData_HOST(const uint frameIndex , uint *data );
+    void setFrameData_HOST( uint *data );
 
     /**
      * @brief loadFrameDataToDevice
@@ -93,8 +85,7 @@ public:
      * If block is set to CL_TRUE, the current thraed will wait until the
      * buffer is completely loaded to device.
      */
-    virtual void loadFrameDataToDevice( const uint frameIndex ,
-                                        const cl_bool block );
+    virtual void loadFrameDataToDevice(const cl_bool block );
 
     /**
      * @brief accumulateFrame_DEVICE
@@ -106,7 +97,7 @@ public:
      * @param frameIndex
      * the index of the corresponding compositing frame.
      */
-    void accumulateFrame_DEVICE( const uint frameIndex );
+    void accumulateFrame_DEVICE( );
 
 
     void compositeFrames_DEVICE( );
@@ -116,20 +107,6 @@ public:
      * Called after all compositing buffers accumulated to collage buffer.
      */
     void uploadCollageFromDevice( )  ;
-
-
-    /**
-     * @brief rewindCollageFrame_DEVICE
-     * After all compositing frames accumulated to the collage buffer,
-     * and the resultant collage buffer is properly uploaded to host,
-     * this method will clear the collage buffer at device for the next
-     * rendering loop.
-     *
-     * @param blocking
-     * If CL_TRUE, the thread will wait until the frame is completely cleared.
-     */
-    void rewindCollageFrame_DEVICE( cl_bool blocking );
-
 
 
     /**
@@ -154,11 +131,9 @@ public:
      */
     uint framesCount() const ;
 
-    /**
-     * @brief compositingMode
-     * @return
-     */
-    CompositingMode compositingMode() const ;
+    uint8_t &getCompositedFramesCount();
+
+
 
 private:
     /**
@@ -195,7 +170,6 @@ private:
 
 private:
 
-    const CompositingMode mode_ ;
 
     //Kernel wrapped objects.
     /**
@@ -215,6 +189,8 @@ private:
     const Dimensions2D collageFrameDimensions_;
 
     const uint framesCount_ ;
+
+    uint8_t compositedFramesCount_ ;
 
     cl_platform_id platform_;
 
@@ -239,15 +215,6 @@ private:
      * compositing buffers.
      */
     std::vector< CLFrame32* > frames_ ;
-
-    CLImage2DArray32 *framesArray_;
-
-    //empty
-    /**
-     * @brief framesData_
-     * the compositing buffers pointers on host.
-     */
-    std::vector< uint* > framesData_ ;
 
 };
 

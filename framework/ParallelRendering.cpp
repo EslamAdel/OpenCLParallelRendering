@@ -146,8 +146,7 @@ void ParallelRendering::addCompositingNode( const uint64_t gpuIndex )
                                             inUseGPUs_.size() ,
                                             frameWidth_ ,
                                             frameHeight_ ,
-                                            framesCenters_ ,
-                                            CompositingNode::Accumulate );
+                                            framesCenters_ );
 
     collagePixmapTask_ =
             new TaskMakePixmap( compositingNode_->getCLFrameCollage() );
@@ -180,8 +179,7 @@ void ParallelRendering::addCompositingNode( const uint64_t gpuIndex )
         // Add compositing task, that will wrap instructions to accumulate
         // a frame to the collageFrame.
         auto compositingTask =
-                new TaskComposite( compositingNode_ , frameIndex ,
-                                   compositedFramesCount_ );
+                new TaskComposite( compositingNode_ );
 
         // Add the compositing task to
         // the map < rendering node , compositing task >.
@@ -464,7 +462,6 @@ void ParallelRendering::benchmark_()
     PRINT( compositingProfile.threadSpawning_TIMER ) ;
     PRINT( compositingProfile.accumulatingFrame_TIMER ) ;
     PRINT( compositingProfile.loadCollageFromDevice_TIMER ) ;
-    PRINT( compositingProfile.rewindCollage_TIMER ) ;
     PRINT( compositingProfile.compositing_TIMER ) ;
 
 
