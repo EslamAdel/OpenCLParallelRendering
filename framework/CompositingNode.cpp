@@ -73,9 +73,11 @@ void CompositingNode::collectFrame( const uint8_t frameIndex ,
 
     if( sourceFrame.inSameContext( *frames_[ frameIndex ]))
     {
+        //TODO: Create the CompositingNode at the same context of the
+        //RenderingNode that attached to the same GPU.
+
 
     }
-
     else
     {
         frames_[ frameIndex ]->readOtherDeviceData( sourceCmdQueue ,

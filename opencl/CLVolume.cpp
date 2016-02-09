@@ -1,6 +1,7 @@
 #include "CLVolume.h"
 #include <typeinfo>
 #include <Logger.h>
+#include <oclHWDL.h>
 
 template< class T >
 CLVolume< T >::CLVolume( const Volume< T >* volume,
@@ -126,6 +127,11 @@ cl_mem CLVolume< T >::createDeviceVolume( cl_context context )
         break;
     }
 
+    if( error != CL_SUCCESS )
+    {
+        oclHWDL::Error::checkCLError( error );
+        LOG_ERROR("Error Creating Device Volume!");
+    }
     LOG_DEBUG( "[DONE] Creating an OpenCL volume " );
 
     return deviceVolume;

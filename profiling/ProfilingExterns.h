@@ -6,7 +6,7 @@
 #define BENCHMARKING
 
 //use: 256, 384, 512, 640, 768, 896, 1024
-#define VOLUME_SIZE 256
+#define VOLUME_SIZE 1024
 
 //#define PROFILE_SINGLE_GPU
 
