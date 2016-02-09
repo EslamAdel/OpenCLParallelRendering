@@ -40,9 +40,14 @@ public:
     virtual void readDeviceData( cl_command_queue cmdQueue ,
                                  const cl_bool blocking );
 
-    virtual void readDeviceData( cl_command_queue cmdQueue ,
+    virtual void readOtherDeviceData( cl_command_queue sourceCmdQueue ,
+                                      const CLFrame< T > &sourceFrame ,
+                                      const cl_bool blocking );
+
+    virtual void copyDeviceData( cl_command_queue cmdQueue ,
                                  const CLFrame< T > &frame ,
                                  const cl_bool blocking );
+
 
     virtual T *getHostData() const;
 
@@ -57,6 +62,13 @@ public:
     virtual cl_mem getDeviceData() const;
 
     const Dimensions2D &getFrameDimensions() const;
+
+    const cl_context getContext() const ;
+
+    const bool isInDevice() const ;
+
+    const bool inSameContext( const CLFrame<T> &frame ) const ;
+
 
 private:
     void releaseDeviceData_();
@@ -74,9 +86,11 @@ protected:
 
     const Dimensions2D dimensions_ ;
 
+    cl_context context_ ;
 
     //flags
     bool pixmapSynchronized_ ;
+    bool inDevice_ ;
 };
 
 

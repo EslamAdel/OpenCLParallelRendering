@@ -20,9 +20,9 @@
 
 template< class T >
 CLContext< T >::CLContext(const uint64_t gpuIndex ,
-                           const uint frameWidth ,
-                           const uint frameHeight ,
-                           const Volume<T>* volume )
+                          const uint frameWidth ,
+                          const uint frameHeight ,
+                          const Volume<T>* volume )
     : volume_( volume ) ,
       gpuIndex_( gpuIndex ) ,
       frameWidth_( frameWidth ),
@@ -194,10 +194,10 @@ void CLContext< T >::handleKernel(std::string string)
     // Upload the transfer function to the volume.
     // TODO: Fix the hardcoded values.
     transferFunctionArray_ = clCreateImage2D
-            ( context_,
-              CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
-              &tfFormat, 9, 1, sizeof( float ) * 9 * 4,
-              transferFunctionTable, &clErrorCode );
+                             ( context_,
+                               CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
+                               &tfFormat, 9, 1, sizeof( float ) * 9 * 4,
+                               transferFunctionTable, &clErrorCode );
     oclHWDL::Error::checkCLError(clErrorCode);
 
     // Create samplers (same as texture in OpenGL) for transfer function
@@ -382,10 +382,15 @@ void CLContext< T >::renderFrame( const float* inverseMatrix ,
                                            0,
                                            0,
                                            0);
-    oclHWDL::Error::checkCLError(clErrorCode);
+
+
 
     clFinish( commandQueue_ );
-
+    if( clErrorCode != CL_SUCCESS )
+    {
+        oclHWDL::Error::checkCLError(clErrorCode);
+        LOG_ERROR("Error in Rendering Execution!");
+    }
 }
 
 

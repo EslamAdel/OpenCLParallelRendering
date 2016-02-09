@@ -55,14 +55,38 @@ void CompositingNode::setFrameData_HOST( uint* data ,
                                          const uint8_t frameIndex )
 {
     frames_[ frameIndex ]->setHostData( data );
-
 }
 
-void CompositingNode::loadFrameDataToDevice( const uint8_t frameIndex ,
-                                             const cl_bool block )
+void CompositingNode::loadFrameToDevice( const uint8_t frameIndex ,
+                                         const cl_bool block )
 {
-    frames_[ frameIndex ]->
-            writeDeviceData( commandQueue_ , block );
+    frames_[ frameIndex ]->writeDeviceData( commandQueue_ , block );
+}
+
+void CompositingNode::collectFrame( const uint8_t frameIndex ,
+                                    cl_command_queue sourceCmdQueue,
+                                    const CLFrame32 &sourceFrame ,
+                                    const cl_bool block )
+{
+    //if the two buffers are in same context, copy the buffer directly in Device.
+
+
+    if( sourceFrame.inSameContext( *frames_[ frameIndex ]))
+    {
+
+    }
+
+    else
+    {
+        frames_[ frameIndex ]->readOtherDeviceData( sourceCmdQueue ,
+                                                    sourceFrame ,
+                                                    block );
+
+        frames_[ frameIndex ]->writeDeviceData( commandQueue_ ,
+                                                block );
+    }
+
+
 
 }
 
@@ -71,7 +95,7 @@ void CompositingNode::accumulateFrame_DEVICE( const uint frameIndex )
     //if first frame, it is already written to collageFrame, return.
     if( compositedFramesCount_ == 0 )
     {
-//        LOG_DEBUG("Frame[%d] as Collage Buffer", frameIndex );
+        //        LOG_DEBUG("Frame[%d] as Collage Buffer", frameIndex );
         //make first loaded frame buffer as collage frame.
         collageFrame_ = frames_[ frameIndex ];
         collageBufferFrameIndex_ = frameIndex ;
@@ -122,7 +146,7 @@ void CompositingNode::accumulateFrame_DEVICE( const uint frameIndex )
     }
 
     clFinish( commandQueue_ );
-//    LOG_DEBUG("[DONE] Accumulating Frame[%d]", frameIndex );
+    //    LOG_DEBUG("[DONE] Accumulating Frame[%d]", frameIndex );
 
     compositedFramesCount_ ++;
 }
@@ -161,11 +185,11 @@ void CompositingNode::compositeFrames_DEVICE()
 void CompositingNode::loadCollageFromDevice()
 {
 
-//    LOG_DEBUG("Reading CollageFrame[%d]" , collageBufferFrameIndex_ );
-    collageFrameReadout_->readDeviceData( commandQueue_ ,
-                                          *collageFrame_ ,
-                                          CL_TRUE );
-//    LOG_DEBUG("[DONE] Reading CollageFrame[%d]" , collageBufferFrameIndex_ );
+    //    LOG_DEBUG("Reading CollageFrame[%d]" , collageBufferFrameIndex_ );
+    collageFrameReadout_->readOtherDeviceData( commandQueue_ ,
+                                               *collageFrame_ ,
+                                               CL_TRUE );
+    //    LOG_DEBUG("[DONE] Reading CollageFrame[%d]" , collageBufferFrameIndex_ );
 
     compositedFramesCount_ = 0 ;
 }

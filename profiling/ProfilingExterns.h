@@ -3,13 +3,12 @@
 
 #include "Profiles.hh"
 
-
 #define BENCHMARKING
 
 //use: 256, 384, 512, 640, 768, 896, 1024
 #define VOLUME_SIZE 256
 
-#define PROFILE_SINGLE_GPU
+//#define PROFILE_SINGLE_GPU
 
 
 #ifdef PROFILE_SINGLE_GPU
@@ -22,7 +21,7 @@
 
 
 // As you increase TEST_FRAMES, standard deviations decrease.
-#define TEST_FRAMES 15*360
+#define TEST_FRAMES 50*360
 
 #ifdef BENCHMARKING
 
@@ -89,6 +88,10 @@
     exit(EXIT_SUCCESS);}\
     while( 0 )
 
+#define BEEP()\
+    do{\
+    fprintf(stdout, "\a\n" );}\
+    while( 0 )
 
 #else
 #define TIC( timer ) \
@@ -145,6 +148,11 @@
 #define EXIT_PROFILING()\
     do{  }\
     while( 0 )
+
+#define BEEP()\
+    do{  }\
+    while( 0 )
+
 #endif
 
 

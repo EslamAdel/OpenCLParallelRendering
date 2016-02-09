@@ -71,7 +71,7 @@ public:
      * @param data
      * The pointer of the buffer at host.
      */
-    void setFrameData_HOST( uint *data , const uint8_t frameIndex );
+        void setFrameData_HOST( uint *data , const uint8_t frameIndex );
 
     /**
      * @brief loadFrameDataToDevice
@@ -85,9 +85,13 @@ public:
      * If block is set to CL_TRUE, the current thraed will wait until the
      * buffer is completely loaded to device.
      */
-    virtual void loadFrameDataToDevice( const uint8_t frameIndex ,
-                                        const cl_bool block );
+    virtual void loadFrameToDevice( const uint8_t frameIndex ,
+                                    const cl_bool block );
 
+    virtual void collectFrame( const uint8_t frameIndex ,
+                               cl_command_queue sourceCmdQueue ,
+                               const CLFrame32 &sourceFrame ,
+                               const cl_bool block );
     /**
      * @brief accumulateFrame_DEVICE
      * This method initiates the operation of accumulating the compositing

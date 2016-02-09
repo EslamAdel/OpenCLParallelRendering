@@ -8,7 +8,8 @@ CLFrame< T >::CLFrame( const Dimensions2D dimensions ,
                        T *data )
     : dimensions_( dimensions ),
       hostData_( data ) ,
-      pixmapSynchronized_( false )
+      pixmapSynchronized_( false ) ,
+      inDevice_( false )
 {
     if( typeid(T) != typeid(uint) )
         LOG_ERROR("Images other than uint/pixel is not supported!");
@@ -43,16 +44,24 @@ void CLFrame< T >::createDeviceData( cl_context context )
         oclHWDL::Error::checkCLError( error );
         LOG_ERROR("OpenCL Error!");
     }
+
+    context_ = context ;
+    inDevice_ = true ;
+
     LOG_DEBUG( "[DONE] Creating an OpenCL image " );
+
 }
 
 template< class T >
 void CLFrame< T >::writeDeviceData( cl_command_queue cmdQueue ,
                                     const cl_bool blocking )
 {
+    if( !inDevice_ )
+        LOG_ERROR("No allocation for the buffer in device!");
+
     // Initially, assume that everything is fine
-    static cl_int error = CL_SUCCESS;
-    error = clEnqueueWriteBuffer( cmdQueue, deviceData_ , blocking ,
+    cl_int error = CL_SUCCESS;
+    error = clEnqueueWriteBuffer( cmdQueue , deviceData_ , blocking ,
                                   0 , dimensions_.imageSize() * sizeof(T) ,
                                   ( const void *) hostData_ ,
                                   0 , NULL , NULL );
@@ -84,15 +93,15 @@ void CLFrame< T >::readDeviceData( cl_command_queue cmdQueue ,
 }
 
 template< class T >
-void CLFrame< T >::readDeviceData( cl_command_queue cmdQueue ,
-                                   const CLFrame<T> &frame,
-                                   const cl_bool blocking )
+void CLFrame< T >::readOtherDeviceData( cl_command_queue sourceCmdQueue ,
+                                        const CLFrame<T> &sourceFrame ,
+                                        const cl_bool blocking )
 {
-    if( frame.getFrameDimensions() != dimensions_ )
+    if( sourceFrame.getFrameDimensions() != dimensions_ )
         LOG_ERROR("Dimensions mismatch!");
 
     static cl_int error = CL_SUCCESS;
-    error = clEnqueueReadBuffer( cmdQueue, frame.getDeviceData() , blocking ,
+    error = clEnqueueReadBuffer( sourceCmdQueue , sourceFrame.getDeviceData() , blocking ,
                                  0 , dimensions_.imageSize() * sizeof(T) ,
                                  ( void * ) hostData_ ,
                                  0 , NULL , NULL);
@@ -104,6 +113,35 @@ void CLFrame< T >::readDeviceData( cl_command_queue cmdQueue ,
     }
     //Now, neither QPixmap frame_ nor rgbaFrame represents the recent raw data.
     pixmapSynchronized_ = false ;
+}
+
+template< class T >
+void CLFrame< T >::copyDeviceData( cl_command_queue cmdQueue ,
+                                   const CLFrame<T> &frame ,
+                                   const cl_bool blocking )
+{
+    if( ! inSameContext( frame ))
+        LOG_ERROR("Cannot Copy Device data from different context.");
+
+    if( frame.getFrameDimensions() != dimensions_ )
+        LOG_ERROR("Dimensions mismatch!");
+
+    cl_bool error = CL_SUCCESS ;
+    error = clEnqueueCopyBuffer( cmdQueue ,
+                                 frame.getDeviceData() , deviceData_ ,
+                                 0 , 0 ,
+                                 dimensions_.imageSize() * sizeof(T) ,
+                                 0 , NULL , NULL ) ;
+
+    if( error != CL_SUCCESS )
+    {
+        oclHWDL::Error::checkCLError( error );
+        LOG_ERROR("Error copying buffers");
+    }
+
+    if( blocking )
+        clFinish( cmdQueue );
+
 }
 
 
@@ -183,6 +221,24 @@ template< class T >
 const Dimensions2D &CLFrame< T >::getFrameDimensions() const
 {
     return dimensions_;
+}
+
+template< class T >
+const cl_context CLFrame< T >::getContext() const
+{
+    return context_ ;
+}
+
+template< class T >
+const bool CLFrame< T >::isInDevice() const
+{
+    return inDevice_ ;
+}
+
+template< class T >
+const bool CLFrame< T >::inSameContext(const CLFrame<T> &frame ) const
+{
+    return frame.isInDevice() && ( frame.getContext() == context_ ) ;
 }
 
 template< class T >

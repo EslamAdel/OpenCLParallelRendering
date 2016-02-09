@@ -450,9 +450,7 @@ void ParallelRendering::benchmark_()
 
         COLLECTING_PROFILE_TAG( node , compositingNode_ );
         PRINT( COLLECTING_PROFILE( node ).threadSpawning_TIMER );
-        PRINT( COLLECTING_PROFILE( node ).loadingBufferFromDevice_TIMER );
-        PRINT( COLLECTING_PROFILE( node ).loadingBufferToDevice_TIMER );
-
+        PRINT( COLLECTING_PROFILE( node ).transferingBuffer_TIMER );
     }
 
     COMPOSITING_PROFILE_TAG( compositingNode_ );
@@ -465,6 +463,8 @@ void ParallelRendering::benchmark_()
     FRAMEWORK_PROFILE_TAG( );
     PRINT( frameworkProfile.renderingLoop_TIMER );
     PRINT( frameworkProfile.convertToPixmap_TIMER );
+    BEEP();
+
 
     EXIT_PROFILING();
 }

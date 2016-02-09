@@ -23,18 +23,16 @@ struct RenderingProfile : public GeneralProfile
 
 struct CollectingProfile : public GeneralProfile
 {
-    CollectingProfile() : loadingBufferFromDevice_TIMER("Loading Buffer From Device") ,
-                          loadingBufferToDevice_TIMER("Loading Buffer To Device") {}
-    Timer64 loadingBufferFromDevice_TIMER ;
-    Timer64 loadingBufferToDevice_TIMER ;
+    CollectingProfile() : transferingBuffer_TIMER("Loading Buffer From Renderer to Compositor"){}
+    Timer64 transferingBuffer_TIMER ;
 
 };
 
 struct CompositingProfile : public GeneralProfile
 {
-    CompositingProfile() : accumulatingFrame_TIMER("Accumulating Frame on Device") ,
-                           compositing_TIMER("Total Compositing Time on Device") ,
-                           loadCollageFromDevice_TIMER("Loading Collage Buffer from Device"){}
+    CompositingProfile() : accumulatingFrame_TIMER("Accumulating Frame on Compositor") ,
+                           compositing_TIMER("Total Compositing Time on Compositor") ,
+                           loadCollageFromDevice_TIMER("Loading Collage Buffer from Compositor"){}
     Timer64 threadSpawning_TIMER;
     Timer64 accumulatingFrame_TIMER;
     Timer64 compositing_TIMER ;
