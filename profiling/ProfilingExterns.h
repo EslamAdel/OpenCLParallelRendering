@@ -3,27 +3,61 @@
 
 #include "Profiles.hh"
 
-//#define BENCHMARKING
-
-//use: 256, 384, 512, 640, 768, 896, 1024
-#define VOLUME_SIZE 384
+#define BENCHMARKING
 
 //#define PROFILE_SINGLE_GPU
 
-
 #ifdef PROFILE_SINGLE_GPU
-#define DEPLOY_GPU_INDEX 1
-
+    #define DEPLOY_GPU_INDEX 1
 #else
-#define PROFILE_ALL_GPUS
+    #define PROFILE_ALL_GPUS
+#endif
+
+
+//#define VIRTUAL_GPUS 20
+
+// As you increase TEST_FRAMES, standard deviations decrease.
+#define TEST_FRAMES 5*360
+
+
+//use: 256, 384, 512, 640, 768, 896, 1024
+#define VOLUME_SIZE 1024
+
+#define FRAME_WIDTH 512
+#define FRAME_HEIGHT 512
+
+//in bytes: 15.6 MB
+#if  VOLUME_SIZE == 256
+    #define VOLUME_PREFIX "/projects/volume-datasets/skull/skull"
+
+//in bytes: 52.7 MB
+#elif VOLUME_SIZE == 384
+    #define VOLUME_PREFIX "/projects/volume-datasets/skull-scales/skull-384-384-384/output-voulme"
+
+//in bytes: 125 MB
+#elif VOLUME_SIZE == 512
+    #define VOLUME_PREFIX "/projects/volume-datasets/skull-scales/skull-512-512-512/output-voulme"
+
+//in bytes: 244.1 MB
+#elif VOLUME_SIZE == 640
+    #define VOLUME_PREFIX "/projects/volume-datasets/skull-scales/skull-640-640-640/output-voulme"
+
+//in bytes: 421.8 MB
+#elif VOLUME_SIZE == 768
+    #define VOLUME_PREFIX "/projects/volume-datasets/skull-scales/skull-768-768-768/output-voulme"
+
+//in bytes: 670 MB
+#elif VOLUME_SIZE == 896
+    #define VOLUME_PREFIX "/projects/volume-datasets/skull-scales/skull-896-896-896/output-voulme"
+
+//in bytes: 1.0 GB
+#elif VOLUME_SIZE == 1024
+    #define VOLUME_PREFIX "/projects/volume-datasets/skull-scales/skull-1024-1024-1024/output-voulme"
+
 
 #endif
 
 
-#define VIRTUAL_GPUS 3
-
-// As you increase TEST_FRAMES, standard deviations decrease.
-#define TEST_FRAMES 50*360
 
 #ifdef BENCHMARKING
 

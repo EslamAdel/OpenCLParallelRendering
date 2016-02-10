@@ -15,7 +15,7 @@ CLXRayCompositingKernel::CLXRayCompositingKernel( const cl_context clContext,
     retrieveKernelObject_();
 }
 
-void CLXRayCompositingKernel::setCollegeFrame(const cl_mem collageFrame)
+void CLXRayCompositingKernel::setCollageFrame(const cl_mem collageFrame)
 {
 
     cl_int error = CL_SUCCESS;

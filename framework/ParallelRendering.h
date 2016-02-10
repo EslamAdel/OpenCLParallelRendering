@@ -106,12 +106,6 @@ public:
      */
     virtual uint getMachineGPUsCount() const;
 
-    /**
-     * @brief activeRenderingNodesCount
-     * @return
-     */
-    uint8_t activeRenderingNodesCount() const;
-
 signals:
     /**
      * @brief framesReady_SIGNAL

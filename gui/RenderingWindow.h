@@ -18,11 +18,15 @@ class RenderingWindow;
 }
 
 class RenderingWindow : public QMainWindow
-{
+{   
     Q_OBJECT
 
 public:
-    explicit RenderingWindow( QWidget *parent = 0 );
+
+    RenderingWindow( ParallelRendering *parallelRenderer ,
+                     QWidget *parent = 0 ) ;
+
+
     ~RenderingWindow( );
 
 private:
@@ -71,13 +75,10 @@ private slots:
 
 private:
     Ui::RenderingWindow *ui;
-   // CLContext< uint8_t >* clContext_;
 
-#ifdef VIRTUAL_GPUS
-    VirtualParallelRendering *parallelRenderer_ ;
-#else
-    ParallelRendering *parallelRenderer_;
- #endif
+
+    ParallelRendering *parallelRenderer_ ;
+
 
     QVector< QLabel*  > frameContainers_;
     QVector< QPixmap* > pixmaps_;

@@ -103,7 +103,6 @@ void ParallelRendering::addRenderingNode( const uint64_t gpuIndex)
     // Add the new task object to
     // the map < rendering node , corresponding rendering task >
     renderingTasks_[ node ] = taskRender;
-//    makePixmapTasks_[ node ] = new TaskMakePixmap( node->getCLFrame() , node );
 
     // Set the maximum number of active threads of the rendering thread pool and
     // the collector thread pool  to the current number of deployed GPUs.
@@ -115,11 +114,6 @@ void ParallelRendering::addRenderingNode( const uint64_t gpuIndex)
     // to the corresponding slot.
     connect( node , SIGNAL( finishedRendering( RenderingNode* )),
              this , SLOT( finishedRendering_SLOT( RenderingNode* )));
-
-//    connect( makePixmapTasks_[ node ] ,
-//             SIGNAL( pixmapReady_SIGNAL(  QPixmap* , const RenderingNode* )) ,
-//             this , SLOT( pixmapReady_SLOT( QPixmap* , const RenderingNode* )));
-
 }
 
 int ParallelRendering::getRenderingNodesCount() const
@@ -204,8 +198,8 @@ void ParallelRendering::addCompositingNode( const uint64_t gpuIndex )
                  SIGNAL( frameLoadedToDevice_SIGNAL( RenderingNode* )) ,
                  this , SLOT( frameLoadedToDevice_SLOT( RenderingNode* )));
 
-        connect( compositingTask , SIGNAL(compositingFinished_SIGNAL( )) ,
-                 this , SLOT(compositingFinished_SLOT( )));
+        connect( compositingTask , SIGNAL( compositingFinished_SIGNAL( )) ,
+                 this , SLOT( compositingFinished_SLOT( )));
 
         frameIndex++ ;
     }
@@ -333,13 +327,9 @@ uint ParallelRendering::getMachineGPUsCount() const
     return machineGPUsCount_;
 }
 
-uint8_t ParallelRendering::activeRenderingNodesCount() const
-{
-    return activeRenderingNodes_;
-}
-
 void ParallelRendering::finishedRendering_SLOT( RenderingNode *finishedNode )
 {
+//    LOG_DEBUG("Finished Rendering");
 
     TIC( collectingProfiles[ finishedNode ]->threadSpawning_TIMER );
 
@@ -348,6 +338,7 @@ void ParallelRendering::finishedRendering_SLOT( RenderingNode *finishedNode )
 
 void ParallelRendering::compositingFinished_SLOT()
 {
+
 
     TOC( frameworkProfile.renderingLoop_TIMER );
 
@@ -379,6 +370,7 @@ void ParallelRendering::frameLoadedToDevice_SLOT( RenderingNode *node )
 {
     TIC( compositingProfile.threadSpawning_TIMER );
 
+//    LOG_DEBUG("Frame[%d] Loaded to device" , node->getFrameIndex( ));
 
     //accumulate the recently loaded frame to the collage frame.
     compositorPool_.start( compositingTasks_[ node ] );
@@ -388,6 +380,7 @@ void ParallelRendering::frameLoadedToDevice_SLOT( RenderingNode *node )
 void ParallelRendering::pixmapReady_SLOT( QPixmap *pixmap,
                                           const RenderingNode *node)
 {
+//    LOG_DEBUG("Pixmap Ready");
     emit this->finalFrameReady_SIGNAL( pixmap );
 
 }

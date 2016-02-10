@@ -22,7 +22,7 @@ void TaskComposite::run()
     if( compositedFramesCount == 0 )
     {
         TIC( compositingProfile.compositing_TIMER );
-        //LOG_DEBUG("GPU<%d> rendered buffer as collage buffer",co)
+//        LOG_DEBUG("Frame[%d] set as CollageFrame" , frameIndex_ );
     }
 
     TIC( compositingProfile.accumulatingFrame_TIMER );
@@ -32,6 +32,7 @@ void TaskComposite::run()
     if( compositingNode_->getCompositedFramesCount()
         == compositingNode_->framesCount() )
     {
+//        LOG_DEBUG("[DONE] Compositing");
 
         TIC( compositingProfile.loadCollageFromDevice_TIMER );
         compositingNode_->loadCollageFromDevice();

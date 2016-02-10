@@ -102,7 +102,7 @@ void CompositingNode::accumulateFrame_DEVICE( const uint frameIndex )
         collageBufferFrameIndex_ = frameIndex ;
 
         compositingKernel_->
-                setCollegeFrame( frames_[ frameIndex ]->getDeviceData() );
+                setCollageFrame( frames_[ frameIndex ]->getDeviceData() );
 
         ++compositedFramesCount_;
         return ;
@@ -147,7 +147,7 @@ void CompositingNode::accumulateFrame_DEVICE( const uint frameIndex )
     }
 
     clFinish( commandQueue_ );
-    //    LOG_DEBUG("[DONE] Accumulating Frame[%d]", frameIndex );
+//    LOG_DEBUG("[DONE] Accumulating Frame[%d]", frameIndex );
 
     compositedFramesCount_ ++;
 }
@@ -267,7 +267,7 @@ void CompositingNode::initializeKernel_()
                                          "xray_compositing_accumulate" );
 
     //set arguments of xray_composite kernel.
-    compositingKernel_->setCollegeFrame( collageFrame_->getDeviceData() );
+    compositingKernel_->setCollageFrame( collageFrame_->getDeviceData() );
 
 
     LOG_DEBUG( "[DONE] Initializing an OpenCL Kernel ... " );

@@ -337,7 +337,7 @@
     </widget>
     <widget class="QLabel" name="frameContainer0">
      <property name="enabled">
-      <bool>false</bool>
+      <bool>true</bool>
      </property>
      <property name="geometry">
       <rect>
@@ -365,7 +365,7 @@
     </widget>
     <widget class="QLabel" name="frameContainer1">
      <property name="enabled">
-      <bool>false</bool>
+      <bool>true</bool>
      </property>
      <property name="geometry">
       <rect>
@@ -419,7 +419,7 @@
     </widget>
     <widget class="QLabel" name="frameContainer2">
      <property name="enabled">
-      <bool>false</bool>
+      <bool>true</bool>
      </property>
      <property name="geometry">
       <rect>
