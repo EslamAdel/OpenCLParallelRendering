@@ -173,7 +173,7 @@ private:
      */
     void createCommandQueue_( );
 
-private:
+protected:
 
 
     //Kernel wrapped objects.

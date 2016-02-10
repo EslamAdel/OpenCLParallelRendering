@@ -3,7 +3,7 @@
 
 #include "Logger.h"
 TaskComposite::TaskComposite( CompositingNode *compositingNode ,
-                             uint8_t frameIndex)
+                             uint frameIndex)
     : frameIndex_( frameIndex )
 {
     compositingNode_ = compositingNode ;

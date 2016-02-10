@@ -65,9 +65,9 @@ public:
 
     const cl_context getContext() const ;
 
-    const bool isInDevice() const ;
+    bool isInDevice() const ;
 
-    const bool inSameContext( const CLFrame<T> &frame ) const ;
+    bool inSameContext( const CLFrame<T> &frame ) const ;
 
 
 private:

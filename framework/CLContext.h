@@ -41,7 +41,7 @@ public:
      * @brief getGPUIndex
      * @return
      */
-    uint64_t getGPUIndex( ) const;
+    virtual uint64_t getGPUIndex( ) const;
 
     /**
      * @brief getPlatformId

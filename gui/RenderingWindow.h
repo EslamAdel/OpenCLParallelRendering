@@ -6,9 +6,11 @@
 #include <CLContext.h>
 #include <Headers.hh>
 #include "ParallelRendering.h"
+#include "VirtualParallelRendering.h"
 #include "RenderingNode.h"
 #include <vector>
 #include <QLabel>
+#include "ProfilingExterns.h"
 
 namespace Ui
 {
@@ -70,7 +72,13 @@ private slots:
 private:
     Ui::RenderingWindow *ui;
    // CLContext< uint8_t >* clContext_;
+
+#ifdef VIRTUAL_GPUS
+    VirtualParallelRendering *parallelRenderer_ ;
+#else
     ParallelRendering *parallelRenderer_;
+ #endif
+
     QVector< QLabel*  > frameContainers_;
     QVector< QPixmap* > pixmaps_;
     QPixmap *finalFrame_;

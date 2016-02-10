@@ -230,13 +230,13 @@ const cl_context CLFrame< T >::getContext() const
 }
 
 template< class T >
-const bool CLFrame< T >::isInDevice() const
+bool CLFrame< T >::isInDevice() const
 {
     return inDevice_ ;
 }
 
 template< class T >
-const bool CLFrame< T >::inSameContext(const CLFrame<T> &frame ) const
+bool CLFrame< T >::inSameContext(const CLFrame<T> &frame ) const
 {
     return frame.isInDevice() && ( frame.getContext() == context_ ) ;
 }

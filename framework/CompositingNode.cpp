@@ -80,6 +80,7 @@ void CompositingNode::collectFrame( const uint8_t frameIndex ,
     }
     else
     {
+
         frames_[ frameIndex ]->readOtherDeviceData( sourceCmdQueue ,
                                                     sourceFrame ,
                                                     block );
@@ -87,8 +88,6 @@ void CompositingNode::collectFrame( const uint8_t frameIndex ,
         frames_[ frameIndex ]->writeDeviceData( commandQueue_ ,
                                                 block );
     }
-
-
 
 }
 

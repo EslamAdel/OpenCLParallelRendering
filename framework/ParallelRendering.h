@@ -46,9 +46,9 @@ public:
      *  frameWidth and frameHeight will be set for all rendered frames
      *  and collage frame as well.
      */
-    ParallelRendering(Volume< uchar >* volume ,
-                      const uint frameWidth = 512,
-                      const uint frameHeight = 512 );
+    ParallelRendering( Volume< uchar >* volume ,
+                       const uint frameWidth = 512 ,
+                       const uint frameHeight = 512 );
 
 
     /**
@@ -63,8 +63,10 @@ public:
      *
      * @param gpuIndex
      */
-    void addRenderingNode( const uint64_t gpuIndex );
+    virtual void addRenderingNode( const uint64_t gpuIndex );
 
+
+    virtual int getRenderingNodesCount() const ;
 
 
     /**
@@ -72,20 +74,22 @@ public:
      * Create and attach CompositingNode to the GPU indexed by gpuIndex.
      * @param gpuIndex
      */
-    void addCompositingNode( const uint64_t gpuIndex );
+    virtual void addCompositingNode( const uint64_t gpuIndex );
+
 
     /**
      * @brief distributeBaseVolume1D
      * Distribute the baseVolume_ over the renderingNodes_ evenly based on
      * the X-axis.
      */
-    void distributeBaseVolume1D();
+    virtual void distributeBaseVolume1D();
+
 
     /**
      * @brief startRendering
      * Spark the rendering loop.
      */
-    void startRendering();
+    virtual void startRendering();
 
 
 
@@ -100,14 +104,13 @@ public:
      * @brief machineGPUsCount
      * @return
      */
-    uint8_t machineGPUsCount() const;
+    virtual uint getMachineGPUsCount() const;
 
     /**
      * @brief activeRenderingNodesCount
      * @return
      */
     uint8_t activeRenderingNodesCount() const;
-
 
 signals:
     /**
@@ -209,12 +212,12 @@ public slots :
      */
     void updateVolumeDensity_SLOT( float density );
 
-private:
+protected:
     /**
      * @brief applyTransformation
      * Start rendering and apply the desired transformation.
      */
-    void applyTransformation_();
+    virtual void applyTransformation_();
 
     /**
      * @brief syncTransformation
@@ -225,16 +228,19 @@ private:
 
     void benchmark_() ;
 
-private:
+protected :
 
     //oclHWDl utilities
     oclHWDL::Hardware         clHardware_;
     QSet< oclHWDL::Device* >   inUseGPUs_;
     oclHWDL::Devices            listGPUs_;
 
+private:
     //The workers, each node is attached to a single device.
     RenderingNodes        renderingNodes_;
     CompositingNode     *compositingNode_;
+
+protected:
 
     //threadpools
     QThreadPool rendererPool_  ; //[producer] for collector pool.
@@ -247,7 +253,6 @@ private:
     RenderingTasks  renderingTasks_ ;
     CollectingTasks collectingTasks_ ;
     CompositingTasks compositingTasks_ ;
-    MakePixmapTasks makePixmapTasks_ ;
     TaskMakePixmap *collagePixmapTask_;
 
     //Volume Data
@@ -279,7 +284,7 @@ private:
     uint8_t compositedFramesCount_ ;
 
     //facts
-    uint8_t machineGPUsCount_;
+    uint machineGPUsCount_;
     const uint frameWidth_ ;
     const uint frameHeight_ ;
 

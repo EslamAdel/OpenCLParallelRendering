@@ -103,7 +103,7 @@ void ParallelRendering::addRenderingNode( const uint64_t gpuIndex)
     // Add the new task object to
     // the map < rendering node , corresponding rendering task >
     renderingTasks_[ node ] = taskRender;
-    makePixmapTasks_[ node ] = new TaskMakePixmap( node->getCLFrame() , node );
+//    makePixmapTasks_[ node ] = new TaskMakePixmap( node->getCLFrame() , node );
 
     // Set the maximum number of active threads of the rendering thread pool and
     // the collector thread pool  to the current number of deployed GPUs.
@@ -116,11 +116,17 @@ void ParallelRendering::addRenderingNode( const uint64_t gpuIndex)
     connect( node , SIGNAL( finishedRendering( RenderingNode* )),
              this , SLOT( finishedRendering_SLOT( RenderingNode* )));
 
-    connect( makePixmapTasks_[ node ] ,
-             SIGNAL( pixmapReady_SIGNAL(  QPixmap* , const RenderingNode* )) ,
-             this , SLOT( pixmapReady_SLOT( QPixmap* , const RenderingNode* )));
+//    connect( makePixmapTasks_[ node ] ,
+//             SIGNAL( pixmapReady_SIGNAL(  QPixmap* , const RenderingNode* )) ,
+//             this , SLOT( pixmapReady_SLOT( QPixmap* , const RenderingNode* )));
 
 }
+
+int ParallelRendering::getRenderingNodesCount() const
+{
+    return inUseGPUs_.size();
+}
+
 
 void ParallelRendering::addCompositingNode( const uint64_t gpuIndex )
 {
@@ -208,6 +214,7 @@ void ParallelRendering::addCompositingNode( const uint64_t gpuIndex )
     compositingNodeSpecified_ = true ;
 }
 
+
 void ParallelRendering::distributeBaseVolume1D()
 {
     LOG_DEBUG("Distributing Volume");
@@ -266,7 +273,7 @@ void ParallelRendering::distributeBaseVolume1D()
 
 void ParallelRendering::startRendering()
 {
-    activeRenderingNodes_ = inUseGPUs_.size();
+    activeRenderingNodes_ =  inUseGPUs_.size();
 
     LOG_INFO("Triggering Rendering Nodes");
 
@@ -321,7 +328,7 @@ RenderingNode &ParallelRendering::getRenderingNode(const uint64_t gpuIndex)
 
 }
 
-uint8_t ParallelRendering::machineGPUsCount() const
+uint ParallelRendering::getMachineGPUsCount() const
 {
     return machineGPUsCount_;
 }

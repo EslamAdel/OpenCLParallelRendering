@@ -19,6 +19,7 @@ INCLUDEPATH += kernel/
 INCLUDEPATH += /usr/local/include/oclHWDL/
 INCLUDEPATH += /usr/local/cuda-7.5/include/
 INCLUDEPATH += framework/
+INCLUDEPATH += framework/virtual/
 INCLUDEPATH += gui/
 INCLUDEPATH += compositing/
 INCLUDEPATH += profiling/
@@ -57,7 +58,11 @@ SOURCES += main.cpp \
     framework/CLContext.cpp \
     opencl/CLImage2DArray.cpp \
     profiling/ProfilingExterns.cpp \
-    framework/TaskMakePixmap.cpp
+    framework/TaskMakePixmap.cpp \
+    framework/virtual/VirtualParallelRendering.cpp \
+    framework/virtual/VirtualRenderingNode.cpp \
+    framework/virtual/VirtualCompositingNode.cpp \
+    framework/virtual/VirtualTaskCollect.cpp
 
 HEADERS += \
     system/Colors.hh \
@@ -242,7 +247,11 @@ HEADERS += \
     opencl/CLImage2DArray.h \
     profiling/Profiles.hh \
     profiling/ProfilingExterns.h \
-    framework/TaskMakePixmap.h
+    framework/TaskMakePixmap.h \
+    framework/virtual/VirtualParallelRendering.h \
+    framework/virtual/VirtualRenderingNode.h \
+    framework/virtual/VirtualCompositingNode.h \
+    framework/virtual/VirtualTaskCollect.h
 
 FORMS += \
     gui/RenderingWindow.ui

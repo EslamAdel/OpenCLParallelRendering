@@ -6,7 +6,6 @@
 #include <QDir>
 #include <QPicture>
 
-#include "ProfilingExterns.h"
 
 #define WIDTH 512
 #define HEIGHT 512
@@ -47,6 +46,9 @@
 #endif
 
 
+
+
+
 #define min( a , b ) ( a < b )? a : b
 
 RenderingWindow::RenderingWindow( QWidget *parent ) :
@@ -62,8 +64,6 @@ RenderingWindow::RenderingWindow( QWidget *parent ) :
 
     LOG_DEBUG( "Creating Parallel Rendering Framework!..." );
 
-    parallelRenderer_ = new ParallelRendering( volume , WIDTH , HEIGHT);
-
     QVector< QLabel* > labels ;
 
     ui->frameContainer0->setEnabled( false );
@@ -78,6 +78,16 @@ RenderingWindow::RenderingWindow( QWidget *parent ) :
     frameContainers_.push_back( ui->frameContainer2 );
     labels.push_back( ui->labelGPU2 );
 
+
+#ifdef VIRTUAL_GPUS
+    //argument 3 is count of virtual GPUs.
+    parallelRenderer_ = new VirtualParallelRendering( volume , WIDTH , HEIGHT ,
+                                                      VIRTUAL_GPUS );
+#else
+    parallelRenderer_ = new ParallelRendering( volume , WIDTH , HEIGHT);
+#endif
+
+
 #ifdef PROFILE_SINGLE_GPU
 
     parallelRenderer_->addRenderingNode( DEPLOY_GPU_INDEX );
@@ -87,9 +97,8 @@ RenderingWindow::RenderingWindow( QWidget *parent ) :
                      + QString( "(active)" ));
 
 #else
-
     int upTo =  min( frameContainers_.size() ,
-                     parallelRenderer_->machineGPUsCount() );
+                     parallelRenderer_->getMachineGPUsCount() );
 
     for( auto i = 0 ; i < upTo  ; i++ )
     {

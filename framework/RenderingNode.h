@@ -64,9 +64,9 @@ public:
 
     void loadVolume( const Volume< uchar >* volume );
 
-    void setFrameIndex( const uint8_t frameIndex  );
+    void setFrameIndex(const uint frameIndex  );
 
-    uint8_t getFrameIndex() const ;
+    uint getFrameIndex() const ;
 
 signals:
     /**
@@ -93,7 +93,7 @@ private:
      */
     Coordinates3D currentCenter_ ;
 
-    uint8_t frameIndex_ ;
+    uint frameIndex_ ;
 
 };
 

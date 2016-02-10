@@ -3,10 +3,10 @@
 
 #include "Profiles.hh"
 
-#define BENCHMARKING
+//#define BENCHMARKING
 
 //use: 256, 384, 512, 640, 768, 896, 1024
-#define VOLUME_SIZE 1024
+#define VOLUME_SIZE 384
 
 //#define PROFILE_SINGLE_GPU
 
@@ -19,6 +19,8 @@
 
 #endif
 
+
+#define VIRTUAL_GPUS 3
 
 // As you increase TEST_FRAMES, standard deviations decrease.
 #define TEST_FRAMES 50*360
