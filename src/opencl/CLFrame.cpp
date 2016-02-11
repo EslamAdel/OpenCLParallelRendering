@@ -1,7 +1,6 @@
 #include "CLFrame.h"
 #include <typeinfo>
 #include <Logger.h>
-#include <Utilities.h>
 
 template< class T >
 CLFrame< T >::CLFrame( const Dimensions2D dimensions ,
@@ -162,7 +161,9 @@ QPixmap &CLFrame<T>::getFramePixmap()
     for(int i = 0; i < dimensions_.imageSize() ; i++)
     {
         rgba = hostData_[i];
-        SystemUtilities::convertColorToRGBA( rgba, r, g, b, a );
+
+
+        convertColorToRGBA_( rgba, r, g, b, a );
 
         rgbaFrame_[4*i] = r;
         rgbaFrame_[4*i + 1] = g;
@@ -246,6 +247,20 @@ void CLFrame< T >::releaseDeviceData_()
 {
     clReleaseMemObject( deviceData_ );
 
+}
+
+template< class T >
+void CLFrame< T >::convertColorToRGBA_( uint Color ,
+                                        uint8_t &r ,
+                                        uint8_t &g ,
+                                        uint8_t &b ,
+                                        uint8_t &a )
+{
+
+    b = Color & 0xFF; Color >>= 8;
+    g = Color & 0xFF; Color >>= 8;
+    r = Color & 0xFF; Color >>= 8;
+    a = Color & 0xFF;
 }
 
 #include <CLFrame.ipp>

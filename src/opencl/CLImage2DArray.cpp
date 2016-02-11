@@ -1,5 +1,6 @@
 #include "CLImage2DArray.h"
 #include "Logger.h"
+#include <typeinfo>
 
 template< class T >
 CLImage2DArray< T >::CLImage2DArray( const uint width ,

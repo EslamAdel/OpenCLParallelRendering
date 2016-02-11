@@ -3,7 +3,15 @@
 
 #include "Profiles.hh"
 
-#define BENCHMARKING
+//#define BENCHMARKING
+#define VIRTUAL_PARALLEL
+
+//benchmarking and virtual parallel are mutually
+//exclusive.
+#ifdef BENCHMARKING
+    #undef VIRTUAL_PARALLEL
+#endif
+
 
 //#define PROFILE_SINGLE_GPU
 
@@ -14,8 +22,9 @@
 #endif
 
 
-//#define VIRTUAL_GPUS 20
-
+#ifdef VIRTUAL_PARALLEL
+    #define VIRTUAL_GPUS 10
+#endif
 // As you increase TEST_FRAMES, standard deviations decrease.
 #define TEST_FRAMES 5*360
 

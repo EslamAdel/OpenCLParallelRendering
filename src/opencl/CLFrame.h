@@ -4,6 +4,11 @@
 #include <QPixmap>
 #include <Typedefs.hh>
 #include <oclHWDL/ErrorHandler.h>
+#include "Utilities.h"
+
+
+namespace SystemUtilities {}
+using namespace SystemUtilities;
 
 template< class T >
 class CLFrame
@@ -73,7 +78,10 @@ public:
 private:
     void releaseDeviceData_();
 
-
+    //Temporary solution as namesapce SystemUtilites cannot be found
+    //by compiler.
+    void convertColorToRGBA_( uint Color,
+                             uint8_t &r, uint8_t &g, uint8_t &b, uint8_t &a );
 protected:
 
     T *hostData_;
