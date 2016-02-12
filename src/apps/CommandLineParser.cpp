@@ -1,5 +1,7 @@
 #include "CommandLineParser.h"
 #include <QSet>
+#include <QObject>
+#include <memory>
 
 CommandLineParser::CommandLineParser( const QCoreApplication &app ,
                                       QCommandLineParser &parser ,
@@ -18,18 +20,16 @@ void CommandLineParser::addDefinitions_( )
     parser_.setSingleDashWordOptionMode(
                 QCommandLineParser::ParseAsLongOptions );
 
-    parser_.addPositionalArgument(
-                "p" ,
-                QCoreApplication::translate( "main",
-                                             "Volume prefix that contains "
-                                             "the .img and .hdr files." ) ,
-                "prefix" );
-
 
     QList< QCommandLineOption > options ;
 
     options << //Add width option
-               QCommandLineOption( QStringList() << "w" << "width" ,
+               QCommandLineOption( QStringList() << "v" << "volume-prefix",
+                                   "Volume prefix that prepends "
+                                   "the .img and .hdr files."  ,
+                                   "Volume Prefix" )
+            <<
+               QCommandLineOption( QStringList() << "W" <<  "frame-width",
                                    "Frame Width of the rendered frame and "
                                    "final frame as well. if not set, "
                                    "the default width will be set" ,
@@ -37,7 +37,7 @@ void CommandLineParser::addDefinitions_( )
                                    QString::number( DEFAULT_FRAME_WIDTH ))
 
             << //Add Height option
-               QCommandLineOption( QStringList() << "h" << "height" ,
+               QCommandLineOption( QStringList() << "H" << "frame-height" ,
                                    "Frame Height of the rendered frame and "
                                    "final frame as well. if not set, "
                                    "the default height will be set" ,
@@ -81,18 +81,15 @@ bool
 CommandLineParser::checkDevicesAvailability_( QList< uint > &devices ) const
 {
     // Scan the hardware
-    oclHWDL::Hardware* clHardware = new oclHWDL::Hardware();
+    std::unique_ptr< oclHWDL::Hardware >clHardware( new oclHWDL::Hardware );
 
     // Get a list of all the GPUs that are connected to the system
-    const oclHWDL::Devices listGPUs = clHardware->getListGPUs();
-
-
-    delete clHardware ;
+    const oclHWDL::Devices listGPUs = clHardware.get()->getListGPUs();
 
     if( listGPUs.empty() ) return false ;
 
     for( uint index : devices )
-        if( index < 0 && index > listGPUs.size() - 1 )
+        if( index < 0 || index > listGPUs.size() - 1 )
             return false ;
 
     return true ;
@@ -126,20 +123,20 @@ CommandLineParser::tokenize( Volume<uchar> *&volume ,
 {
     parser_.process( app_ );
 
+    QString volumePrefix = parser_.value( "volume-prefix" );
     //collect volume prefix.
-    const QStringList args = parser_.positionalArguments( ) ;
-    if( !parser_.isSet("volume-prefix"))
+    if( ! parser_.isSet( "volume-prefix" ))
     {
         errorMessage = new QString("Volume Prefix is not set!");
         return CommandLineResult::CommandLineError ;
     }
     else
-        volume = new Volume< uchar >( args.at(0).toStdString() );
+        volume = new Volume< uchar >( volumePrefix.toStdString( ));
 
 
     //collect frame width/height ... if not set, the defualt values is used.
-    frameWidth = parser_.value( "width" ).toUInt( );
-    frameHeight = parser_.value( "height" ).toUInt( );
+    frameWidth = parser_.value( "frame-width" ).toUInt( );
+    frameHeight = parser_.value( "frame-height" ).toUInt( );
 
     if( frameWidth > MAX_FRAME_DIMENSION || frameHeight > MAX_FRAME_DIMENSION )
     {
