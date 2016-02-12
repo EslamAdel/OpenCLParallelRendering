@@ -7,8 +7,8 @@
 set( OCL_MGPUVR_EXECUTABLE "oclMGPUVR" )
 
 ### Application source/header/ui files
-set( OCL_MGPUVR_HEADER_FILES RenderingWindow.h )
-set( OCL_MGPUVR_SOURCE_FILES oclMGPUVS.cpp RenderingWindow.cpp )
+set( OCL_MGPUVR_HEADER_FILES CommandLineParser.h RenderingWindow.h )
+set( OCL_MGPUVR_SOURCE_FILES oclMGPUVR.cpp CommandLineParser.cpp RenderingWindow.cpp )
 set( OCL_MGPUVR_APP_FORMS RenderingWindow.ui )
 qt5_wrap_ui( OCL_MGPUVS_APP_FORMS_MOC ${OCL_MGPUVR_APP_FORMS} )
 
