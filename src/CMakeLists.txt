@@ -7,13 +7,6 @@ include_directories( ${PROJECT_BINARY_DIR} )
 
 
 
-message( "${FRAMEWORK_SOURCE}" )
-
-
-
-
-
-
 ### Adding the source files to the CMake source tree
 SET( OCL_MGPUVS_SOURCE_FILES
     framework/ParallelRendering.cpp
@@ -130,26 +123,61 @@ foreach( kernel_file ${OCL_MGPUVS_KERNELS} )
     message(${CMAKE_CURRENT_SOURCE_DIR}/${kernel_file})
 endforeach( )
 
+
+
+### ---------------------- RELEASE LIBRARY SETTING ---------------------------###
+
+
 # Create a library with the main compoments of the framework and link the apps
 # against it later to reduce the compilation time
 set( OCL_MGPUVS_LIBRARY "oclMGPUVS" )
-
-
 
 add_library( ${OCL_MGPUVS_LIBRARY}
     ${OCL_MGPUVS_SOURCE_FILES}
     ${OCL_MGPUVS_HEADER_FILES}
     ${OCL_MGPUVS_KERNELS} )
 
-target_include_directories( ${OCL_MGPUVS_LIBRARY}  PUBLIC framework )
 
 set_property( TARGET ${OCL_MGPUVS_LIBRARY} PROPERTY IMPORTED_LOCATION
     ${CMAKE_BINARY_DIRECTORY}/lib${OCL_MGPUVS_LIBRARY} )
 
-
-
 install( TARGETS ${OCL_MGPUVS_LIBRARY} DESTINATION lib )
 install( FILES ${OCL_MGPUVS_HEADER_FILES} DESTINATION include )
+
+
+### ---------------------- BENCHMARK LIBRARY SETTING ---------------------------###
+
+
+
+# Create same library, but with activation of BENCHMARKING Definition.
+set( OCL_MGPUVS_LIBRARY_BENCHMARK "oclMGPUVS_benchmark" )
+
+
+# same library with BENCHMARKING defined.
+add_library( ${OCL_MGPUVS_LIBRARY_BENCHMARK}
+    ${OCL_MGPUVS_SOURCE_FILES}
+    ${OCL_MGPUVS_HEADER_FILES}
+    ${OCL_MGPUVS_KERNELS} )
+
+
+target_compile_definitions( ${OCL_MGPUVS_LIBRARY_BENCHMARK} INTERFACE BENCHMARKING)
+
+set_target_properties(  ${OCL_MGPUVS_LIBRARY_BENCHMARK}
+                        PROPERTIES COMPILE_DEFINITIONS "BENCHMARKING" )
+# BENCHMARKING defined
+set_property( TARGET ${OCL_MGPUVS_LIBRARY_BENCHMARK} PROPERTY IMPORTED_LOCATION
+    ${CMAKE_BINARY_DIRECTORY}/lib${OCL_MGPUVS_LIBRARY} )
+
+
+install( TARGETS ${OCL_MGPUVS_LIBRARY_BENCHMARK} DESTINATION lib )
+install( FILES ${OCL_MGPUVS_HEADER_FILES} DESTINATION include )
+
+
+
+
+### ------------------------------------------------------------------------------###
+
+
 install( FILES ${OCL_MGPUVS_KERNELS} DESTINATION share )
 
 # Add the applications

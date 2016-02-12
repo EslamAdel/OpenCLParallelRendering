@@ -123,6 +123,9 @@ signals:
      */
     void finalFrameReady_SIGNAL( QPixmap *finalFrame );
 
+
+    void finishedCompositing_SIGNAL( );
+
 public slots :
 
     /**

@@ -352,8 +352,8 @@ void ParallelRendering::compositingFinished_SLOT()
     {
         renderingNodesReady_ = true ;
 #ifdef BENCHMARKING
-        static uint testFrames = 0 ;
-        if( ++testFrames < TEST_FRAMES )
+        static uint framesCounter = 0 ;
+        if( ++framesCounter < testFrames )
             updateRotationX_SLOT( rotation_.x + 1 );
 
         else

@@ -201,30 +201,30 @@ void RenderingWindow::captureView_SLOT()
 
     QString date = QDateTime::currentDateTime().toString( "hh-mm-ss" );
 
-    QString newDir = dir + QString( "/" ) + date +
-                     QString( "[%1x%2]" ).arg( QString::number( FRAME_WIDTH ) ,
-                                               QString::number( FRAME_HEIGHT ));
-    QDir createDir;
-    createDir.mkdir( newDir );
-    LOG_DEBUG("New Dir:%s" , newDir.toStdString().c_str() );
+//    QString newDir = dir + QString( "/" ) + date +
+//                     QString( "[%1x%2]" ).arg( QString::number( FRAME_WIDTH ) ,
+//                                               QString::number( FRAME_HEIGHT ));
+//    QDir createDir;
+//    createDir.mkdir( newDir );
+//    LOG_DEBUG("New Dir:%s" , newDir.toStdString().c_str() );
 
 
-    QPixmap pic( finalFrame_->
-                 scaledToHeight( FRAME_WIDTH ).scaledToWidth( FRAME_HEIGHT ));
-    pic.save( newDir + "/result.jpg");
+//    QPixmap pic( finalFrame_->
+//                 scaledToHeight( FRAME_WIDTH ).scaledToWidth( FRAME_HEIGHT ));
+//    pic.save( newDir + "/result.jpg");
 
-    int i = 0;
-    for( const QLabel *frame : frameContainers_ )
-    {
-        if( frame->isEnabled() )
-        {
-            QPixmap framePixmap( parallelRenderer_->getRenderingNode( i ).
-                                 getCLFrame()->getFramePixmap().
-                                 scaledToHeight( FRAME_WIDTH ).
-                                 scaledToWidth( FRAME_HEIGHT ));
+//    int i = 0;
+//    for( const QLabel *frame : frameContainers_ )
+//    {
+//        if( frame->isEnabled() )
+//        {
+//            QPixmap framePixmap( parallelRenderer_->getRenderingNode( i ).
+//                                 getCLFrame()->getFramePixmap().
+//                                 scaledToHeight( FRAME_WIDTH ).
+//                                 scaledToWidth( FRAME_HEIGHT ));
 
-            framePixmap.save( newDir + QString("/GPU%1.jpg").arg(i++) );
-        }
-    }
+//            framePixmap.save( newDir + QString("/GPU%1.jpg").arg(i++) );
+//        }
+//    }
 }
 
