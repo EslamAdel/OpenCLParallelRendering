@@ -10,6 +10,10 @@
 #define X_RAY_INVERSE_MATRIX_ARG                                            5
 #define X_RAY_VOLUME_ARRAY_ARG                                              6
 #define X_RAY_VOLUME_SAMPLER_ARG                                            7
+#define X_RAY_TRANSFER_FUNCTION_OFFSET_ARG                                  8
+#define X_RAY_TRANSFER_FUNCTION_SCALE_ARG                                   9
+#define X_RAY_TRANSFER_FUNCTION_DATA_ARG                                    10
+#define X_RAY_TRANSFER_FUNCTION_SAMPLER_ARG                                 11
 
 CLXRayRenderingKernel::CLXRayRenderingKernel(cl_context clContext,
                                              const std::string kernelDirectory,
@@ -94,4 +98,36 @@ void CLXRayRenderingKernel::setInverseViewMatrix( cl_mem matrix )
                                    sizeof( cl_mem ),
                                    ( void* ) &matrix );
     oclCheckErrorEX( error, CL_SUCCESS, 0 );
+}
+
+void CLXRayRenderingKernel::setTransferFunctionData(cl_mem data)
+{
+    cl_int error = clSetKernelArg(kernelObject_,X_RAY_TRANSFER_FUNCTION_DATA_ARG,
+                                  sizeof( cl_mem ),
+                                  (void *) &data);
+    oclCheckErrorEX(error,CL_SUCCESS, 0);
+}
+
+void CLXRayRenderingKernel::setTransferFunctionOffset(float offset)
+{
+    cl_int error = clSetKernelArg(kernelObject_,X_RAY_TRANSFER_FUNCTION_OFFSET_ARG,
+                                  sizeof( float ),
+                                  (void* ) &offset);
+    oclCheckErrorEX(error,CL_SUCCESS,0);
+}
+
+void CLXRayRenderingKernel::setTransferFunctionSampler(cl_sampler sampler)
+{
+    cl_int error = clSetKernelArg( kernelObject_, X_RAY_TRANSFER_FUNCTION_SAMPLER_ARG,
+                                   sizeof( cl_sampler ),
+                                   &sampler );
+    oclCheckErrorEX( error, CL_SUCCESS, 0 );
+}
+
+void CLXRayRenderingKernel::setTransferFunctionScale(float scale)
+{
+    cl_int error = clSetKernelArg(kernelObject_,X_RAY_TRANSFER_FUNCTION_SCALE_ARG,
+                                  sizeof( float ),
+                                  (void *)&scale);
+    oclCheckErrorEX(error,CL_SUCCESS,0);
 }

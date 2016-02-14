@@ -223,6 +223,18 @@ void CLContext< T >::handleKernel(std::string string)
     activeRenderingKernel_->setVolumeSampler
             (linearFiltering_ ? linearVolumeSampler_ : nearestVolumeSampler_);
 
+    activeRenderingKernel_->setTransferFunctionData(transferFunctionArray_);
+
+    activeRenderingKernel_->setTransferFunctionSampler(transferFunctionSampler_);
+
+    //Set the initial Value of the Transfer function offset and scale
+    //TODO add Slider to update these values.
+    float transferOffset = 0.0f;
+    float transferScale = 1.0f;
+
+    activeRenderingKernel_->setTransferFunctionOffset(transferOffset);
+
+    activeRenderingKernel_->setTransferFunctionScale(transferScale);
 
     inverseMatrix_ = clCreateBuffer( context_,
                                      CL_MEM_READ_ONLY,

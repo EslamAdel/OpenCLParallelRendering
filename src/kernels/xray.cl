@@ -83,7 +83,12 @@ __kernel void xray( __global    uint* frameBuffer,
                                 float density, float brightness,
                     __constant  float* invViewMatrix,
                     __read_only image3d_t volume,
-                    sampler_t   volumeSampler )
+                    sampler_t   volumeSampler,
+                    float transferOffset,
+                    float transferScale,
+                    __read_only image2d_t transferFunc,
+                    sampler_t transferFuncSampler
+                    )
 {
     uint x = get_global_id( 0 );
     uint y = get_global_id( 1 );
@@ -156,12 +161,15 @@ __kernel void xray( __global    uint* frameBuffer,
         // Sample the 3D volume data using the _volumeSampler_ at the specified
         // positions along the ray.
         float4 intensity = read_imagef( volume, volumeSampler, position );
+        // lookup in transfer function texture
+        float2 transfer_pos = (float2)((intensity.x-transferOffset)*transferScale, 0.5f);
+        float4 col = read_imagef(transferFunc, transferFuncSampler, transfer_pos);
 
         // Accumulate the result by mixing what is currently in the
         // _intensityBuffer_ with the new intensity value that was sampled from
         // the volume, with the corrsponding alpha components
-        float alpha = intensity.w * density;
-        intensityBuffer = mix( intensityBuffer, intensity,
+        float alpha = col.w * density;
+        intensityBuffer = mix( intensityBuffer, col,
                              ( float4 )( alpha, alpha, alpha, alpha ));
 
         // Get the parametric value of the next sample along the ray
