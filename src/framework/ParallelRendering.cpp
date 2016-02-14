@@ -6,7 +6,7 @@
 #define VOLUME_PREFIX "/projects/volume-datasets/foot/foot"
 #define INITIAL_VOLUME_CENTER_X 0.0
 #define INITIAL_VOLUME_CENTER_Y 0.0
-#define INITIAL_VOLUME_CENTER_Z -4.0
+#define INITIAL_VOLUME_CENTER_Z 0.0
 #define INITIAL_VOLUME_ROTATION_X 0.0
 #define INITIAL_VOLUME_ROTATION_Y 0.0
 #define INITIAL_VOLUME_ROTATION_Z 0.0
@@ -419,6 +419,14 @@ void ParallelRendering::updateTranslationY_SLOT(int distance)
     if( renderingNodesReady_ ) applyTransformation_();
     else pendingTransformations_ = true ;
 }
+
+void ParallelRendering::updateTranslationZ_SLOT(int distance)
+{
+    translation_.z = distance;
+    if( renderingNodesReady_ ) applyTransformation_();
+    else pendingTransformations_ = true ;
+}
+
 
 void ParallelRendering::updateImageBrightness_SLOT(float brightness)
 {

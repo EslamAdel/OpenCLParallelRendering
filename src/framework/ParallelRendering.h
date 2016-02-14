@@ -196,7 +196,11 @@ public slots :
      * @param distance
      */
     void updateTranslationY_SLOT( int distance );
-
+    /**
+     * @brief updateTranslationZ_SLOT
+     * @param distance
+     */
+    void updateTranslationZ_SLOT( int distance );
     /**
      * @brief updateImageBrightness_SLOT
      * @param brithness

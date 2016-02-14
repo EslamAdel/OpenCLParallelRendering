@@ -227,6 +227,7 @@ void RenderingWindow::newYTranslation_SLOT(int value)
 void RenderingWindow::newZTranslation_SLOT(int value)
 {
     ui->zTranslationValue->setText( QString::number( value ));
+    parallelRenderer_->updateTranslationZ_SLOT( value );
 
 }
 
