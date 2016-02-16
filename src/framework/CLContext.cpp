@@ -270,7 +270,7 @@ void CLContext< T >::paint( const Coordinates3D &rotation ,
     glm::tvec3< float > axis = glm::axis(quaternion);
     auto translationVector = glm::tvec3<float>( translation.x ,
                                                 translation.y ,
-                                                4.0 );
+                                                4-translation.z );
 
     //Calculating the translate value for each brick
     glm::tvec3< float > relativeCenterBack =
