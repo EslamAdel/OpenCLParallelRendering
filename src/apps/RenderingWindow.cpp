@@ -102,7 +102,19 @@ void RenderingWindow::intializeConnections_()
     //capture button
     connect( ui->captureButton , SIGNAL( released( )) ,
              this , SLOT( captureView_SLOT( )));
+
+    // trasnfer function
+    connect( ui->scaleSlider , SIGNAL( valueChanged(int)) ,
+             this , SLOT(newTransferFunctionScale_SLOT(int)) );
+
+
+    connect( ui->offsetSlider , SIGNAL( valueChanged(int)) ,
+             this , SLOT(newTransferFunctionOffset_SLOT(int)) );
+
+
+
 }
+
 
 void RenderingWindow::startRendering_( )
 {
@@ -141,6 +153,14 @@ void RenderingWindow::startRendering_( )
     ui->densitySlider->setRange(0,100);
     ui->densitySlider->setValue(50);
     ui->densityValue->setText(QString::number(50));
+
+
+    // transfer function sliders
+    ui->offsetSlider->setRange(0,50);
+    ui->scaleSlider->setRange(-100,100);
+    ui->scaleValue->setText(QString::number(1));
+
+
 
 
     // Getting the initial values from the sliders
@@ -270,6 +290,27 @@ void RenderingWindow::newDensity_SLOT(int value)
     parallelRenderer_->updateVolumeDensity_SLOT( density );
 }
 
+
+
+void RenderingWindow::newTransferFunctionScale_SLOT(int value)
+{
+    ui->scaleValue->setText( QString::number(1.0+(float)value/100 ));
+
+    float scale = 1.0f+float( value ) / 100.0;
+    parallelRenderer_->updateTransferFunctionScale_SLOT( scale );
+
+}
+
+void RenderingWindow::newTransferFunctionOffset_SLOT(int value)
+{
+    ui->offsetValue->setText( QString::number((float) value/100));
+
+    float offset = float( value ) / 100.0;
+    parallelRenderer_->updateTransferFunctionOffset_SLOT( offset );
+
+}
+
+
 void RenderingWindow::captureView_SLOT()
 {
     QString dir =
@@ -306,6 +347,7 @@ void RenderingWindow::captureView_SLOT()
 
 //            framePixmap.save( newDir + QString("/GPU%1.jpg").arg(i++) );
 //        }
-//    }
+    //    }
 }
+
 

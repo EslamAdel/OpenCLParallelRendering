@@ -15,7 +15,9 @@ public:
                           const Coordinates3D &globalTranslation,
                           const Coordinates3D &globalRotation,
                           const float &volumeDensity,
-                          const float &brightness );
+                          const float &brightness ,
+                          const float &transferScale,
+                          const float &transferOffset);
 
     uint64_t getGPUIndex( ) const;
 

@@ -86,7 +86,10 @@ public:
       */
     void renderFrame( const float* inverseMatrix ,
                       const float &volumeDensity ,
-                      const float &imageBrightness );
+                      const float &imageBrightness,
+                      const float &transferFScale,
+                      const float &transferFOffset
+                      );
 
     /**
       * @brief releasePixelBuffer
@@ -112,6 +115,8 @@ public:
                 const Coordinates3D &translation,
                 const float &volumeDensity ,
                 const float &imageBrightness ,
+                const float &transferFScale ,
+                const float &transferFOffset ,
                 Coordinates3D &currentCenter);
 
 private:

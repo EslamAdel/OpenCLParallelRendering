@@ -20,7 +20,9 @@ void VirtualParallelRendering::addRenderingNode( const uint64_t gpuIndex )
                                            translationAsync_,
                                            rotationAsync_,
                                            volumeDensityAsync_,
-                                           brightnessAsync_  );
+                                           brightnessAsync_  ,
+                                           transferFunctionScaleAsync_,
+                                           transferFunctionOffsetAsync_);
 
     renderingNodes_.push_back( node );
 

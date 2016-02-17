@@ -46,7 +46,8 @@ public:
                    const uint frameWidth , const uint frameHeight ,
                    const Coordinates3D &globalTranslation,
                    const Coordinates3D &globalRotation,
-                   const float &volumeDensity, const float &brightness  );
+                   const float &volumeDensity, const float &brightness,
+                   const float &transferScale,const float &transferOffset );
 
     /**
      * @brief applyTransformation
@@ -86,6 +87,9 @@ private:
     const Coordinates3D &translation_ ;
     const float &volumeDensity_ ;
     const float &imageBrightness_ ;
+    const float &transferFunctionScale_ ;
+    const float &transferFunctionOffset_ ;
+
 
 
     /**

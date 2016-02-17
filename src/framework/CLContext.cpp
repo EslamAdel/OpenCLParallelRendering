@@ -252,6 +252,8 @@ void CLContext< T >::paint( const Coordinates3D &rotation ,
                             const Coordinates3D &translation,
                             const float &volumeDensity ,
                             const float &imageBrightness ,
+                            const float &transferFScale ,
+                            const float &transferFOffset,
                             Coordinates3D &currentCenter )
 {
 
@@ -351,14 +353,19 @@ void CLContext< T >::paint( const Coordinates3D &rotation ,
     TOC( RENDERING_PROFILE( gpuIndex_ ).mvMatrix_TIMER );
 
     TIC( RENDERING_PROFILE( gpuIndex_ ).rendering_TIMER );
-    renderFrame( inverseMatrixArray_ , volumeDensity , imageBrightness );
+    renderFrame( inverseMatrixArray_ , volumeDensity , imageBrightness,
+                 transferFScale ,transferFOffset);
+
     TOC( RENDERING_PROFILE( gpuIndex_ ).rendering_TIMER );
 }
 
 template< class T >
 void CLContext< T >::renderFrame( const float* inverseMatrix ,
                                   const float &volumeDensity ,
-                                  const float &imageBrightness )
+                                  const float &imageBrightness,
+                                  const float &transferFScale ,
+                                  const float &transferFOffset
+                                  )
 {
     // update the device view matrix
 
@@ -383,6 +390,8 @@ void CLContext< T >::renderFrame( const float* inverseMatrix ,
 
     activeRenderingKernel_->setVolumeDensityFactor( volumeDensity);
     activeRenderingKernel_->setImageBrightnessFactor(imageBrightness);
+    activeRenderingKernel_->setTransferFunctionOffset(transferFOffset);
+    activeRenderingKernel_->setTransferFunctionScale(transferFScale);
 
     // Enqueue the kernel for execution
     clErrorCode |= clEnqueueNDRangeKernel( commandQueue_,

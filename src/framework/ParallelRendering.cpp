@@ -10,6 +10,9 @@
 #define INITIAL_VOLUME_ROTATION_X 0.0
 #define INITIAL_VOLUME_ROTATION_Y 0.0
 #define INITIAL_VOLUME_ROTATION_Z 0.0
+#define INITIAL_TRANSFER_SCALE    1.0
+#define INITIAL_TRANSFER_OFFSET   0.0
+
 
 
 
@@ -48,6 +51,10 @@ ParallelRendering::ParallelRendering( Volume<uchar> *volume ,
     rotation_.y = INITIAL_VOLUME_ROTATION_Y;
     rotation_.z = INITIAL_VOLUME_ROTATION_Z;
 
+    //transfer parameters
+    transferFunctionOffset_= INITIAL_TRANSFER_OFFSET;
+    transferFunctionScale_ = INITIAL_TRANSFER_SCALE;
+
 
     /**
     compositing of frames is not performed concurrently,
@@ -83,7 +90,9 @@ void ParallelRendering::addRenderingNode( const uint64_t gpuIndex)
                                              translationAsync_,
                                              rotationAsync_,
                                              volumeDensityAsync_,
-                                             brightnessAsync_  );
+                                             brightnessAsync_,
+                                             transferFunctionScaleAsync_,
+                                             transferFunctionOffsetAsync_);
 
     ATTACH_RENDERING_PROFILE( node );
     ATTACH_COLLECTING_PROFILE( node );
@@ -306,6 +315,9 @@ void ParallelRendering::syncTransformation_()
     rotationAsync_ = rotation_;
     brightnessAsync_ = brightness_ ;
     volumeDensityAsync_ = volumeDensity_;
+    transferFunctionScaleAsync_=transferFunctionScale_;
+    transferFunctionOffsetAsync_=transferFunctionOffset_;
+
 }
 
 
@@ -442,6 +454,23 @@ void ParallelRendering::updateVolumeDensity_SLOT(float density)
     else pendingTransformations_ = true ;
 }
 
+void ParallelRendering::updateTransferFunctionScale_SLOT(float scale)
+{
+     transferFunctionScale_=scale;
+     if( renderingNodesReady_ ) applyTransformation_();
+     else pendingTransformations_ = true ;
+
+
+}
+
+void ParallelRendering::updateTransferFunctionOffset_SLOT(float offset)
+{
+    transferFunctionOffset_=offset;
+    if( renderingNodesReady_ ) applyTransformation_();
+    else pendingTransformations_ = true ;
+
+
+}
 
 
 void ParallelRendering::benchmark_()

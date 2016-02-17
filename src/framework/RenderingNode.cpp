@@ -6,12 +6,16 @@ RenderingNode::RenderingNode(const uint64_t gpuIndex ,
                              const Coordinates3D &globalTranslation,
                              const Coordinates3D &globalRotation,
                              const float &volumeDensity,
-                             const float &brightness )
+                             const float &brightness,
+                             const float &transferScale,
+                             const float &transferOffset)
     : CLContext< uchar >( gpuIndex , frameWidth , frameHeight , nullptr ) ,
       translation_( globalTranslation ),
       rotation_( globalRotation ),
       volumeDensity_( volumeDensity ),
-      imageBrightness_( brightness )
+      imageBrightness_( brightness ),
+      transferFunctionScale_(transferScale),
+      transferFunctionOffset_(transferOffset)
 {
     LOG_INFO( "Creating Context on Node with GPU <%d>", gpuIndex );
 
@@ -26,7 +30,10 @@ void RenderingNode::applyTransformation( )
                  translation_,
                  volumeDensity_,
                  imageBrightness_ ,
-                 currentCenter_ );
+                 transferFunctionScale_,
+                 transferFunctionOffset_,
+                 currentCenter_
+                 );
 
     emit this->finishedRendering( this );
 }

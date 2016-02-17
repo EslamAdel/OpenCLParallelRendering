@@ -82,6 +82,11 @@ private slots:
 
     void captureView_SLOT() ;
 
+    void newTransferFunctionScale_SLOT(int value);
+
+    void newTransferFunctionOffset_SLOT(int value);
+
+
 private:
     Ui::RenderingWindow *ui;
 

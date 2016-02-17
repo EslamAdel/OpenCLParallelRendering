@@ -212,6 +212,16 @@ public slots :
      * @param density
      */
     void updateVolumeDensity_SLOT( float density );
+    /**
+     * @brief updateTransferFunctionScale_SLOT
+     * @param scale
+     */
+    void updateTransferFunctionScale_SLOT(float scale);
+    /**
+     * @brief updateTransferFunctionOffset_SLOT
+     * @param offset
+     */
+    void updateTransferFunctionOffset_SLOT(float offset);
 
 protected:
     /**
@@ -265,6 +275,9 @@ protected:
     Coordinates3D translation_;
     float brightness_;
     float volumeDensity_;
+    float transferFunctionScale_;
+    float transferFunctionOffset_;
+
 
     //shared data for multithreads, must not be modified during
     //the activity rendering threads.
@@ -273,6 +286,8 @@ protected:
     Coordinates3D translationAsync_;
     float brightnessAsync_;
     float volumeDensityAsync_;
+    float transferFunctionScaleAsync_;
+    float transferFunctionOffsetAsync_;
 
     //flags
     bool pendingTransformations_;
