@@ -190,10 +190,7 @@ void CLContext< T >::handleKernel(std::string string)
 
     // Transfer function format
     cl_image_format tfFormat;
-    if(TFChannelOrderFlage == 0)
     tfFormat.image_channel_order = CL_RGBA;
-    else
-    tfFormat.image_channel_order = CL_BGRA;
     tfFormat.image_channel_data_type =  CL_FLOAT;
 
     // Upload the transfer function to the volume.

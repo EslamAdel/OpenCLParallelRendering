@@ -8,7 +8,7 @@
 #include <CLVolume.h>
 #include <CLXRayRenderingKernel.h>
 #include <CLFrame.h>
-#include <../apps/develop/CommandLineParser.h>
+
 
 
 //#include "ProfilingExterns.hh"
