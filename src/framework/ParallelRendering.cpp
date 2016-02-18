@@ -282,6 +282,7 @@ void ParallelRendering::distributeBaseVolume1D()
                    renderingNodes_[ renderingDevice ]->getGPUIndex( ));
     }
 
+    emit this->frameworkReady_SIGNAL();
 }
 
 void ParallelRendering::startRendering()

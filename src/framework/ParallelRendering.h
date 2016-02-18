@@ -107,6 +107,9 @@ public:
     virtual uint getMachineGPUsCount() const;
 
 signals:
+
+    void frameworkReady_SIGNAL( );
+
     /**
      * @brief framesReady_SIGNAL
      * For each rendered frame done, emit a signal.

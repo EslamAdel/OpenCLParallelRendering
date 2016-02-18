@@ -4,7 +4,7 @@
 # volume rendering of large volume on multiple GPUs connected to the system.
 ################################################################################
 
-CMAKE_MINIMUM_REQUIRED( VERSION 3.1 )
+CMAKE_MINIMUM_REQUIRED( VERSION 3.1 FATAL_ERROR)
 set( CMAKE_CXX_STANDARD 11 )
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)

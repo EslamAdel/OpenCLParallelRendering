@@ -5,12 +5,12 @@ message("Develop Setting...")
 set( OCL_MGPUVR_EXECUTABLE "oclMGPUVR_Develop" )
 
 
+
 ### Application source/header/ui files
 set( OCL_MGPUVR_HEADER_FILES CommandLineParser.h RenderingWindow.h )
 set( OCL_MGPUVR_SOURCE_FILES oclMGPUVR.cpp CommandLineParser.cpp RenderingWindow.cpp )
 set( OCL_MGPUVR_APP_FORMS RenderingWindow.ui )
 qt5_wrap_ui( OCL_MGPUVR_APP_FORMS_MOC ${OCL_MGPUVR_APP_FORMS} )
-
 
 
 

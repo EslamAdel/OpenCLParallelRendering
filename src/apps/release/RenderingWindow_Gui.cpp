@@ -13,7 +13,7 @@ RenderingWindow_Gui::RenderingWindow_Gui(
       ui( new Ui::RenderingWindow_Gui )
 {
     parallelRenderer_ = parallelRenderer ;
-
+    frameworkReady_ = false ;
 
     // UI setup
     ui->setupUi( this );
@@ -33,12 +33,22 @@ RenderingWindow_Gui::RenderingWindow_Gui(
     frameContainers_.push_back( ui->frameContainer2 );
     labels.push_back( ui->labelGPU2 );
 
+    connect( ui->initializeButton , SIGNAL(released( )) ,
+             this , SLOT( initializeFramework_SLOT( )));
 
-    intializeConnections_();
+
+    ui->availableDevices->surveyGPUs();
+    ui->availableDevices->setFixed( true );
+
+    ui->renderingDevices->setFixed( false );
+    ui->compositingDevice->setFixed( false );
+    ui->compositingDevice->setMaxGPUs( 1 );
 
 
-    LOG_INFO( "Triggering rendering" );
-    startRendering_( );
+    //disable transformations and transfer function when framework is not ready.
+    ui->tabWidget->setTabEnabled( TransformationTabIndex , false );
+    ui->tabWidget->setTabEnabled( TransferFunctionTabIndex , false );
+
 }
 
 RenderingWindow_Gui::~RenderingWindow_Gui( )
@@ -48,16 +58,6 @@ RenderingWindow_Gui::~RenderingWindow_Gui( )
 
 void RenderingWindow_Gui::intializeConnections_()
 {
-    //parallelRenderer_
-    connect( parallelRenderer_ ,
-             SIGNAL( frameReady_SIGNAL( QPixmap * ,
-                                        const RenderingNode* )),
-             this , SLOT( frameReady_SLOT( QPixmap * ,
-                                           const RenderingNode* )));
-
-    connect( parallelRenderer_ , SIGNAL( finalFrameReady_SIGNAL( QPixmap* )) ,
-             this , SLOT( collageFrameReady_SLOT( QPixmap* )));
-
 
     //sliders
     connect( ui->xRotationSlider , SIGNAL( valueChanged( int )),
@@ -108,11 +108,23 @@ void RenderingWindow_Gui::intializeConnections_()
     connect( ui->offsetSlider , SIGNAL( valueChanged(int)) ,
              this , SLOT(newTransferFunctionOffset_SLOT(int)) );
 
+    //parallelRenderer_
+    connect( parallelRenderer_ ,
+             SIGNAL( frameReady_SIGNAL( QPixmap * ,
+                                        const RenderingNode* )),
+             this , SLOT( frameReady_SLOT( QPixmap * ,
+                                           const RenderingNode* )));
+
+    connect( parallelRenderer_ , SIGNAL( finalFrameReady_SIGNAL( QPixmap* )) ,
+             this , SLOT( collageFrameReady_SLOT( QPixmap* )));
 }
 
 
 void RenderingWindow_Gui::startRendering_( )
 {
+    if( ! frameworkReady_ )
+        LOG_ERROR("Framework not intialized!");
+
     //set slider ranges
     ui->xTranslationSlider->setRange(-5,5);
     ui->xTranslationSlider->setValue(0);
@@ -307,6 +319,53 @@ void RenderingWindow_Gui::newTransferFunctionOffset_SLOT(int value)
     float offset = float( value ) / 100.0;
     parallelRenderer_->updateTransferFunctionOffset_SLOT( offset );
 
+}
+
+void RenderingWindow_Gui::initializeFramework_SLOT()
+{
+
+    const QList< uint > &compositors =
+            ui->compositingDevice->getGPUsIndices().toList();
+
+    const QSet< uint > &renderers = ui->renderingDevices->getGPUsIndices();
+
+    if( compositors.size() != 1 || renderers.isEmpty() )
+    {
+        LOG_WARNING("At least one GPU should be selected for "
+                    "rendering and compositing!");
+        return ;
+    }
+
+    connect( parallelRenderer_ , SIGNAL( frameworkReady_SIGNAL( )) ,
+             this , SLOT( frameworkReady_SLOT( )));
+
+
+    TaskInitializeFramework *task =
+            new TaskInitializeFramework( parallelRenderer_ ,
+                                         renderers ,
+                                         compositors.at( 0 ));
+
+
+
+    QThreadPool::globalInstance()->start( task );
+
+    ui->initializeButton->setText( QString("Initializing..."));
+    ui->initializeButton->setEnabled( false );
+
+
+}
+
+void RenderingWindow_Gui::frameworkReady_SLOT()
+{
+    frameworkReady_ = true ;
+
+    ui->initializeButton->setText( QString("Framework ready!"));
+    //disable transformations and transfer function when framework is not ready.
+    ui->tabWidget->setTabEnabled( TransformationTabIndex , true );
+    ui->tabWidget->setTabEnabled( TransferFunctionTabIndex , true );
+
+    intializeConnections_();
+    startRendering_();
 }
 
 

@@ -11,6 +11,8 @@
 #include "ParallelRendering.h"
 #include "RenderingNode.h"
 #include "ProfilingExterns.h"
+#include <QThreadPool>
+#include "TaskInitializeFramework.h"
 
 namespace Ui
 {
@@ -21,7 +23,15 @@ class RenderingWindow_Gui : public QMainWindow
 {
     Q_OBJECT
 
+
+    enum Tabs
+    {
+        DevicesTabIndex = 0 ,
+        TransformationTabIndex ,
+        TransferFunctionTabIndex
+    };
 public:
+
 
     RenderingWindow_Gui( ParallelRendering *parallelRenderer ,
                          QWidget *parent = 0 ) ;
@@ -87,12 +97,21 @@ private slots:
     void newTransferFunctionOffset_SLOT(int value);
 
 
+    void initializeFramework_SLOT( );
+
+
+    void frameworkReady_SLOT( );
+
 private:
     Ui::RenderingWindow_Gui *ui;
 
 
     ParallelRendering *parallelRenderer_ ;
 
+
+    bool frameworkReady_ ;
+    std::vector< uint > deployGPUs_ ;
+    uint compositorIndex_ ;
 
     QVector< QLabel*  > frameContainers_;
     QVector< QPixmap* > pixmaps_;

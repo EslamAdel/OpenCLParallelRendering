@@ -40,23 +40,13 @@ int main(int argc, char *argv[])
         }
     }
 
-//        Dimensions3D size = volume->getDimensions() ;
-//        LOG_INFO("volume size: %dx%dx%d", size.x , size.y , size.z );
-//        LOG_INFO("frame: %dx%d" , frameWidth , frameHeight );
-//        for( auto index : deployGPUs )
-//            LOG_INFO("Deploy GPU<%d>", index );
-//        LOG_INFO("compositor: GPU<%d>", compositorGPUIndex );
+
 
     ParallelRendering parallelRenderer( volume , frameWidth , frameHeight );
 
 
 
-    for( const uint rendererIndex : deployGPUs )
-        parallelRenderer.addRenderingNode( rendererIndex );
 
-    parallelRenderer.addCompositingNode( compositorGPUIndex );
-
-    parallelRenderer.distributeBaseVolume1D();
 
 
     RenderingWindow_Gui rw( &parallelRenderer ) ;
