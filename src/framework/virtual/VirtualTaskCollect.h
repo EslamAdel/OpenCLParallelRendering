@@ -26,7 +26,6 @@ protected:
 private:
     VirtualRenderingNode *renderingNode_;
     VirtualCompositingNode *compositingNode_;
-    const uint frameIndex_ ;
 
 };
 

@@ -2,9 +2,9 @@
 #include "ProfilingExterns.h"
 
 #include "Logger.h"
-TaskComposite::TaskComposite( CompositingNode *compositingNode ,
-                             uint frameIndex)
-    : frameIndex_( frameIndex )
+TaskComposite::TaskComposite(CompositingNode *compositingNode ,
+                             RenderingNode *renderingNode)
+    : renderingNode_( renderingNode )
 {
     compositingNode_ = compositingNode ;
     setAutoDelete( false );
@@ -22,17 +22,15 @@ void TaskComposite::run()
     if( compositedFramesCount == 0 )
     {
         TIC( compositingProfile.compositing_TIMER );
-//        LOG_DEBUG("Frame[%d] set as CollageFrame" , frameIndex_ );
     }
 
     TIC( compositingProfile.accumulatingFrame_TIMER );
-    compositingNode_->accumulateFrame_DEVICE( frameIndex_ );
+    compositingNode_->accumulateFrame_DEVICE( renderingNode_ );
     TOC( compositingProfile.accumulatingFrame_TIMER );
 
     if( compositingNode_->getCompositedFramesCount()
         == compositingNode_->framesCount() )
     {
-//        LOG_DEBUG("[DONE] Compositing");
 
         TIC( compositingProfile.loadCollageFromDevice_TIMER );
         compositingNode_->loadCollageFromDevice();

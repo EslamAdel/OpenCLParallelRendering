@@ -11,23 +11,14 @@
 
 
 CompositingNode::CompositingNode(const uint64_t gpuIndex,
-                                 const uint framesCount,
                                  const uint frameWidth ,
-                                 const uint frameHeight ,
-                                 const std::vector< const Coordinates3D *> framesCenters)
+                                 const uint frameHeight )
     : gpuIndex_( gpuIndex ) ,
-      framesCount_( framesCount ) ,
-      collageFrameDimensions_( frameWidth , frameHeight ) ,
-      framesCenters_( framesCenters )
+      collageFrameDimensions_( frameWidth , frameHeight )
 {
     compositedFramesCount_ = 0 ;
+    framesCount_ = 0 ;
 
-    if( framesCount != framesCenters.size() )
-        LOG_ERROR("Size Mismatch in framesCount and framesCenters count");
-
-    LOG_DEBUG("Constructing CompositingNode:\nFramesCount:%d\n"
-              "FrameSize:%dx%d" , framesCount_ ,
-              collageFrameDimensions_.x , collageFrameDimensions_.y );
 
     initializeContext_();
     initializeBuffers_();
@@ -41,6 +32,19 @@ CompositingNode::~CompositingNode()
 
 }
 
+void CompositingNode::allocateFrame( RenderingNode *renderingNode )
+{
+
+    CLFrame32 *frame =
+            new CLFrame32( renderingNode->getCLFrame()->getFrameDimensions( ));
+
+    frame->createDeviceData( context_ );
+
+    frames_[ renderingNode ] = frame ;
+
+    framesCount_++ ;
+}
+
 uint64_t CompositingNode::getGPUIndex() const
 {
     return gpuIndex_;
@@ -51,27 +55,15 @@ CLFrame32 *&CompositingNode::getCLFrameCollage()
     return collageFrameReadout_ ;
 }
 
-void CompositingNode::setFrameData_HOST( uint* data ,
-                                         const uint8_t frameIndex )
-{
-    frames_[ frameIndex ]->setHostData( data );
-}
 
-void CompositingNode::loadFrameToDevice( const uint8_t frameIndex ,
-                                         const cl_bool block )
-{
-    frames_[ frameIndex ]->writeDeviceData( commandQueue_ , block );
-}
-
-void CompositingNode::collectFrame( const uint8_t frameIndex ,
-                                    cl_command_queue sourceCmdQueue,
-                                    const CLFrame32 &sourceFrame ,
+void CompositingNode::collectFrame( RenderingNode *renderingNode ,
                                     const cl_bool block )
 {
     //if the two buffers are in same context, copy the buffer directly in Device.
 
 
-    if( sourceFrame.inSameContext( *frames_[ frameIndex ]))
+    if( renderingNode->getContext() ==
+        frames_[ renderingNode ]->getContext( ))
     {
         //TODO: Create the CompositingNode at the same context of the
         //RenderingNode that attached to the same GPU.
@@ -81,39 +73,36 @@ void CompositingNode::collectFrame( const uint8_t frameIndex ,
     else
     {
 
-        frames_[ frameIndex ]->readOtherDeviceData( sourceCmdQueue ,
-                                                    sourceFrame ,
-                                                    block );
+        frames_[ renderingNode ]->
+                readOtherDeviceData( renderingNode->getCommandQueue() ,
+                                     *renderingNode->getCLFrame() ,
+                                     block );
 
-        frames_[ frameIndex ]->writeDeviceData( commandQueue_ ,
-                                                block );
+        frames_[ renderingNode ]->
+                writeDeviceData( commandQueue_ ,
+                                 block );
     }
 
 }
 
-void CompositingNode::accumulateFrame_DEVICE( const uint frameIndex )
+void CompositingNode::accumulateFrame_DEVICE( RenderingNode *renderingNode )
 {   
     //if first frame, it is already written to collageFrame, return.
     if( compositedFramesCount_ == 0 )
     {
         //        LOG_DEBUG("Frame[%d] as Collage Buffer", frameIndex );
         //make first loaded frame buffer as collage frame.
-        collageFrame_ = frames_[ frameIndex ];
-        collageBufferFrameIndex_ = frameIndex ;
+        collageFrame_ = frames_[ renderingNode ];
 
         compositingKernel_->
-                setCollageFrame( frames_[ frameIndex ]->getDeviceData() );
+                setCollageFrame( collageFrame_->getDeviceData( ));
 
         ++compositedFramesCount_;
         return ;
     }
 
 
-    if( collageBufferFrameIndex_ == frameIndex )
-    {
-        LOG_ERROR("Accumulating Collage Frame to itself!!");
-    }
-    const CLFrame32 *currentFrame = frames_[ frameIndex ];
+    const CLFrame32 *currentFrame = frames_[ renderingNode ];
 
 
     const cl_mem currentFrameObject = currentFrame->getDeviceData();
@@ -147,40 +136,9 @@ void CompositingNode::accumulateFrame_DEVICE( const uint frameIndex )
     }
 
     clFinish( commandQueue_ );
-//    LOG_DEBUG("[DONE] Accumulating Frame[%d]", frameIndex );
+    //    LOG_DEBUG("[DONE] Accumulating Frame[%d]", frameIndex );
 
     compositedFramesCount_ ++;
-}
-
-void CompositingNode::compositeFrames_DEVICE()
-{
-
-    // Assume everything is fine in the begnning
-    cl_int clErrorCode = CL_SUCCESS;
-
-
-    const size_t localSize[ ] = { 1 , 1  };
-    const size_t globalSize[ ] = { collageFrameDimensions_.x ,
-                                   collageFrameDimensions_.y  } ;
-
-    clErrorCode =
-            clEnqueueNDRangeKernel( commandQueue_ ,
-                                    compositingKernel_->getKernelObject() ,
-                                    2 ,
-                                    NULL ,
-                                    globalSize ,
-                                    localSize ,
-                                    0 ,
-                                    NULL ,
-                                    NULL ) ;
-    if( clErrorCode != CL_SUCCESS )
-    {
-        oclHWDL::Error::checkCLError( clErrorCode );
-        LOG_ERROR("OpenCL Error!");
-    }
-
-    clFinish( commandQueue_ );
-
 }
 
 void CompositingNode::loadCollageFromDevice()
@@ -243,16 +201,6 @@ void CompositingNode::initializeBuffers_()
 
     collageFrameReadout_ = new CLFrame32( collageFrameDimensions_ );
 
-    for( auto i = 0 ; i < framesCount_ ; i++ )
-    {
-        auto frame = new CLFrame32( collageFrameDimensions_ );
-        frame->createDeviceData( context_ );
-        frames_.push_back( frame );
-    }
-
-
-    //set CollageFrame to the first frame
-    collageFrame_ = frames_[ 0 ] ;
 
     LOG_DEBUG("[DONE] Initializing Buffers ...");
 
@@ -265,10 +213,6 @@ void CompositingNode::initializeKernel_()
     compositingKernel_ =
             new CLXRayCompositingKernel( context_ ,
                                          "xray_compositing_accumulate" );
-
-    //set arguments of xray_composite kernel.
-    compositingKernel_->setCollageFrame( collageFrame_->getDeviceData() );
-
 
     LOG_DEBUG( "[DONE] Initializing an OpenCL Kernel ... " );
 }

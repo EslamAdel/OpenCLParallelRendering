@@ -4,8 +4,7 @@
 VirtualTaskCollect::VirtualTaskCollect( VirtualRenderingNode *renderingNode,
                                         VirtualCompositingNode *compositingNode)
     : renderingNode_( renderingNode ) ,
-      compositingNode_( compositingNode ) ,
-      frameIndex_( renderingNode_->getFrameIndex() )
+      compositingNode_( compositingNode )
 {
     setAutoDelete( false );
 }
@@ -13,10 +12,8 @@ VirtualTaskCollect::VirtualTaskCollect( VirtualRenderingNode *renderingNode,
 void VirtualTaskCollect::run()
 {
 
-    LOG_DEBUG("collecting frame %d", frameIndex_ );
-    compositingNode_->collectFrame( frameIndex_ ,
-                                    renderingNode_->getCommandQueue() ,
-                                    *renderingNode_->getCLFrame() ,
+    LOG_DEBUG("collecting frame %d", renderingNode_->getGPUIndex() );
+    compositingNode_->collectFrame( renderingNode_ ,
                                     CL_TRUE );
 
 

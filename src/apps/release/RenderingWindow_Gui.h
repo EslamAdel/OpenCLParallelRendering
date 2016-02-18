@@ -1,33 +1,33 @@
-#ifndef RENDERINGWINDOW_H
-#define RENDERINGWINDOW_H
+#ifndef RENDERINGWINDOW_GUI_H
+#define RENDERINGWINDOW_GUI_H
 
-#include <QtWidgets/QMainWindow>
+
 #include <QMainWindow>
 #include <CLContext.h>
 #include <Headers.hh>
-#include "ParallelRendering.h"
-#include "VirtualParallelRendering.h"
-#include "RenderingNode.h"
 #include <vector>
 #include <QLabel>
+
+#include "ParallelRendering.h"
+#include "RenderingNode.h"
 #include "ProfilingExterns.h"
 
 namespace Ui
 {
-class RenderingWindow;
+class RenderingWindow_Gui;
 }
 
-class RenderingWindow : public QMainWindow
-{   
+class RenderingWindow_Gui : public QMainWindow
+{
     Q_OBJECT
 
 public:
 
-    RenderingWindow( ParallelRendering *parallelRenderer ,
-                     QWidget *parent = 0 ) ;
+    RenderingWindow_Gui( ParallelRendering *parallelRenderer ,
+                         QWidget *parent = 0 ) ;
 
 
-    ~RenderingWindow( );
+    ~RenderingWindow_Gui( );
 
 private:
 
@@ -88,7 +88,7 @@ private slots:
 
 
 private:
-    Ui::RenderingWindow *ui;
+    Ui::RenderingWindow_Gui *ui;
 
 
     ParallelRendering *parallelRenderer_ ;
@@ -100,4 +100,4 @@ private:
     //std::vector
 };
 
-#endif // RENDERINGWINDOW_H
+#endif // RENDERINGWINDOW_GUI_H

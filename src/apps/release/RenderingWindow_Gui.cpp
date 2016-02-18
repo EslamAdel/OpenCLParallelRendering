@@ -1,16 +1,16 @@
-#include "RenderingWindow.h"
-#include "ui_RenderingWindow.h"
-#include <Logger.h>
+#include "RenderingWindow_Gui.h"
+#include "ui_RenderingWindow_Gui.h"
+
 #include <QFileDialog>
 #include <QDateTime>
-#include <QDir>
-#include <QPicture>
 
+#include "Logger.h"
 
-RenderingWindow::RenderingWindow( ParallelRendering *parallelRenderer ,
-                                  QWidget *parent )
+RenderingWindow_Gui::RenderingWindow_Gui(
+        ParallelRendering *parallelRenderer ,
+        QWidget *parent )
     : QMainWindow( parent ),
-      ui( new Ui::RenderingWindow )
+      ui( new Ui::RenderingWindow_Gui )
 {
     parallelRenderer_ = parallelRenderer ;
 
@@ -24,15 +24,12 @@ RenderingWindow::RenderingWindow( ParallelRendering *parallelRenderer ,
 
     QVector< QLabel* > labels ;
 
-//    ui->frameContainer0->setEnabled( false );
     frameContainers_.push_back( ui->frameContainer0 );
     labels.push_back( ui->labelGPU0 );
 
-//    ui->frameContainer1->setEnabled( false );
     frameContainers_.push_back( ui->frameContainer1 );
     labels.push_back( ui->labelGPU1 );
 
-//    ui->frameContainer2->setEnabled( false );
     frameContainers_.push_back( ui->frameContainer2 );
     labels.push_back( ui->labelGPU2 );
 
@@ -44,12 +41,12 @@ RenderingWindow::RenderingWindow( ParallelRendering *parallelRenderer ,
     startRendering_( );
 }
 
-RenderingWindow::~RenderingWindow( )
+RenderingWindow_Gui::~RenderingWindow_Gui( )
 {
     delete ui;
 }
 
-void RenderingWindow::intializeConnections_()
+void RenderingWindow_Gui::intializeConnections_()
 {
     //parallelRenderer_
     connect( parallelRenderer_ ,
@@ -111,12 +108,10 @@ void RenderingWindow::intializeConnections_()
     connect( ui->offsetSlider , SIGNAL( valueChanged(int)) ,
              this , SLOT(newTransferFunctionOffset_SLOT(int)) );
 
-
-
 }
 
 
-void RenderingWindow::startRendering_( )
+void RenderingWindow_Gui::startRendering_( )
 {
     //set slider ranges
     ui->xTranslationSlider->setRange(-5,5);
@@ -179,7 +174,7 @@ void RenderingWindow::startRendering_( )
 
 }
 
-void RenderingWindow::displayFrame_( QPixmap *frame , uint id )
+void RenderingWindow_Gui::displayFrame_( QPixmap *frame , uint id )
 {
 
     frameContainers_[ id ]->setPixmap
@@ -190,8 +185,8 @@ void RenderingWindow::displayFrame_( QPixmap *frame , uint id )
 
 }
 
-void RenderingWindow::frameReady_SLOT( QPixmap *frame ,
-                                       const RenderingNode *node )
+void RenderingWindow_Gui::frameReady_SLOT( QPixmap *frame ,
+                                                const RenderingNode *node )
 {
     uint index = node->getFrameIndex();
 
@@ -199,7 +194,7 @@ void RenderingWindow::frameReady_SLOT( QPixmap *frame ,
         displayFrame_( frame , index );
 }
 
-void RenderingWindow::collageFrameReady_SLOT( QPixmap *finalFrame )
+void RenderingWindow_Gui::collageFrameReady_SLOT( QPixmap *finalFrame )
 {
     finalFrame_ = finalFrame;
     ui->frameContainerResult->
@@ -208,21 +203,21 @@ void RenderingWindow::collageFrameReady_SLOT( QPixmap *finalFrame )
                                            Qt::KeepAspectRatio ));
 }
 
-void RenderingWindow::newXRotation_SLOT(int value)
+void RenderingWindow_Gui::newXRotation_SLOT(int value)
 {
     ui->xRotationValue->setText(QString::number(value));
 
     parallelRenderer_->updateRotationX_SLOT( value );
 }
 
-void RenderingWindow::newYRotation_SLOT(int value)
+void RenderingWindow_Gui::newYRotation_SLOT(int value)
 {
     ui->yRotationValue->setText(QString::number(value));
 
     parallelRenderer_->updateRotationY_SLOT( value );
 }
 
-void RenderingWindow::newZRotation_SLOT(int value)
+void RenderingWindow_Gui::newZRotation_SLOT(int value)
 {
     ui->zRotationValue->setText( QString::number( value ));
 
@@ -230,50 +225,50 @@ void RenderingWindow::newZRotation_SLOT(int value)
 
 }
 
-void RenderingWindow::newXTranslation_SLOT(int value)
+void RenderingWindow_Gui::newXTranslation_SLOT(int value)
 {
     ui->xTranslationValue->setText( QString::number( value ));
 
     parallelRenderer_->updateTranslationX_SLOT( value );
 }
 
-void RenderingWindow::newYTranslation_SLOT(int value)
+void RenderingWindow_Gui::newYTranslation_SLOT(int value)
 {
     ui->yTranslationValue->setText( QString::number( value ));
 
     parallelRenderer_->updateTranslationY_SLOT( value );
 }
 
-void RenderingWindow::newZTranslation_SLOT(int value)
+void RenderingWindow_Gui::newZTranslation_SLOT(int value)
 {
     ui->zTranslationValue->setText( QString::number( value ));
-    parallelRenderer_->updateTranslationZ_SLOT( value );
+    //parallelRenderer_->updateTranslationZ_SLOT( value );
 
 }
 
-void RenderingWindow::newXScaling_SLOT(int value)
+void RenderingWindow_Gui::newXScaling_SLOT(int value)
 {
     ui->xScalingValue->setText( QString::number( value ));
 }
 
-void RenderingWindow::newYScaling_SLOT(int value)
+void RenderingWindow_Gui::newYScaling_SLOT(int value)
 {
     ui->yScalingValue->setText( QString::number( value ));
 }
 
-void RenderingWindow::newZScaling_SLOT(int value)
+void RenderingWindow_Gui::newZScaling_SLOT(int value)
 {
     ui->zScalingValue->setText( QString::number( value ));
 }
 
-void RenderingWindow::newXYZScaling_SLOT(int value)
+void RenderingWindow_Gui::newXYZScaling_SLOT(int value)
 {
     ui->xyzScalingValue->setText( QString::number( value ));
 }
 
 
 
-void RenderingWindow::newBrightness_SLOT(int value)
+void RenderingWindow_Gui::newBrightness_SLOT(int value)
 {
     ui->brightnessValue->setText( QString::number( value ));
 
@@ -282,7 +277,7 @@ void RenderingWindow::newBrightness_SLOT(int value)
 
 }
 
-void RenderingWindow::newDensity_SLOT(int value)
+void RenderingWindow_Gui::newDensity_SLOT(int value)
 {
     ui->densityValue->setText( QString::number( value ));
 
@@ -292,26 +287,26 @@ void RenderingWindow::newDensity_SLOT(int value)
 
 
 
-void RenderingWindow::newTransferFunctionScale_SLOT(int value)
+void RenderingWindow_Gui::newTransferFunctionScale_SLOT(int value)
 {
     ui->scaleValue->setText( QString::number(1.0+(float)value/100 ));
 
     float scale = 1.0f+float( value ) / 100.0;
-    parallelRenderer_->updateTransferFunctionScale_SLOT( scale );
+    //parallelRenderer_->updateTransferFunctionScale_SLOT( scale );
 
 }
 
-void RenderingWindow::newTransferFunctionOffset_SLOT(int value)
+void RenderingWindow_Gui::newTransferFunctionOffset_SLOT(int value)
 {
     ui->offsetValue->setText( QString::number((float) value/100));
 
     float offset = float( value ) / 100.0;
-    parallelRenderer_->updateTransferFunctionOffset_SLOT( offset );
+    //parallelRenderer_->updateTransferFunctionOffset_SLOT( offset );
 
 }
 
 
-void RenderingWindow::captureView_SLOT()
+void RenderingWindow_Gui::captureView_SLOT()
 {
     QString dir =
             QFileDialog::
@@ -323,31 +318,30 @@ void RenderingWindow::captureView_SLOT()
 
     QString date = QDateTime::currentDateTime().toString( "hh-mm-ss" );
 
-//    QString newDir = dir + QString( "/" ) + date +
-//                     QString( "[%1x%2]" ).arg( QString::number( FRAME_WIDTH ) ,
-//                                               QString::number( FRAME_HEIGHT ));
-//    QDir createDir;
-//    createDir.mkdir( newDir );
-//    LOG_DEBUG("New Dir:%s" , newDir.toStdString().c_str() );
+    //    QString newDir = dir + QString( "/" ) + date +
+    //                     QString( "[%1x%2]" ).arg( QString::number( FRAME_WIDTH ) ,
+    //                                               QString::number( FRAME_HEIGHT ));
+    //    QDir createDir;
+    //    createDir.mkdir( newDir );
+    //    LOG_DEBUG("New Dir:%s" , newDir.toStdString().c_str() );
 
 
-//    QPixmap pic( finalFrame_->
-//                 scaledToHeight( FRAME_WIDTH ).scaledToWidth( FRAME_HEIGHT ));
-//    pic.save( newDir + "/result.jpg");
+    //    QPixmap pic( finalFrame_->
+    //                 scaledToHeight( FRAME_WIDTH ).scaledToWidth( FRAME_HEIGHT ));
+    //    pic.save( newDir + "/result.jpg");
 
-//    int i = 0;
-//    for( const QLabel *frame : frameContainers_ )
-//    {
-//        if( frame->isEnabled() )
-//        {
-//            QPixmap framePixmap( parallelRenderer_->getRenderingNode( i ).
-//                                 getCLFrame()->getFramePixmap().
-//                                 scaledToHeight( FRAME_WIDTH ).
-//                                 scaledToWidth( FRAME_HEIGHT ));
+    //    int i = 0;
+    //    for( const QLabel *frame : frameContainers_ )
+    //    {
+    //        if( frame->isEnabled() )
+    //        {
+    //            QPixmap framePixmap( parallelRenderer_->getRenderingNode( i ).
+    //                                 getCLFrame()->getFramePixmap().
+    //                                 scaledToHeight( FRAME_WIDTH ).
+    //                                 scaledToWidth( FRAME_HEIGHT ));
 
-//            framePixmap.save( newDir + QString("/GPU%1.jpg").arg(i++) );
-//        }
+    //            framePixmap.save( newDir + QString("/GPU%1.jpg").arg(i++) );
+    //        }
     //    }
 }
-
 
