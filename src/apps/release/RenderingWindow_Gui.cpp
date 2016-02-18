@@ -79,16 +79,16 @@ void RenderingWindow_Gui::intializeConnections_()
              this , SLOT( newZTranslation_SLOT( int )));
 
     connect( ui->xScalingSlider , SIGNAL( valueChanged( int )),
-             this , SLOT( newYScaling_SLOT( int )));
+             this , SLOT( newXScaling_SLOT( int )));
 
     connect( ui->yScalingSlider , SIGNAL( valueChanged( int )),
              this , SLOT( newYScaling_SLOT( int )));
 
     connect( ui->zScalingSlider , SIGNAL( valueChanged( int )),
-             this , SLOT( newYScaling_SLOT( int )));
+             this , SLOT( newZScaling_SLOT( int )));
 
     connect( ui->xyzScalingSlider , SIGNAL( valueChanged( int )),
-             this , SLOT( newYScaling_SLOT( int )));
+             this , SLOT( newXYZScaling_SLOT( int )));
 
     connect( ui->brightnessSlider , SIGNAL( valueChanged( int )),
              this , SLOT( newBrightness_SLOT( int )));
@@ -242,28 +242,32 @@ void RenderingWindow_Gui::newYTranslation_SLOT(int value)
 void RenderingWindow_Gui::newZTranslation_SLOT(int value)
 {
     ui->zTranslationValue->setText( QString::number( value ));
-    //parallelRenderer_->updateTranslationZ_SLOT( value );
+    parallelRenderer_->updateTranslationZ_SLOT( value );
 
 }
 
 void RenderingWindow_Gui::newXScaling_SLOT(int value)
 {
     ui->xScalingValue->setText( QString::number( value ));
+    parallelRenderer_->updateScaleX_SLOT( value );
 }
 
 void RenderingWindow_Gui::newYScaling_SLOT(int value)
 {
     ui->yScalingValue->setText( QString::number( value ));
+    parallelRenderer_->updateScaleY_SLOT( value );
 }
 
 void RenderingWindow_Gui::newZScaling_SLOT(int value)
 {
     ui->zScalingValue->setText( QString::number( value ));
+    parallelRenderer_->updateScaleZ_SLOT( value );
 }
 
 void RenderingWindow_Gui::newXYZScaling_SLOT(int value)
 {
     ui->xyzScalingValue->setText( QString::number( value ));
+    parallelRenderer_->updateScaleXYZ_SLOT( value );
 }
 
 

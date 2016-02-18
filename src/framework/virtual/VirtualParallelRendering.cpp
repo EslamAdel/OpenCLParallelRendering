@@ -19,6 +19,7 @@ void VirtualParallelRendering::addRenderingNode( const uint64_t gpuIndex )
                                            frameHeight_ ,
                                            translationAsync_,
                                            rotationAsync_,
+                                           scaleAsync_,
                                            volumeDensityAsync_,
                                            brightnessAsync_  ,
                                            transferFunctionScaleAsync_,

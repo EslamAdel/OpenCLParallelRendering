@@ -260,6 +260,7 @@ void CLContext< T >::handleKernel(std::string string)
 template< class T >
 void CLContext< T >::paint( const Coordinates3D &rotation ,
                             const Coordinates3D &translation,
+                            const Coordinates3D &scale,
                             const float &volumeDensity ,
                             const float &imageBrightness ,
                             const float &transferFScale ,
@@ -284,6 +285,10 @@ void CLContext< T >::paint( const Coordinates3D &rotation ,
                                                 translation.y ,
                                                 4-translation.z );
 
+    auto scaleVector = glm::tvec3<float>(1/scale.x ,
+                                                  1/scale.y ,
+                                                      1/scale.z );
+
     //Calculating the translate value for each brick
     glm::tvec3< float > relativeCenterBack =
             glm::tvec3<float>( 2.f*(0.5 - volume_->getUnitCubeCenter().x) ,
@@ -301,6 +306,7 @@ void CLContext< T >::paint( const Coordinates3D &rotation ,
 
     //    //Scale at first
     glmMVMatrix = glm::scale(glmMVMatrix, unitSccale);
+    glmMVMatrix = glm::scale(glmMVMatrix, scaleVector);
     //    //Translate each brick to its position
     glmMVMatrix = glm::translate(glmMVMatrix , relativeCenterBack);
 

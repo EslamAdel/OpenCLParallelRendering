@@ -113,6 +113,7 @@ public:
      */
     void paint( const Coordinates3D &rotation ,
                 const Coordinates3D &translation,
+                const Coordinates3D &scale,
                 const float &volumeDensity ,
                 const float &imageBrightness ,
                 const float &transferFScale ,

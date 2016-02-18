@@ -4,6 +4,7 @@
 ################################################################################
 
 # Qt5 moccing
+set( CMAKE_PREFIX_PATH "/home/shrief/Qt5.5.1/5.5/gcc_64/")
 set( CMAKE_INCLUDE_CURRENT_DIR ON )
 set( CMAKE_AUTOMOC ON )
 

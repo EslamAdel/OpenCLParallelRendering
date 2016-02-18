@@ -10,6 +10,9 @@
 #define INITIAL_VOLUME_ROTATION_X 0.0
 #define INITIAL_VOLUME_ROTATION_Y 0.0
 #define INITIAL_VOLUME_ROTATION_Z 0.0
+#define INITIAL_VOLUME_SCALE_X 1.0
+#define INITIAL_VOLUME_SCALE_Y 1.0
+#define INITIAL_VOLUME_SCALE_Z 1.0
 #define INITIAL_TRANSFER_SCALE    1.0
 #define INITIAL_TRANSFER_OFFSET   0.0
 
@@ -51,6 +54,11 @@ ParallelRendering::ParallelRendering( Volume<uchar> *volume ,
     rotation_.y = INITIAL_VOLUME_ROTATION_Y;
     rotation_.z = INITIAL_VOLUME_ROTATION_Z;
 
+    //Scale
+    scale_.x = INITIAL_VOLUME_SCALE_X;
+    scale_.y = INITIAL_VOLUME_SCALE_Y;
+    scale_.z = INITIAL_VOLUME_SCALE_Z;
+
     //transfer parameters
     transferFunctionOffset_= INITIAL_TRANSFER_OFFSET;
     transferFunctionScale_ = INITIAL_TRANSFER_SCALE;
@@ -89,6 +97,7 @@ void ParallelRendering::addRenderingNode( const uint64_t gpuIndex)
                                              frameHeight_ ,
                                              translationAsync_,
                                              rotationAsync_,
+                                             scaleAsync_,
                                              volumeDensityAsync_,
                                              brightnessAsync_,
                                              transferFunctionScaleAsync_,
@@ -314,6 +323,7 @@ void ParallelRendering::syncTransformation_()
     // modified when no active rendering threads
     translationAsync_ = translation_;
     rotationAsync_ = rotation_;
+    scaleAsync_ = scale_;
     brightnessAsync_ = brightness_ ;
     volumeDensityAsync_ = volumeDensity_;
     transferFunctionScaleAsync_=transferFunctionScale_;
@@ -440,6 +450,35 @@ void ParallelRendering::updateTranslationZ_SLOT(int distance)
     else pendingTransformations_ = true ;
 }
 
+void ParallelRendering::updateScaleX_SLOT(int distance)
+{
+    scale_.x = distance;
+    if( renderingNodesReady_ ) applyTransformation_();
+    else pendingTransformations_ = true ;
+}
+
+void ParallelRendering::updateScaleY_SLOT(int distance)
+{
+    scale_.y = distance;
+    if( renderingNodesReady_ ) applyTransformation_();
+    else pendingTransformations_ = true ;
+}
+
+void ParallelRendering::updateScaleZ_SLOT(int distance)
+{
+    scale_.z = distance;
+    if( renderingNodesReady_ ) applyTransformation_();
+    else pendingTransformations_ = true ;
+}
+
+void ParallelRendering::updateScaleXYZ_SLOT(int distance)
+{
+    scale_.x = distance;
+    scale_.y = distance;
+    scale_.z = distance;
+    if( renderingNodesReady_ ) applyTransformation_();
+    else pendingTransformations_ = true ;
+}
 
 void ParallelRendering::updateImageBrightness_SLOT(float brightness)
 {

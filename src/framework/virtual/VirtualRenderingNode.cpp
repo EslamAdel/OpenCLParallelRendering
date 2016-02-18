@@ -5,12 +5,13 @@ VirtualRenderingNode::VirtualRenderingNode( const uint64_t gpuIndex,
                                             const uint frameHeight ,
                                             const Coordinates3D &globalTranslation,
                                             const Coordinates3D &globalRotation,
+                                            const Coordinates3D &globalScale,
                                             const float &volumeDensity,
                                             const float &brightness,
                                             const float &transferScale,
                                             const float &transferOffset)
     : RenderingNode( 0 , frameWidth , frameHeight , globalTranslation ,
-                     globalRotation , volumeDensity , brightness,
+                     globalRotation , globalScale ,volumeDensity , brightness,
                      transferScale,transferOffset  ) ,
       gpuIndex_VIRTUAL_( gpuIndex )
 {

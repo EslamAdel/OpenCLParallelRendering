@@ -201,6 +201,27 @@ public slots :
      * @param distance
      */
     void updateTranslationZ_SLOT( int distance );
+
+    /**
+     * @brief updateScaleX_SLOT
+     * @param distance
+     */
+    void updateScaleX_SLOT( int distance );
+    /**
+     * @brief updateScaleY_SLOT
+     * @param distance
+     */
+    void updateScaleY_SLOT( int distance );
+    /**
+     * @brief updateScaleZ_SLOT
+     * @param distance
+     */
+    void updateScaleZ_SLOT( int distance );
+    /**
+     * @brief updateScaleXYZ_SLOT
+     * @param distance
+     */
+    void updateScaleXYZ_SLOT( int distance );
     /**
      * @brief updateImageBrightness_SLOT
      * @param brithness
@@ -273,6 +294,7 @@ protected:
     //Transformation parameters
     Coordinates3D rotation_;
     Coordinates3D translation_;
+    Coordinates3D scale_;
     float brightness_;
     float volumeDensity_;
     float transferFunctionScale_;
@@ -284,6 +306,7 @@ protected:
     //modified using syncTransformation_()
     Coordinates3D rotationAsync_;
     Coordinates3D translationAsync_;
+    Coordinates3D scaleAsync_;
     float brightnessAsync_;
     float volumeDensityAsync_;
     float transferFunctionScaleAsync_;
