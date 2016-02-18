@@ -306,12 +306,12 @@ void CLContext< T >::paint( const Coordinates3D &rotation ,
 
     //    //Scale at first
     glmMVMatrix = glm::scale(glmMVMatrix, unitSccale);
-    glmMVMatrix = glm::scale(glmMVMatrix, scaleVector);
     //    //Translate each brick to its position
     glmMVMatrix = glm::translate(glmMVMatrix , relativeCenterBack);
 
 
     // Rotate , and then translate to keep the local rotation
+    glmMVMatrix = glm::scale(glmMVMatrix, scaleVector);
 
     glmMVMatrix = glm::rotate( glmMVMatrix , angle , axis );
 
