@@ -292,7 +292,7 @@ void RenderingWindow_Gui::newTransferFunctionScale_SLOT(int value)
     ui->scaleValue->setText( QString::number(1.0+(float)value/100 ));
 
     float scale = 1.0f+float( value ) / 100.0;
-    //parallelRenderer_->updateTransferFunctionScale_SLOT( scale );
+    parallelRenderer_->updateTransferFunctionScale_SLOT( scale );
 
 }
 
@@ -301,7 +301,7 @@ void RenderingWindow_Gui::newTransferFunctionOffset_SLOT(int value)
     ui->offsetValue->setText( QString::number((float) value/100));
 
     float offset = float( value ) / 100.0;
-    //parallelRenderer_->updateTransferFunctionOffset_SLOT( offset );
+    parallelRenderer_->updateTransferFunctionOffset_SLOT( offset );
 
 }
 

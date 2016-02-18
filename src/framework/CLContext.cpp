@@ -239,12 +239,12 @@ void CLContext< T >::handleKernel(std::string string)
 
     //Set the initial Value of the Transfer function offset and scale
     //TODO add Slider to update these values.
-    float transferOffset = 0.0f;
-    float transferScale = 1.0f;
+//    float transferOffset = 0.0f;
+//    float transferScale = 1.0f;
 
-    activeRenderingKernel_->setTransferFunctionOffset(transferOffset);
+//    activeRenderingKernel_->setTransferFunctionOffset(transferOffset);
 
-    activeRenderingKernel_->setTransferFunctionScale(transferScale);
+//    activeRenderingKernel_->setTransferFunctionScale(transferScale);
 
     inverseMatrix_ = clCreateBuffer( context_,
                                      CL_MEM_READ_ONLY,

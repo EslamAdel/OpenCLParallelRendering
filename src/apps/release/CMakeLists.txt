@@ -7,14 +7,17 @@ message("Featured Gui Executable Setting...")
 set( OCL_MGPUVR_FEATURED_EXECUTABLE "oclMGPUVR_Gui" )
 
 ## BENCHMARKING source/header files.
-set( OCL_MGPUVR_FEATURED_HEADER_FILES RenderingWindow_Gui.h )
+set( OCL_MGPUVR_FEATURED_HEADER_FILES RenderingWindow_Gui.h
+                                      ../develop/CommandLineParser.h )
 
 set( OCL_MGPUVR_FEATURED_SOURCE_FILES
                                 oclMGPUVR_Gui.cpp
-                                RenderingWindow_Gui.cpp )
+                                RenderingWindow_Gui.cpp
+                                ../develop/CommandLineParser.cpp )
 
 set( OCL_MGPUVR_FEATURED_APP_FORMS RenderingWindow_Gui.ui )
 
+include_directories( ../develop)
 
 qt5_wrap_ui( OCL_MGPUVR_FEATURED_APP_FORMS_MOC ${OCL_MGPUVR_FEATURED_APP_FORMS} )
 
