@@ -65,15 +65,6 @@ private slots:
 
     void newYTranslation_SLOT( int value );
 
-    void newZTranslation_SLOT( int value );
-
-    void newXScaling_SLOT( int value );
-
-    void newYScaling_SLOT( int value );
-
-    void newZScaling_SLOT( int value );
-
-    void newXYZScaling_SLOT( int value );
 
     void newBrightness_SLOT( int value );
 
@@ -81,11 +72,6 @@ private slots:
     void newDensity_SLOT( int value );
 
     void captureView_SLOT() ;
-
-    void newTransferFunctionScale_SLOT(int value);
-
-    void newTransferFunctionOffset_SLOT(int value);
-
 
 private:
     Ui::RenderingWindow *ui;
