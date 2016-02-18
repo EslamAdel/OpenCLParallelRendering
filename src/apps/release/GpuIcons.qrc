@@ -1,0 +1,8 @@
+<RCC>
+    <qresource prefix="/">
+        <file alias="nvidia">images/nvidia.jpg</file>
+        <file alias="intel">images/intel.jpg</file>
+        <file alias="ati">images/ati.png</file>
+        <file alias="other">images/other.jpg</file>
+    </qresource>
+</RCC>
