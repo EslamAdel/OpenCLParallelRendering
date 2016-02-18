@@ -18,8 +18,8 @@
   </property>
   <property name="minimumSize">
    <size>
-    <width>700</width>
-    <height>593</height>
+    <width>845</width>
+    <height>658</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -34,14 +34,9 @@ background-color:#262626;
 }
 QLabel{
 color:#ffffff;
+	font: 75 11pt &quot;Ubuntu Condensed&quot;;
 }
-#imageParamtersFrame
-{
-border: #3B3131;
-background:#3D3C3A;
-border-radius: 3px;
 
-}
 QRadioButton{
 	color:#fff;
 	font:bold;
@@ -51,34 +46,11 @@ QRadioButton::inidacator{
 	color:black;
    background:black;
 }
-#Rframe
-{
-border: #3B3131;
-background:#3D3C3A;
-border-radius: 3px;
-}
-
-#transfer_widget
-{
-border: #3B3131;
-background:#3D3C3A;
-border-radius: 3px;
-}
 
 
-#Tframe
-{
-border: #3B3131;
-background:#3D3C3A;
-border-radius: 3px;
-}
 
-#Sframe
-{
-border: #3B3131;
-border-radius: 3px;
-background:#3D3C3A;
-}
+
+
 
 
 </string>
@@ -282,23 +254,75 @@ color:#fff;
      <rect>
       <x>20</x>
       <y>10</y>
-      <width>261</width>
-      <height>571</height>
+      <width>291</width>
+      <height>601</height>
      </rect>
     </property>
     <property name="styleSheet">
-     <string notr="true"> QTabWidget::pane { /* The tab widget frame */
+     <string notr="true">
+QTabWidget::pane { /* The tab widget frame */
      border-top: 2px solid #C2C7CB;
  }
+/**
 QTabBar::tab:selected
 {
     color: #DEF600;
     background: qlineargradient( x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #262626, stop: 1.0 #3D3D3D );
 }
+**/
+
+QTabWidget::tab-bar {
+    left: 5px; /* move to the right by 5px */
+}
+
+/* Style the tab using the tab sub-control. Note that
+    it reads QTabBar _not_ QTabWidget */
+QTabBar::tab {
+/**
+    background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                stop: 0 #E1E1E1, stop: 0.4 #DDDDDD,
+                                stop: 0.5 #D8D8D8, stop: 1.0 #D3D3D3);
+**/
+	
+	
+	
+	
+    background-color: qlineargradient(spread:pad, x1:0.734, y1:0.4655, x2:0.871, y2:0, stop:0 rgba(0, 0, 0, 255), stop:1 rgba(176, 176, 176, 255));
+
+	color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(255, 242, 196, 242), stop:1 rgba(255, 255, 255, 255));
+
+	font: 75 12pt &quot;Ubuntu Condensed&quot;;
+    border: 2px solid #C4C4C3;
+    border-bottom-color: #C2C7CB; /* same as the pane color */
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+    min-width: 10ex;
+    padding: 8px;
+}
+
+QTabBar::tab:selected, QTabBar::tab:hover {
+/**
+ background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                stop: 0 #fafafa, stop: 0.4 #f4f4f4,
+                                stop: 0.5 #e7e7e7, stop: 1.0 #fafafa);
+**/
+	background-color: qlineargradient(spread:pad, x1:0.956, y1:0.653, x2:1, y2:0, stop:0 rgba(22, 18, 18, 255), stop:1 rgba(255, 255, 255, 255));
+	
+}
+
+QTabBar::tab:selected {
+    border-color: #9B9B9B;
+    border-bottom-color: #C2C7CB; /* same as pane color */
+}
+
+QTabBar::tab:!selected {
+    margin-top: 2px; /* make non-selected tabs look smaller */
+}
+
 </string>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>1</number>
     </property>
     <widget class="QWidget" name="tab">
      <attribute name="title">
@@ -307,11 +331,27 @@ QTabBar::tab:selected
      <widget class="QFrame" name="Tframe">
       <property name="geometry">
        <rect>
-        <x>0</x>
-        <y>150</y>
-        <width>261</width>
+        <x>1</x>
+        <y>160</y>
+        <width>279</width>
         <height>131</height>
        </rect>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>279</width>
+        <height>131</height>
+       </size>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">#Tframe
+{
+background:#3D3C3A;
+    border-width: 1px;
+    border-style:   solid;
+	border-color: rgb(255, 255, 255);
+}
+</string>
       </property>
       <property name="frameShape">
        <enum>QFrame::StyledPanel</enum>
@@ -327,6 +367,12 @@ QTabBar::tab:selected
          <width>241</width>
          <height>119</height>
         </rect>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>241</width>
+         <height>119</height>
+        </size>
        </property>
        <widget class="QLabel" name="xTranslationValue">
         <property name="geometry">
@@ -369,7 +415,7 @@ border-radius: 4px;
 }
 
 QSlider::add-page:horizontal {
-background: #fff;
+background-color: rgb(254, 224, 224);
 border: 1px solid #777;
 height: 10px;
 border-radius: 4px;
@@ -408,6 +454,9 @@ background: #eee;
 border: 1px solid #aaa;
 border-radius: 4px;
 }</string>
+        </property>
+        <property name="value">
+         <number>0</number>
         </property>
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
@@ -467,7 +516,7 @@ border-radius: 4px;
 }
 
 QSlider::add-page:horizontal {
-background: #fff;
+background-color: rgb(229, 248, 213);
 border: 1px solid #777;
 height: 10px;
 border-radius: 4px;
@@ -506,6 +555,9 @@ background: #eee;
 border: 1px solid #aaa;
 border-radius: 4px;
 }</string>
+        </property>
+        <property name="value">
+         <number>0</number>
         </property>
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
@@ -552,7 +604,7 @@ border-radius: 4px;
 }
 
 QSlider::add-page:horizontal {
-background: #fff;
+background-color: rgb(224, 227, 243);
 border: 1px solid #777;
 height: 10px;
 border-radius: 4px;
@@ -592,6 +644,9 @@ border: 1px solid #aaa;
 border-radius: 4px;
 }</string>
         </property>
+        <property name="value">
+         <number>0</number>
+        </property>
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
@@ -621,6 +676,9 @@ border-radius: 4px;
         <property name="text">
          <string>z</string>
         </property>
+        <property name="textFormat">
+         <enum>Qt::RichText</enum>
+        </property>
        </widget>
        <widget class="QLabel" name="yRotationLabel_9">
         <property name="geometry">
@@ -634,20 +692,41 @@ border-radius: 4px;
         <property name="text">
          <string>x</string>
         </property>
+        <property name="textFormat">
+         <enum>Qt::RichText</enum>
+        </property>
        </widget>
       </widget>
      </widget>
      <widget class="QFrame" name="Rframe">
       <property name="geometry">
        <rect>
-        <x>0</x>
-        <y>0</y>
-        <width>261</width>
+        <x>1</x>
+        <y>10</y>
+        <width>279</width>
         <height>141</height>
        </rect>
       </property>
+      <property name="minimumSize">
+       <size>
+        <width>279</width>
+        <height>141</height>
+       </size>
+      </property>
       <property name="styleSheet">
-       <string notr="true"/>
+       <string notr="true">#Rframe
+{
+background:#3D3C3A;
+    border-width: 1px;
+    border-style:   solid;
+	border-color: rgb(255, 255, 255);
+	
+
+	/**
+	border-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0.133971 rgba(255, 255, 125, 255), stop:1 rgba(255, 255, 255, 255));
+**/
+}
+</string>
       </property>
       <property name="frameShape">
        <enum>QFrame::StyledPanel</enum>
@@ -664,13 +743,14 @@ border-radius: 4px;
          <height>119</height>
         </rect>
        </property>
+       <property name="minimumSize">
+        <size>
+         <width>251</width>
+         <height>119</height>
+        </size>
+       </property>
        <property name="styleSheet">
-        <string notr="true">#Rframe
-{
-border: #463E3F;
-border-radius: 40px;
-background: white;
-}</string>
+        <string notr="true"/>
        </property>
        <widget class="QLabel" name="xRotationValue">
         <property name="geometry">
@@ -696,6 +776,9 @@ background: white;
         </property>
         <property name="text">
          <string>x</string>
+        </property>
+        <property name="textFormat">
+         <enum>Qt::RichText</enum>
         </property>
        </widget>
        <widget class="QSlider" name="xRotationSlider">
@@ -726,7 +809,7 @@ border-radius: 4px;
 }
 
 QSlider::add-page:horizontal {
-background: #fff;
+background-color: rgb(254, 224, 224);
 border: 1px solid #777;
 height: 10px;
 border-radius: 4px;
@@ -766,6 +849,9 @@ border: 1px solid #aaa;
 border-radius: 4px;
 }</string>
         </property>
+        <property name="value">
+         <number>0</number>
+        </property>
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
@@ -794,6 +880,9 @@ border-radius: 4px;
         </property>
         <property name="text">
          <string>y</string>
+        </property>
+        <property name="textFormat">
+         <enum>Qt::RichText</enum>
         </property>
        </widget>
        <widget class="QSlider" name="yRotationSlider">
@@ -824,7 +913,7 @@ border-radius: 4px;
 }
 
 QSlider::add-page:horizontal {
-background: #fff;
+background-color: rgb(229, 248, 213);
 border: 1px solid #777;
 height: 10px;
 border-radius: 4px;
@@ -863,6 +952,9 @@ background: #eee;
 border: 1px solid #aaa;
 border-radius: 4px;
 }</string>
+        </property>
+        <property name="value">
+         <number>0</number>
         </property>
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
@@ -909,7 +1001,7 @@ border-radius: 4px;
 }
 
 QSlider::add-page:horizontal {
-background: #fff;
+background-color: rgb(224, 227, 243);
 border: 1px solid #777;
 height: 10px;
 border-radius: 4px;
@@ -949,6 +1041,9 @@ border: 1px solid #aaa;
 border-radius: 4px;
 }</string>
         </property>
+        <property name="value">
+         <number>0</number>
+        </property>
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
@@ -978,17 +1073,35 @@ border-radius: 4px;
         <property name="text">
          <string>z</string>
         </property>
+        <property name="textFormat">
+         <enum>Qt::RichText</enum>
+        </property>
        </widget>
       </widget>
      </widget>
      <widget class="QFrame" name="Sframe">
       <property name="geometry">
        <rect>
-        <x>0</x>
-        <y>290</y>
-        <width>261</width>
+        <x>1</x>
+        <y>300</y>
+        <width>279</width>
         <height>161</height>
        </rect>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>279</width>
+        <height>161</height>
+       </size>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">#Sframe
+{
+background:#3D3C3A;
+    border-width: 1px;
+    border-style:   solid;
+	border-color: rgb(255, 255, 255);
+}</string>
       </property>
       <property name="frameShape">
        <enum>QFrame::StyledPanel</enum>
@@ -1002,8 +1115,14 @@ border-radius: 4px;
          <x>0</x>
          <y>10</y>
          <width>241</width>
-         <height>119</height>
+         <height>151</height>
         </rect>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>241</width>
+         <height>151</height>
+        </size>
        </property>
        <widget class="QLabel" name="xScalingValue">
         <property name="geometry">
@@ -1059,7 +1178,7 @@ border-radius: 4px;
 }
 
 QSlider::add-page:horizontal {
-background: #fff;
+background-color: rgb(254, 224, 224);
 border: 1px solid #777;
 height: 10px;
 border-radius: 4px;
@@ -1098,6 +1217,9 @@ background: #eee;
 border: 1px solid #aaa;
 border-radius: 4px;
 }</string>
+        </property>
+        <property name="value">
+         <number>0</number>
         </property>
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
@@ -1157,7 +1279,7 @@ border-radius: 4px;
 }
 
 QSlider::add-page:horizontal {
-background: #fff;
+background-color: rgb(229, 248, 213);
 border: 1px solid #777;
 height: 10px;
 border-radius: 4px;
@@ -1196,6 +1318,9 @@ background: #eee;
 border: 1px solid #aaa;
 border-radius: 4px;
 }</string>
+        </property>
+        <property name="value">
+         <number>0</number>
         </property>
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
@@ -1242,7 +1367,7 @@ border-radius: 4px;
 }
 
 QSlider::add-page:horizontal {
-background: #fff;
+background-color: rgb(224, 227, 243);
 border: 1px solid #777;
 height: 10px;
 border-radius: 4px;
@@ -1281,6 +1406,9 @@ background: #eee;
 border: 1px solid #aaa;
 border-radius: 4px;
 }</string>
+        </property>
+        <property name="value">
+         <number>0</number>
         </property>
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
@@ -1312,44 +1440,43 @@ border-radius: 4px;
          <string>z</string>
         </property>
        </widget>
-      </widget>
-      <widget class="QLabel" name="xyzScalingValue">
-       <property name="geometry">
-        <rect>
-         <x>220</x>
-         <y>120</y>
-         <width>20</width>
-         <height>20</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>0</string>
-       </property>
-      </widget>
-      <widget class="QLabel" name="yRotationLabel_7">
-       <property name="geometry">
-        <rect>
-         <x>30</x>
-         <y>120</y>
-         <width>67</width>
-         <height>17</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>xyz</string>
-       </property>
-      </widget>
-      <widget class="QSlider" name="xyzScalingSlider">
-       <property name="geometry">
-        <rect>
-         <x>30</x>
-         <y>130</y>
-         <width>201</width>
-         <height>29</height>
-        </rect>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">QSlider::groove:horizontal {
+       <widget class="QLabel" name="yRotationLabel_7">
+        <property name="geometry">
+         <rect>
+          <x>30</x>
+          <y>110</y>
+          <width>67</width>
+          <height>17</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>xyz</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="xyzScalingValue">
+        <property name="geometry">
+         <rect>
+          <x>220</x>
+          <y>110</y>
+          <width>20</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>0</string>
+        </property>
+       </widget>
+       <widget class="QSlider" name="xyzScalingSlider">
+        <property name="geometry">
+         <rect>
+          <x>30</x>
+          <y>120</y>
+          <width>201</width>
+          <height>29</height>
+         </rect>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QSlider::groove:horizontal {
 border: 1px solid #bbb;
 background: white;
 height: 7px;
@@ -1367,7 +1494,7 @@ border-radius: 4px;
 }
 
 QSlider::add-page:horizontal {
-background: #fff;
+background-color: rgb(238, 228, 211);
 border: 1px solid #777;
 height: 10px;
 border-radius: 4px;
@@ -1406,24 +1533,55 @@ background: #eee;
 border: 1px solid #aaa;
 border-radius: 4px;
 }</string>
-       </property>
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
+        </property>
+        <property name="value">
+         <number>0</number>
+        </property>
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+       </widget>
+       <zorder>xScalingValue</zorder>
+       <zorder>xRotationLabel_3</zorder>
+       <zorder>xScalingSlider</zorder>
+       <zorder>yScalingValue</zorder>
+       <zorder>yRotationLabel_5</zorder>
+       <zorder>yScalingSlider</zorder>
+       <zorder>label_15</zorder>
+       <zorder>zScalingSlider</zorder>
+       <zorder>zScalingValue</zorder>
+       <zorder>yRotationLabel_6</zorder>
+       <zorder>xyzScalingSlider</zorder>
+       <zorder>yRotationLabel_7</zorder>
+       <zorder>xyzScalingValue</zorder>
+       <zorder>xyzScalingSlider</zorder>
       </widget>
-      <zorder>xyzScalingValue</zorder>
-      <zorder>xyzScalingSlider</zorder>
-      <zorder>ScalingWidget</zorder>
-      <zorder>yRotationLabel_7</zorder>
      </widget>
      <widget class="QFrame" name="imageParamtersFrame">
       <property name="geometry">
        <rect>
-        <x>0</x>
-        <y>460</y>
-        <width>271</width>
-        <height>91</height>
+        <x>1</x>
+        <y>470</y>
+        <width>279</width>
+        <height>108</height>
        </rect>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>279</width>
+        <height>108</height>
+       </size>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">#imageParamtersFrame
+{
+
+background:#3D3C3A;
+    border-width: 1px;
+    border-style:   solid;
+	border-color: rgb(255, 255, 255);
+
+}</string>
       </property>
       <property name="frameShape">
        <enum>QFrame::StyledPanel</enum>
@@ -1439,6 +1597,12 @@ border-radius: 4px;
          <width>221</width>
          <height>141</height>
         </rect>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>221</width>
+         <height>141</height>
+        </size>
        </property>
        <widget class="QSlider" name="brightnessSlider">
         <property name="geometry">
@@ -1468,7 +1632,7 @@ border-radius: 4px;
 }
 
 QSlider::add-page:horizontal {
-background: #fff;
+background-color: rgb(255, 234, 211);
 border: 1px solid #777;
 height: 10px;
 border-radius: 4px;
@@ -1507,6 +1671,9 @@ background: #eee;
 border: 1px solid #aaa;
 border-radius: 4px;
 }</string>
+        </property>
+        <property name="value">
+         <number>10</number>
         </property>
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
@@ -1540,7 +1707,7 @@ border-radius: 4px;
 }
 
 QSlider::add-page:horizontal {
-background: #fff;
+background-color: rgb(233, 241, 255);
 border: 1px solid #777;
 height: 10px;
 border-radius: 4px;
@@ -1579,6 +1746,9 @@ background: #eee;
 border: 1px solid #aaa;
 border-radius: 4px;
 }</string>
+        </property>
+        <property name="value">
+         <number>10</number>
         </property>
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
@@ -1652,13 +1822,23 @@ border-radius: 4px;
         <height>119</height>
        </rect>
       </property>
+      <property name="minimumSize">
+       <size>
+        <width>251</width>
+        <height>119</height>
+       </size>
+      </property>
       <property name="styleSheet">
-       <string notr="true">#Rframe
+       <string notr="true">
+
+#transfer_widget
 {
-border: #463E3F;
-border-radius: 40px;
-background: white;
-}</string>
+background:#3D3C3A;
+    border-width: 1px;
+    border-style:   solid;
+	border-color: rgb(255, 255, 255);
+}
+</string>
       </property>
       <widget class="QLabel" name="offsetValue">
        <property name="geometry">
@@ -1714,7 +1894,7 @@ border-radius: 4px;
 }
 
 QSlider::add-page:horizontal {
-background: #fff;
+background-color: rgb(254, 224, 224);
 border: 1px solid #777;
 height: 10px;
 border-radius: 4px;
@@ -1753,6 +1933,9 @@ background: #eee;
 border: 1px solid #aaa;
 border-radius: 4px;
 }</string>
+       </property>
+       <property name="value">
+        <number>0</number>
        </property>
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
@@ -1812,7 +1995,7 @@ border-radius: 4px;
 }
 
 QSlider::add-page:horizontal {
-background: #fff;
+background-color: rgb(229, 248, 213);
 border: 1px solid #777;
 height: 10px;
 border-radius: 4px;
@@ -1852,6 +2035,9 @@ border: 1px solid #aaa;
 border-radius: 4px;
 }</string>
        </property>
+       <property name="value">
+        <number>0</number>
+       </property>
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
        </property>
@@ -1861,17 +2047,21 @@ border-radius: 4px;
         <rect>
          <x>30</x>
          <y>0</y>
-         <width>101</width>
+         <width>211</width>
          <height>17</height>
         </rect>
        </property>
        <property name="text">
-        <string>parameters</string>
+        <string>Transfer Functoin Parameters</string>
        </property>
       </widget>
      </widget>
     </widget>
    </widget>
+   <zorder>groupBox</zorder>
+   <zorder>captureButton</zorder>
+   <zorder>tabWidget</zorder>
+   <zorder>Rframe</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
