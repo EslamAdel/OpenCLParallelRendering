@@ -1,33 +1,33 @@
-#ifndef RENDERINGWINDOW_H
-#define RENDERINGWINDOW_H
+#ifndef RENDERINGWINDOW_GUI_H
+#define RENDERINGWINDOW_GUI_H
 
-#include <QtWidgets/QMainWindow>
+
 #include <QMainWindow>
 #include <CLContext.h>
 #include <Headers.hh>
-#include "ParallelRendering.h"
-#include "VirtualParallelRendering.h"
-#include "RenderingNode.h"
 #include <vector>
 #include <QLabel>
+
+#include "ParallelRendering.h"
+#include "RenderingNode.h"
 #include "ProfilingExterns.h"
 
 namespace Ui
 {
-class RenderingWindow;
+class RenderingWindow_Gui;
 }
 
-class RenderingWindow : public QMainWindow
-{   
+class RenderingWindow_Gui : public QMainWindow
+{
     Q_OBJECT
 
 public:
 
-    RenderingWindow( ParallelRendering *parallelRenderer ,
-                     QWidget *parent = 0 ) ;
+    RenderingWindow_Gui( ParallelRendering *parallelRenderer ,
+                         QWidget *parent = 0 ) ;
 
 
-    ~RenderingWindow( );
+    ~RenderingWindow_Gui( );
 
 private:
 
@@ -65,6 +65,15 @@ private slots:
 
     void newYTranslation_SLOT( int value );
 
+    void newZTranslation_SLOT( int value );
+
+    void newXScaling_SLOT( int value );
+
+    void newYScaling_SLOT( int value );
+
+    void newZScaling_SLOT( int value );
+
+    void newXYZScaling_SLOT( int value );
 
     void newBrightness_SLOT( int value );
 
@@ -73,8 +82,13 @@ private slots:
 
     void captureView_SLOT() ;
 
+    void newTransferFunctionScale_SLOT(int value);
+
+    void newTransferFunctionOffset_SLOT(int value);
+
+
 private:
-    Ui::RenderingWindow *ui;
+    Ui::RenderingWindow_Gui *ui;
 
 
     ParallelRendering *parallelRenderer_ ;
@@ -86,4 +100,4 @@ private:
     //std::vector
 };
 
-#endif // RENDERINGWINDOW_H
+#endif // RENDERINGWINDOW_GUI_H

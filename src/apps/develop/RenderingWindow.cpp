@@ -1,5 +1,6 @@
 #include "RenderingWindow.h"
 #include "ui_RenderingWindow.h"
+
 #include <Logger.h>
 #include <QFileDialog>
 #include <QDateTime>

@@ -7,6 +7,8 @@
 CMAKE_MINIMUM_REQUIRED( VERSION 3.1 )
 set( CMAKE_CXX_STANDARD 11 )
 
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
+
 
 # OpenCL-based Multi-GPU 'Volume Scales'
 PROJECT( parallel-rendering-multi-gpu )
