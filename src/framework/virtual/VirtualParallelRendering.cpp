@@ -37,18 +37,12 @@ void VirtualParallelRendering::addRenderingNode( const uint64_t gpuIndex )
 void VirtualParallelRendering::addCompositingNode(const uint64_t gpuIndex)
 {
     LOG_DEBUG("Adding Virtual Compositing Node");
-    // add compositingNode_ that will manage compositing rendered frames.
-    std::vector< const Coordinates3D *> framesCenters ;
-    for( auto node : renderingNodes_ )
-        framesCenters.push_back( &node->getCurrentCenter() );
 
 
     compositingNode_ =
             new VirtualCompositingNode( gpuIndex ,
-                                        renderingNodes_.size() ,
                                         frameWidth_ ,
-                                        frameHeight_ ,
-                                        framesCenters );
+                                        frameHeight_ );
 
 
 
@@ -70,7 +64,7 @@ void VirtualParallelRendering::addCompositingNode(const uint64_t gpuIndex)
     for( VirtualRenderingNode *node : renderingNodes_ )
     {
 
-        node->setFrameIndex( frameIndex );
+        compositingNode_->allocateFrame( node );
 
         TaskRender *renderingTask = new TaskRender( *node );
 
@@ -89,7 +83,7 @@ void VirtualParallelRendering::addCompositingNode(const uint64_t gpuIndex)
 
         TaskComposite *compositingTask =
                 new TaskComposite( compositingNode_ ,
-                                   frameIndex );
+                                   node );
 
         compositingTasks_.push_back( compositingTask ) ;
 

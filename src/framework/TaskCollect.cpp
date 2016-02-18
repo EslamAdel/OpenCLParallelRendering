@@ -19,9 +19,7 @@ void TaskCollect::run()
     //upload frame from rendering GPU to HOST.
     TIC( COLLECTING_PROFILE( renderingNode_ ).transferingBuffer_TIMER );
 
-    compositingNode_->collectFrame( renderingNode_->getFrameIndex() ,
-                                    renderingNode_->getCommandQueue() ,
-                                    *renderingNode_->getCLFrame() ,
+    compositingNode_->collectFrame( renderingNode_ ,
                                     CL_TRUE );
 
     TOC( COLLECTING_PROFILE(renderingNode_).transferingBuffer_TIMER ) ;

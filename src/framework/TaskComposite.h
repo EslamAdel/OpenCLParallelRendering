@@ -22,7 +22,7 @@ public:
      * @param compositedFramesCount
      */
     TaskComposite( CompositingNode *compositingNode ,
-                   uint frameIndex );
+                   RenderingNode *renderingNode );
 
 signals:
     /**
@@ -36,7 +36,7 @@ protected:
 
 private:
     CompositingNode *compositingNode_ ;
-    const uint frameIndex_ ;
+    RenderingNode *renderingNode_  ;
 
 
 };

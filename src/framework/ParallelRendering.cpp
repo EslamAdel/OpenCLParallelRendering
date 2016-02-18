@@ -124,6 +124,7 @@ int ParallelRendering::getRenderingNodesCount() const
 
 void ParallelRendering::addCompositingNode( const uint64_t gpuIndex )
 {
+    LOG_INFO("Linking Rendering Units with Compositing Unit...");
 
     // handle some errors, TODO: more robust handling for errors.
     if( gpuIndex >= listGPUs_.size() )
@@ -136,20 +137,14 @@ void ParallelRendering::addCompositingNode( const uint64_t gpuIndex )
         return ;
     }
 
-    // add compositingNode_ that will manage compositing rendered frames.
-    std::vector< const Coordinates3D *> framesCenters_ ;
-    for( auto device : inUseGPUs_ )
-        framesCenters_.push_back( &renderingNodes_[ device ]->getCurrentCenter() );
-
-
+    LOG_DEBUG("Initialize Compositing Unit");
     compositingNode_ = new CompositingNode( gpuIndex ,
-                                            inUseGPUs_.size() ,
                                             frameWidth_ ,
-                                            frameHeight_ ,
-                                            framesCenters_ );
+                                            frameHeight_ );
 
 
 
+    LOG_DEBUG("[DONE] Initialize Compositing Unit");
 
     collagePixmapTask_ =
             new TaskMakePixmap( compositingNode_->getCLFrameCollage() );
@@ -171,14 +166,17 @@ void ParallelRendering::addCompositingNode( const uint64_t gpuIndex )
     // compositing task will follow!
     for( auto renderingDevice : inUseGPUs_ )
     {
-
         auto renderingNode = renderingNodes_[ renderingDevice ];
 
-        renderingNode->setFrameIndex( frameIndex );
+        LOG_DEBUG("Connecting RenderingNode< %d >" ,
+                  renderingNode->getGPUIndex( ));
+
+        //register a frame to be allocated in the compositor device.
+        compositingNode_->allocateFrame( renderingNode );
 
         TaskComposite *compositingTask =
                 new TaskComposite( compositingNode_ ,
-                                   frameIndex );
+                                   renderingNode );
 
         compositingTasks_[ renderingNode ] = compositingTask ;
 
@@ -206,6 +204,9 @@ void ParallelRendering::addCompositingNode( const uint64_t gpuIndex )
 
 
     compositingNodeSpecified_ = true ;
+
+    LOG_INFO("[DONE] Linking Rendering Units with Compositing Unit...");
+
 }
 
 

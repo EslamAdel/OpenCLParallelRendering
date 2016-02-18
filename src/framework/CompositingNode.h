@@ -10,7 +10,10 @@
 #include <QObject>
 #include "CLImage2D.h"
 #include "CLImage2DArray.h"
+#include <unordered_map>
+#include "RenderingNode.h"
 
+typedef std::unordered_map< const RenderingNode * , CLFrame32* > Frames ;
 
 /**
  * @brief The CompositingNode class
@@ -51,46 +54,16 @@ public:
      * of OpenCL kernel execution is not predicted.
      */
     CompositingNode( const uint64_t gpuIndex ,
-                     const uint framesCount ,
                      const uint frameWidth ,
-                     const uint frameHeight ,
-                     const std::vector< const Coordinates3D* > framesCenters ) ;
+                     const uint frameHeight ) ;
 
     ~CompositingNode();
 
 
-    /**
-     * @brief setFrameData_HOST
-     * When the compositing frame is uploaded from the rendering device, the
-     * compositing node should hold a pointer to that buffer in order to load
-     * it to the compositor device.
-     *
-     * @param frameIndex
-     * frameIndex should be a value within [ 0 , framesCount_ - 1 ].
-     *
-     * @param data
-     * The pointer of the buffer at host.
-     */
-        void setFrameData_HOST( uint *data , const uint8_t frameIndex );
 
-    /**
-     * @brief loadFrameDataToDevice
-     * Start transfering the buffer data from host to device.
-     *
-     * @param frameIndex
-     * The index of the corresponding frame, this frame should be properly
-     * uploaded to host in prior to load it to the compositor device.
-     *
-     * @param block
-     * If block is set to CL_TRUE, the current thraed will wait until the
-     * buffer is completely loaded to device.
-     */
-    virtual void loadFrameToDevice( const uint8_t frameIndex ,
-                                    const cl_bool block );
+    virtual void allocateFrame( RenderingNode *renderingNode );
 
-    virtual void collectFrame( const uint8_t frameIndex ,
-                               cl_command_queue sourceCmdQueue ,
-                               const CLFrame32 &sourceFrame ,
+    virtual void collectFrame( RenderingNode *renderingNode ,
                                const cl_bool block );
     /**
      * @brief accumulateFrame_DEVICE
@@ -102,10 +75,8 @@ public:
      * @param frameIndex
      * the index of the corresponding compositing frame.
      */
-    void accumulateFrame_DEVICE( const uint frameIndex );
+    void accumulateFrame_DEVICE( RenderingNode *renderingNode );
 
-
-    void compositeFrames_DEVICE( );
 
     /**
      * @brief uploadCollageFromDevice
@@ -182,18 +153,13 @@ protected:
      */
     CLXRayCompositingKernel *compositingKernel_ ;
 
-    /**
-     * @brief rewindFrameKernel_
-     */
-    CLRewindFrameKernel *rewindFrameKernel_;
-
 
     //facts
     const uint64_t gpuIndex_;
 
     const Dimensions2D collageFrameDimensions_;
 
-    const uint framesCount_ ;
+    uint framesCount_ ;
 
     uint8_t compositedFramesCount_ ;
 
@@ -214,16 +180,8 @@ protected:
 
     CLFrame32 *collageFrameReadout_ ;
 
-    uint8_t collageBufferFrameIndex_ ;
-
-    const std::vector< const Coordinates3D* > &framesCenters_ ;
-
     //empty
-    /**
-     * @brief frames_
-     * compositing buffers.
-     */
-    std::vector< CLFrame32* > frames_ ;
+    Frames frames_ ;
 
 };
 

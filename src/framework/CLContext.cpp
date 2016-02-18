@@ -34,12 +34,16 @@ CLContext< T >::CLContext(const uint64_t gpuIndex ,
     kernelInitialized_ = false ;
     if( volume == nullptr ) volumeLoaded_ = false ;
 
+
     /// @note The oclHWDL scans the entire system, and returns a list of
     /// platforms and devices. Since we don't really care about the different
     /// platforms in the system and curious only to get the GPUs, we get a
     /// list of all the GPUs connected to the system in a list and select
     /// one of them based on the given GPU ID.
     initializeContext_( );
+
+    // Creating the pixel buffer that will contain the final image
+    createPixelBuffer( frameWidth_ , frameHeight_ );
 
     if( volumeLoaded_ )initializeKernel_( );
 
@@ -77,8 +81,7 @@ void CLContext<T>::initializeKernel_()
 
     handleKernel();
 
-    // Creating the pixel buffer that will contain the final image
-    createPixelBuffer( frameWidth_ , frameHeight_ );
+
 
     LOG_DEBUG( "[DONE] Initializing an OpenCL Kernel ... " );
 
@@ -217,6 +220,13 @@ void CLContext< T >::handleKernel(std::string string)
                                              CL_FILTER_NEAREST,
                                              &clErrorCode );
     oclHWDL::Error::checkCLError(clErrorCode);
+
+
+
+    activeRenderingKernel_->setFrameBuffer( clFrame_->getDeviceData() );
+    activeRenderingKernel_->setFrameWidth( clFrame_->getFrameDimensions().x );
+    activeRenderingKernel_->setFrameHeight( clFrame_->getFrameDimensions().y );
+
 
     activeRenderingKernel_->setVolumeData(volumeArray_);
 
@@ -407,9 +417,6 @@ void CLContext< T >::createPixelBuffer( const uint frameWidth,
     clFrame_ = new CLFrame< uint >( dimensions );
     clFrame_->createDeviceData( context_ );
 
-    activeRenderingKernel_->setFrameBuffer( clFrame_->getDeviceData() );
-    activeRenderingKernel_->setFrameWidth(frameWidth);
-    activeRenderingKernel_->setFrameHeight(frameHeight);
 
 }
 
