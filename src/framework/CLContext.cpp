@@ -298,27 +298,42 @@ void CLContext< T >::paint( const Coordinates3D &rotation ,
                                2.f*(0.5 - volume_->getUnitCubeCenter().z) );
 
 
-
-
     //Scale all  to the unit volume
+
     glm::tvec3< float > unitSccale =
+
             glm::tvec3< float >(1/volume_->getUnitCubeScaleFactors().x,
+
                                 1/volume_->getUnitCubeScaleFactors().y,
+
                                 1/volume_->getUnitCubeScaleFactors().z);
 
-    //Scale at first
+    //    //Scale at first
+
     glmMVMatrix = glm::scale(glmMVMatrix, unitSccale);
-    //Translate each brick to its position
+
+
+    //    //Translate each brick to its position
+
     glmMVMatrix = glm::translate(glmMVMatrix , relativeCenterBack);
 
-    //Scale now
-    glmMVMatrix = glm::scale(glmMVMatrix, scaleVector);
+
+
+
+
     // Rotate , and then translate to keep the local rotation
+
+    glmMVMatrix = glm::scale(glmMVMatrix, scaleVector);
+
+
+
     glmMVMatrix = glm::rotate( glmMVMatrix , angle , axis );
 
 
-    glmMVMatrix = glm::translate( glmMVMatrix , translationVector );
 
+
+
+    glmMVMatrix = glm::translate( glmMVMatrix , translationVector );
 
 
 
