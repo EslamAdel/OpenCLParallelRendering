@@ -82,12 +82,3 @@ void xray_compositing_patch( __global uint* collageFrame ,
 
 
 
-__kernel
-void rewind_buffer(  __global uint* frame )
-{
-const uint index = get_global_id(0);
-frame[ index ] = 0 ;
-
-}
-
-

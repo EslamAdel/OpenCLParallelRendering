@@ -41,7 +41,7 @@ install( TARGETS ${OCL_MGPUVR_EXECUTABLE} DESTINATION bin )
 message("Benchmarking Executable Setting...")
 
 ### Benchmarking Application name
-set( OCL_MGPUVR_BENCHMARK_EXECUTABLE "oclMGPUVR_benchmark" )
+set( OCL_MGPUVR_BENCHMARK_EXECUTABLE "oclMGPUVR_Benchmark" )
 
 ## BENCHMARKING source/header files.
 set( OCL_MGPUVR_BENCHMARK_HEADER_FILES ${OCL_MGPUVR_HEADER_FILES}

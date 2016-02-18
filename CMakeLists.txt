@@ -34,3 +34,4 @@ include( OCLHWDL )
 add_subdirectory( src )
 
 
+message("Project Executables will be built to <project_dir>/bin")
