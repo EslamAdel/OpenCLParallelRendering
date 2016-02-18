@@ -11,7 +11,6 @@
 #include <auxillary/glm/gtc/type_ptr.hpp>
 #include "ProfilingExterns.h"
 
-
 #define DEG_TO_RAD(x) (x * 0.0174532925199f)
 
 #define LOCAL_SIZE_X    16
@@ -191,15 +190,18 @@ void CLContext< T >::handleKernel(std::string string)
 
     // Transfer function format
     cl_image_format tfFormat;
+    if(TFChannelOrderFlage == 0)
     tfFormat.image_channel_order = CL_RGBA;
-    tfFormat.image_channel_data_type = CL_FLOAT;
+    else
+    tfFormat.image_channel_order = CL_BGRA;
+    tfFormat.image_channel_data_type =  CL_FLOAT;
 
     // Upload the transfer function to the volume.
     // TODO: Fix the hardcoded values.
     transferFunctionArray_ = clCreateImage2D
                              ( context_,
                                CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
-                               &tfFormat, 9, 1, sizeof( float ) * 9 * 4,
+                               &tfFormat, 9,1, sizeof( float ) * 9 * 4,
                                transferFunctionTable, &clErrorCode );
     oclHWDL::Error::checkCLError(clErrorCode);
 
@@ -211,7 +213,7 @@ void CLContext< T >::handleKernel(std::string string)
     oclHWDL::Error::checkCLError(clErrorCode);
 
     linearVolumeSampler_ = clCreateSampler( context_, true,
-                                            CL_ADDRESS_REPEAT,
+                                            CL_ADDRESS_CLAMP_TO_EDGE,
                                             CL_FILTER_LINEAR, &clErrorCode );
     oclHWDL::Error::checkCLError(clErrorCode);
 
@@ -286,8 +288,8 @@ void CLContext< T >::paint( const Coordinates3D &rotation ,
                                                 4-translation.z );
 
     auto scaleVector = glm::tvec3<float>(1/scale.x ,
-                                                  1/scale.y ,
-                                                      1/scale.z );
+                                         1/scale.y ,
+                                         1/scale.z );
 
     //Calculating the translate value for each brick
     glm::tvec3< float > relativeCenterBack =
@@ -296,28 +298,42 @@ void CLContext< T >::paint( const Coordinates3D &rotation ,
                                2.f*(0.5 - volume_->getUnitCubeCenter().z) );
 
 
-
-
     //Scale all  to the unit volume
+
     glm::tvec3< float > unitSccale =
+
             glm::tvec3< float >(1/volume_->getUnitCubeScaleFactors().x,
+
                                 1/volume_->getUnitCubeScaleFactors().y,
+
                                 1/volume_->getUnitCubeScaleFactors().z);
 
     //    //Scale at first
+
     glmMVMatrix = glm::scale(glmMVMatrix, unitSccale);
+
+
     //    //Translate each brick to its position
+
     glmMVMatrix = glm::translate(glmMVMatrix , relativeCenterBack);
 
 
+
+
+
     // Rotate , and then translate to keep the local rotation
+
     glmMVMatrix = glm::scale(glmMVMatrix, scaleVector);
+
+
 
     glmMVMatrix = glm::rotate( glmMVMatrix , angle , axis );
 
 
-    glmMVMatrix = glm::translate( glmMVMatrix , translationVector );
 
+
+
+    glmMVMatrix = glm::translate( glmMVMatrix , translationVector );
 
 
 

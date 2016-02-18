@@ -4,7 +4,9 @@
 #include <QCommandLineParser>
 #include "oclHWDL.h"
 
-
+//this is a global variable used to define the transfer function channel order
+//TODO don't use global variables
+extern int TFChannelOrderFlage ;
 #define DEFAULT_FRAME_WIDTH 512
 #define DEFAULT_FRAME_HEIGHT 512
 #define MAX_FRAME_DIMENSION 2048

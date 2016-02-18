@@ -3,6 +3,8 @@
 #include <QObject>
 #include <memory>
 
+int TFChannelOrderFlage = 0;
+
 CommandLineParser::CommandLineParser( const QCoreApplication &app ,
                                       QCommandLineParser &parser ,
                                       QString helpDescription )
@@ -163,8 +165,10 @@ CommandLineParser::tokenize( Volume<uchar> *&volume ,
         renderers = renderersList.toStdList() ;
     }
     else
+    {
         renderers = getAllGPUs_( );
-
+        TFChannelOrderFlage = 1;
+    }
 
     compositorGPUIndex = parser_.value( "compositor-index" ).toUInt( );
 
