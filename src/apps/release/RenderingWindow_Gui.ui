@@ -239,11 +239,38 @@ color:#fff;
    <widget class="QPushButton" name="captureButton">
     <property name="geometry">
      <rect>
-      <x>590</x>
+      <x>710</x>
       <y>590</y>
-      <width>99</width>
-      <height>27</height>
+      <width>161</width>
+      <height>41</height>
      </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">
+QPushButton {
+    border: 2px solid #8f8f91;
+    border-radius: 6px;
+	font: 75 13pt &quot;Ubuntu Condensed&quot;;
+	
+	color: rgb(255, 255, 255);
+	
+	background-color: qlineargradient(spread:pad, x1:0.072, y1:0.381, x2:0, y2:0, stop:0 rgba(0, 0, 0, 255), stop:1 rgba(255, 255, 255, 255));
+    min-width: 80px;
+}
+QPushButton:pressed {
+       background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                stop: 0 #FAFBFE, stop: 1 #DCDEF1);
+}
+
+/**
+QPushButton:flat {
+    border: none; /* no border for a flat push button */
+/**}
+
+QPushButton:default {
+    border-color: navy; /* make the default button prominent */
+/**}
+**/</string>
     </property>
     <property name="text">
      <string>Capture</string>

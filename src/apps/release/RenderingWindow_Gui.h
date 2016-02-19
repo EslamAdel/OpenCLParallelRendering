@@ -110,7 +110,7 @@ private:
 
 
     bool frameworkReady_ ;
-    std::vector< uint > deployGPUs_ ;
+    QVector< uint > deployGPUs_ ;
     uint compositorIndex_ ;
 
     QVector< QLabel*  > frameContainers_;

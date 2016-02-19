@@ -344,8 +344,7 @@ void ParallelRendering::syncTransformation_()
 }
 
 
-
-RenderingNode &ParallelRendering::getRenderingNode(const uint64_t gpuIndex)
+RenderingNode &ParallelRendering::getRenderingNode( const uint64_t gpuIndex )
 {
     // handle some minor exceptions.
     auto device = listGPUs_.at( gpuIndex );
@@ -357,9 +356,25 @@ RenderingNode &ParallelRendering::getRenderingNode(const uint64_t gpuIndex)
 
 }
 
+CompositingNode &ParallelRendering::getCompositingNode()
+{
+    return *compositingNode_ ;
+}
+
+
 uint ParallelRendering::getMachineGPUsCount() const
 {
     return machineGPUsCount_;
+}
+
+uint ParallelRendering::getFrameWidth() const
+{
+    return frameWidth_;
+}
+
+uint ParallelRendering::getFrameHeight() const
+{
+    return frameHeight_;
 }
 
 void ParallelRendering::finishedRendering_SLOT( RenderingNode *finishedNode )
