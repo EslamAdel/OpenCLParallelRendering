@@ -25,9 +25,9 @@ uint rgbaFloatToInt( float4 rgba )
 float4 convertColorToRGBAF( uint Color )
 {
     float4 rgba ;
-    rgba.z = ( Color & 0xFF ) / 255.f ; Color >>= 8;
-    rgba.y = ( Color & 0xFF ) / 255.f ; Color >>= 8;
     rgba.x = ( Color & 0xFF ) / 255.f ; Color >>= 8;
+    rgba.y = ( Color & 0xFF ) / 255.f ; Color >>= 8;
+    rgba.z = ( Color & 0xFF ) / 255.f ; Color >>= 8;
     rgba.w = ( Color & 0xFF ) / 255.f ;
     return rgba ;
 }
