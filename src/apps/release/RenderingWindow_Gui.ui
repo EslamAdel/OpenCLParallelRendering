@@ -257,7 +257,7 @@ color:#fff;
      <rect>
       <x>20</x>
       <y>10</y>
-      <width>371</width>
+      <width>401</width>
       <height>631</height>
      </rect>
     </property>
@@ -325,7 +325,7 @@ QTabBar::tab:!selected {
 </string>
     </property>
     <property name="currentIndex">
-     <number>1</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="Devices">
      <attribute name="title">
