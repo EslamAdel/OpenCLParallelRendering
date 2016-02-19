@@ -73,10 +73,23 @@ void CompositingNode::collectFrame( RenderingNode *renderingNode ,
     else
     {
 
+#ifdef BENCHMARKING
+        //direct copy frame from rendering device to the host pointer
+        //of the compositing frame.
+        //more effiecent.
         frames_[ renderingNode ]->
                 readOtherDeviceData( renderingNode->getCommandQueue() ,
                                      *renderingNode->getCLFrame() ,
-                                     block );
+                                     block );   
+#else
+        renderingNode->getCLFrame()->
+                readDeviceData( renderingNode->getCommandQueue() ,
+                                block );
+
+        frames_[ renderingNode ]->
+                copyHostData( renderingNode->getCLFrame()->getHostData( ));
+
+#endif
 
         frames_[ renderingNode ]->
                 writeDeviceData( commandQueue_ ,

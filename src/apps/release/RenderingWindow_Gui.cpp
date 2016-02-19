@@ -188,6 +188,9 @@ void RenderingWindow_Gui::startRendering_( )
 
 void RenderingWindow_Gui::displayFrame_( QPixmap *frame , uint id )
 {
+    LOG_DEBUG("Set Pixmap<%d>",id );
+    if( frame->isNull() )
+        LOG_WARNING("Null frame");
 
     frameContainers_[ id ]->setPixmap
             (( frame->scaled( frameContainers_[ id ]->width( ),
@@ -201,6 +204,8 @@ void RenderingWindow_Gui::frameReady_SLOT( QPixmap *frame ,
                                                 const RenderingNode *node )
 {
     uint index = node->getFrameIndex();
+
+    LOG_DEBUG("Catch frame <%d> ", node->getFrameIndex());
 
     if( index < frameContainers_.size() )
         displayFrame_( frame , index );

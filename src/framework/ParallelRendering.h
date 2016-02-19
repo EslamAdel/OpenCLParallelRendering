@@ -289,6 +289,8 @@ protected:
     CollectingTasks collectingTasks_ ;
     CompositingTasks compositingTasks_ ;
     TaskMakePixmap *collagePixmapTask_;
+    MakePixmapTasks makePixmapTasks_ ;
+
 
     //Volume Data
     Volume<uchar> *baseVolume_;

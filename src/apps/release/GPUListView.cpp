@@ -94,7 +94,8 @@ void GPUListView::surveyGPUs()
         else
             vendor = GPUListView::Vendor::Other ;
 
-        QString  info( QString( name.c_str( )) + QString::number( index )
+        QString  info( QString( name.c_str( )) + "(" +
+                       QString::number( index ) + ")"
                        + "\n"
                        + "Ram: " + QString::number( ramMemory )
                        + "(GB)");

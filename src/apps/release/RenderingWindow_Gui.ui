@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>845</width>
+    <width>918</width>
     <height>694</height>
    </rect>
   </property>
@@ -18,7 +18,7 @@
   </property>
   <property name="minimumSize">
    <size>
-    <width>845</width>
+    <width>918</width>
     <height>694</height>
    </size>
   </property>
@@ -61,8 +61,8 @@ QRadioButton::inidacator{
      <rect>
       <x>440</x>
       <y>10</y>
-      <width>411</width>
-      <height>531</height>
+      <width>461</width>
+      <height>571</height>
      </rect>
     </property>
     <property name="styleSheet">
@@ -77,8 +77,8 @@ color:#fff;
     <widget class="QLabel" name="labelGPU0">
      <property name="geometry">
       <rect>
-       <x>60</x>
-       <y>30</y>
+       <x>50</x>
+       <y>420</y>
        <width>121</width>
        <height>17</height>
       </rect>
@@ -93,10 +93,10 @@ color:#fff;
      </property>
      <property name="geometry">
       <rect>
-       <x>0</x>
-       <y>50</y>
-       <width>191</width>
-       <height>211</height>
+       <x>50</x>
+       <y>440</y>
+       <width>111</width>
+       <height>121</height>
       </rect>
      </property>
      <property name="autoFillBackground">
@@ -121,10 +121,10 @@ color:#fff;
      </property>
      <property name="geometry">
       <rect>
-       <x>200</x>
-       <y>50</y>
-       <width>191</width>
-       <height>211</height>
+       <x>190</x>
+       <y>440</y>
+       <width>111</width>
+       <height>121</height>
       </rect>
      </property>
      <property name="autoFillBackground">
@@ -146,8 +146,8 @@ color:#fff;
     <widget class="QLabel" name="labelGPU1">
      <property name="geometry">
       <rect>
-       <x>260</x>
-       <y>30</y>
+       <x>190</x>
+       <y>420</y>
        <width>121</width>
        <height>17</height>
       </rect>
@@ -159,8 +159,8 @@ color:#fff;
     <widget class="QLabel" name="labelGPU2">
      <property name="geometry">
       <rect>
-       <x>50</x>
-       <y>270</y>
+       <x>320</x>
+       <y>420</y>
        <width>121</width>
        <height>17</height>
       </rect>
@@ -175,10 +175,10 @@ color:#fff;
      </property>
      <property name="geometry">
       <rect>
-       <x>0</x>
-       <y>290</y>
-       <width>191</width>
-       <height>211</height>
+       <x>320</x>
+       <y>440</y>
+       <width>111</width>
+       <height>121</height>
       </rect>
      </property>
      <property name="autoFillBackground">
@@ -200,10 +200,10 @@ color:#fff;
     <widget class="QLabel" name="frameContainerResult">
      <property name="geometry">
       <rect>
-       <x>200</x>
-       <y>290</y>
-       <width>191</width>
-       <height>211</height>
+       <x>50</x>
+       <y>50</y>
+       <width>381</width>
+       <height>351</height>
       </rect>
      </property>
      <property name="autoFillBackground">
@@ -225,8 +225,8 @@ color:#fff;
     <widget class="QLabel" name="label_5">
      <property name="geometry">
       <rect>
-       <x>240</x>
-       <y>270</y>
+       <x>50</x>
+       <y>30</y>
        <width>121</width>
        <height>17</height>
       </rect>
@@ -240,7 +240,7 @@ color:#fff;
     <property name="geometry">
      <rect>
       <x>590</x>
-      <y>540</y>
+      <y>590</y>
       <width>99</width>
       <height>27</height>
      </rect>
@@ -2311,7 +2311,7 @@ border-radius: 4px;
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>845</width>
+     <width>918</width>
      <height>25</height>
     </rect>
    </property>
