@@ -100,11 +100,18 @@ public:
      */
     RenderingNode &getRenderingNode( const uint64_t gpuIndex );
 
+
+    CompositingNode &getCompositingNode( ) ;
     /**
      * @brief machineGPUsCount
      * @return
      */
     virtual uint getMachineGPUsCount() const;
+
+    uint getFrameWidth() const ;
+
+    uint getFrameHeight() const ;
+
 
 signals:
 
@@ -128,6 +135,9 @@ signals:
 
 
     void finishedCompositing_SIGNAL( );
+
+
+
 
 public slots :
 

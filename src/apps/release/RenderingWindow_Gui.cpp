@@ -3,6 +3,7 @@
 
 #include <QFileDialog>
 #include <QDateTime>
+#include <QPicture>
 
 #include "Logger.h"
 
@@ -159,7 +160,7 @@ void RenderingWindow_Gui::displayFrame_( QPixmap *frame , uint id )
 }
 
 void RenderingWindow_Gui::frameReady_SLOT( QPixmap *frame ,
-                                                const RenderingNode *node )
+                                           const RenderingNode *node )
 {
     uint index = node->getFrameIndex();
 
@@ -292,6 +293,8 @@ void RenderingWindow_Gui::initializeFramework_SLOT()
 
     const QSet< uint > &renderers = ui->renderingDevices->getGPUsIndices();
 
+    deployGPUs_ = renderers.toList().toVector();
+
     if( compositors.size() != 1 || renderers.isEmpty() )
     {
         LOG_WARNING("At least one GPU should be selected for "
@@ -344,30 +347,38 @@ void RenderingWindow_Gui::captureView_SLOT()
 
     QString date = QDateTime::currentDateTime().toString( "hh-mm-ss" );
 
-    //    QString newDir = dir + QString( "/" ) + date +
-    //                     QString( "[%1x%2]" ).arg( QString::number( FRAME_WIDTH ) ,
-    //                                               QString::number( FRAME_HEIGHT ));
-    //    QDir createDir;
-    //    createDir.mkdir( newDir );
-    //    LOG_DEBUG("New Dir:%s" , newDir.toStdString().c_str() );
+    const uint width = parallelRenderer_->getFrameWidth();
+    const uint height = parallelRenderer_->getFrameHeight();
+
+    QString newDir = dir + QString( "/" ) + date +
+                     QString( "[%1x%2]" ).arg( QString::number( width ) ,
+                                               QString::number( height ));
+    QDir createDir;
+    createDir.mkdir( newDir );
+    LOG_DEBUG("New Dir:%s" , newDir.toStdString().c_str() );
 
 
-    //    QPixmap pic( finalFrame_->
-    //                 scaledToHeight( FRAME_WIDTH ).scaledToWidth( FRAME_HEIGHT ));
-    //    pic.save( newDir + "/result.jpg");
+    LOG_DEBUG("Saving resultant frame");
+    QPixmap pic( parallelRenderer_->getCompositingNode().getCLFrameCollage()->
+                 getFramePixmap().
+                 scaledToHeight( width ).scaledToWidth( height ));
+    pic.save( newDir + "/result.jpg");
 
-    //    int i = 0;
-    //    for( const QLabel *frame : frameContainers_ )
-    //    {
-    //        if( frame->isEnabled() )
-    //        {
-    //            QPixmap framePixmap( parallelRenderer_->getRenderingNode( i ).
-    //                                 getCLFrame()->getFramePixmap().
-    //                                 scaledToHeight( FRAME_WIDTH ).
-    //                                 scaledToWidth( FRAME_HEIGHT ));
 
-    //            framePixmap.save( newDir + QString("/GPU%1.jpg").arg(i++) );
-    //        }
-    //    }
+
+    for( const uint gpuIndex : deployGPUs_ )
+    {
+
+        LOG_DEBUG("Saving frame<%d>", gpuIndex );
+
+        QPixmap framePixmap( parallelRenderer_->
+                             getRenderingNode( gpuIndex ).getCLFrame()->
+                             getFramePixmap().
+                             scaledToHeight( width ).
+                             scaledToWidth( height ));
+
+        framePixmap.save( newDir + QString("/GPU%1.jpg").arg( gpuIndex ));
+
+    }
 }
 
