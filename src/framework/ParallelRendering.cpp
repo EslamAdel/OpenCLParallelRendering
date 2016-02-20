@@ -393,9 +393,9 @@ void ParallelRendering::compositingFinished_SLOT()
 
     TOC( frameworkProfile.renderingLoop_TIMER );
 
-
+#ifndef BENCHMARKING
     pixmapMakerPool_.start( collagePixmapTask_ );
-
+#endif
 
     if( pendingTransformations_ )
         applyTransformation_();
@@ -573,8 +573,6 @@ void ParallelRendering::benchmark_()
 
     FRAMEWORK_PROFILE_TAG( );
     PRINT( frameworkProfile.renderingLoop_TIMER );
-    PRINT( frameworkProfile.convertToPixmap_TIMER );
-    BEEP();
 
 
     EXIT_PROFILING();

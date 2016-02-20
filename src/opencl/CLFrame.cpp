@@ -172,9 +172,9 @@ QPixmap &CLFrame<T>::getFramePixmap()
     }
 
     // Create a QImage and send it back to the rendering window.
-    const QImage image(rgbaFrame_,
-                       dimensions_.x , dimensions_.y , QImage::Format_ARGB32);
-    frame_ = frame_.fromImage(image);
+    const QImage image( rgbaFrame_,
+                        dimensions_.x , dimensions_.y , QImage::Format_ARGB32);
+    frame_ = frame_.fromImage( image );
 
     return frame_ ;
 

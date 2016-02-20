@@ -14,7 +14,7 @@ int main(int argc, char *argv[])
 #ifndef BENCHMARKING
     LOG_ERROR("BENCHMARKING MUST BE DEFINED");
 #endif
-    QApplication a(argc, argv);
+    QCoreApplication a(argc, argv);
 
     QCoreApplication::setApplicationName("oclMGPUVR_benchmark");
 
@@ -56,13 +56,9 @@ int main(int argc, char *argv[])
 
     parallelRenderer.distributeBaseVolume1D();
 
-    RenderingWindow rw( &parallelRenderer ) ;
 
-    if( gui == true )
-        rw.show();
 
-    else
-        parallelRenderer.startRendering();
+    parallelRenderer.startRendering();
 
     return a.exec();
 }
