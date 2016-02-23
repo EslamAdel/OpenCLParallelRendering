@@ -62,3 +62,8 @@ uint RenderingNode::getFrameIndex() const
 {
     return frameIndex_;
 }
+
+void RenderingNode::setTransferFunctionFlag(int flag)
+{
+    activeRenderingKernel_->setTransferFunctionFlag(flag);
+}

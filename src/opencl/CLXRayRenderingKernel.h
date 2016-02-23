@@ -89,6 +89,12 @@ public:
      */
     void setTransferFunctionScale(float scale);
 
+    /**
+     * @brief setTransferFunctionFlag
+     * @param enableTransferFunction
+     */
+    void setTransferFunctionFlag(int enableTransferFunction);
+
 private:
 
     /**

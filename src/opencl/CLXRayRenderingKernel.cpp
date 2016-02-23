@@ -14,6 +14,7 @@
 #define X_RAY_TRANSFER_FUNCTION_SCALE_ARG                                   9
 #define X_RAY_TRANSFER_FUNCTION_DATA_ARG                                    10
 #define X_RAY_TRANSFER_FUNCTION_SAMPLER_ARG                                 11
+#define X_RAY_TRANSFER_FUNCTION_FLAG_ARG                                    12
 
 CLXRayRenderingKernel::CLXRayRenderingKernel(cl_context clContext,
                                              const std::string kernelDirectory,
@@ -130,4 +131,12 @@ void CLXRayRenderingKernel::setTransferFunctionScale(float scale)
                                   sizeof( float ),
                                   (void *)&scale);
     oclCheckErrorEX(error,CL_SUCCESS,0);
+}
+
+void CLXRayRenderingKernel::setTransferFunctionFlag(int enableTransferFunction)
+{
+    cl_int error = clSetKernelArg( kernelObject_, X_RAY_TRANSFER_FUNCTION_FLAG_ARG,
+                                   sizeof( int ),
+                                   &enableTransferFunction );
+    oclCheckErrorEX( error, CL_SUCCESS, 0 );
 }

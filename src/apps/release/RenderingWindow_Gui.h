@@ -96,6 +96,7 @@ private slots:
 
     void newTransferFunctionOffset_SLOT(int value);
 
+    void tFunctionSLiderControl_SLOT(int state);
 
     void initializeFramework_SLOT( );
 

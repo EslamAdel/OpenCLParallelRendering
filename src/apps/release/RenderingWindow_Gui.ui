@@ -72,7 +72,7 @@ color:#fff;
 }</string>
     </property>
     <property name="title">
-     <string>Display</string>
+     <string>                                                          Display</string>
     </property>
     <widget class="QLabel" name="labelGPU0">
      <property name="geometry">
@@ -2187,9 +2187,9 @@ border-radius: 4px;
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>20</y>
-        <width>251</width>
-        <height>119</height>
+        <y>10</y>
+        <width>281</width>
+        <height>171</height>
        </rect>
       </property>
       <property name="minimumSize">
@@ -2210,24 +2210,11 @@ background:#3D3C3A;
 }
 </string>
       </property>
-      <widget class="QLabel" name="offsetValue">
-       <property name="geometry">
-        <rect>
-         <x>210</x>
-         <y>30</y>
-         <width>61</width>
-         <height>20</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>0</string>
-       </property>
-      </widget>
       <widget class="QLabel" name="xRotationLabel_2">
        <property name="geometry">
         <rect>
          <x>30</x>
-         <y>30</y>
+         <y>70</y>
          <width>67</width>
          <height>17</height>
         </rect>
@@ -2240,7 +2227,7 @@ background:#3D3C3A;
        <property name="geometry">
         <rect>
          <x>30</x>
-         <y>40</y>
+         <y>80</y>
          <width>201</width>
          <height>29</height>
         </rect>
@@ -2304,6 +2291,9 @@ border: 1px solid #aaa;
 border-radius: 4px;
 }</string>
        </property>
+       <property name="minimum">
+        <number>0</number>
+       </property>
        <property name="maximum">
         <number>50</number>
        </property>
@@ -2317,9 +2307,9 @@ border-radius: 4px;
       <widget class="QLabel" name="scaleValue">
        <property name="geometry">
         <rect>
-         <x>210</x>
-         <y>70</y>
-         <width>61</width>
+         <x>220</x>
+         <y>110</y>
+         <width>41</width>
          <height>20</height>
         </rect>
        </property>
@@ -2331,7 +2321,7 @@ border-radius: 4px;
        <property name="geometry">
         <rect>
          <x>30</x>
-         <y>70</y>
+         <y>110</y>
          <width>67</width>
          <height>17</height>
         </rect>
@@ -2344,7 +2334,7 @@ border-radius: 4px;
        <property name="geometry">
         <rect>
          <x>30</x>
-         <y>80</y>
+         <y>120</y>
          <width>201</width>
          <height>29</height>
         </rect>
@@ -2434,6 +2424,64 @@ border-radius: 4px;
         <string>Transfer Functoin Parameters</string>
        </property>
       </widget>
+      <widget class="QCheckBox" name="transferFunctionCheckBox">
+       <property name="geometry">
+        <rect>
+         <x>20</x>
+         <y>40</y>
+         <width>21</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="focusPolicy">
+        <enum>Qt::NoFocus</enum>
+       </property>
+       <property name="contextMenuPolicy">
+        <enum>Qt::DefaultContextMenu</enum>
+       </property>
+       <property name="autoFillBackground">
+        <bool>false</bool>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+      <widget class="QLabel" name="xRotationLabel_5">
+       <property name="geometry">
+        <rect>
+         <x>50</x>
+         <y>40</y>
+         <width>161</width>
+         <height>17</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Enable Transfer Function</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="offsetValue">
+       <property name="geometry">
+        <rect>
+         <x>220</x>
+         <y>70</y>
+         <width>41</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>0</string>
+       </property>
+      </widget>
+      <zorder>xRotationLabel_2</zorder>
+      <zorder>offsetSlider</zorder>
+      <zorder>scaleValue</zorder>
+      <zorder>yRotationLabel_10</zorder>
+      <zorder>scaleSlider</zorder>
+      <zorder>label_16</zorder>
+      <zorder>transferFunctionCheckBox</zorder>
+      <zorder>xRotationLabel_5</zorder>
+      <zorder>offsetValue</zorder>
+      <zorder>offsetValue</zorder>
      </widget>
     </widget>
    </widget>

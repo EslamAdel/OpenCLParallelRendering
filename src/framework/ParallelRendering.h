@@ -257,6 +257,12 @@ public slots :
      */
     void updateTransferFunctionOffset_SLOT(float offset);
 
+    /**
+     * @brief tranferFunctionFlag_SLOT
+     * @param flag
+     */
+    void tranferFunctionFlag_SLOT(int flag);
+
 protected:
     /**
      * @brief applyTransformation

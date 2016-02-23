@@ -70,6 +70,11 @@ public:
 
     uint getFrameIndex() const ;
 
+    /**
+     * @brief setTransferFunctionFlag
+     */
+    void setTransferFunctionFlag(int flag);
+
 signals:
     /**
      * @brief finishedRendering

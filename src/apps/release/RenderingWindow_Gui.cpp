@@ -44,6 +44,9 @@ RenderingWindow_Gui::RenderingWindow_Gui(
     ui->renderingDevices->setFixed( false );
     ui->compositingDevice->setFixed( false );
     ui->compositingDevice->setMaxGPUs( 1 );
+    ui->offsetSlider->setEnabled(false);
+    ui->scaleSlider->setEnabled(false);
+
 
 
     //disable transformations and transfer function when framework is not ready.
@@ -108,6 +111,12 @@ void RenderingWindow_Gui::intializeConnections_()
 
     connect( ui->offsetSlider , SIGNAL( valueChanged(int)) ,
              this , SLOT(newTransferFunctionOffset_SLOT(int)) );
+
+    connect(ui->transferFunctionCheckBox ,SIGNAL(stateChanged(int)),
+            parallelRenderer_,SLOT(tranferFunctionFlag_SLOT(int)));
+
+    connect(ui->transferFunctionCheckBox ,SIGNAL(stateChanged(int)),
+            this , SLOT(tFunctionSLiderControl_SLOT(int)));
 
     //parallelRenderer_
     connect( parallelRenderer_ ,
@@ -282,6 +291,22 @@ void RenderingWindow_Gui::newTransferFunctionOffset_SLOT(int value)
 
     float offset = float( value ) / 100.0;
     parallelRenderer_->updateTransferFunctionOffset_SLOT( offset );
+
+}
+
+void RenderingWindow_Gui::tFunctionSLiderControl_SLOT(int state)
+{
+    if(state == 0)
+    {
+        ui->offsetSlider->setEnabled(false);
+        ui->scaleSlider->setEnabled(false);
+    }
+    else
+    {
+        ui->offsetSlider->setEnabled(true);
+        ui->scaleSlider->setEnabled(true);
+
+    }
 
 }
 

@@ -546,6 +546,17 @@ void ParallelRendering::updateTransferFunctionOffset_SLOT(float offset)
 
 }
 
+void ParallelRendering::tranferFunctionFlag_SLOT(int flag)
+{
+    for( auto renderingDevice : inUseGPUs_ )
+    {
+         RenderingNode* node = renderingNodes_[ renderingDevice ];
+         node->setTransferFunctionFlag(flag);
+    }
+    if( renderingNodesReady_ ) applyTransformation_();
+    else pendingTransformations_ = true ;
+}
+
 
 void ParallelRendering::benchmark_()
 {

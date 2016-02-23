@@ -236,6 +236,9 @@ void CLContext< T >::handleKernel(std::string string)
 
     activeRenderingKernel_->setTransferFunctionSampler(transferFunctionSampler_);
 
+    int enableTF = 0 ;
+
+    activeRenderingKernel_->setTransferFunctionFlag(enableTF);
     //Set the initial Value of the Transfer function offset and scale
     //TODO add Slider to update these values.
 //    float transferOffset = 0.0f;

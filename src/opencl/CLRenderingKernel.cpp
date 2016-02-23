@@ -68,6 +68,11 @@ void CLRenderingKernel::setTransferFunctionScale( float scale )
     LOG_WARNING( "Unimplemented setTransferFunctionScale()" );
 }
 
+void CLRenderingKernel::setTransferFunctionFlag(int enableTransferFunction)
+{
+     LOG_WARNING( "Unimplemented setTransferFunctionFlag()" );
+}
+
 void CLRenderingKernel::releaseKernel()
 {
     if( kernelContext_->getProgram( ))

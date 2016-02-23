@@ -134,6 +134,12 @@ public:
     virtual void setTransferFunctionScale( float scale );
 
     /**
+     * @brief setTransferFunctionFlag
+     * @param enableTransferFunction
+     */
+    virtual void setTransferFunctionFlag(int enableTransferFunction);
+
+    /**
      * @brief releaseKernel
      */
     void releaseKernel( );
