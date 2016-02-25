@@ -53,7 +53,7 @@ cl_kernel CLXRayCompositingKernel::getKernelObject() const
 }
 
 
-void CLXRayCompositingKernel::buildKernel_(const std::string extraBuildOptions)
+void CLXRayCompositingKernel::buildKernel_(const std::string extraBuildOptions )
 {
 
     LOG_INFO("Building the kernel");
