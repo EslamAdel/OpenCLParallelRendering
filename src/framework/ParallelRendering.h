@@ -310,7 +310,6 @@ protected:
 
     //Volume Data
     Volume<uchar> *baseVolume_;
-    std::vector< Volume<uchar>* > bricks_;
 
     //Transformation parameters
     Coordinates3D rotation_;

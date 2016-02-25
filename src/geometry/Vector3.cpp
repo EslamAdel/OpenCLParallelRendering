@@ -177,6 +177,24 @@ std::string Vector3< T >::toString() const
 }
 
 template< class T >
+bool Vector3< T >::isXMax() const
+{
+    return ( x >= y && x >= z );
+}
+
+template< class T >
+bool Vector3< T >::isYMax() const
+{
+    return ( y >= x && y >= z );
+}
+
+template< class T >
+bool Vector3< T >::isZMax() const
+{
+    return ( z >= x && z >= y );
+}
+
+template< class T >
 bool Vector3< T >::operator==( const Vector3< T >& v ) const
 {
     return ( x == v.x && y == v.y && z == v.z );
