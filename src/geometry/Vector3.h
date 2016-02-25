@@ -58,6 +58,26 @@ public:
      */
     std::string toString() const;
 
+
+    /**
+     * @brief isXMax
+     * @return
+     */
+    bool isXMax( ) const ;
+
+    /**
+     * @brief isYMax
+     * @return
+     */
+    bool isYMax( ) const ;
+
+    /**
+     * @brief isZMax
+     * @return
+     */
+    bool isZMax( ) const ;
+
+
 public:
 
     /**

@@ -121,7 +121,8 @@ void VirtualParallelRendering::distributeBaseVolume1D()
         LOG_ERROR( "No deployed devices to distribute volume!");
 
 
-    Volumes8 &bricks = this->baseVolume_->getBricksXAxis( nDevices );
+//    QVector< Volume8 *> bricks = this->baseVolume_->getBricksXAxis( nDevices );
+    QVector< Volume8 *> bricks = baseVolume_->heuristicBricking( nDevices );
 
     int i = 0;
 

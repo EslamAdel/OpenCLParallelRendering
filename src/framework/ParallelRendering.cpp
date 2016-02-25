@@ -241,15 +241,14 @@ void ParallelRendering::addCompositingNode( const uint64_t gpuIndex )
 
 void ParallelRendering::distributeBaseVolume1D()
 {
-
-
     const int nDevices = inUseGPUs_.size();
 
     if( nDevices == 0 )
         LOG_ERROR( "No deployed devices to distribute volume!");
 
+    QVector< Volume8 *> bricks = baseVolume_->getBricksXAxis( nDevices );
 
-    Volumes8 &bricks = baseVolume_->getBricksXAxis( nDevices );
+    //QVector< Volume8 *> bricks = baseVolume_->heuristicBricking( nDevices );
     int i = 0;
 
     for( auto renderingDevice  : inUseGPUs_ )
@@ -266,35 +265,7 @@ void ParallelRendering::distributeBaseVolume1D()
     emit this->frameworkReady_SIGNAL();
 }
 
-//void ParallelRendering::
-//decomposeBaseVolume3D( const uint partitions ,
-//                       const Volume< uchar > &base ,
-//                       std::vector< Volume< uchar > *> *subvolumes )
-//{
 
-//    if( partitions > 2 )
-//    {
-//        //divide according to the greatest dimensions.
-//        if( base.getDimensions().x >= base.getDimensions().y &&
-//            base.getDimensions().x >= base.getDimensions().z  )
-//        {
-//            Volume< uchar > *first =
-//                    base.getBrick( 0 ,
-//                                   base.getDimensions().x / 2 ,
-//                                   0 ,
-//                                   base.getDimensions().y ,
-//                                   0 ,
-//                                   base.getDimensions().z ) ;
-
-//            Volume< uchar > *second =
-//                    base.getBrick( base.getDimensions().x / 2 + 1 ,
-//                                   base.getDimensions().x ,
-//                                   0 ,
-//                                   base.getDimensions().)
-//        }
-
-//    }
-//}
 
 void ParallelRendering::startRendering()
 {

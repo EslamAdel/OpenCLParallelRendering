@@ -113,10 +113,6 @@ public:
     uint getFrameHeight() const ;
 
 
-//    void decomposeBaseVolume3D( const uint partitions ,
-//                                const Volume< uchar > &base,
-//                                std::vector< Volume< uchar > *> *subvolumes ) ;
-
 signals:
 
     void frameworkReady_SIGNAL( );

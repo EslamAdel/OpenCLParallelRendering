@@ -9,6 +9,7 @@
 #include <fcntl.h>
 #include <sys/mman.h>
 #include <unistd.h>
+#include <QVector>
 
 template < class T >
 class Volume
@@ -177,9 +178,15 @@ public: // Public functions
                          const u_int64_t zf ) const ;
 
 
-    std::vector< Volume< T > *> &getBricksXAxis( uint partitions ) const;
+    QVector< Volume< T > *> getBricksXAxis( uint partitions ) const;
+
+    QVector< Volume< T > *> getBricksYAxis( uint partitions ) const;
+
+    QVector< Volume< T > *> getBricksZAxis( uint partitions ) const;
 
 
+    QVector< Volume< T > *>
+    heuristicBricking( const uint partitions ) const;
 
 protected: // Protected functions
 
@@ -289,7 +296,6 @@ typedef Volume< float > VolumeF;
 typedef Volume< double > VolumeD;
 
 
-typedef std::vector< Volume< u_int8_t > *> Volumes8 ;
 
 
 #endif // VOLUME_H
