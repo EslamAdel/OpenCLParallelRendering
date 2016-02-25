@@ -113,6 +113,10 @@ public:
     uint getFrameHeight() const ;
 
 
+//    void decomposeBaseVolume3D( const uint partitions ,
+//                                const Volume< uchar > &base,
+//                                std::vector< Volume< uchar > *> *subvolumes ) ;
+
 signals:
 
     void frameworkReady_SIGNAL( );
@@ -310,7 +314,6 @@ protected:
 
     //Volume Data
     Volume<uchar> *baseVolume_;
-    std::vector< Volume<uchar>* > bricks_;
 
     //Transformation parameters
     Coordinates3D rotation_;

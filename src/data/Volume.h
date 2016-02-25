@@ -16,6 +16,7 @@ class Volume
 
 public: // Constructors
 
+
     /**
      * @brief Volume
      * @param prefix
@@ -23,10 +24,10 @@ public: // Constructors
     Volume( const std::string prefix,
             const bool drawBoundingBox = false );
 
-    Volume( const Coordinates3D brickCoordinates,
-            const Dimensions3D brickDimensions,
-            const Coordinates3D brickUnitCubeCenter,
-            const Coordinates3D brickUnitCubeScaleFactors,
+    Volume( const Coordinates3D brickCoordinates ,
+            const Dimensions3D brickDimensions ,
+            const Coordinates3D brickUnitCubeCenter ,
+            const Coordinates3D brickUnitCubeScaleFactors ,
             T *brickData,
             const bool drawBoundingBox = false ) ;
 
@@ -173,7 +174,12 @@ public: // Public functions
                          const u_int64_t yi ,
                          const u_int64_t yf ,
                          const u_int64_t zi ,
-                         const u_int64_t zf );
+                         const u_int64_t zf ) const ;
+
+
+    std::vector< Volume< T > *> &getBricksXAxis( uint partitions ) const;
+
+
 
 protected: // Protected functions
 
@@ -281,5 +287,9 @@ typedef Volume< float > VolumeF;
  * An double precision Volume.
  */
 typedef Volume< double > VolumeD;
+
+
+typedef std::vector< Volume< u_int8_t > *> Volumes8 ;
+
 
 #endif // VOLUME_H

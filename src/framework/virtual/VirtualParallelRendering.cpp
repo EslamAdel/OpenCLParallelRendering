@@ -23,10 +23,10 @@ void VirtualParallelRendering::addRenderingNode( const uint64_t gpuIndex )
                                            volumeDensityAsync_,
                                            brightnessAsync_  ,
                                            transferFunctionScaleAsync_,
-                                           transferFunctionOffsetAsync_);
+                                           transferFunctionOffsetAsync_ );
 
     renderingNodes_.push_back( node );
-
+    node->setFrameIndex( gpuIndex );
 
     this->rendererPool_.setMaxThreadCount( renderingNodes_.size( ));
     this->collectorPool_.setMaxThreadCount( renderingNodes_.size( ));
@@ -120,41 +120,16 @@ void VirtualParallelRendering::distributeBaseVolume1D()
     if( nDevices == 0 )
         LOG_ERROR( "No deployed devices to distribute volume!");
 
-    // Decompose the base volume for each rendering device
-    // evenly over the X-axis.
-    const uint64_t baseXDimension = this->baseVolume_->getDimensions().x;
-    const uint64_t newXDimension =  baseXDimension / nDevices  ;
 
+    Volumes8 &bricks = this->baseVolume_->getBricksXAxis( nDevices );
 
-    //Extract Brick For each node
-    for( auto i = 0 ; i < nDevices - 1 ; i++ )
-    {
-        auto *brick = this->baseVolume_->getBrick( newXDimension*i ,
-                                                   newXDimension*( i + 1 )  ,
-                                                   0,
-                                                   baseVolume_->getDimensions().y ,
-                                                   0,
-                                                   baseVolume_->getDimensions().z );
-
-        this->bricks_.push_back( brick );
-    }
-
-    //The Last node will have the entire remaining brick
-    auto brick = this->baseVolume_->getBrick( newXDimension*( nDevices - 1 ) ,
-                                              this->baseVolume_->getDimensions().x ,
-                                              0,
-                                              this->baseVolume_->getDimensions().y ,
-                                              0,
-                                              this->baseVolume_->getDimensions().z );
-
-    this->bricks_.push_back( brick );
     int i = 0;
 
     for( auto node  : renderingNodes_ )
     {
         LOG_DEBUG( "Loading subVolume to device" );
 
-        auto subVolume = this->bricks_[ i++ ];
+        auto subVolume = bricks[ i++ ];
         node->loadVolume( subVolume );
 
         LOG_DEBUG( "[DONE] Loading subVolume to GPU <%d>",
@@ -186,17 +161,17 @@ void VirtualParallelRendering::startRendering()
 
 void VirtualParallelRendering::frameLoadedToDevice_SLOT( VirtualRenderingNode *node )
 {
-    LOG_DEBUG("Frame Loaded to Device");
+    LOG_DEBUG("Frame<%d> Loaded to Device" , node->getGPUIndex() );
 
     emit this->frameReady_SIGNAL( &node->getCLFrame()->getFramePixmap() , node  );
     //accumulate the recently loaded frame to the collage frame.
-    compositorPool_.start( compositingTasks_[ node->getFrameIndex() ] );
+    compositorPool_.start( compositingTasks_[ node->getGPUIndex() ] );
 }
 
 void VirtualParallelRendering::finishedRendering_SLOT(RenderingNode *node)
 {
 
-    collectorPool_.start( collectingTasks_[ node->getFrameIndex() ]);
+    collectorPool_.start( collectingTasks_[ node->getGPUIndex() ]);
 
 }
 
@@ -227,10 +202,10 @@ void VirtualParallelRendering::applyTransformation_()
 
     for( VirtualRenderingNode *node : renderingNodes_ )
     {
-        LOG_DEBUG("Triggering rendering frame[%d]:%p" , node->getFrameIndex() ,
+        LOG_DEBUG("Triggering renderer[%d]:%p" , node->getGPUIndex() ,
                   node );
         // Spawn threads and start rendering on each rendering node.
-        this->rendererPool_.start( renderingTasks_[ node->getFrameIndex() ]);
+        this->rendererPool_.start( renderingTasks_[ node->getGPUIndex() ]);
     }
 
     this->pendingTransformations_ = false;

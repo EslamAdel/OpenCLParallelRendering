@@ -6,6 +6,7 @@
 #include <Vector4.h>
 #include <vector>
 
+
 ////////////////////////////////////////////////////////////////////////////////
 /// Vector2 (Image)
 ////////////////////////////////////////////////////////////////////////////////
@@ -68,5 +69,8 @@ typedef Vector4F Color;
  * A list of colors reflecting a set of points of a transfer function.
  */
 typedef std::vector< Color > Colors;
+
+
+
 
 #endif // TYPEDEFS_HH

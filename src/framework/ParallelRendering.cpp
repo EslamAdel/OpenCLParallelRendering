@@ -241,52 +241,22 @@ void ParallelRendering::addCompositingNode( const uint64_t gpuIndex )
 
 void ParallelRendering::distributeBaseVolume1D()
 {
-    LOG_DEBUG("Distributing Volume");
 
-    // Handle some minor exceptions.
-    if( baseVolume_ == nullptr )
-        LOG_ERROR( "No Base Volume to distribute!" );
 
     const int nDevices = inUseGPUs_.size();
 
     if( nDevices == 0 )
         LOG_ERROR( "No deployed devices to distribute volume!");
 
-    // Decompose the base volume for each rendering device
-    // evenly over the X-axis.
-    const uint64_t baseXDimension = baseVolume_->getDimensions().x;
-    const uint64_t newXDimension =  baseXDimension / nDevices  ;
 
-
-    //Extract Brick For each node
-    for( auto i = 0 ; i < nDevices - 1 ; i++ )
-    {
-        auto *brick = baseVolume_->getBrick( newXDimension*i ,
-                                             newXDimension*( i + 1 )  ,
-                                             0,
-                                             baseVolume_->getDimensions().y ,
-                                             0,
-                                             baseVolume_->getDimensions().z );
-
-        bricks_.push_back( brick );
-    }
-
-    //The Last node will have the entire remaining brick
-    auto brick = baseVolume_->getBrick( newXDimension*( nDevices - 1 ) ,
-                                        baseVolume_->getDimensions().x ,
-                                        0,
-                                        baseVolume_->getDimensions().y ,
-                                        0,
-                                        baseVolume_->getDimensions().z );
-
-    bricks_.push_back( brick );
+    Volumes8 &bricks = baseVolume_->getBricksXAxis( nDevices );
     int i = 0;
 
     for( auto renderingDevice  : inUseGPUs_ )
     {
         LOG_DEBUG( "Loading subVolume to device" );
 
-        auto subVolume = bricks_[ i++ ];
+        auto subVolume = bricks[ i++ ];
         renderingNodes_[ renderingDevice ]->loadVolume( subVolume );
 
         LOG_DEBUG( "[DONE] Loading subVolume to GPU <%d>",
@@ -295,6 +265,36 @@ void ParallelRendering::distributeBaseVolume1D()
 
     emit this->frameworkReady_SIGNAL();
 }
+
+//void ParallelRendering::
+//decomposeBaseVolume3D( const uint partitions ,
+//                       const Volume< uchar > &base ,
+//                       std::vector< Volume< uchar > *> *subvolumes )
+//{
+
+//    if( partitions > 2 )
+//    {
+//        //divide according to the greatest dimensions.
+//        if( base.getDimensions().x >= base.getDimensions().y &&
+//            base.getDimensions().x >= base.getDimensions().z  )
+//        {
+//            Volume< uchar > *first =
+//                    base.getBrick( 0 ,
+//                                   base.getDimensions().x / 2 ,
+//                                   0 ,
+//                                   base.getDimensions().y ,
+//                                   0 ,
+//                                   base.getDimensions().z ) ;
+
+//            Volume< uchar > *second =
+//                    base.getBrick( base.getDimensions().x / 2 + 1 ,
+//                                   base.getDimensions().x ,
+//                                   0 ,
+//                                   base.getDimensions().)
+//        }
+
+//    }
+//}
 
 void ParallelRendering::startRendering()
 {
@@ -550,8 +550,8 @@ void ParallelRendering::tranferFunctionFlag_SLOT(int flag)
 {
     for( auto renderingDevice : inUseGPUs_ )
     {
-         RenderingNode* node = renderingNodes_[ renderingDevice ];
-         node->setTransferFunctionFlag(flag);
+        RenderingNode* node = renderingNodes_[ renderingDevice ];
+        node->setTransferFunctionFlag(flag);
     }
     if( renderingNodesReady_ ) applyTransformation_();
     else pendingTransformations_ = true ;
