@@ -246,9 +246,9 @@ void ParallelRendering::distributeBaseVolume1D()
     if( nDevices == 0 )
         LOG_ERROR( "No deployed devices to distribute volume!");
 
-    QVector< Volume8 *> bricks = baseVolume_->getBricksXAxis( nDevices );
+    //QVector< Volume8 *> bricks = baseVolume_->getBricksXAxis( nDevices );
 
-    //QVector< Volume8 *> bricks = baseVolume_->heuristicBricking( nDevices );
+    QVector< Volume8 *> bricks = baseVolume_->heuristicBricking( nDevices );
     int i = 0;
 
     for( auto renderingDevice  : inUseGPUs_ )
