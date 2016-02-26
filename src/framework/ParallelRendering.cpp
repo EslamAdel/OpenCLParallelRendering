@@ -192,8 +192,6 @@ void ParallelRendering::addCLCompositor( const uint64_t gpuIndex )
         LOG_DEBUG("Connecting CLRenderer< %d >" ,
                   renderer->getGPUIndex( ));
 
-        renderer->setFrameIndex( frameIndex );
-
         //register a frame to be allocated in the compositor device.
         compositor_->allocateFrame( renderer );
 

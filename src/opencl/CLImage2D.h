@@ -10,7 +10,7 @@ class CLImage2D : public CLFrame< T >
 
 public:
     CLImage2D(  const Dimensions2D dimensions ,
-                const cl_channel_order channelOrder = CL_INTENSITY ,
+                const cl_channel_order channelOrder = CL_RGBA ,
                 const cl_channel_type channelType = CL_UNORM_INT8  );
 
     virtual void createDeviceData( cl_context context ) override;

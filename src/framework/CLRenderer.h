@@ -72,6 +72,11 @@ public:
      */
     void setTransferFunctionFlag(int flag);
 
+    //depth comparator.
+    bool operator<( const CLRenderer &rhs ) const ;
+
+    static bool lessThan( const CLRenderer* lhs , const CLRenderer* rhs );
+
 signals:
     /**
      * @brief finishedRendering
@@ -95,5 +100,7 @@ private:
     uint frameIndex_ ;
 
 };
+
+
 
 #endif // CLRenderer_H

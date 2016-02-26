@@ -8,7 +8,7 @@
 #include <auxillary/glm/gtc/matrix_transform.hpp>
 #include <auxillary/glm/gtc/type_ptr.hpp>
 
-
+#include <QtAlgorithms>
 
 CLCompositor::CLCompositor(const uint64_t gpuIndex,
                            const uint frameWidth ,
@@ -19,7 +19,7 @@ CLCompositor::CLCompositor(const uint64_t gpuIndex,
     compositedFramesCount_ = 0 ;
     framesCount_ = 0 ;
     framesInCompositor_ = 0 ;
-
+    depthIndex_ = nullptr;
 
     initializeContext_();
     initializeKernel_();
@@ -35,20 +35,28 @@ CLCompositor::~CLCompositor()
 
 void CLCompositor::allocateFrame( CLRenderer *renderer )
 {
+    if( renderers_.contains( renderer ))
+        return ;
 
-    //    CLFrame32 *frame =
-    //            new CLFrame32( renderer->getCLFrame()->getFrameDimensions( ));
+    renderer->setFrameIndex( renderers_.size( ));
 
-    //    frame->createDeviceData( context_ );
-
-    //    frames_[ renderer ] = frame ;
-
-
-    //    framesCount_++ ;
-
+    renderers_ << renderer ;
     imagesArray_->resize( imagesArray_->size() + 1 ,
                           context_ );
 
+    if( depthIndex_ == nullptr )
+    {
+        depthIndex_ = new CLBuffer< uint >( 1 );
+        depthIndex_->createDeviceData( context_ );
+    }
+    else
+        depthIndex_->resize( renderers_.size( ));
+
+
+    compositingKernel_->setDepthIndex( depthIndex_->getDeviceData( ));
+
+    if( imagesArray_->inDevice())
+        compositingKernel_->setFrame( imagesArray_->getDeviceData( ));
 
 }
 
@@ -66,6 +74,9 @@ CLImage2D< uint > *&CLCompositor::getCLFrameCollage()
 void CLCompositor::collectFrame( CLRenderer *renderer ,
                                  const cl_bool block )
 {
+
+
+
     //if the two buffers are in same context, copy the buffer directly in Device.
 
 
@@ -180,14 +191,26 @@ void CLCompositor::compositeFrames_DEVICE()
     if( framesInCompositor_ != imagesArray_->size( ))
         return ;
 
-    compositingKernel_->setFrame( imagesArray_->getDeviceData( ));
+    qStableSort( renderers_.begin() , renderers_.end() ,
+                 CLRenderer::lessThan );
 
+    QVector< uint > depthIndex ;
+
+    for( CLRenderer *renderer : renderers_ )
+        depthIndex << renderer->getFrameIndex();
+
+    for( CLRenderer *renderer : renderers_ )
+        LOG_DEBUG("Depth<%d>: %f" ,
+                  renderer->getFrameIndex() ,
+                  renderer->getCurrentCenter().z );
+
+
+    depthIndex_->setHostData( depthIndex );
+    depthIndex_->writeDeviceData( commandQueue_ , CL_TRUE );
 
     const size_t localSize[ ] = { 1 , 1  } ;
     const size_t globalSize[ ] = { collageFrameDimensions_.x ,
                                    collageFrameDimensions_.y };
-
-
 
     cl_int clErrorCode =
             clEnqueueNDRangeKernel( commandQueue_ ,
@@ -218,11 +241,11 @@ void CLCompositor::compositeFrames_DEVICE()
 void CLCompositor::loadCollageFromDevice()
 {
 
-    LOG_DEBUG("Reading CollageFrame" );
+//    LOG_DEBUG("Reading CollageFrame" );
     collageFrameReadout_->readOtherDeviceData( commandQueue_ ,
                                                *collageFrame_ ,
                                                CL_TRUE );
-    LOG_DEBUG("[DONE] Reading CollageFrame"  );
+//    LOG_DEBUG("[DONE] Reading CollageFrame"  );
 
     readOutReady_ = false ;
     compositedFramesCount_ = 0 ;

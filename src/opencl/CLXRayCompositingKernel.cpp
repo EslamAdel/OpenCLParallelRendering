@@ -31,7 +31,7 @@ void CLXRayCompositingKernel::setCollageFrame(const cl_mem collageFrame)
 }
 
 
-void CLXRayCompositingKernel::setFrame(const cl_mem frameImage2D)
+void CLXRayCompositingKernel::setFrame( const cl_mem frameImage2D )
 {
 
     cl_int error = CL_SUCCESS;
@@ -39,6 +39,28 @@ void CLXRayCompositingKernel::setFrame(const cl_mem frameImage2D)
     error = clSetKernelArg( kernelObject_, KernelArguments::Frame ,
                             sizeof( cl_mem ),
                             ( void* ) &frameImage2D );
+
+    if( error != CL_SUCCESS )
+    {
+        oclHWDL::Error::checkCLError( error );
+        LOG_ERROR("Exiting due to OpenCL Error!");
+    }
+}
+
+void CLXRayCompositingKernel::setDepthIndex( const cl_mem depthIndex )
+{
+    cl_int error = CL_SUCCESS;
+
+//    LOG_DEBUG( "setting depth index");
+//    for( uint val : depth )
+//        std::cout << val << std::endl ;
+
+//    LOG_DEBUG("buffer size in bytes = %d" , sizeof(uint)*depth.size());
+//    const uint *data = depth.constData();
+
+    error = clSetKernelArg( kernelObject_, KernelArguments::DepthIndex ,
+                            sizeof( cl_mem ) ,
+                            ( void* ) &depthIndex );
 
     if( error != CL_SUCCESS )
     {

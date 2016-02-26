@@ -86,9 +86,9 @@ void CLImage2D< T >::readOtherDeviceData( cl_command_queue sourceCmdQueue ,
     if( sourceFrame.getFrameDimensions() != this->dimensions_ )
         LOG_ERROR("Dimensions mismatch!");
 
-    LOG_DEBUG("Reading device image %dx%d = %d",
-              this->dimensions_.x , this->dimensions_.y ,
-              this->dimensions_.imageSize( ));
+//    LOG_DEBUG("Reading device image %dx%d = %d",
+//              this->dimensions_.x , this->dimensions_.y ,
+//              this->dimensions_.imageSize( ));
 
     const size_t origin[3] = { 0 , 0 , 0 };
     const size_t region[] = { this->dimensions_.x , this->dimensions_.y , 1 } ;

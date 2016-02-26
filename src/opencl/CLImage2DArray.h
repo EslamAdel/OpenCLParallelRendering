@@ -13,7 +13,7 @@ public:
 
     CLImage2DArray( const uint width , const uint height ,
                     const uint arraySize ,
-                    const cl_channel_order channelOrder = CL_INTENSITY ,
+                    const cl_channel_order channelOrder = CL_RGBA ,
                     const cl_channel_type channelType = CL_UNORM_INT8  );
 
     ~CLImage2DArray();
@@ -43,6 +43,9 @@ public:
                               const uint index ,
                               const CLFrame< T > &source ,
                               cl_bool blocking ) ;
+
+    bool inDevice() const ;
+
 private :
     void releaseDeviceData_();
 

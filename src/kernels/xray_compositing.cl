@@ -55,12 +55,13 @@ void xray_compositing_accumulate(   __global uint* collageFrame ,
 
 
 
-const sampler_t sampler =  CLK_FILTER_NEAREST | CLK_NORMALIZED_COORDS_TRUE
-                            | CLK_ADDRESS_CLAMP_TO_EDGE ;
+const sampler_t sampler =  CLK_FILTER_NEAREST | CLK_NORMALIZED_COORDS_FALSE
+                            | CLK_ADDRESS_CLAMP_TO_EDGE;
 
 __kernel
 void xray_compositing_patch( __write_only image2d_t collageFrame ,
-                             __read_only image3d_t framesArray )
+                             __read_only image3d_t framesArray ,
+                             __constant  uint* depthIndex )
 {
 
     const uint x = get_global_id(0);
@@ -68,18 +69,14 @@ void xray_compositing_patch( __write_only image2d_t collageFrame ,
 
     const uint framesCount = get_image_depth( framesArray );
 
-
-
-
-
     float4 color = (float4)( 0.f , 0.f , 0.f , 0.f );
 
-    for( int i = 0 ; i < framesCount - 2  ; i++ )
+    for( int i = 0 ; i < framesCount ; i++ )
     {
-        int4 location = (int4)( x , y , i , 0 );
+        uint currentDepth = depthIndex[ i ];
+        int4 location = (int4)( x , y , currentDepth , 0 );
         float4 sample = read_imagef( framesArray , sampler , location ) ;
-        //color = mix( color, sample , sample.w );
-        color = clamp( color + sample , 0.f , 1.f );
+        color = mix( color , sample  ,  sample.w   );
     }
     int2 locate = (int2)( x , y );
 

@@ -10,6 +10,7 @@
 #include <QObject>
 #include "CLImage2D.h"
 #include "CLImage2DArray.h"
+#include "CLBuffer.h"
 #include <unordered_map>
 #include "CLRenderer.h"
 
@@ -153,7 +154,7 @@ protected:
      */
     CLXRayCompositingKernel *compositingKernel_ ;
 
-
+    QVector< CLRenderer *> renderers_ ;
     //facts
     const uint64_t gpuIndex_;
 
@@ -164,7 +165,6 @@ protected:
     uint framesInCompositor_ ;
 
     bool readOutReady_ ;
-
 
     uint8_t compositedFramesCount_ ;
 
@@ -188,6 +188,8 @@ protected:
     //empty
     //Frames frames_ ;
     CLImage2DArray< uint > *imagesArray_ ;
+
+    CLBuffer< uint > *depthIndex_ ;
 };
 
 #endif // CLCompositor_H

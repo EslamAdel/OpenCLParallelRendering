@@ -38,6 +38,7 @@ SET( OCL_MGPUVS_SOURCE_FILES
     opencl/CLVolume.cpp
     opencl/CLXRayCompositingKernel.cpp
     opencl/CLXRayRenderingKernel.cpp
+    opencl/CLBuffer.cpp
     profiling/ProfilingExterns.cpp
     system/oclUtils.cpp
     system/Utilities.cpp
@@ -83,6 +84,7 @@ SET( OCL_MGPUVS_HEADER_FILES
     opencl/CLVolume.ipp
     opencl/CLXRayCompositingKernel.h
     opencl/CLXRayRenderingKernel.h
+    opencl/CLBuffer.h
     profiling/Profiles.hh
     profiling/ProfilingExterns.h
     system/Logger.h

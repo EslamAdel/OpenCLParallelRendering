@@ -190,6 +190,12 @@ void CLImage2DArray< T >::readOtherDeviceData( cl_command_queue cmdQueue ,
 }
 
 template< class T >
+bool CLImage2DArray< T >::inDevice() const
+{
+    return inDevice_ ;
+}
+
+template< class T >
 void CLImage2DArray< T >::releaseDeviceData_()
 {
     if( deviceData_ != NULL )

@@ -131,7 +131,7 @@ void RenderingWindow::frameReady_SLOT( QPixmap *frame ,
 void RenderingWindow::collageFrameReady_SLOT( QPixmap *finalFrame )
 {
 
-    LOG_DEBUG("Final Frame ready");
+//    LOG_DEBUG("Final Frame ready");
     finalFrame_ = finalFrame;
     ui->frameContainerResult->
             setPixmap( finalFrame->scaled( ui->frameContainerResult->width( ) ,

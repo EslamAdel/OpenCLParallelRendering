@@ -11,7 +11,8 @@ class CLXRayCompositingKernel
 public:
     enum KernelArguments {
         CollageFrame = 0 ,
-        Frame
+        Frame ,
+        DepthIndex
     };
 
     CLXRayCompositingKernel(
@@ -25,6 +26,7 @@ public:
 
     virtual void setFrame( const cl_mem frameImage2D );
 
+    virtual void setDepthIndex( const cl_mem depthIndex );
 
     void releaseKernel( );
 

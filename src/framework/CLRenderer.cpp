@@ -46,3 +46,15 @@ void CLRenderer::setTransferFunctionFlag(int flag)
 {
     activeRenderingKernel_->setTransferFunctionFlag(flag);
 }
+
+bool CLRenderer::operator<(const CLRenderer &rhs) const
+{
+    return currentCenter_.z < rhs.getCurrentCenter().z ;
+}
+
+bool CLRenderer::lessThan(const CLRenderer *lhs, const CLRenderer *rhs)
+{
+    return lhs->getCurrentCenter().z < rhs->getCurrentCenter().z ;
+}
+
+
