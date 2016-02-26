@@ -348,7 +348,6 @@ void ParallelRendering::finishedRendering_SLOT(CLRenderer *renderer )
 void ParallelRendering::compositingFinished_SLOT()
 {
 
-
     TOC( frameworkProfile.renderingLoop_TIMER );
 
 #ifndef BENCHMARKING

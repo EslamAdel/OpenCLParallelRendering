@@ -75,13 +75,13 @@ public:
     bool inSameContext( const CLFrame<T> &frame ) const ;
 
 
-private:
+protected:
     void releaseDeviceData_();
 
     //Temporary solution as namesapce SystemUtilites cannot be found
     //by compiler.
     void convertColorToRGBA_( uint Color,
-                             uint8_t &r, uint8_t &g, uint8_t &b, uint8_t &a );
+                              uint8_t &r, uint8_t &g, uint8_t &b, uint8_t &a );
 protected:
 
     T *hostData_;

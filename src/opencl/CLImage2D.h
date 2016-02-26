@@ -13,14 +13,19 @@ public:
                 const cl_channel_order channelOrder = CL_INTENSITY ,
                 const cl_channel_type channelType = CL_UNORM_INT8  );
 
-    virtual void createDeviceData( cl_context context );
+    virtual void createDeviceData( cl_context context ) override;
 
 
     virtual void writeDeviceData(  cl_command_queue cmdQueue ,
-                                   const cl_bool blocking );
+                                   const cl_bool blocking ) override;
 
     virtual void readDeviceData( cl_command_queue cmdQueue ,
-                                 const cl_bool blocking );
+                                 const cl_bool blocking ) override;
+
+    virtual void readOtherDeviceData( cl_command_queue sourceCmdQueue ,
+                                      const CLFrame< T > &sourceFrame ,
+                                      const cl_bool blocking ) override ;
+
 
 
 private :

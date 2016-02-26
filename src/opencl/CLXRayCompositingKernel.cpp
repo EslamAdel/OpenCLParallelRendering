@@ -2,9 +2,9 @@
 #include "Logger.h"
 
 
-CLXRayCompositingKernel::CLXRayCompositingKernel( const cl_context clContext,
-                                                  const std::string kernelName,
-                                                  const std::string kernelFile,
+CLXRayCompositingKernel::CLXRayCompositingKernel( const cl_context clContext ,
+                                                  const std::string kernelName ,
+                                                  const std::string kernelFile ,
                                                   const std::string kernelDirectory )
     : clContext_( clContext ),
       kernelDirectory_( kernelDirectory ),
@@ -23,8 +23,11 @@ void CLXRayCompositingKernel::setCollageFrame(const cl_mem collageFrame)
     error = clSetKernelArg( kernelObject_, KernelArguments::CollageFrame,
                             sizeof( cl_mem ),
                             ( void* ) &collageFrame );
-
-    oclHWDL::Error::checkCLError( error );
+    if( error != CL_SUCCESS )
+    {
+        oclHWDL::Error::checkCLError( error );
+        LOG_ERROR("Exiting due to OpenCL Error!");
+    }
 }
 
 
@@ -37,7 +40,11 @@ void CLXRayCompositingKernel::setFrame(const cl_mem frameImage2D)
                             sizeof( cl_mem ),
                             ( void* ) &frameImage2D );
 
-    oclHWDL::Error::checkCLError( error );
+    if( error != CL_SUCCESS )
+    {
+        oclHWDL::Error::checkCLError( error );
+        LOG_ERROR("Exiting due to OpenCL Error!");
+    }
 }
 
 

@@ -245,7 +245,8 @@ bool CLFrame< T >::inSameContext(const CLFrame<T> &frame ) const
 template< class T >
 void CLFrame< T >::releaseDeviceData_()
 {
-    clReleaseMemObject( deviceData_ );
+    if( deviceData_ )
+        clReleaseMemObject( deviceData_ );
 
 }
 

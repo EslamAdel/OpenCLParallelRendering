@@ -281,7 +281,6 @@ protected:
     void benchmark_() ;
 
 protected :
-
     //oclHWDl utilities
     oclHWDL::Hardware         clHardware_;
     QSet< oclHWDL::Device* >   inUseGPUs_;
@@ -308,7 +307,6 @@ protected:
     TaskMakePixmap *collagePixmapTask_;
     MakePixmapTasks makePixmapTasks_ ;
 
-
     //Volume Data
     Volume<uchar> *baseVolume_;
 
@@ -319,7 +317,6 @@ protected:
     //the activity rendering threads.
     //modified using syncTransformation_()
     Transformation transformationAsync_ ;
-
 
     //flags
     bool pendingTransformations_;
@@ -335,8 +332,6 @@ protected:
     uint machineGPUsCount_;
     const uint frameWidth_ ;
     const uint frameHeight_ ;
-
-
 };
 
 #endif // PARALLELRENDERING_H

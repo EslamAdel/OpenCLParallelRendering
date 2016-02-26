@@ -2,6 +2,8 @@
 #define CLIMAGE2DARRAY_H
 
 #include <oclHWDL.h>
+#include <QVector>
+#include "CLFrame.h"
 
 template< class T >
 class CLImage2DArray
@@ -13,6 +15,8 @@ public:
                     const uint arraySize ,
                     const cl_channel_order channelOrder = CL_INTENSITY ,
                     const cl_channel_type channelType = CL_UNORM_INT8  );
+
+    ~CLImage2DArray();
 
     void createDeviceData( cl_context context );
 
@@ -30,17 +34,32 @@ public:
      */
     float getFrameDepth();
 
-private:
-    const uint width_ ;
-    const uint height_ ;
-    const uint arraySize_;
+    void resize( const uint newArraySize , cl_context context );
 
+    size_t size() const ;
+
+
+    void readOtherDeviceData( cl_command_queue cmdQueue ,
+                              const uint index ,
+                              const CLFrame< T > &source ,
+                              cl_bool blocking ) ;
+private :
+    void releaseDeviceData_();
+
+
+private:
+    const uint width_    ;
+    const uint height_   ;
+    uint arraySize_ ;
     cl_mem deviceData_ ;
 
     cl_image_format imageFormat_ ;
     float frameDepth_;
-    std::vector< T* > framesData_ ;
-    std::vector< bool > framesSet_ ;
+    QVector< T* > framesData_ ;
+    QVector< bool > framesSet_ ;
+
+    cl_context context_ ;
+    bool inDevice_ ;
 };
 
 

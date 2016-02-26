@@ -55,36 +55,37 @@ void xray_compositing_accumulate(   __global uint* collageFrame ,
 
 
 
+const sampler_t sampler =  CLK_FILTER_NEAREST | CLK_NORMALIZED_COORDS_TRUE
+                            | CLK_ADDRESS_CLAMP_TO_EDGE ;
 
-const sampler_t sampler   = CLK_NORMALIZED_COORDS_FALSE |
-                            CLK_ADDRESS_NONE |
-                            CLK_FILTER_LINEAR ;
+__kernel
+void xray_compositing_patch( __write_only image2d_t collageFrame ,
+                             __read_only image3d_t framesArray )
+{
 
-//__kernel
-//void xray_compositing_patch( __write_only image2d_t collageFrame ,
-//                             __read_only image3d_t framesArray )
-//{
+    const uint x = get_global_id(0);
+    const uint y = get_global_id(1);
 
-//    const uint x = get_global_id(0);
-//    const uint y = get_global_id(1);
-
-//    const uint imageWidth = get_image_width( framesArray );
-//    const uint framesCount = get_image_depth( framesArray );
-
-//    float4 locate = (float4)( x , y , 0 , 0 );
-
-//    float4 color = (float4)( 0.f , 0.f , 0.f , 0.f );
-
-//    for( int i = 0 ; i < framesCount ; i++ )
-//    {
-//        //color = clamp( color + read_imagef( framesArray , sampler , locate ) , 0.f , 1.f ) ;
-//        int4 location = (int4)( get_global_id(0) , get_global_id(1) , i , 0 );
-//        color += read_imagef( framesArray , sampler , location ) ;
-//    }
+    const uint framesCount = get_image_depth( framesArray );
 
 
-//    collageFrame[ ( imageWidth * y ) + x ] =  rgbaFloatToInt( color );
-//}
+
+
+
+    float4 color = (float4)( 0.f , 0.f , 0.f , 0.f );
+
+    for( int i = 0 ; i < framesCount - 2  ; i++ )
+    {
+        int4 location = (int4)( x , y , i , 0 );
+        float4 sample = read_imagef( framesArray , sampler , location ) ;
+        //color = mix( color, sample , sample.w );
+        color = clamp( color + sample , 0.f , 1.f );
+    }
+    int2 locate = (int2)( x , y );
+
+
+    write_imagef( collageFrame , locate , color ) ;
+}
 
 
 

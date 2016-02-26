@@ -5,13 +5,14 @@
 #include <QRunnable>
 #include <CLFrame.h>
 #include "CLRenderer.h"
+#include <CLImage2D.h>
 
 class TaskMakePixmap : public QObject , public QRunnable
 {
     Q_OBJECT
 public:
-    TaskMakePixmap(CLFrame32 *&frame , const CLRenderer* clRenderer = nullptr );
-
+    TaskMakePixmap( CLFrame<uint> *frame ,
+                    const CLRenderer* clRenderer_ = nullptr );
 protected:
     void run() ;
 
@@ -19,7 +20,7 @@ signals:
     void pixmapReady_SIGNAL(  QPixmap *pixmap , const CLRenderer* clRenderer);
 
 private:
-    CLFrame32 *&frame_ ;
+    CLFrame32 *frame_ ;
     const CLRenderer *clRenderer_;
 
 };

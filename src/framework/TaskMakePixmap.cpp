@@ -1,15 +1,14 @@
 #include "TaskMakePixmap.h"
 #include "ProfilingExterns.h"
 
-TaskMakePixmap::TaskMakePixmap(CLFrame32 *&frame ,
-                                 const CLRenderer *clRenderer )
+TaskMakePixmap::TaskMakePixmap( CLFrame< uint > *frame ,
+                                const CLRenderer *clRenderer )
     : frame_( frame ) ,
       clRenderer_( clRenderer )
 {
     setAutoDelete( false );
 
 }
-
 
 void TaskMakePixmap::run()
 {

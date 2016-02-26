@@ -40,7 +40,6 @@ class CLCompositor : public QObject
 {
     Q_OBJECT
 public:
-
     /**
      * @brief CLCompositor
      * @param gpuIndex
@@ -54,8 +53,8 @@ public:
      * of OpenCL kernel execution is not predicted.
      */
     CLCompositor( const uint64_t gpuIndex ,
-                     const uint frameWidth ,
-                     const uint frameHeight ) ;
+                  const uint frameWidth ,
+                  const uint frameHeight ) ;
 
     ~CLCompositor();
 
@@ -78,6 +77,7 @@ public:
     void accumulateFrame_DEVICE( CLRenderer *renderer );
 
 
+    void compositeFrames_DEVICE( );
     /**
      * @brief uploadCollageFromDevice
      * Called after all compositing buffers accumulated to collage buffer.
@@ -98,7 +98,7 @@ public:
      * @return
      * return the collage Pixmap.
      */
-    CLFrame32 *&getCLFrameCollage();
+    CLImage2D< uint > *&getCLFrameCollage();
 
 
     /**
@@ -110,7 +110,7 @@ public:
     uint8_t getCompositedFramesCount() const;
 
 
-
+    bool readOutReady() const ;
 private:
     /**
      * @brief selectGPU_
@@ -161,6 +161,11 @@ protected:
 
     uint framesCount_ ;
 
+    uint framesInCompositor_ ;
+
+    bool readOutReady_ ;
+
+
     uint8_t compositedFramesCount_ ;
 
     cl_platform_id platform_;
@@ -176,13 +181,13 @@ protected:
      * @brief collageFrame_
      * Collage frame object.
      */
-    CLFrame32 *collageFrame_ ;
+    CLImage2D< uint > *collageFrame_ ;
 
-    CLFrame32 *collageFrameReadout_ ;
+    CLImage2D< uint > *collageFrameReadout_ ;
 
     //empty
-    Frames frames_ ;
-
+    //Frames frames_ ;
+    CLImage2DArray< uint > *imagesArray_ ;
 };
 
 #endif // CLCompositor_H

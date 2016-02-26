@@ -14,10 +14,11 @@ public:
         Frame
     };
 
-    CLXRayCompositingKernel( const cl_context clContext ,
-                             const std::string kernelName = "xray_compositing_accumulate" ,
-                             const std::string kernelFile = "xray_compositing.cl" ,
-                             const std::string kernelDirectory = "." );
+    CLXRayCompositingKernel(
+            const cl_context clContext ,
+            const std::string kernelName = "xray_compositing_accumulate" ,
+            const std::string kernelFile = "xray_compositing.cl" ,
+            const std::string kernelDirectory = "." );
 
 
     virtual void setCollageFrame( const cl_mem collageImage2D );
