@@ -17,13 +17,7 @@ void VirtualParallelRendering::addCLRenderer( const uint64_t gpuIndex )
     auto *renderer = new VirtualCLRenderer( gpuIndex,
                                             frameWidth_ ,
                                             frameHeight_ ,
-                                            translationAsync_,
-                                            rotationAsync_,
-                                            scaleAsync_,
-                                            volumeDensityAsync_,
-                                            brightnessAsync_  ,
-                                            transferFunctionScaleAsync_,
-                                            transferFunctionOffsetAsync_ );
+                                            transformationAsync_ );
 
     renderers_.push_back( renderer );
     renderer->setFrameIndex( gpuIndex );

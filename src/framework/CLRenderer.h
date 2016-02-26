@@ -4,6 +4,7 @@
 #include <QObject>
 #include "CLContext.h"
 #include "Volume.h"
+#include "Transformation.h"
 
 /**
  * @brief The CLRenderer class
@@ -43,12 +44,8 @@ public:
      * by many threads simultaneously.
      */
     CLRenderer( const uint64_t gpuIndex,
-                   const uint frameWidth , const uint frameHeight ,
-                   const Coordinates3D &globalTranslation,
-                   const Coordinates3D &globalRotation,
-                   const Coordinates3D &globalScale,
-                   const float &volumeDensity, const float &brightness,
-                   const float &transferScale,const float &transferOffset );
+                const uint frameWidth , const uint frameHeight ,
+                const Transformation &transformation );
 
     /**
      * @brief applyTransformation
@@ -80,7 +77,7 @@ signals:
      * @brief finishedRendering
      * Inform the outside world if rendering is finished.
      * @param thisPtr
-     * Pass this pointer as Identifier to this node. 
+     * Pass this pointer as Identifier to this node.
      */
     void finishedRendering( CLRenderer *thisPtr );
 
@@ -89,16 +86,7 @@ signals:
 
 private:
 
-    const Coordinates3D &rotation_ ;
-    const Coordinates3D &translation_ ;
-    const Coordinates3D &scale_ ;
-    const float &volumeDensity_ ;
-    const float &imageBrightness_ ;
-    const float &transferFunctionScale_ ;
-    const float &transferFunctionOffset_ ;
-
-
-
+    const Transformation &transformation_ ;
     /**
      * @brief currentCenter_
      */

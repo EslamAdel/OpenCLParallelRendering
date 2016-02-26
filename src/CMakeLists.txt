@@ -21,6 +21,7 @@ SET( OCL_MGPUVS_SOURCE_FILES
     framework/virtual/VirtualCLRenderer.cpp
     framework/virtual/VirtualCLCompositor.cpp
     framework/virtual/VirtualTaskCollect.cpp
+    framework/Transformation.cpp
     auxillary/VolumeUtilities.cpp
     data/Image.cpp
     data/TransferFunction.cpp
@@ -57,6 +58,7 @@ SET( OCL_MGPUVS_HEADER_FILES
     framework/virtual/VirtualParallelRendering.h
     framework/virtual/VirtualCLRenderer.h
     framework/virtual/VirtualTaskCollect.h
+    framework/Transformation.h
     auxillary/half.hpp
     auxillary/VolumeUtilities.h
     common/Headers.hh

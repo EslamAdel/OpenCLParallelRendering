@@ -241,12 +241,12 @@ void CLContext< T >::handleKernel(std::string string)
     activeRenderingKernel_->setTransferFunctionFlag(enableTF);
     //Set the initial Value of the Transfer function offset and scale
     //TODO add Slider to update these values.
-//    float transferOffset = 0.0f;
-//    float transferScale = 1.0f;
+    //    float transferOffset = 0.0f;
+    //    float transferScale = 1.0f;
 
-//    activeRenderingKernel_->setTransferFunctionOffset(transferOffset);
+    //    activeRenderingKernel_->setTransferFunctionOffset(transferOffset);
 
-//    activeRenderingKernel_->setTransferFunctionScale(transferScale);
+    //    activeRenderingKernel_->setTransferFunctionScale(transferScale);
 
     inverseMatrix_ = clCreateBuffer( context_,
                                      CL_MEM_READ_ONLY,
@@ -260,13 +260,7 @@ void CLContext< T >::handleKernel(std::string string)
 }
 
 template< class T >
-void CLContext< T >::paint( const Coordinates3D &rotation ,
-                            const Coordinates3D &translation,
-                            const Coordinates3D &scale,
-                            const float &volumeDensity ,
-                            const float &imageBrightness ,
-                            const float &transferFScale ,
-                            const float &transferFOffset,
+void CLContext< T >::paint( const Transformation &transformation ,
                             Coordinates3D &currentCenter )
 {
 
@@ -276,62 +270,58 @@ void CLContext< T >::paint( const Coordinates3D &rotation ,
     auto glmMVMatrix = glm::mat4( 1.0f );
 
     // Use quatrenions
-    auto rotationVector = glm::tvec3<float>( rotation.x ,
-                                             rotation.y ,
-                                             rotation.z );
+    auto rotationVector =
+            glm::tvec3<float>( transformation.rotation.x ,
+                               transformation.rotation.y ,
+                               transformation.rotation.z );
+
     glm::tquat< float > quaternion =
             glm::tquat< float >(DEG_TO_RAD(rotationVector));
     float angle = glm::angle(quaternion);
     glm::tvec3< float > axis = glm::axis(quaternion);
-    auto translationVector = glm::tvec3<float>( translation.x ,
-                                                translation.y ,
-                                                4-translation.z );
 
-    auto scaleVector = glm::tvec3<float>(1/scale.x ,
-                                         1/scale.y ,
-                                         1/scale.z );
+    auto translationVector =
+            glm::tvec3<float>( transformation.translation.x ,
+                               transformation.translation.y ,
+                               4-transformation.translation.z );
+
+    auto scaleVector =
+            glm::tvec3<float>( 1 / transformation.scale.x ,
+                               1 / transformation.scale.y ,
+                               1 / transformation.scale.z );
 
     //Calculating the translate value for each brick
     glm::tvec3< float > relativeCenterBack =
-            glm::tvec3<float>( 2.f*(0.5 - volume_->getUnitCubeCenter().x) ,
-                               2.f*(0.5 - volume_->getUnitCubeCenter().y) ,
-                               2.f*(0.5 - volume_->getUnitCubeCenter().z) );
+            glm::tvec3<float>( 2.f * ( 0.5 - volume_->getUnitCubeCenter().x ) ,
+                               2.f * ( 0.5 - volume_->getUnitCubeCenter().y ) ,
+                               2.f * ( 0.5 - volume_->getUnitCubeCenter().z ));
 
 
     //Scale all  to the unit volume
 
     glm::tvec3< float > unitSccale =
-
-            glm::tvec3< float >(1/volume_->getUnitCubeScaleFactors().x,
-
-                                1/volume_->getUnitCubeScaleFactors().y,
-
-                                1/volume_->getUnitCubeScaleFactors().z);
+            glm::tvec3< float >( 1 / volume_->getUnitCubeScaleFactors().x ,
+                                 1 / volume_->getUnitCubeScaleFactors().y ,
+                                 1 / volume_->getUnitCubeScaleFactors().z );
 
     //    //Scale at first
 
-    glmMVMatrix = glm::scale(glmMVMatrix, unitSccale);
+    glmMVMatrix = glm::scale( glmMVMatrix , unitSccale );
 
 
-    //    //Translate each brick to its position
+    //Translate each brick to its position
 
-    glmMVMatrix = glm::translate(glmMVMatrix , relativeCenterBack);
-
-
+    glmMVMatrix = glm::translate( glmMVMatrix , relativeCenterBack );
 
 
 
-    // Rotate , and then translate to keep the local rotation
-
-    glmMVMatrix = glm::scale(glmMVMatrix, scaleVector);
 
 
+    // Scale, Rotate, and then translate.
+
+    glmMVMatrix = glm::scale( glmMVMatrix , scaleVector );
 
     glmMVMatrix = glm::rotate( glmMVMatrix , angle , axis );
-
-
-
-
 
     glmMVMatrix = glm::translate( glmMVMatrix , translationVector );
 
@@ -347,8 +337,12 @@ void CLContext< T >::paint( const Coordinates3D &rotation ,
             modelViewMatrix[ index++ ] = glmMVMatrix[ i ][ j ];
         }
     }
-    Coordinates3D center;
-    // You can then apply this matrix to your vertices with a standard matrix multiplication. Keep in mind that the matrix is arranged in row-major order. With an input vector xIn, the transformed vector xOut is:
+
+    Coordinates3D center ;
+    // You can then apply this matrix to your vertices with a standard matrix
+    // multiplication. Keep in mind that the matrix is arranged
+    // in row-major order. With an input vector xIn,
+    // the transformed vector xOut is:
     center.x = modelViewMatrix[0] * volume_->getUnitCubeCenter().x +
                modelViewMatrix[1] * volume_->getUnitCubeCenter().y +
                modelViewMatrix[2] * volume_->getUnitCubeCenter().z +
@@ -359,9 +353,9 @@ void CLContext< T >::paint( const Coordinates3D &rotation ,
                modelViewMatrix[6] * volume_->getUnitCubeCenter().z +
                modelViewMatrix[13];
 
-    center.z = modelViewMatrix[8] * volume_->getUnitCubeCenter().x +
-               modelViewMatrix[9] * volume_->getUnitCubeCenter().y +
-               modelViewMatrix[10] * volume_->getUnitCubeCenter().z+
+    center.z = modelViewMatrix[8]  * volume_->getUnitCubeCenter().x +
+               modelViewMatrix[9]  * volume_->getUnitCubeCenter().y +
+               modelViewMatrix[10] * volume_->getUnitCubeCenter().z +
                modelViewMatrix[14];
 
 
@@ -385,8 +379,12 @@ void CLContext< T >::paint( const Coordinates3D &rotation ,
     TOC( RENDERING_PROFILE( gpuIndex_ ).mvMatrix_TIMER );
 
     TIC( RENDERING_PROFILE( gpuIndex_ ).rendering_TIMER );
-    renderFrame( inverseMatrixArray_ , volumeDensity , imageBrightness,
-                 transferFScale ,transferFOffset);
+
+    renderFrame( inverseMatrixArray_ ,
+                 transformation.volumeDensity ,
+                 transformation.brightness ,
+                 transformation.transferFunctionScale ,
+                 transformation.transferFunctionOffset );
 
     TOC( RENDERING_PROFILE( gpuIndex_ ).rendering_TIMER );
 }

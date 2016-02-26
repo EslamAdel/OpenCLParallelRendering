@@ -8,7 +8,7 @@
 #include <CLVolume.h>
 #include <CLXRayRenderingKernel.h>
 #include <CLFrame.h>
-
+#include "Transformation.h"
 
 
 //#include "ProfilingExterns.hh"
@@ -113,13 +113,7 @@ public:
      * @param volumeDensity
      * @param imageBrightness
      */
-    void paint( const Coordinates3D &rotation ,
-                const Coordinates3D &translation,
-                const Coordinates3D &scale,
-                const float &volumeDensity ,
-                const float &imageBrightness ,
-                const float &transferFScale ,
-                const float &transferFOffset ,
+    void paint( const Transformation &transformation ,
                 Coordinates3D &currentCenter);
 
 private:

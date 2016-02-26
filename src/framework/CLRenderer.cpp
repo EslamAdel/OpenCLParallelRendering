@@ -1,23 +1,11 @@
 #include "CLRenderer.h"
 #include <Logger.h>
 
-CLRenderer::CLRenderer(const uint64_t gpuIndex ,
-                             const uint frameWidth, const uint frameHeight,
-                             const Coordinates3D &globalTranslation,
-                             const Coordinates3D &globalRotation,
-                             const Coordinates3D &globalScale,
-                             const float &volumeDensity,
-                             const float &brightness,
-                             const float &transferScale,
-                             const float &transferOffset)
+CLRenderer::CLRenderer( const uint64_t gpuIndex ,
+                        const uint frameWidth, const uint frameHeight,
+                        const Transformation &transformation )
     : CLContext< uchar >( gpuIndex , frameWidth , frameHeight , nullptr ) ,
-      translation_( globalTranslation ),
-      rotation_( globalRotation ),
-      scale_( globalScale ),
-      volumeDensity_( volumeDensity ),
-      imageBrightness_( brightness ),
-      transferFunctionScale_(transferScale),
-      transferFunctionOffset_(transferOffset)
+      transformation_( transformation )
 {
     LOG_INFO( "Creating Context on Node with GPU <%d>", gpuIndex );
 
@@ -27,16 +15,7 @@ CLRenderer::CLRenderer(const uint64_t gpuIndex ,
 
 void CLRenderer::applyTransformation( )
 {
-
-    this->paint( rotation_,
-                 translation_,
-                 scale_,
-                 volumeDensity_,
-                 imageBrightness_ ,
-                 transferFunctionScale_,
-                 transferFunctionOffset_,
-                 currentCenter_
-                 );
+    this->paint( transformation_ ,  currentCenter_  );
 
     emit this->finishedRendering( this );
 }

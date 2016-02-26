@@ -21,6 +21,7 @@
 #include "CLCompositor.h"
 
 #include "Volume.h"
+#include "Transformation.h"
 
 typedef std::unordered_map<const oclHWDL::Device*,CLRenderer*> CLRenderers;
 typedef std::unordered_map<const CLRenderer* ,TaskRender*> RenderingTasks;
@@ -311,26 +312,14 @@ protected:
     //Volume Data
     Volume<uchar> *baseVolume_;
 
-    //Transformation parameters
-    Coordinates3D rotation_;
-    Coordinates3D translation_;
-    Coordinates3D scale_;
-    float brightness_;
-    float volumeDensity_;
-    float transferFunctionScale_;
-    float transferFunctionOffset_;
-
+    //Transformations
+    Transformation transformation_ ;
 
     //shared data for multithreads, must not be modified during
     //the activity rendering threads.
     //modified using syncTransformation_()
-    Coordinates3D rotationAsync_;
-    Coordinates3D translationAsync_;
-    Coordinates3D scaleAsync_;
-    float brightnessAsync_;
-    float volumeDensityAsync_;
-    float transferFunctionScaleAsync_;
-    float transferFunctionOffsetAsync_;
+    Transformation transformationAsync_ ;
+
 
     //flags
     bool pendingTransformations_;

@@ -45,23 +45,23 @@ ParallelRendering::ParallelRendering( Volume<uchar> *volume ,
     machineGPUsCount_ = listGPUs_.size();
 
     // Translation
-    translation_.x = INITIAL_VOLUME_CENTER_X;
-    translation_.y = INITIAL_VOLUME_CENTER_X;
-    translation_.z = INITIAL_VOLUME_CENTER_Z;
+    transformation_.translation.x = INITIAL_VOLUME_CENTER_X;
+    transformation_.translation.y = INITIAL_VOLUME_CENTER_X;
+    transformation_.translation.z = INITIAL_VOLUME_CENTER_Z;
 
     // Rotation
-    rotation_.x = INITIAL_VOLUME_ROTATION_X;
-    rotation_.y = INITIAL_VOLUME_ROTATION_Y;
-    rotation_.z = INITIAL_VOLUME_ROTATION_Z;
+    transformation_.rotation.x = INITIAL_VOLUME_ROTATION_X;
+    transformation_.rotation.y = INITIAL_VOLUME_ROTATION_Y;
+    transformation_.rotation.z = INITIAL_VOLUME_ROTATION_Z;
 
     //Scale
-    scale_.x = INITIAL_VOLUME_SCALE_X;
-    scale_.y = INITIAL_VOLUME_SCALE_Y;
-    scale_.z = INITIAL_VOLUME_SCALE_Z;
+    transformation_.scale.x = INITIAL_VOLUME_SCALE_X;
+    transformation_.scale.y = INITIAL_VOLUME_SCALE_Y;
+    transformation_.scale.z = INITIAL_VOLUME_SCALE_Z;
 
     //transfer parameters
-    transferFunctionOffset_= INITIAL_TRANSFER_OFFSET;
-    transferFunctionScale_ = INITIAL_TRANSFER_SCALE;
+    transformation_.transferFunctionOffset = INITIAL_TRANSFER_OFFSET;
+    transformation_.transferFunctionScale  = INITIAL_TRANSFER_SCALE;
 
 
     /**
@@ -95,13 +95,7 @@ void ParallelRendering::addCLRenderer( const uint64_t gpuIndex)
     CLRenderer *renderer = new CLRenderer( gpuIndex,
                                            frameWidth_ ,
                                            frameHeight_ ,
-                                           translationAsync_,
-                                           rotationAsync_,
-                                           scaleAsync_,
-                                           volumeDensityAsync_,
-                                           brightnessAsync_,
-                                           transferFunctionScaleAsync_,
-                                           transferFunctionOffsetAsync_);
+                                           transformationAsync_ );
 
     ATTACH_RENDERING_PROFILE( renderer );
     ATTACH_COLLECTING_PROFILE( renderer );
@@ -304,14 +298,7 @@ void ParallelRendering::applyTransformation_()
 void ParallelRendering::syncTransformation_()
 {
     // modified when no active rendering threads
-    translationAsync_ = translation_;
-    rotationAsync_ = rotation_;
-    scaleAsync_ = scale_;
-    brightnessAsync_ = brightness_ ;
-    volumeDensityAsync_ = volumeDensity_;
-    transferFunctionScaleAsync_=transferFunctionScale_;
-    transferFunctionOffsetAsync_=transferFunctionOffset_;
-
+    transformationAsync_ = transformation_ ;
 }
 
 
@@ -376,7 +363,7 @@ void ParallelRendering::compositingFinished_SLOT()
 #ifdef BENCHMARKING
         static uint framesCounter = 0 ;
         if( ++framesCounter < testFrames )
-            updateRotationX_SLOT( rotation_.x + 1 );
+            updateRotationX_SLOT( transformation_.rotation.x + 1 );
 
         else
             benchmark_();
@@ -415,93 +402,93 @@ void ParallelRendering::pixmapReady_SLOT( QPixmap *pixmap,
 
 void ParallelRendering::updateRotationX_SLOT(int angle)
 {
-    rotation_.x = angle ;
+    transformation_.rotation.x = angle ;
     if( renderersReady_ ) applyTransformation_();
     pendingTransformations_ = true ;
 }
 
 void ParallelRendering::updateRotationY_SLOT(int angle)
 {
-    rotation_.y = angle ;
+    transformation_.rotation.y = angle ;
     if( renderersReady_ ) applyTransformation_();
     else pendingTransformations_ = true ;
 }
 
 void ParallelRendering::updateRotationZ_SLOT(int angle)
 {
-    rotation_.z = angle ;
+    transformation_.rotation.z = angle ;
     if( renderersReady_ ) applyTransformation_();
     else pendingTransformations_ = true ;
 }
 
 void ParallelRendering::updateTranslationX_SLOT(int distance)
 {
-    translation_.x = distance;
+    transformation_.translation.x = distance;
     if( renderersReady_ ) applyTransformation_();
     else pendingTransformations_ = true ;
 }
 
 void ParallelRendering::updateTranslationY_SLOT(int distance)
 {
-    translation_.y = distance;
+    transformation_.translation.y = distance;
     if( renderersReady_ ) applyTransformation_();
     else pendingTransformations_ = true ;
 }
 
 void ParallelRendering::updateTranslationZ_SLOT(int distance)
 {
-    translation_.z = distance;
+    transformation_.translation.z = distance;
     if( renderersReady_ ) applyTransformation_();
     else pendingTransformations_ = true ;
 }
 
 void ParallelRendering::updateScaleX_SLOT(int distance)
 {
-    scale_.x = distance;
+    transformation_.scale.x = distance;
     if( renderersReady_ ) applyTransformation_();
     else pendingTransformations_ = true ;
 }
 
 void ParallelRendering::updateScaleY_SLOT(int distance)
 {
-    scale_.y = distance;
+    transformation_.scale.y = distance;
     if( renderersReady_ ) applyTransformation_();
     else pendingTransformations_ = true ;
 }
 
 void ParallelRendering::updateScaleZ_SLOT(int distance)
 {
-    scale_.z = distance;
+    transformation_.scale.z = distance;
     if( renderersReady_ ) applyTransformation_();
     else pendingTransformations_ = true ;
 }
 
 void ParallelRendering::updateScaleXYZ_SLOT(int distance)
 {
-    scale_.x = distance;
-    scale_.y = distance;
-    scale_.z = distance;
+    transformation_.scale.x = distance;
+    transformation_.scale.y = distance;
+    transformation_.scale.z = distance;
     if( renderersReady_ ) applyTransformation_();
     else pendingTransformations_ = true ;
 }
 
 void ParallelRendering::updateImageBrightness_SLOT(float brightness)
 {
-    brightness_ = brightness;
+    transformation_.brightness = brightness;
     if( renderersReady_ ) applyTransformation_();
     else pendingTransformations_ = true ;
 }
 
 void ParallelRendering::updateVolumeDensity_SLOT(float density)
 {
-    volumeDensity_ = density;
+    transformation_.volumeDensity = density;
     if( renderersReady_ ) applyTransformation_();
     else pendingTransformations_ = true ;
 }
 
 void ParallelRendering::updateTransferFunctionScale_SLOT(float scale)
 {
-    transferFunctionScale_=scale;
+    transformation_.transferFunctionScale =scale;
     if( renderersReady_ ) applyTransformation_();
     else pendingTransformations_ = true ;
 
@@ -510,7 +497,7 @@ void ParallelRendering::updateTransferFunctionScale_SLOT(float scale)
 
 void ParallelRendering::updateTransferFunctionOffset_SLOT(float offset)
 {
-    transferFunctionOffset_=offset;
+    transformation_.transferFunctionOffset = offset ;
     if( renderersReady_ ) applyTransformation_();
     else pendingTransformations_ = true ;
 
