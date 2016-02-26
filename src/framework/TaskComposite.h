@@ -3,7 +3,7 @@
 
 #include <QRunnable>
 #include "CLRenderer.h"
-#include "CLCompositor.h"
+#include "CLAbstractCompositor.h"
 #include <QObject>
 #include "Profiles.hh"
 
@@ -21,7 +21,7 @@ public:
      * @param frameIndex
      * @param compositedFramesCount
      */
-    TaskComposite(CLCompositor *CLCompositor ,
+    TaskComposite( CLAbstractCompositor *compositor ,
                    CLRenderer *cLRenderer );
 
 signals:
@@ -35,9 +35,9 @@ protected:
     void run();
 
 private:
-    CLCompositor *compositor_ ;
+    CLAbstractCompositor *compositor_ ;
     CLRenderer *renderer_  ;
-
+    bool firstTime_ ;
 
 };
 

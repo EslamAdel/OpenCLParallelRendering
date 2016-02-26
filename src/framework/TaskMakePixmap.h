@@ -11,7 +11,7 @@ class TaskMakePixmap : public QObject , public QRunnable
 {
     Q_OBJECT
 public:
-    TaskMakePixmap( CLFrame<uint> *frame ,
+    TaskMakePixmap( CLFrame< uint > *frame ,
                     const CLRenderer* clRenderer_ = nullptr );
 protected:
     void run() ;

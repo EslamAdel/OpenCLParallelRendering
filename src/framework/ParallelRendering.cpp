@@ -159,26 +159,40 @@ void ParallelRendering::addCLCompositor( const uint64_t gpuIndex )
     }
 
     LOG_DEBUG("Initialize Compositing Unit");
-    compositor_ = new CLCompositor( gpuIndex ,
-                                    frameWidth_ ,
-                                    frameHeight_ );
 
+    // If only a single CLRenderer exists, don't use CLCompositor,
+    // because compositing is done in a patch using image3d_t
+    // while image3d_t doesn't allow occupancy by a single image slice.
+    // Instead, use the CLCompositorAccumulate that is based on regular
+    // OpenCL buffers.
+    if( inUseGPUs_.size() > 1 )
+    {
+        auto compositor = new CLCompositor( gpuIndex ,
+                                            frameWidth_ ,
+                                            frameHeight_ );
+        compositor_ =
+                static_cast< CLAbstractCompositor * >( compositor );
+    }
+    else
+    {
+        auto compositor = new CLCompositorAccumulate( gpuIndex ,
+                                                      frameWidth_ ,
+                                                      frameHeight_ );
+        compositor_ =
+                static_cast< CLAbstractCompositor * >( compositor );
+    }
 
 
     LOG_DEBUG("[DONE] Initialize Compositing Unit");
 
     collagePixmapTask_ =
-            new TaskMakePixmap( compositor_->getCLFrameCollage() );
+            new TaskMakePixmap( compositor_->getFinalFrame( ));
 
     connect( collagePixmapTask_ ,
              SIGNAL( pixmapReady_SIGNAL( QPixmap* , const CLRenderer* )) ,
              this , SLOT(pixmapReady_SLOT( QPixmap* , const CLRenderer* )));
     // Frame index will be assigned to each rendering GPU (rednering node).
     // As a start, consider each frame will be indexed in the next for-loop.
-
-
-
-
 
 
     uint frameIndex = 0 ;
@@ -312,9 +326,9 @@ CLRenderer &ParallelRendering::getCLRenderer( const uint64_t gpuIndex )
 
 }
 
-CLCompositor &ParallelRendering::getCLCompositor()
+CLAbstractCompositor &ParallelRendering::getCLCompositor()
 {
-    return *compositor_ ;
+    return static_cast< CLAbstractCompositor& >( *compositor_ ) ;
 }
 
 
@@ -333,7 +347,7 @@ uint ParallelRendering::getFrameHeight() const
     return frameHeight_;
 }
 
-void ParallelRendering::finishedRendering_SLOT(CLRenderer *renderer )
+void ParallelRendering::finishedRendering_SLOT( CLRenderer *renderer )
 {
     //    LOG_DEBUG("Finished Rendering");
 
@@ -390,7 +404,7 @@ void ParallelRendering::frameLoadedToDevice_SLOT( CLRenderer *renderer )
 void ParallelRendering::pixmapReady_SLOT( QPixmap *pixmap,
                                           const CLRenderer *renderer )
 {
-
+    LOG_DEBUG("Pixmap ready");
     if( renderer == nullptr )
         emit this->finalFrameReady_SIGNAL( pixmap );
     else
@@ -531,9 +545,9 @@ void ParallelRendering::benchmark_()
     }
 
     COMPOSITING_PROFILE_TAG( compositor_ );
-    PRINT( compositingProfile.threadSpawning_TIMER ) ;
-    PRINT( compositingProfile.accumulatingFrame_TIMER ) ;
-    PRINT( compositingProfile.loadCollageFromDevice_TIMER ) ;
+//    PRINT( compositingProfile.threadSpawning_TIMER ) ;
+//    PRINT( compositingProfile.accumulatingFrame_TIMER ) ;
+//    PRINT( compositingProfile.loadCollageFromDevice_TIMER ) ;
     PRINT( compositingProfile.compositing_TIMER ) ;
 
 

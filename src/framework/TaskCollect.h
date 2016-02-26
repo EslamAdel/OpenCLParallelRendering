@@ -31,7 +31,7 @@ public:
      * The index of the rendered frame.
      */
     TaskCollect( CLRenderer *renderer ,
-                 CLCompositor *compositor );
+                 CLAbstractCompositor *compositor );
 
 signals:
     /**
@@ -49,7 +49,7 @@ protected:
 
 private:
     CLRenderer *renderer_;
-    CLCompositor *compositor_;
+    CLAbstractCompositor *compositor_;
 
 };
 

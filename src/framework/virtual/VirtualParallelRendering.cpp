@@ -45,7 +45,7 @@ void VirtualParallelRendering::addCLCompositor(const uint64_t gpuIndex)
 
 
     this->collagePixmapTask_ =
-            new TaskMakePixmap( compositor_->getCLFrameCollage() );
+            new TaskMakePixmap( compositor_->getFinalFrame() );
 
     connect( this->collagePixmapTask_ ,
              SIGNAL( pixmapReady_SIGNAL( QPixmap* , const CLRenderer* )) ,
@@ -174,11 +174,10 @@ void VirtualParallelRendering::compositingFinished_SLOT()
 {
     LOG_DEBUG("[DONE] Compositing");
 
-
     //this->pixmapMakerPool_.start( collagePixmapTask_ );
 
     emit this->finalFrameReady_SIGNAL(
-                &compositor_->getCLFrameCollage()->getFramePixmap() );
+                &compositor_->getFinalFrame()->getFramePixmap() );
 
     if( this->pendingTransformations_ )
         applyTransformation_();

@@ -122,6 +122,7 @@ void RenderingWindow::displayFrame_( QPixmap *frame , uint id )
 void RenderingWindow::frameReady_SLOT( QPixmap *frame ,
                                        const CLRenderer *renderer )
 {
+
     uint index = renderer->getFrameIndex();
 
     if( index < frameContainers_.size() )
@@ -131,7 +132,10 @@ void RenderingWindow::frameReady_SLOT( QPixmap *frame ,
 void RenderingWindow::collageFrameReady_SLOT( QPixmap *finalFrame )
 {
 
-//    LOG_DEBUG("Final Frame ready");
+    LOG_DEBUG("Final Frame ready ");
+    if( finalFrame->isNull() )
+        LOG_ERROR("NULL pixmap");
+
     finalFrame_ = finalFrame;
     ui->frameContainerResult->
             setPixmap( finalFrame->scaled( ui->frameContainerResult->width( ) ,

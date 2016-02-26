@@ -95,8 +95,8 @@ void CLBuffer< T >::setHostData( const T *data )
 {
     std::copy(  data  , data + size_ ,  hostData_ );
 
-    for( int i=0 ; i < size_ ; i++ )
-        std::cout << hostData_[i] << " " << data[i] << std::endl ;
+//    for( int i=0 ; i < size_ ; i++ )
+//        std::cout << hostData_[i] << " " << data[i] << std::endl ;
 
 }
 

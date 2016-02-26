@@ -1,8 +1,8 @@
 #include "TaskCollect.h"
 #include "Logger.h"
 
-TaskCollect::TaskCollect(CLRenderer *renderer ,
-                         CLCompositor *compositor )
+TaskCollect::TaskCollect( CLRenderer *renderer ,
+                          CLAbstractCompositor *compositor )
     : renderer_( renderer ) ,
       compositor_( compositor )
 {

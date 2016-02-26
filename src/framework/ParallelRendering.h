@@ -18,7 +18,8 @@
 #include "TaskMakePixmap.h"
 
 #include "CLRenderer.h"
-#include "CLCompositor.h"
+#include "CLCompositorAccumulate.h"
+#include "CLAbstractCompositor.h"
 
 #include "Volume.h"
 #include "Transformation.h"
@@ -102,7 +103,7 @@ public:
     CLRenderer &getCLRenderer( const uint64_t gpuIndex );
 
 
-    CLCompositor &getCLCompositor( ) ;
+    CLAbstractCompositor &getCLCompositor( ) ;
     /**
      * @brief machineGPUsCount
      * @return
@@ -289,7 +290,7 @@ protected :
 private:
     //The workers, each node is attached to a single device.
     CLRenderers        renderers_;
-    CLCompositor     *compositor_;
+    CLAbstractCompositor     *compositor_;
 
 protected:
 
