@@ -1,5 +1,5 @@
-#ifndef COMPOSITINGNODE_H
-#define COMPOSITINGNODE_H
+#ifndef CLCompositor_H
+#define CLCompositor_H
 
 #include <Headers.hh>
 #include <oclHWDL/oclHWDL.h>
@@ -11,12 +11,12 @@
 #include "CLImage2D.h"
 #include "CLImage2DArray.h"
 #include <unordered_map>
-#include "RenderingNode.h"
+#include "CLRenderer.h"
 
-typedef std::unordered_map< const RenderingNode * , CLFrame32* > Frames ;
+typedef std::unordered_map< const CLRenderer * , CLFrame32* > Frames ;
 
 /**
- * @brief The CompositingNode class
+ * @brief The CLCompositor class
  * -Wrapping the OpenCL Context where compositing performed.
  * -Managing the compositing operations.
  * -Wrapping two kernel objects, a kernel for compositor and
@@ -26,23 +26,23 @@ typedef std::unordered_map< const RenderingNode * , CLFrame32* > Frames ;
  * When rendering node has properly rendered a frame, and then the
  * buffer is uploaded to host with pointer ptr.
  *
- * 1| CompositingNode::setFrameData_HOST( frameIndex , ptr );
- * 2| CompositingNode::loadFrameDataToDevice( frameIndex, block);
- * 3| CompositingNode::accumulateFrame_DEVICE( frameIndex );
+ * 1| CLCompositor::setFrameData_HOST( frameIndex , ptr );
+ * 2| CLCompositor::loadFrameDataToDevice( frameIndex, block);
+ * 3| CLCompositor::accumulateFrame_DEVICE( frameIndex );
  * 4| Repeat 1-3 until for each compositing frame.
- * 5| CompositingNode::uploadCollageFromDevice();
- * 6| CompositingNode::getCollagePixmap();
- * 7| CompositingNode::rewindCollageFrame_DEVICE( blocking );
+ * 5| CLCompositor::uploadCollageFromDevice();
+ * 6| CLCompositor::getCollagePixmap();
+ * 7| CLCompositor::rewindCollageFrame_DEVICE( blocking );
  * 8| repeat 1-7 for each rendering loop.
  *
  */
-class CompositingNode : public QObject
+class CLCompositor : public QObject
 {
     Q_OBJECT
 public:
 
     /**
-     * @brief CompositingNode
+     * @brief CLCompositor
      * @param gpuIndex
      * The worker device.
      * @param framesCount
@@ -53,17 +53,17 @@ public:
      * should be with the same width and height. Otherwise, the behaviour
      * of OpenCL kernel execution is not predicted.
      */
-    CompositingNode( const uint64_t gpuIndex ,
+    CLCompositor( const uint64_t gpuIndex ,
                      const uint frameWidth ,
                      const uint frameHeight ) ;
 
-    ~CompositingNode();
+    ~CLCompositor();
 
 
 
-    virtual void allocateFrame( RenderingNode *renderingNode );
+    virtual void allocateFrame( CLRenderer *renderer );
 
-    virtual void collectFrame( RenderingNode *renderingNode ,
+    virtual void collectFrame( CLRenderer *renderer ,
                                const cl_bool block );
     /**
      * @brief accumulateFrame_DEVICE
@@ -75,7 +75,7 @@ public:
      * @param frameIndex
      * the index of the corresponding compositing frame.
      */
-    void accumulateFrame_DEVICE( RenderingNode *renderingNode );
+    void accumulateFrame_DEVICE( CLRenderer *renderer );
 
 
     /**
@@ -185,4 +185,4 @@ protected:
 
 };
 
-#endif // COMPOSITINGNODE_H
+#endif // CLCompositor_H

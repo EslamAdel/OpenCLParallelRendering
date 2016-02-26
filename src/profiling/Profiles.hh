@@ -2,7 +2,7 @@
 #define PROFILES_HH
 
 #include <oclHWDL.h>
-#include "RenderingNode.h"
+#include "CLRenderer.h"
 #include <unordered_map>
 
 typedef oclHWDL::Timer64 Timer64 ;
@@ -49,9 +49,9 @@ struct FrameworkProfile
 };
 
 
-typedef std::unordered_map<const RenderingNode* , RenderingProfile* > RenderingProfiles;
-typedef std::unordered_map<const RenderingNode* , CollectingProfile*> CollectingProfiles;
-typedef std::unordered_map<const RenderingNode* , CompositingProfile*> CompositingProfiles;
+typedef std::unordered_map<const CLRenderer* , RenderingProfile* > RenderingProfiles;
+typedef std::unordered_map<const CLRenderer* , CollectingProfile*> CollectingProfiles;
+typedef std::unordered_map<const CLRenderer* , CompositingProfile*> CompositingProfiles;
 
 
 

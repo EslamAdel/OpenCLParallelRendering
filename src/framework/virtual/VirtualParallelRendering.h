@@ -2,9 +2,10 @@
 #define VIRTUALPARALLELRENDERING_H
 
 #include "ParallelRendering.h"
-#include "VirtualRenderingNode.h"
-#include "VirtualCompositingNode.h"
+#include "VirtualCLRenderer.h"
+#include "VirtualCLCompositor.h"
 #include "VirtualTaskCollect.h"
+#include "VirtualCLRenderer.h"
 
 
 
@@ -19,25 +20,25 @@ public:
                               const uint virtualGPUsCount = 0 );
 
 
-    void addRenderingNode( const uint64_t gpuIndex = 0 );
+    void addCLRenderer( const uint64_t gpuIndex = 0 );
 
 
-    void addCompositingNode( const uint64_t gpuIndex = 0 );
+    void addCLCompositor( const uint64_t gpuIndex = 0 );
 
 
     void distributeBaseVolume1D( );
 
 
-    int getRenderingNodesCount() const ;
+    int getCLRenderersCount() const ;
 
     uint getMachineGPUsCount() const ;
 
     void startRendering();
 
 public slots:
-    void frameLoadedToDevice_SLOT( VirtualRenderingNode *finishedNode );
+    void frameLoadedToDevice_SLOT( VirtualCLRenderer *renderer );
 
-    void finishedRendering_SLOT( RenderingNode *finishedNode );
+    void finishedRendering_SLOT( CLRenderer *renderer );
 
     void compositingFinished_SLOT( );
 
@@ -47,8 +48,8 @@ protected:
 private:
 
     //for virtual GPUs only.
-    std::vector< VirtualRenderingNode* > renderingNodes_ ;
-    VirtualCompositingNode *compositingNode_ ;
+    std::vector< VirtualCLRenderer* > renderers_ ;
+    VirtualCLCompositor *compositor_ ;
     const uint virtualGPUsCount_ ;
 
     std::vector< TaskComposite* > compositingTasks_ ;

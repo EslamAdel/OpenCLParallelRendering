@@ -3,8 +3,8 @@
 
 #include <QObject>
 #include <QRunnable>
-#include "VirtualRenderingNode.h"
-#include "VirtualCompositingNode.h"
+#include "VirtualCLRenderer.h"
+#include "VirtualCLCompositor.h"
 
 class VirtualTaskCollect : public QObject , public QRunnable
 {
@@ -12,20 +12,20 @@ class VirtualTaskCollect : public QObject , public QRunnable
 
 public:
 
-    VirtualTaskCollect( VirtualRenderingNode *renderingNode ,
-                        VirtualCompositingNode *compositingNode );
+    VirtualTaskCollect( VirtualCLRenderer *renderer ,
+                        VirtualCLCompositor *compositor );
 
 
 signals:
 
-    void frameLoadedToDevice_SIGNAL( VirtualRenderingNode *node );
+    void frameLoadedToDevice_SIGNAL( VirtualCLRenderer *renderer );
 
 protected:
     void run();
 
 private:
-    VirtualRenderingNode *renderingNode_;
-    VirtualCompositingNode *compositingNode_;
+    VirtualCLRenderer *renderer_;
+    VirtualCLCompositor *compositor_;
 
 };
 

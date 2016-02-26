@@ -15,9 +15,9 @@ TaskInitializeFramework::TaskInitializeFramework( ParallelRendering *parallelRen
 void TaskInitializeFramework::run()
 {
     for( const uint rendererIndex : renderers_ )
-        parallelRenderer_->addRenderingNode( rendererIndex );
+        parallelRenderer_->addCLRenderer( rendererIndex );
 
-    parallelRenderer_->addCompositingNode( compositorIndex_ );
+    parallelRenderer_->addCLCompositor( compositorIndex_ );
 
     parallelRenderer_->distributeBaseVolume1D();
 }

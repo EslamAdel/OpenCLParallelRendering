@@ -2,11 +2,11 @@
 #include "ProfilingExterns.h"
 
 #include "Logger.h"
-TaskComposite::TaskComposite(CompositingNode *compositingNode ,
-                             RenderingNode *renderingNode)
-    : renderingNode_( renderingNode )
+TaskComposite::TaskComposite(CLCompositor *compositor ,
+                             CLRenderer *renderer)
+    : renderer_( renderer )
 {
-    compositingNode_ = compositingNode ;
+    compositor_ = compositor ;
     setAutoDelete( false );
 }
 
@@ -17,7 +17,7 @@ void TaskComposite::run()
     TOC( compositingProfile.threadSpawning_TIMER ) ;
 
     uint8_t compositedFramesCount =
-            compositingNode_->getCompositedFramesCount( );
+            compositor_->getCompositedFramesCount( );
 
     if( compositedFramesCount == 0 )
     {
@@ -25,15 +25,15 @@ void TaskComposite::run()
     }
 
     TIC( compositingProfile.accumulatingFrame_TIMER );
-    compositingNode_->accumulateFrame_DEVICE( renderingNode_ );
+    compositor_->accumulateFrame_DEVICE( renderer_ );
     TOC( compositingProfile.accumulatingFrame_TIMER );
 
-    if( compositingNode_->getCompositedFramesCount()
-        == compositingNode_->framesCount() )
+    if( compositor_->getCompositedFramesCount()
+        == compositor_->framesCount() )
     {
 
         TIC( compositingProfile.loadCollageFromDevice_TIMER );
-        compositingNode_->loadCollageFromDevice();
+        compositor_->loadCollageFromDevice();
         TOC( compositingProfile.loadCollageFromDevice_TIMER );
 
         TOC( compositingProfile.compositing_TIMER );

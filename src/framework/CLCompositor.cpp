@@ -1,4 +1,4 @@
-#include "CompositingNode.h"
+#include "CLCompositor.h"
 #include "Logger.h"
 #include <oclUtils.h>
 #include <Volume.h>
@@ -10,9 +10,9 @@
 
 
 
-CompositingNode::CompositingNode(const uint64_t gpuIndex,
-                                 const uint frameWidth ,
-                                 const uint frameHeight )
+CLCompositor::CLCompositor(const uint64_t gpuIndex,
+                           const uint frameWidth ,
+                           const uint frameHeight )
     : gpuIndex_( gpuIndex ) ,
       collageFrameDimensions_( frameWidth , frameHeight )
 {
@@ -27,46 +27,46 @@ CompositingNode::CompositingNode(const uint64_t gpuIndex,
 }
 
 
-CompositingNode::~CompositingNode()
+CLCompositor::~CLCompositor()
 {
 
 }
 
-void CompositingNode::allocateFrame( RenderingNode *renderingNode )
+void CLCompositor::allocateFrame( CLRenderer *renderer )
 {
 
     CLFrame32 *frame =
-            new CLFrame32( renderingNode->getCLFrame()->getFrameDimensions( ));
+            new CLFrame32( renderer->getCLFrame()->getFrameDimensions( ));
 
     frame->createDeviceData( context_ );
 
-    frames_[ renderingNode ] = frame ;
+    frames_[ renderer ] = frame ;
 
     framesCount_++ ;
 }
 
-uint64_t CompositingNode::getGPUIndex() const
+uint64_t CLCompositor::getGPUIndex() const
 {
     return gpuIndex_;
 }
 
-CLFrame32 *&CompositingNode::getCLFrameCollage()
+CLFrame32 *&CLCompositor::getCLFrameCollage()
 {
     return collageFrameReadout_ ;
 }
 
 
-void CompositingNode::collectFrame( RenderingNode *renderingNode ,
-                                    const cl_bool block )
+void CLCompositor::collectFrame( CLRenderer *renderer ,
+                                 const cl_bool block )
 {
     //if the two buffers are in same context, copy the buffer directly in Device.
 
 
-    if( renderingNode->getContext() ==
-        frames_[ renderingNode ]->getContext( ))
+    if( renderer->getContext() ==
+        frames_[ renderer ]->getContext( ))
     {
-        //TODO: Create the CompositingNode at the same context of the
-        //RenderingNode that attached to the same GPU.
+        //TODO: Create the CLCompositor at the same context of the
+        //CLRenderer that attached to the same GPU.
 
 
     }
@@ -77,35 +77,35 @@ void CompositingNode::collectFrame( RenderingNode *renderingNode ,
         //direct copy frame from rendering device to the host pointer
         //of the compositing frame.
         //more effiecent.
-        frames_[ renderingNode ]->
-                readOtherDeviceData( renderingNode->getCommandQueue() ,
-                                     *renderingNode->getCLFrame() ,
-                                     block );   
+        frames_[ renderer ]->
+                readOtherDeviceData( renderer->getCommandQueue() ,
+                                     *renderer->getCLFrame() ,
+                                     block );
 #else
-        renderingNode->getCLFrame()->
-                readDeviceData( renderingNode->getCommandQueue() ,
+        renderer->getCLFrame()->
+                readDeviceData( renderer->getCommandQueue() ,
                                 block );
 
-        frames_[ renderingNode ]->
-                copyHostData( renderingNode->getCLFrame()->getHostData( ));
+        frames_[ renderer ]->
+                copyHostData( renderer->getCLFrame()->getHostData( ));
 
 #endif
 
-        frames_[ renderingNode ]->
+        frames_[ renderer ]->
                 writeDeviceData( commandQueue_ ,
                                  block );
     }
 
 }
 
-void CompositingNode::accumulateFrame_DEVICE( RenderingNode *renderingNode )
+void CLCompositor::accumulateFrame_DEVICE( CLRenderer *renderer )
 {   
     //if first frame, it is already written to collageFrame, return.
     if( compositedFramesCount_ == 0 )
     {
         //        LOG_DEBUG("Frame[%d] as Collage Buffer", frameIndex );
         //make first loaded frame buffer as collage frame.
-        collageFrame_ = frames_[ renderingNode ];
+        collageFrame_ = frames_[ renderer ];
 
         compositingKernel_->
                 setCollageFrame( collageFrame_->getDeviceData( ));
@@ -115,7 +115,7 @@ void CompositingNode::accumulateFrame_DEVICE( RenderingNode *renderingNode )
     }
 
 
-    const CLFrame32 *currentFrame = frames_[ renderingNode ];
+    const CLFrame32 *currentFrame = frames_[ renderer ];
 
 
     const cl_mem currentFrameObject = currentFrame->getDeviceData();
@@ -154,7 +154,7 @@ void CompositingNode::accumulateFrame_DEVICE( RenderingNode *renderingNode )
     compositedFramesCount_ ++;
 }
 
-void CompositingNode::loadCollageFromDevice()
+void CLCompositor::loadCollageFromDevice()
 {
 
     //    LOG_DEBUG("Reading CollageFrame[%d]" , collageBufferFrameIndex_ );
@@ -166,17 +166,17 @@ void CompositingNode::loadCollageFromDevice()
     compositedFramesCount_ = 0 ;
 }
 
-uint CompositingNode::framesCount() const
+uint CLCompositor::framesCount() const
 {
     return framesCount_ ;
 }
 
-uint8_t CompositingNode::getCompositedFramesCount() const
+uint8_t CLCompositor::getCompositedFramesCount() const
 {
     return compositedFramesCount_ ;
 }
 
-void CompositingNode::selectGPU_()
+void CLCompositor::selectGPU_()
 {
     // Scan the hardware
     oclHWDL::Hardware* clHardware = new oclHWDL::Hardware();
@@ -197,7 +197,7 @@ void CompositingNode::selectGPU_()
     context_ = clContext->getContext();
 }
 
-void CompositingNode::initializeContext_()
+void CLCompositor::initializeContext_()
 {
     LOG_DEBUG( "Initializing an OpenCL context ... " );
 
@@ -207,7 +207,7 @@ void CompositingNode::initializeContext_()
     LOG_DEBUG( "[DONE] Initializing an OpenCL context ... " );
 }
 
-void CompositingNode::initializeBuffers_()
+void CLCompositor::initializeBuffers_()
 {
 
     LOG_DEBUG("Initializing Buffers ...");
@@ -219,7 +219,7 @@ void CompositingNode::initializeBuffers_()
 
 }
 
-void CompositingNode::initializeKernel_()
+void CLCompositor::initializeKernel_()
 {
     LOG_DEBUG( "Initializing an OpenCL Kernel ... " );
 
@@ -230,7 +230,7 @@ void CompositingNode::initializeKernel_()
     LOG_DEBUG( "[DONE] Initializing an OpenCL Kernel ... " );
 }
 
-void CompositingNode::createCommandQueue_()
+void CLCompositor::createCommandQueue_()
 {
     cl_int clErrorCode = CL_SUCCESS;
     commandQueue_ = clCreateCommandQueue( context_,

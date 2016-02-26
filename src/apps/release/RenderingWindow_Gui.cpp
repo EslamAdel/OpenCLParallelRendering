@@ -121,9 +121,9 @@ void RenderingWindow_Gui::intializeConnections_()
     //parallelRenderer_
     connect( parallelRenderer_ ,
              SIGNAL( frameReady_SIGNAL( QPixmap * ,
-                                        const RenderingNode* )),
+                                        const CLRenderer* )),
              this , SLOT( frameReady_SLOT( QPixmap * ,
-                                           const RenderingNode* )));
+                                           const CLRenderer* )));
 
     connect( parallelRenderer_ , SIGNAL( finalFrameReady_SIGNAL( QPixmap* )) ,
              this , SLOT( collageFrameReady_SLOT( QPixmap* )));
@@ -169,11 +169,11 @@ void RenderingWindow_Gui::displayFrame_( QPixmap *frame , uint id )
 }
 
 void RenderingWindow_Gui::frameReady_SLOT( QPixmap *frame ,
-                                           const RenderingNode *node )
+                                           const CLRenderer *renderer )
 {
-    uint index = node->getFrameIndex();
+    uint index = renderer->getFrameIndex();
 
-    LOG_DEBUG("Catch frame <%d> ", node->getFrameIndex());
+    LOG_DEBUG("Catch frame <%d> ", renderer->getFrameIndex());
 
     if( index < frameContainers_.size() )
         displayFrame_( frame , index );
@@ -384,7 +384,7 @@ void RenderingWindow_Gui::captureView_SLOT()
 
 
     LOG_DEBUG("Saving resultant frame");
-    QPixmap pic( parallelRenderer_->getCompositingNode().getCLFrameCollage()->
+    QPixmap pic( parallelRenderer_->getCLCompositor().getCLFrameCollage()->
                  getFramePixmap().
                  scaledToHeight( width ).scaledToWidth( height ));
     pic.save( newDir + "/result.jpg");
@@ -397,7 +397,7 @@ void RenderingWindow_Gui::captureView_SLOT()
         LOG_DEBUG("Saving frame<%d>", gpuIndex );
 
         QPixmap framePixmap( parallelRenderer_->
-                             getRenderingNode( gpuIndex ).getCLFrame()->
+                             getCLRenderer( gpuIndex ).getCLFrame()->
                              getFramePixmap().
                              scaledToHeight( width ).
                              scaledToWidth( height ));

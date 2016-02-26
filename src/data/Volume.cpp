@@ -44,7 +44,7 @@ Volume< T >::Volume( const Coordinates3D brickCoordinates,
     data_ = brickData ;
     mmapAddr_ = nullptr ;
 
-    addBoundingBox_();
+//    addBoundingBox_();
 
 
 }

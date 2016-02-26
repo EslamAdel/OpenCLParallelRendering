@@ -1,10 +1,10 @@
 #include "VirtualTaskCollect.h"
 #include "Logger.h"
 
-VirtualTaskCollect::VirtualTaskCollect( VirtualRenderingNode *renderingNode,
-                                        VirtualCompositingNode *compositingNode)
-    : renderingNode_( renderingNode ) ,
-      compositingNode_( compositingNode )
+VirtualTaskCollect::VirtualTaskCollect( VirtualCLRenderer *renderer,
+                                        VirtualCLCompositor *compositor )
+    : renderer_( renderer ) ,
+      compositor_( compositor )
 {
     setAutoDelete( false );
 }
@@ -12,10 +12,10 @@ VirtualTaskCollect::VirtualTaskCollect( VirtualRenderingNode *renderingNode,
 void VirtualTaskCollect::run()
 {
 
-    LOG_DEBUG("collecting frame %d", renderingNode_->getGPUIndex() );
-    compositingNode_->collectFrame( renderingNode_ ,
-                                    CL_TRUE );
+    LOG_DEBUG("collecting frame %d", renderer_->getGPUIndex() );
+    compositor_->collectFrame( renderer_ ,
+                               CL_TRUE );
 
 
-    emit this->frameLoadedToDevice_SIGNAL( renderingNode_ );
+    emit this->frameLoadedToDevice_SIGNAL( renderer_ );
 }

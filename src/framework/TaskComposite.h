@@ -2,8 +2,8 @@
 #define TASKCOMPOSITE_H
 
 #include <QRunnable>
-#include "RenderingNode.h"
-#include "CompositingNode.h"
+#include "CLRenderer.h"
+#include "CLCompositor.h"
 #include <QObject>
 #include "Profiles.hh"
 
@@ -17,12 +17,12 @@ class TaskComposite : public QObject , public QRunnable
 public:
     /**
      * @brief TaskComposite
-     * @param compositingNode
+     * @param CLCompositor
      * @param frameIndex
      * @param compositedFramesCount
      */
-    TaskComposite( CompositingNode *compositingNode ,
-                   RenderingNode *renderingNode );
+    TaskComposite(CLCompositor *CLCompositor ,
+                   CLRenderer *cLRenderer );
 
 signals:
     /**
@@ -35,8 +35,8 @@ protected:
     void run();
 
 private:
-    CompositingNode *compositingNode_ ;
-    RenderingNode *renderingNode_  ;
+    CLCompositor *compositor_ ;
+    CLRenderer *renderer_  ;
 
 
 };

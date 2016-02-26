@@ -1,10 +1,10 @@
 #include "TaskCollect.h"
 #include "Logger.h"
 
-TaskCollect::TaskCollect(RenderingNode *renderingNode ,
-                         CompositingNode *compositingNode )
-    : renderingNode_( renderingNode ) ,
-      compositingNode_( compositingNode )
+TaskCollect::TaskCollect(CLRenderer *renderer ,
+                         CLCompositor *compositor )
+    : renderer_( renderer ) ,
+      compositor_( compositor )
 {
     setAutoDelete( false );
 }
@@ -12,20 +12,20 @@ TaskCollect::TaskCollect(RenderingNode *renderingNode ,
 void TaskCollect::run()
 {
 
-    TOC( COLLECTING_PROFILE(renderingNode_).threadSpawning_TIMER );
+    TOC( COLLECTING_PROFILE(renderer_).threadSpawning_TIMER );
 
 
 
     //upload frame from rendering GPU to HOST.
-    TIC( COLLECTING_PROFILE( renderingNode_ ).transferingBuffer_TIMER );
+    TIC( COLLECTING_PROFILE( renderer_ ).transferingBuffer_TIMER );
 
-    compositingNode_->collectFrame( renderingNode_ ,
-                                    CL_TRUE );
+    compositor_->collectFrame( renderer_ ,
+                               CL_TRUE );
 
-    TOC( COLLECTING_PROFILE(renderingNode_).transferingBuffer_TIMER ) ;
+    TOC( COLLECTING_PROFILE(renderer_).transferingBuffer_TIMER ) ;
 
 
-    emit this->frameLoadedToDevice_SIGNAL( renderingNode_ );
+    emit this->frameLoadedToDevice_SIGNAL( renderer_ );
 
 }
 

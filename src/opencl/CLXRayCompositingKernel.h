@@ -20,9 +20,9 @@ public:
                              const std::string kernelDirectory = "." );
 
 
-    void setCollageFrame( const cl_mem collageImage2D );
+    virtual void setCollageFrame( const cl_mem collageImage2D );
 
-    void setFrame( const cl_mem frameImage2D );
+    virtual void setFrame( const cl_mem frameImage2D );
 
 
     void releaseKernel( );

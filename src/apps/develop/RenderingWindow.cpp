@@ -55,9 +55,9 @@ void RenderingWindow::intializeConnections_()
     //parallelRenderer_
     connect( parallelRenderer_ ,
              SIGNAL( frameReady_SIGNAL( QPixmap * ,
-                                        const RenderingNode* )),
+                                        const CLRenderer* )),
              this , SLOT( frameReady_SLOT( QPixmap * ,
-                                           const RenderingNode* )));
+                                           const CLRenderer* )));
 
     connect( parallelRenderer_ , SIGNAL( finalFrameReady_SIGNAL( QPixmap* )) ,
              this , SLOT( collageFrameReady_SLOT( QPixmap* )));
@@ -120,9 +120,9 @@ void RenderingWindow::displayFrame_( QPixmap *frame , uint id )
 }
 
 void RenderingWindow::frameReady_SLOT( QPixmap *frame ,
-                                       const RenderingNode *node )
+                                       const CLRenderer *renderer )
 {
-    uint index = node->getFrameIndex();
+    uint index = renderer->getFrameIndex();
 
     if( index < frameContainers_.size() )
         displayFrame_( frame , index );
@@ -219,7 +219,7 @@ void RenderingWindow::captureView_SLOT()
 //    {
 //        if( frame->isEnabled() )
 //        {
-//            QPixmap framePixmap( parallelRenderer_->getRenderingNode( i ).
+//            QPixmap framePixmap( parallelRenderer_->getCLRenderer( i ).
 //                                 getCLFrame()->getFramePixmap().
 //                                 scaledToHeight( FRAME_WIDTH ).
 //                                 scaledToWidth( FRAME_HEIGHT ));

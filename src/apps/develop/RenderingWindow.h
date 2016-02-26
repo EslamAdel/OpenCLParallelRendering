@@ -7,7 +7,7 @@
 #include <Headers.hh>
 #include "ParallelRendering.h"
 #include "VirtualParallelRendering.h"
-#include "RenderingNode.h"
+#include "CLRenderer.h"
 #include <vector>
 #include <QLabel>
 #include "ProfilingExterns.h"
@@ -44,7 +44,7 @@ private:
     void displayFrame_( QPixmap *frame , uint id );
 
 public slots:
-    void frameReady_SLOT(QPixmap *frame, const RenderingNode *node );
+    void frameReady_SLOT( QPixmap *frame, const CLRenderer *renderer );
     void collageFrameReady_SLOT( QPixmap *finalFrame ) ;
 
 private slots:

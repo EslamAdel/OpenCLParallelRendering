@@ -143,14 +143,14 @@ __kernel void xray( __global    uint* frameBuffer,
     }
 
     // Clamp to near plane if the tNear was negative
-    if (tNear < 0.f)
+    if( tNear < 0.f )
         tNear = 0.f;
 
     // March along the ray accumulating the densities
     float4 intensityBuffer = ( float4 )( 0.f, 0.f, 0.f, 0.f );
     float t = tFar;
 
-    for( uint i = 0; i < MAX_STEPS; i++ )
+    for( uint i = 0 ; i < MAX_STEPS ; i++ )
     {
         // Current position along the ray
         float4 position = eyeRayOrigin + eyeRayDirection * t;
@@ -175,7 +175,7 @@ __kernel void xray( __global    uint* frameBuffer,
         // Accumulate the result by mixing what is currently in the
         // _intensityBuffer_ with the new intensity value that was sampled from
         // the volume, with the corrsponding alpha components
-        float alpha = col.w * density;
+        float alpha = col.w * density ;
         intensityBuffer = mix( intensityBuffer, col,
                              ( float4 )( alpha, alpha, alpha, alpha ));
 

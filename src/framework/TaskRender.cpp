@@ -1,7 +1,7 @@
 #include "TaskRender.h"
 
-TaskRender::TaskRender( RenderingNode &renderingNode )
-    : renderingNode_( renderingNode )
+TaskRender::TaskRender( CLRenderer &cLRenderer )
+    : cLRenderer_( cLRenderer )
 {
     setAutoDelete( false );
 
@@ -10,7 +10,7 @@ TaskRender::TaskRender( RenderingNode &renderingNode )
 void TaskRender::run()
 {
 
-    TOC( renderingProfiles[ &renderingNode_ ]->threadSpawning_TIMER );
-    renderingNode_.applyTransformation();
+    TOC( renderingProfiles[ &cLRenderer_ ]->threadSpawning_TIMER );
+    cLRenderer_.applyTransformation();
 }
 

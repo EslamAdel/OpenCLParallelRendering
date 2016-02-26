@@ -29,6 +29,9 @@ float4 convertColorToRGBAF( uint Color )
     rgba.y = ( Color & 0xFF ) / 255.f ; Color >>= 8;
     rgba.z = ( Color & 0xFF ) / 255.f ; Color >>= 8;
     rgba.w = ( Color & 0xFF ) / 255.f ;
+
+
+
     return rgba ;
 }
 
@@ -42,7 +45,10 @@ void xray_compositing_accumulate(   __global uint* collageFrame ,
 
     float4 collageRGBA = convertColorToRGBAF( collageFrame[ index ] );
 
-    float4 finalColor = clamp( frameRGBA + collageRGBA , 0.f , 1.f ) ;
+
+    float4 finalColor;
+
+    finalColor = clamp(  collageRGBA + frameRGBA  , 0.f , 1.f );
 
     collageFrame[ index ] = rgbaFloatToInt( finalColor ) ;
 }
@@ -54,31 +60,31 @@ const sampler_t sampler   = CLK_NORMALIZED_COORDS_FALSE |
                             CLK_ADDRESS_NONE |
                             CLK_FILTER_LINEAR ;
 
-__kernel
-void xray_compositing_patch( __global uint* collageFrame ,
-                             __read_only image3d_t framesArray )
-{
+//__kernel
+//void xray_compositing_patch( __write_only image2d_t collageFrame ,
+//                             __read_only image3d_t framesArray )
+//{
 
-    const uint x = get_global_id(0);
-    const uint y = get_global_id(1);
+//    const uint x = get_global_id(0);
+//    const uint y = get_global_id(1);
 
-    const uint imageWidth = get_image_width( framesArray );
-    const uint framesCount = get_image_depth( framesArray );
+//    const uint imageWidth = get_image_width( framesArray );
+//    const uint framesCount = get_image_depth( framesArray );
 
-    float4 locate = (float4)( x , y , 0 , 0 );
+//    float4 locate = (float4)( x , y , 0 , 0 );
 
-    float4 color = (float4)( 0.f , 0.f , 0.f , 0.f );
+//    float4 color = (float4)( 0.f , 0.f , 0.f , 0.f );
 
-    for( int i = 0 ; i < framesCount ; i++ )
-    {
-        //color = clamp( color + read_imagef( framesArray , sampler , locate ) , 0.f , 1.f ) ;
-        int4 location = (int4)( get_global_id(0) , get_global_id(1) , i , 0 );
-        color += read_imagef( framesArray , sampler , location ) ;
-    }
+//    for( int i = 0 ; i < framesCount ; i++ )
+//    {
+//        //color = clamp( color + read_imagef( framesArray , sampler , locate ) , 0.f , 1.f ) ;
+//        int4 location = (int4)( get_global_id(0) , get_global_id(1) , i , 0 );
+//        color += read_imagef( framesArray , sampler , location ) ;
+//    }
 
 
-    collageFrame[ ( imageWidth * y ) + x ] =  rgbaFloatToInt( color );
-}
+//    collageFrame[ ( imageWidth * y ) + x ] =  rgbaFloatToInt( color );
+//}
 
 
 

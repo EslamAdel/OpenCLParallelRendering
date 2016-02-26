@@ -1,7 +1,7 @@
-#include "RenderingNode.h"
+#include "CLRenderer.h"
 #include <Logger.h>
 
-RenderingNode::RenderingNode(const uint64_t gpuIndex ,
+CLRenderer::CLRenderer(const uint64_t gpuIndex ,
                              const uint frameWidth, const uint frameHeight,
                              const Coordinates3D &globalTranslation,
                              const Coordinates3D &globalRotation,
@@ -25,7 +25,7 @@ RenderingNode::RenderingNode(const uint64_t gpuIndex ,
 }
 
 
-void RenderingNode::applyTransformation( )
+void CLRenderer::applyTransformation( )
 {
 
     this->paint( rotation_,
@@ -41,29 +41,29 @@ void RenderingNode::applyTransformation( )
     emit this->finishedRendering( this );
 }
 
-const Coordinates3D &RenderingNode::getCurrentCenter() const
+const Coordinates3D &CLRenderer::getCurrentCenter() const
 {
     return currentCenter_ ;
 }
 
 
-void RenderingNode::loadVolume(const Volume<uchar> *volume)
+void CLRenderer::loadVolume(const Volume<uchar> *volume)
 {
     this->loadVolume_( volume );
     currentCenter_ = volume->getUnitCubeCenter();
 }
 
-void RenderingNode::setFrameIndex(const uint frameIndex)
+void CLRenderer::setFrameIndex(const uint frameIndex)
 {
     frameIndex_ = frameIndex;
 }
 
-uint RenderingNode::getFrameIndex() const
+uint CLRenderer::getFrameIndex() const
 {
     return frameIndex_;
 }
 
-void RenderingNode::setTransferFunctionFlag(int flag)
+void CLRenderer::setTransferFunctionFlag(int flag)
 {
     activeRenderingKernel_->setTransferFunctionFlag(flag);
 }

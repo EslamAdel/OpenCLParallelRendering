@@ -1,13 +1,13 @@
-#ifndef VIRTUALCOMPOSITINGNODE_H
-#define VIRTUALCOMPOSITINGNODE_H
+#ifndef VIRTUALCLCompositor_H
+#define VIRTUALCLCompositor_H
 
-#include "CompositingNode.h"
-#include "VirtualRenderingNode.h"
+#include "CLCompositor.h"
+#include "VirtualCLRenderer.h"
 
-class VirtualCompositingNode : public CompositingNode
+class VirtualCLCompositor : public CLCompositor
 {
 public:
-    VirtualCompositingNode( const uint64_t gpuIndex ,
+    VirtualCLCompositor( const uint64_t gpuIndex ,
                             const uint frameWidth ,
                             const uint frameHeight );
 
@@ -18,4 +18,4 @@ public:
 //                       const cl_bool block );
 };
 
-#endif // VIRTUALCOMPOSITINGNODE_H
+#endif // VIRTUALCLCompositor_H

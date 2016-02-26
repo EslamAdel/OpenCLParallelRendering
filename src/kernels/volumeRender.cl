@@ -111,7 +111,7 @@ d_xrender(__global uint *d_output,
         float2 transfer_pos = (float2)((sample.x-transferOffset)*transferScale, 0.5f);
         float4 col = read_imagef(transferFunc, transferFuncSampler, transfer_pos);
 #else
-        float4 col = (float4)(pos.x,pos.y,pos.z,.25f);
+        float4 col = (float4)( pos.x , pos.y , pos.z , .25f );
 #endif
 
 

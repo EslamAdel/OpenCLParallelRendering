@@ -2,8 +2,8 @@
 #define TASKCOLLECT_H
 
 #include <QRunnable>
-#include "RenderingNode.h"
-#include "CompositingNode.h"
+#include "CLRenderer.h"
+#include "CLCompositor.h"
 #include <QObject>
 #include "Profiles.hh"
 #include "ProfilingExterns.h"
@@ -22,34 +22,34 @@ class TaskCollect : public QObject , public QRunnable
 public:
     /**
      * @brief TaskCollect
-     * @param renderingNode
-     * RenderingNode where rendering is finished and buffers
+     * @param CLRenderer
+     * CLRenderer where rendering is finished and buffers
      * need to be uploaded from rendering GPU.
-     * @param compositingNode
-     * CompositingNode where the buffers will be loaded into.
+     * @param CLCompositor
+     * CLCompositor where the buffers will be loaded into.
      * @param frameIndex
      * The index of the rendered frame.
      */
-    TaskCollect( RenderingNode *renderingNode ,
-                 CompositingNode *compositingNode );
+    TaskCollect( CLRenderer *renderer ,
+                 CLCompositor *compositor );
 
 signals:
     /**
      * @brief frameLoadedToDevice_SIGNAL
      * Inform the outside world the task is done.
      * @param node
-     * pass the RenderingNode pointer as Identifier for: the
-     * RenderingNode and the CompositingNode and the frameIndex_ .
-     * Considering each RenderingNode is mapped to a CompositingNode.
+     * pass the CLRenderer pointer as Identifier for: the
+     * CLRenderer and the CLCompositor and the frameIndex_ .
+     * Considering each CLRenderer is mapped to a CLCompositor.
      */
-    void frameLoadedToDevice_SIGNAL( RenderingNode *node );
+    void frameLoadedToDevice_SIGNAL( CLRenderer *renderer );
 
 protected:
     void run();
 
 private:
-    RenderingNode *renderingNode_;
-    CompositingNode *compositingNode_;
+    CLRenderer *renderer_;
+    CLCompositor *compositor_;
 
 };
 

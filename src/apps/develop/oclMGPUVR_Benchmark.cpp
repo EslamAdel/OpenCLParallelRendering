@@ -3,21 +3,23 @@
 #include "Logger.h"
 #include "RenderingWindow.h"
 #include "ProfilingExterns.h"
-#include <QCommandLineParser>
-#include "CommandLineParser.h"
+#include "CommandLineParser_Benchmark.h"
+
+
+uint testFrames = 0 ;
+
 
 int main(int argc, char *argv[])
 {
-
-#ifdef BENCHMARKING
-    LOG_ERROR("BENCHMARKING MUST NOT BE DEFINED!");
+#ifndef BENCHMARKING
+    LOG_ERROR("BENCHMARKING MUST BE DEFINED");
 #endif
-    QApplication a(argc, argv);
+    QCoreApplication a(argc, argv);
 
-    QCoreApplication::setApplicationName("oclMGPUVR");
+    QCoreApplication::setApplicationName("oclMGPUVR_benchmark");
 
     QCommandLineParser parser;
-    CommandLineParser myParser( a , parser , "oclMGPUVR Help" );
+    CommandLineParserBenchmark myParser( a , parser , "oclMGPUVR_benchmark Help" );
 
 
     Volume< uchar > *volume ;
@@ -25,10 +27,13 @@ int main(int argc, char *argv[])
     std::list< uint > deployGPUs ;
     uint compositorGPUIndex ;
     QString *errorMessage = nullptr ;
+    bool gui = false ;
+    //uint testFrames = 0 ;
 
     CommandLineParser::CommandLineResult result =
-            myParser.tokenize( volume , frameWidth , frameHeight , deployGPUs ,
-                               compositorGPUIndex , errorMessage );
+            myParser.tokenize_benchmark( volume , frameWidth , frameHeight ,
+                                         deployGPUs , compositorGPUIndex ,
+                                         errorMessage , gui , testFrames );
 
     switch( result )
     {
@@ -42,16 +47,7 @@ int main(int argc, char *argv[])
         }
     }
 
-    //    Dimensions3D size = volume->getDimensions() ;
-    //    LOG_INFO("volume size: %dx%dx%d", size.x , size.y , size.z );
-    //    LOG_INFO("frame: %dx%d" , frameWidth , frameHeight );
-    //    for( auto index : deployGPUs )
-    //        LOG_INFO("Deploy GPU<%d>", index );
-    //    LOG_INFO("compositor: GPU<%d>", compositorGPUIndex );
-
     ParallelRendering parallelRenderer( volume , frameWidth , frameHeight );
-
-
 
     for( const uint rendererIndex : deployGPUs )
         parallelRenderer.addCLRenderer( rendererIndex );
@@ -60,9 +56,9 @@ int main(int argc, char *argv[])
 
     parallelRenderer.distributeBaseVolume1D();
 
-    RenderingWindow rw( &parallelRenderer ) ;
-    rw.show();
 
+
+    parallelRenderer.startRendering();
 
     return a.exec();
 }

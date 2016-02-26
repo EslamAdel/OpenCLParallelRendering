@@ -17,16 +17,16 @@
 #include "TaskComposite.h"
 #include "TaskMakePixmap.h"
 
-#include "RenderingNode.h"
-#include "CompositingNode.h"
+#include "CLRenderer.h"
+#include "CLCompositor.h"
 
 #include "Volume.h"
 
-typedef std::unordered_map<const oclHWDL::Device*,RenderingNode*> RenderingNodes;
-typedef std::unordered_map<const RenderingNode* ,TaskRender*> RenderingTasks;
-typedef std::unordered_map<const RenderingNode* ,TaskComposite*> CompositingTasks;
-typedef std::unordered_map<const RenderingNode* ,TaskCollect*> CollectingTasks;
-typedef std::unordered_map<const RenderingNode* ,TaskMakePixmap*> MakePixmapTasks;
+typedef std::unordered_map<const oclHWDL::Device*,CLRenderer*> CLRenderers;
+typedef std::unordered_map<const CLRenderer* ,TaskRender*> RenderingTasks;
+typedef std::unordered_map<const CLRenderer* ,TaskComposite*> CompositingTasks;
+typedef std::unordered_map<const CLRenderer* ,TaskCollect*> CollectingTasks;
+typedef std::unordered_map<const CLRenderer* ,TaskMakePixmap*> MakePixmapTasks;
 
 /**
  * @brief The ParallelRendering class
@@ -53,33 +53,33 @@ public:
 
     /**
      * @brief discoverAllNodes
-     * Create and attache RenderingNodes to the available GPUs on machine.
+     * Create and attache CLRenderers to the available GPUs on machine.
      */
     void discoverAllNodes();
 
     /**
-     * @brief addRenderingNode
-     * Create and attach RenderingNode to the GPU indexed by gpuIndex.
+     * @brief addCLRenderer
+     * Create and attach CLRenderer to the GPU indexed by gpuIndex.
      *
      * @param gpuIndex
      */
-    virtual void addRenderingNode( const uint64_t gpuIndex );
+    virtual void addCLRenderer( const uint64_t gpuIndex );
 
 
-    virtual int getRenderingNodesCount() const ;
+    virtual int getCLRenderersCount() const ;
 
 
     /**
-     * @brief addCompositingNode
-     * Create and attach CompositingNode to the GPU indexed by gpuIndex.
+     * @brief addCLCompositor
+     * Create and attach CLCompositor to the GPU indexed by gpuIndex.
      * @param gpuIndex
      */
-    virtual void addCompositingNode( const uint64_t gpuIndex );
+    virtual void addCLCompositor( const uint64_t gpuIndex );
 
 
     /**
      * @brief distributeBaseVolume1D
-     * Distribute the baseVolume_ over the renderingNodes_ evenly based on
+     * Distribute the baseVolume_ over the CLRenderers_ evenly based on
      * the X-axis.
      */
     virtual void distributeBaseVolume1D();
@@ -94,14 +94,14 @@ public:
 
 
     /**
-     * @brief getRenderingNode
+     * @brief getCLRenderer
      * @param gpuIndex
      * @return
      */
-    RenderingNode &getRenderingNode( const uint64_t gpuIndex );
+    CLRenderer &getCLRenderer( const uint64_t gpuIndex );
 
 
-    CompositingNode &getCompositingNode( ) ;
+    CLCompositor &getCLCompositor( ) ;
     /**
      * @brief machineGPUsCount
      * @return
@@ -121,7 +121,7 @@ signals:
      * @brief framesReady_SIGNAL
      * For each rendered frame done, emit a signal.
      */
-    void frameReady_SIGNAL( QPixmap *pixmap , const RenderingNode * node );
+    void frameReady_SIGNAL( QPixmap *pixmap , const CLRenderer * node );
 
     /**
      * @brief finalFrameReady_SIGNAL
@@ -143,16 +143,16 @@ public slots :
 
     /**
      * @brief finishedRendering_SLOT
-     * When a RenderingNode finishs rendering, the signal emitted will be
+     * When a CLRenderer finishs rendering, the signal emitted will be
      * mapped to this slot, so it initiates a collecting task to transfer
      * buffers from the rendering GPU to the compositing GPU.
      * @param finishedNode
      */
-    void finishedRendering_SLOT( RenderingNode *finishedNode );
+    void finishedRendering_SLOT( CLRenderer *renderer );
 
     /**
      * @brief compositingFinished_SLOT
-     * When a CompositingNode finishs compositing, the signal emitted will be
+     * When a CLCompositor finishs compositing, the signal emitted will be
      * mapped to this slot, where proper routines will be performed.
      */
     void compositingFinished_SLOT( );
@@ -164,7 +164,7 @@ public slots :
      * so this slot initiates a compositing task.
      * @param finishedNode
      */
-    void frameLoadedToDevice_SLOT( RenderingNode *finishedNode );
+    void frameLoadedToDevice_SLOT( CLRenderer *renderer );
 
 
     /**
@@ -176,9 +176,9 @@ public slots :
      * @param node
      * JUST IDENTIFIER for whom this pixmap belongs!
      * if it is nullptr then it belongs to the CompositorNode,
-     * otherwise, it belongs to RenderingNode referenced by the pointer.
+     * otherwise, it belongs to CLRenderer referenced by the pointer.
      */
-    void pixmapReady_SLOT( QPixmap *pixmap , const RenderingNode * node );
+    void pixmapReady_SLOT( QPixmap *pixmap , const CLRenderer * renderer );
 
     /**
      * @brief updateRotationX_SLOT
@@ -288,8 +288,8 @@ protected :
 
 private:
     //The workers, each node is attached to a single device.
-    RenderingNodes        renderingNodes_;
-    CompositingNode     *compositingNode_;
+    CLRenderers        renderers_;
+    CLCompositor     *compositor_;
 
 protected:
 
@@ -334,11 +334,11 @@ protected:
 
     //flags
     bool pendingTransformations_;
-    bool renderingNodesReady_;
-    bool compositingNodeSpecified_;
+    bool renderersReady_;
+    bool compositorSpecified_;
 
     //counters
-    uint8_t activeRenderingNodes_;
+    uint8_t activeRenderers_;
     uint8_t readyPixmapsCount_;
     uint8_t compositedFramesCount_ ;
 

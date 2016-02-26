@@ -1,15 +1,15 @@
-#ifndef VIRTUALRENDERINGNODE_H
-#define VIRTUALRENDERINGNODE_H
+#ifndef VirtualCLRenderer_H
+#define VirtualCLRenderer_H
 
-#include "RenderingNode.h"
-
-
+#include "CLRenderer.h"
 
 
-class VirtualRenderingNode : public RenderingNode
+
+
+class VirtualCLRenderer : public CLRenderer
 {
 public:
-    VirtualRenderingNode( const uint64_t gpuIndex,
+    VirtualCLRenderer( const uint64_t gpuIndex,
                           const uint frameWidth,
                           const uint frameHeight,
                           const Coordinates3D &globalTranslation,
@@ -27,4 +27,4 @@ private:
     const uint64_t gpuIndex_VIRTUAL_ ;
 };
 
-#endif // VIRTUALRENDERINGNODE_H
+#endif // VirtualCLRenderer_H

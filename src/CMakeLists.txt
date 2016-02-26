@@ -10,16 +10,16 @@ include_directories( ${PROJECT_BINARY_DIR} )
 ### Adding the source files to the CMake source tree
 SET( OCL_MGPUVS_SOURCE_FILES
     framework/ParallelRendering.cpp
-    framework/RenderingNode.cpp
+    framework/CLRenderer.cpp
     framework/TaskRender.cpp
     framework/TaskCollect.cpp
     framework/TaskComposite.cpp
-    framework/CompositingNode.cpp
+    framework/CLCompositor.cpp
     framework/CLContext.cpp
     framework/TaskMakePixmap.cpp
     framework/virtual/VirtualParallelRendering.cpp
-    framework/virtual/VirtualRenderingNode.cpp
-    framework/virtual/VirtualCompositingNode.cpp
+    framework/virtual/VirtualCLRenderer.cpp
+    framework/virtual/VirtualCLCompositor.cpp
     framework/virtual/VirtualTaskCollect.cpp
     auxillary/VolumeUtilities.cpp
     data/Image.cpp
@@ -47,15 +47,15 @@ SET( OCL_MGPUVS_SOURCE_FILES
 SET( OCL_MGPUVS_HEADER_FILES
     framework/CLContext.h
     framework/CLContext.ipp
-    framework/CompositingNode.h
-    framework/RenderingNode.h
+    framework/CLCompositor.h
+    framework/CLRenderer.h
     framework/TaskCollect.h
     framework/TaskComposite.h
     framework/TaskMakePixmap.h
     framework/TaskRender.h
-    framework/virtual/VirtualCompositingNode.h
+    framework/virtual/VirtualCLCompositor.h
     framework/virtual/VirtualParallelRendering.h
-    framework/virtual/VirtualRenderingNode.h
+    framework/virtual/VirtualCLRenderer.h
     framework/virtual/VirtualTaskCollect.h
     auxillary/half.hpp
     auxillary/VolumeUtilities.h

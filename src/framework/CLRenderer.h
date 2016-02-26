@@ -1,32 +1,32 @@
-#ifndef RENDERINGNODE_H
-#define RENDERINGNODE_H
+#ifndef CLRenderer_H
+#define CLRenderer_H
 
 #include <QObject>
 #include "CLContext.h"
 #include "Volume.h"
 
 /**
- * @brief The RenderingNode class
+ * @brief The CLRenderer class
  * This class wrapping the OpenCL Context where rendering is performed,
  * The proper use of this class is as following:
- * 1| RenderingNode::loadVolume( volume );
- * 2| RenderingNode::applyTransformation();
- * 3| RenderingNode::uploadFrameFromDevice( CL_TRUE );
+ * 1| CLRenderer::loadVolume( volume );
+ * 2| CLRenderer::applyTransformation();
+ * 3| CLRenderer::uploadFrameFromDevice( CL_TRUE );
  * 4| If you want to retrieve the rendered buffer as a raw bytes for further
  *    processing:
- * 4-a| RenderingNode::getFrameData();
+ * 4-a| CLRenderer::getFrameData();
  *    If you want to retrieve a pixmap objects for direct display:
- * 4-b| RenderingNode::getFrame();
+ * 4-b| CLRenderer::getFrame();
  * 5| Repeat 2-4 for each frame.
  *
  */
-class RenderingNode : public QObject , public CLContext< uchar >
+class CLRenderer : public QObject , public CLContext< uchar >
 {
     Q_OBJECT
 public:
 
     /**
-     * @brief RenderingNode
+     * @brief CLRenderer
      * @param gpuIndex
      * The index of the deployed GPU for rendering.
      * @param frameWidth
@@ -42,7 +42,7 @@ public:
      * is prohibited by 'const'ing the references, as it is accessed
      * by many threads simultaneously.
      */
-    RenderingNode( const uint64_t gpuIndex,
+    CLRenderer( const uint64_t gpuIndex,
                    const uint frameWidth , const uint frameHeight ,
                    const Coordinates3D &globalTranslation,
                    const Coordinates3D &globalRotation,
@@ -82,7 +82,7 @@ signals:
      * @param thisPtr
      * Pass this pointer as Identifier to this node. 
      */
-    void finishedRendering( RenderingNode *thisPtr );
+    void finishedRendering( CLRenderer *thisPtr );
 
 
 
@@ -108,4 +108,4 @@ private:
 
 };
 
-#endif // RENDERINGNODE_H
+#endif // CLRenderer_H

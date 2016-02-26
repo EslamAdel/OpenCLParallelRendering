@@ -17,30 +17,30 @@
 
 
 //return rendering profile by passing pointer of rendering node attached to.
-#define RENDERING_PROFILE( renderingNode ) \
-    getRenderingProfile( renderingProfiles , renderingNode )
+#define RENDERING_PROFILE( renderer ) \
+    getRenderingProfile( renderingProfiles , renderer )
 
 //return collecting profile by passing pointer of rendering node attached to.
-#define COLLECTING_PROFILE( renderingNode )\
-    getCollectingProfile( collectingProfiles , renderingNode )
+#define COLLECTING_PROFILE( renderer )\
+    getCollectingProfile( collectingProfiles , renderer )
 
 #define PRINT( timer )\
     do{ timer.print( 1 );  \
     }while( 0 )
 
-#define RENDERING_PROFILE_TAG( node )\
-    do{ printf("Statistics: Rendering on GPU <%d>\n" , node->getGPUIndex() ); }\
+#define RENDERING_PROFILE_TAG( renderer )\
+    do{ printf("Statistics: Rendering on GPU <%d>\n" , renderer->getGPUIndex() ); }\
     while( 0 )
 
-#define COLLECTING_PROFILE_TAG( node , compositingNode )\
+#define COLLECTING_PROFILE_TAG( renderer , compositor )\
     do{\
     printf("Statistics: Data Transfer from GPU <%d> --> Host --> GPU <%d>\n" ,\
-    node->getGPUIndex() , compositingNode_->getGPUIndex() ) ; }\
+    renderer->getGPUIndex() , compositor->getGPUIndex() ) ; }\
     while( 0 )
 
-#define COMPOSITING_PROFILE_TAG( compositingNode )\
+#define COMPOSITING_PROFILE_TAG( compositor )\
     do{\
-    printf("Statistics: Compositing on GPU <%d>\n", compositingNode_->getGPUIndex() ) ;}\
+    printf("Statistics: Compositing on GPU <%d>\n", compositor->getGPUIndex() ) ;}\
     while( 0 )
 
 #define FRAMEWORK_PROFILE_TAG()\
@@ -48,14 +48,14 @@
     printf("Statistics: framework\n"); }\
     while( 0 )
 
-#define ATTACH_RENDERING_PROFILE( renderingNode )\
+#define ATTACH_RENDERING_PROFILE( renderer )\
     do{\
-    renderingProfiles[ renderingNode ] = new RenderingProfile ; }\
+    renderingProfiles[ renderer ] = new RenderingProfile ; }\
     while( 0 )
 
-#define ATTACH_COLLECTING_PROFILE( renderingNode )\
+#define ATTACH_COLLECTING_PROFILE( renderer )\
     do{\
-    collectingProfiles[ renderingNode ] = new CollectingProfile ; }\
+    collectingProfiles[ renderer ] = new CollectingProfile ; }\
     while( 0 )
 
 
@@ -150,10 +150,10 @@ RenderingProfile &getRenderingProfile( RenderingProfiles &profiles ,
                                        uint gpuIndex );
 
 RenderingProfile &getRenderingProfile( RenderingProfiles &profiles ,
-                                       RenderingNode *node  );
+                                       CLRenderer *renderer  );
 
 CollectingProfile &getCollectingProfile( CollectingProfiles &profile ,
-                                         RenderingNode* node );
+                                         CLRenderer* renderer );
 
 
 

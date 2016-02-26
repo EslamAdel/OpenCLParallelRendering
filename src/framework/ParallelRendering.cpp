@@ -36,8 +36,8 @@ ParallelRendering::ParallelRendering( Volume<uchar> *volume ,
     : baseVolume_( volume ),
       frameWidth_( frameWidth ),
       frameHeight_( frameHeight ),
-      renderingNodesReady_( false ),
-      compositingNodeSpecified_( false ),
+      renderersReady_( false ),
+      compositorSpecified_( false ),
       compositedFramesCount_( 0 )
 {
 
@@ -77,11 +77,11 @@ void ParallelRendering::discoverAllNodes()
 {
 
     for(uint64_t gpuIndex = 0 ;  gpuIndex < listGPUs_.size() ; gpuIndex++ )
-        addRenderingNode( gpuIndex );
+        addCLRenderer( gpuIndex );
 
 }
 
-void ParallelRendering::addRenderingNode( const uint64_t gpuIndex)
+void ParallelRendering::addCLRenderer( const uint64_t gpuIndex)
 {
     // if device already occupied by a rendering node, return.
     if( inUseGPUs_.contains( listGPUs_.at( gpuIndex ))) return;
@@ -92,19 +92,19 @@ void ParallelRendering::addRenderingNode( const uint64_t gpuIndex)
     // will be accessed by multithreads. So,
     // they should not be modified during the life of the threads.
 
-    RenderingNode *node = new RenderingNode( gpuIndex,
-                                             frameWidth_ ,
-                                             frameHeight_ ,
-                                             translationAsync_,
-                                             rotationAsync_,
-                                             scaleAsync_,
-                                             volumeDensityAsync_,
-                                             brightnessAsync_,
-                                             transferFunctionScaleAsync_,
-                                             transferFunctionOffsetAsync_);
+    CLRenderer *renderer = new CLRenderer( gpuIndex,
+                                           frameWidth_ ,
+                                           frameHeight_ ,
+                                           translationAsync_,
+                                           rotationAsync_,
+                                           scaleAsync_,
+                                           volumeDensityAsync_,
+                                           brightnessAsync_,
+                                           transferFunctionScaleAsync_,
+                                           transferFunctionOffsetAsync_);
 
-    ATTACH_RENDERING_PROFILE( node );
-    ATTACH_COLLECTING_PROFILE( node );
+    ATTACH_RENDERING_PROFILE( renderer );
+    ATTACH_COLLECTING_PROFILE( renderer );
 
     auto attachedGPU = listGPUs_.at( gpuIndex );
 
@@ -112,20 +112,20 @@ void ParallelRendering::addRenderingNode( const uint64_t gpuIndex)
     inUseGPUs_ << attachedGPU;
 
     // Add the rendering node to the map< gpu , rendering node >.
-    renderingNodes_[ attachedGPU ] = node;
+    renderers_[ attachedGPU ] = renderer;
 
     // Create the TaskRender that wrap the rendering instruction,
     // to be executed concurrently on each device.
-    TaskRender *taskRender = new TaskRender( *node  );
+    TaskRender *taskRender = new TaskRender( *renderer  );
 
     // Add the new task object to
     // the map < rendering node , corresponding rendering task >
-    renderingTasks_[ node ] = taskRender;
+    renderingTasks_[ renderer ] = taskRender;
 
 
-    TaskMakePixmap *taskPixmap = new TaskMakePixmap( node->getCLFrame() ,
-                                                     node );
-    makePixmapTasks_[ node ] = taskPixmap ;
+    TaskMakePixmap *taskPixmap = new TaskMakePixmap( renderer->getCLFrame() ,
+                                                     renderer );
+    makePixmapTasks_[ renderer ] = taskPixmap ;
 
     // Set the maximum number of active threads of the rendering thread pool and
     // the collector thread pool  to the current number of deployed GPUs.
@@ -135,21 +135,21 @@ void ParallelRendering::addRenderingNode( const uint64_t gpuIndex)
 
     // Map the signal emitted from rendering node after rendering is finished
     // to the corresponding slot.
-    connect( node , SIGNAL( finishedRendering( RenderingNode* )),
-             this , SLOT( finishedRendering_SLOT( RenderingNode* )));
+    connect( renderer , SIGNAL( finishedRendering( CLRenderer* )),
+             this , SLOT( finishedRendering_SLOT( CLRenderer* )));
 
     connect( taskPixmap ,
-             SIGNAL(pixmapReady_SIGNAL(QPixmap*,const RenderingNode*)) ,
-             this , SLOT(pixmapReady_SLOT(QPixmap*,const RenderingNode*)));
+             SIGNAL(pixmapReady_SIGNAL(QPixmap*,const CLRenderer*)) ,
+             this , SLOT(pixmapReady_SLOT(QPixmap*,const CLRenderer*)));
 }
 
-int ParallelRendering::getRenderingNodesCount() const
+int ParallelRendering::getCLRenderersCount() const
 {
     return inUseGPUs_.size();
 }
 
 
-void ParallelRendering::addCompositingNode( const uint64_t gpuIndex )
+void ParallelRendering::addCLCompositor( const uint64_t gpuIndex )
 {
     LOG_INFO("Linking Rendering Units with Compositing Unit...");
 
@@ -157,28 +157,28 @@ void ParallelRendering::addCompositingNode( const uint64_t gpuIndex )
     if( gpuIndex >= listGPUs_.size() )
         LOG_ERROR("Choose GPU index from [0-%d]", listGPUs_.size() - 1 );
 
-    if( compositingNodeSpecified_ )
+    if( compositorSpecified_ )
     {
         LOG_WARNING("Compositing Node already attached to GPU <%d>" ,
-                    compositingNode_->getGPUIndex( ));
+                    compositor_->getGPUIndex( ));
         return ;
     }
 
     LOG_DEBUG("Initialize Compositing Unit");
-    compositingNode_ = new CompositingNode( gpuIndex ,
-                                            frameWidth_ ,
-                                            frameHeight_ );
+    compositor_ = new CLCompositor( gpuIndex ,
+                                    frameWidth_ ,
+                                    frameHeight_ );
 
 
 
     LOG_DEBUG("[DONE] Initialize Compositing Unit");
 
     collagePixmapTask_ =
-            new TaskMakePixmap( compositingNode_->getCLFrameCollage() );
+            new TaskMakePixmap( compositor_->getCLFrameCollage() );
 
     connect( collagePixmapTask_ ,
-             SIGNAL( pixmapReady_SIGNAL( QPixmap* , const RenderingNode* )) ,
-             this , SLOT(pixmapReady_SLOT( QPixmap* , const RenderingNode* )));
+             SIGNAL( pixmapReady_SIGNAL( QPixmap* , const CLRenderer* )) ,
+             this , SLOT(pixmapReady_SLOT( QPixmap* , const CLRenderer* )));
     // Frame index will be assigned to each rendering GPU (rednering node).
     // As a start, consider each frame will be indexed in the next for-loop.
 
@@ -193,37 +193,37 @@ void ParallelRendering::addCompositingNode( const uint64_t gpuIndex )
     // compositing task will follow!
     for( auto renderingDevice : inUseGPUs_ )
     {
-        auto renderingNode = renderingNodes_[ renderingDevice ];
+        auto renderer = renderers_[ renderingDevice ];
 
-        LOG_DEBUG("Connecting RenderingNode< %d >" ,
-                  renderingNode->getGPUIndex( ));
+        LOG_DEBUG("Connecting CLRenderer< %d >" ,
+                  renderer->getGPUIndex( ));
 
-        renderingNode->setFrameIndex( frameIndex );
+        renderer->setFrameIndex( frameIndex );
 
         //register a frame to be allocated in the compositor device.
-        compositingNode_->allocateFrame( renderingNode );
+        compositor_->allocateFrame( renderer );
 
         TaskComposite *compositingTask =
-                new TaskComposite( compositingNode_ ,
-                                   renderingNode );
+                new TaskComposite( compositor_ ,
+                                   renderer );
 
-        compositingTasks_[ renderingNode ] = compositingTask ;
+        compositingTasks_[ renderer ] = compositingTask ;
 
         // Now add collectingTasks that transfer buffer from The rendering device
         // (rendering node) to the compositing device (compositing node),
         auto collectingTask =
-                new TaskCollect( renderingNode , compositingNode_ );
+                new TaskCollect( renderer , compositor_ );
 
         // Add the collecting task to
         // the map < rendering node , collecting task >
-        collectingTasks_[ renderingNode ] = collectingTask ;
+        collectingTasks_[ renderer ] = collectingTask ;
 
 
         // Map signals from collecting tasks and compositing tasks to the
         // correspondint slots.
         connect( collectingTask ,
-                 SIGNAL( frameLoadedToDevice_SIGNAL( RenderingNode* )) ,
-                 this , SLOT( frameLoadedToDevice_SLOT( RenderingNode* )));
+                 SIGNAL( frameLoadedToDevice_SIGNAL( CLRenderer* )) ,
+                 this , SLOT( frameLoadedToDevice_SLOT( CLRenderer* )));
 
         connect( compositingTask , SIGNAL( compositingFinished_SIGNAL( )) ,
                  this , SLOT( compositingFinished_SLOT( )));
@@ -232,7 +232,7 @@ void ParallelRendering::addCompositingNode( const uint64_t gpuIndex )
     }
 
 
-    compositingNodeSpecified_ = true ;
+    compositorSpecified_ = true ;
 
     LOG_INFO("[DONE] Linking Rendering Units with Compositing Unit...");
 
@@ -256,10 +256,10 @@ void ParallelRendering::distributeBaseVolume1D()
         LOG_DEBUG( "Loading subVolume to device" );
 
         auto subVolume = bricks[ i++ ];
-        renderingNodes_[ renderingDevice ]->loadVolume( subVolume );
+        renderers_[ renderingDevice ]->loadVolume( subVolume );
 
         LOG_DEBUG( "[DONE] Loading subVolume to GPU <%d>",
-                   renderingNodes_[ renderingDevice ]->getGPUIndex( ));
+                   renderers_[ renderingDevice ]->getGPUIndex( ));
     }
 
     emit this->frameworkReady_SIGNAL();
@@ -269,7 +269,7 @@ void ParallelRendering::distributeBaseVolume1D()
 
 void ParallelRendering::startRendering()
 {
-    activeRenderingNodes_ =  inUseGPUs_.size();
+    activeRenderers_ =  inUseGPUs_.size();
 
     LOG_INFO("Triggering Rendering Nodes");
 
@@ -290,15 +290,15 @@ void ParallelRendering::applyTransformation_()
 
     for( auto renderingDevice : inUseGPUs_ )
     {
-        auto node = renderingNodes_[ renderingDevice ];
+        auto renderer = renderers_[ renderingDevice ];
 
-        TIC( renderingProfiles[ node ]->threadSpawning_TIMER );
+        TIC( renderingProfiles[ renderer ]->threadSpawning_TIMER );
         // Spawn threads and start rendering on each rendering node.
-        rendererPool_.start( renderingTasks_[ node ]);
+        rendererPool_.start( renderingTasks_[ renderer ]);
     }
 
     pendingTransformations_ = false;
-    renderingNodesReady_ = false;
+    renderersReady_ = false;
 }
 
 void ParallelRendering::syncTransformation_()
@@ -315,7 +315,7 @@ void ParallelRendering::syncTransformation_()
 }
 
 
-RenderingNode &ParallelRendering::getRenderingNode( const uint64_t gpuIndex )
+CLRenderer &ParallelRendering::getCLRenderer( const uint64_t gpuIndex )
 {
     // handle some minor exceptions.
     auto device = listGPUs_.at( gpuIndex );
@@ -323,13 +323,13 @@ RenderingNode &ParallelRendering::getRenderingNode( const uint64_t gpuIndex )
     if(!( inUseGPUs_.contains( device )))
         LOG_ERROR("No such rendering node!");
 
-    return *renderingNodes_[ device ];
+    return *renderers_[ device ];
 
 }
 
-CompositingNode &ParallelRendering::getCompositingNode()
+CLCompositor &ParallelRendering::getCLCompositor()
 {
-    return *compositingNode_ ;
+    return *compositor_ ;
 }
 
 
@@ -348,13 +348,13 @@ uint ParallelRendering::getFrameHeight() const
     return frameHeight_;
 }
 
-void ParallelRendering::finishedRendering_SLOT( RenderingNode *finishedNode )
+void ParallelRendering::finishedRendering_SLOT(CLRenderer *renderer )
 {
     //    LOG_DEBUG("Finished Rendering");
 
-    TIC( collectingProfiles[ finishedNode ]->threadSpawning_TIMER );
+    TIC( collectingProfiles[ renderer ]->threadSpawning_TIMER );
 
-    collectorPool_.start( collectingTasks_[ finishedNode ]);
+    collectorPool_.start( collectingTasks_[ renderer ]);
 
 }
 
@@ -372,7 +372,7 @@ void ParallelRendering::compositingFinished_SLOT()
         applyTransformation_();
     else
     {
-        renderingNodesReady_ = true ;
+        renderersReady_ = true ;
 #ifdef BENCHMARKING
         static uint framesCounter = 0 ;
         if( ++framesCounter < testFrames )
@@ -388,91 +388,91 @@ void ParallelRendering::compositingFinished_SLOT()
 
 }
 
-void ParallelRendering::frameLoadedToDevice_SLOT( RenderingNode *node )
+void ParallelRendering::frameLoadedToDevice_SLOT( CLRenderer *renderer )
 {
     TIC( compositingProfile.threadSpawning_TIMER );
 
     //    LOG_DEBUG("Frame[%d] Loaded to device" , node->getFrameIndex( ));
 
     //accumulate the recently loaded frame to the collage frame.
-    compositorPool_.start( compositingTasks_[ node ] );
+    compositorPool_.start( compositingTasks_[ renderer ] );
 
 #ifndef BENCHMARKING
-    pixmapMakerPool_.start( makePixmapTasks_[ node ]);
+    pixmapMakerPool_.start( makePixmapTasks_[ renderer ]);
 #endif
 
 }
 
 void ParallelRendering::pixmapReady_SLOT( QPixmap *pixmap,
-                                          const RenderingNode *node)
+                                          const CLRenderer *renderer )
 {
 
-    if( node == nullptr )
+    if( renderer == nullptr )
         emit this->finalFrameReady_SIGNAL( pixmap );
     else
-        emit this->frameReady_SIGNAL( pixmap , node );
+        emit this->frameReady_SIGNAL( pixmap , renderer );
 }
 
 void ParallelRendering::updateRotationX_SLOT(int angle)
 {
     rotation_.x = angle ;
-    if( renderingNodesReady_ ) applyTransformation_();
+    if( renderersReady_ ) applyTransformation_();
     pendingTransformations_ = true ;
 }
 
 void ParallelRendering::updateRotationY_SLOT(int angle)
 {
     rotation_.y = angle ;
-    if( renderingNodesReady_ ) applyTransformation_();
+    if( renderersReady_ ) applyTransformation_();
     else pendingTransformations_ = true ;
 }
 
 void ParallelRendering::updateRotationZ_SLOT(int angle)
 {
     rotation_.z = angle ;
-    if( renderingNodesReady_ ) applyTransformation_();
+    if( renderersReady_ ) applyTransformation_();
     else pendingTransformations_ = true ;
 }
 
 void ParallelRendering::updateTranslationX_SLOT(int distance)
 {
     translation_.x = distance;
-    if( renderingNodesReady_ ) applyTransformation_();
+    if( renderersReady_ ) applyTransformation_();
     else pendingTransformations_ = true ;
 }
 
 void ParallelRendering::updateTranslationY_SLOT(int distance)
 {
     translation_.y = distance;
-    if( renderingNodesReady_ ) applyTransformation_();
+    if( renderersReady_ ) applyTransformation_();
     else pendingTransformations_ = true ;
 }
 
 void ParallelRendering::updateTranslationZ_SLOT(int distance)
 {
     translation_.z = distance;
-    if( renderingNodesReady_ ) applyTransformation_();
+    if( renderersReady_ ) applyTransformation_();
     else pendingTransformations_ = true ;
 }
 
 void ParallelRendering::updateScaleX_SLOT(int distance)
 {
     scale_.x = distance;
-    if( renderingNodesReady_ ) applyTransformation_();
+    if( renderersReady_ ) applyTransformation_();
     else pendingTransformations_ = true ;
 }
 
 void ParallelRendering::updateScaleY_SLOT(int distance)
 {
     scale_.y = distance;
-    if( renderingNodesReady_ ) applyTransformation_();
+    if( renderersReady_ ) applyTransformation_();
     else pendingTransformations_ = true ;
 }
 
 void ParallelRendering::updateScaleZ_SLOT(int distance)
 {
     scale_.z = distance;
-    if( renderingNodesReady_ ) applyTransformation_();
+    if( renderersReady_ ) applyTransformation_();
     else pendingTransformations_ = true ;
 }
 
@@ -481,28 +481,28 @@ void ParallelRendering::updateScaleXYZ_SLOT(int distance)
     scale_.x = distance;
     scale_.y = distance;
     scale_.z = distance;
-    if( renderingNodesReady_ ) applyTransformation_();
+    if( renderersReady_ ) applyTransformation_();
     else pendingTransformations_ = true ;
 }
 
 void ParallelRendering::updateImageBrightness_SLOT(float brightness)
 {
     brightness_ = brightness;
-    if( renderingNodesReady_ ) applyTransformation_();
+    if( renderersReady_ ) applyTransformation_();
     else pendingTransformations_ = true ;
 }
 
 void ParallelRendering::updateVolumeDensity_SLOT(float density)
 {
     volumeDensity_ = density;
-    if( renderingNodesReady_ ) applyTransformation_();
+    if( renderersReady_ ) applyTransformation_();
     else pendingTransformations_ = true ;
 }
 
 void ParallelRendering::updateTransferFunctionScale_SLOT(float scale)
 {
     transferFunctionScale_=scale;
-    if( renderingNodesReady_ ) applyTransformation_();
+    if( renderersReady_ ) applyTransformation_();
     else pendingTransformations_ = true ;
 
 
@@ -511,7 +511,7 @@ void ParallelRendering::updateTransferFunctionScale_SLOT(float scale)
 void ParallelRendering::updateTransferFunctionOffset_SLOT(float offset)
 {
     transferFunctionOffset_=offset;
-    if( renderingNodesReady_ ) applyTransformation_();
+    if( renderersReady_ ) applyTransformation_();
     else pendingTransformations_ = true ;
 
 
@@ -521,10 +521,10 @@ void ParallelRendering::tranferFunctionFlag_SLOT(int flag)
 {
     for( auto renderingDevice : inUseGPUs_ )
     {
-        RenderingNode* node = renderingNodes_[ renderingDevice ];
-        node->setTransferFunctionFlag(flag);
+        CLRenderer* renderer = renderers_[ renderingDevice ];
+        renderer->setTransferFunctionFlag(flag);
     }
-    if( renderingNodesReady_ ) applyTransformation_();
+    if( renderersReady_ ) applyTransformation_();
     else pendingTransformations_ = true ;
 }
 
@@ -532,21 +532,21 @@ void ParallelRendering::tranferFunctionFlag_SLOT(int flag)
 void ParallelRendering::benchmark_()
 {
 
-    for( auto it : renderingNodes_ )
+    for( auto it : renderers_ )
     {
-        RenderingNode *node = it.second ;
+        CLRenderer *renderer = it.second ;
 
-        RENDERING_PROFILE_TAG( node );
-        PRINT( RENDERING_PROFILE( node ).threadSpawning_TIMER );
-        PRINT( RENDERING_PROFILE( node ).mvMatrix_TIMER );
-        PRINT( RENDERING_PROFILE( node ).rendering_TIMER );
+        RENDERING_PROFILE_TAG( renderer );
+        PRINT( RENDERING_PROFILE( renderer ).threadSpawning_TIMER );
+        PRINT( RENDERING_PROFILE( renderer ).mvMatrix_TIMER );
+        PRINT( RENDERING_PROFILE( renderer ).rendering_TIMER );
 
-        COLLECTING_PROFILE_TAG( node , compositingNode_ );
-        PRINT( COLLECTING_PROFILE( node ).threadSpawning_TIMER );
-        PRINT( COLLECTING_PROFILE( node ).transferingBuffer_TIMER );
+        COLLECTING_PROFILE_TAG( renderer , compositor_ );
+        PRINT( COLLECTING_PROFILE( renderer ).threadSpawning_TIMER );
+        PRINT( COLLECTING_PROFILE( renderer ).transferingBuffer_TIMER );
     }
 
-    COMPOSITING_PROFILE_TAG( compositingNode_ );
+    COMPOSITING_PROFILE_TAG( compositor_ );
     PRINT( compositingProfile.threadSpawning_TIMER ) ;
     PRINT( compositingProfile.accumulatingFrame_TIMER ) ;
     PRINT( compositingProfile.loadCollageFromDevice_TIMER ) ;

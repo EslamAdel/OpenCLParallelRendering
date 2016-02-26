@@ -1,15 +1,15 @@
-#include "VirtualCompositingNode.h"
+#include "VirtualCLCompositor.h"
 #include "Logger.h"
 
-VirtualCompositingNode::VirtualCompositingNode(const uint64_t gpuIndex,
-                                                const uint frameWidth,
-                                                const uint frameHeight)
-    : CompositingNode( gpuIndex , frameWidth , frameHeight )
+VirtualCLCompositor::VirtualCLCompositor( const uint64_t gpuIndex ,
+                                          const uint frameWidth ,
+                                          const uint frameHeight )
+    : CLCompositor( gpuIndex , frameWidth , frameHeight )
 {
 
 }
 
-//void VirtualCompositingNode::collectFrame( VirtualRenderingNode *node,
+//void VirtualCLCompositor::collectFrame( VirtualRenderingNode *node,
 //                                           const cl_bool block)
 //{
 //    LOG_DEBUG("Collecting..");
