@@ -93,14 +93,14 @@ public:
      * Distribute the baseVolume_ over the CLRenderers_ evenly based on
      * the X-axis.
      */
-    virtual void distributeBaseVolume1D();
+    virtual void distributeBaseVolume1D( );
 
 
     /**
      * @brief startRendering
      * Spark the rendering loop.
      */
-    virtual void startRendering();
+    virtual void startRendering( );
 
 
 
@@ -109,10 +109,10 @@ public:
      * @param gpuIndex
      * @return
      */
-    CLAbstractRenderer &getCLRenderer( const uint64_t gpuIndex );
+    const CLAbstractRenderer &getCLRenderer( const uint64_t gpuIndex ) const ;
 
 
-    CLAbstractCompositor &getCLCompositor( ) ;
+    const CLAbstractCompositor &getCLCompositor( ) const ;
     /**
      * @brief machineGPUsCount
      * @return
@@ -292,9 +292,9 @@ protected:
 
 protected :
     //oclHWDl utilities
-    oclHWDL::Hardware         clHardware_;
-    QSet< oclHWDL::Device* >   inUseGPUs_;
-    oclHWDL::Devices            listGPUs_;
+    oclHWDL::Hardware               clHardware_;
+    QSet< const oclHWDL::Device* >  inUseGPUs_;
+    oclHWDL::Devices                listGPUs_;
 
 private:
     //The workers, each node is attached to a single device.

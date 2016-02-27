@@ -35,7 +35,7 @@ public:
     cl_kernel getKernel( ) const override;
 
 
-    CLFrameVariant &getCLFrame( ) override;
+    const CLFrameVariant &getCLFrame( ) const override;
 
 protected:
 

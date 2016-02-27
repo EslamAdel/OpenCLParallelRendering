@@ -99,7 +99,7 @@ void CLCompositor< T >::composite( )
 
     QVector< uint > depthIndex ;
 
-    for( CLAbstractRenderer *renderer : renderers_ )
+    for( const CLAbstractRenderer *renderer : renderers_ )
         depthIndex << renderer->getFrameIndex();
 
     //    for( CLRenderer *renderer : renderers_ )
@@ -151,7 +151,7 @@ void CLCompositor< T >::loadFinalFrame()
 }
 
 template< class T >
-CLFrameVariant &CLCompositor<T>::getFinalFrame()
+const CLFrameVariant &CLCompositor<T>::getFinalFrame() const
 {
     this->finalFrameVariant_.setValue(( CLFrame< T > *) finalFrameReadout_ );
     return this->finalFrameVariant_ ;

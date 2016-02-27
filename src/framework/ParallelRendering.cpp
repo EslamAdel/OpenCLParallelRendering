@@ -138,7 +138,7 @@ void ParallelRendering::addCLRenderer( const uint64_t gpuIndex )
 
     connect( taskPixmap ,
              SIGNAL(pixmapReady_SIGNAL( QPixmap*,
-                                       const CLAbstractRenderer* )) ,
+                                        const CLAbstractRenderer* )) ,
              this , SLOT(pixmapReady_SLOT( QPixmap*,
                                            const CLAbstractRenderer* )));
 }
@@ -172,21 +172,14 @@ void ParallelRendering::addCLCompositor( const uint64_t gpuIndex )
     // Instead, use the CLCompositorAccumulate that is based on regular
     // OpenCL buffers.
     if( inUseGPUs_.size() > 1 )
-    {
-        auto compositor = new CLCompositor< uint >( gpuIndex ,
-                                                    frameWidth_ ,
-                                                    frameHeight_ );
-        compositor_ =
-                static_cast< CLAbstractCompositor * >( compositor );
-    }
+        compositor_ = new CLCompositor< uint >( gpuIndex ,
+                                                frameWidth_ ,
+                                                frameHeight_ );
+
     else
-    {
-        auto compositor = new CLCompositorAccumulate< uint >( gpuIndex ,
-                                                              frameWidth_ ,
-                                                              frameHeight_ );
-        compositor_ =
-                static_cast< CLAbstractCompositor * >( compositor );
-    }
+        compositor_ = new CLCompositorAccumulate< uint >( gpuIndex ,
+                                                          frameWidth_ ,
+                                                          frameHeight_ );
 
 
     LOG_DEBUG("[DONE] Initialize Compositing Unit");
@@ -303,13 +296,13 @@ void ParallelRendering::applyTransformation_()
     // fetch new transformations if exists.
     syncTransformation_();
 
-    for( auto renderingDevice : inUseGPUs_ )
+    for( const oclHWDL::Device *renderingDevice : inUseGPUs_ )
     {
-        auto renderer = renderers_[ renderingDevice ];
+        const CLAbstractRenderer *renderer = renderers_.at( renderingDevice );
 
-        TIC( renderingProfiles[ renderer ]->threadSpawning_TIMER );
+        TIC( renderingProfiles.at( renderer )->threadSpawning_TIMER );
         // Spawn threads and start rendering on each rendering node.
-        rendererPool_.start( renderingTasks_[ renderer ]);
+        rendererPool_.start( renderingTasks_.at( renderer ));
     }
 
     pendingTransformations_ = false;
@@ -323,21 +316,22 @@ void ParallelRendering::syncTransformation_()
 }
 
 
-CLAbstractRenderer &ParallelRendering::getCLRenderer( const uint64_t gpuIndex )
+const CLAbstractRenderer &
+ParallelRendering::getCLRenderer( const uint64_t gpuIndex ) const
 {
     // handle some minor exceptions.
-    auto device = listGPUs_.at( gpuIndex );
+    const oclHWDL::Device *device = listGPUs_.at( gpuIndex );
 
     if(!( inUseGPUs_.contains( device )))
         LOG_ERROR("No such rendering node!");
 
-    return *renderers_[ device ];
+    return *renderers_.at( device );
 
 }
 
-CLAbstractCompositor &ParallelRendering::getCLCompositor()
+const CLAbstractCompositor &ParallelRendering::getCLCompositor() const
 {
-    return static_cast< CLAbstractCompositor& >( *compositor_ ) ;
+    return  *compositor_  ;
 }
 
 
@@ -360,9 +354,9 @@ void ParallelRendering::finishedRendering_SLOT( CLAbstractRenderer *renderer )
 {
     //    LOG_DEBUG("Finished Rendering");
 
-    TIC( collectingProfiles[ renderer ]->threadSpawning_TIMER );
+    TIC( collectingProfiles.at( renderer )->threadSpawning_TIMER );
 
-    collectorPool_.start( collectingTasks_[ renderer ]);
+    collectorPool_.start( collectingTasks_.at( renderer ));
 
 }
 
@@ -405,10 +399,10 @@ void ParallelRendering::frameLoadedToDevice_SLOT( CLAbstractRenderer *renderer )
     //    LOG_DEBUG("Frame[%d] Loaded to device" , node->getFrameIndex( ));
 
     //accumulate the recently loaded frame to the collage frame.
-    compositorPool_.start( compositingTasks_[ renderer ] );
+    compositorPool_.start( compositingTasks_.at( renderer ) );
 
 #ifndef BENCHMARKING
-    pixmapMakerPool_.start( makePixmapTasks_[ renderer ]);
+    pixmapMakerPool_.start( makePixmapTasks_.at( renderer ));
 #endif
 
 }

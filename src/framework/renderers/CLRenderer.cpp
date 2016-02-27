@@ -90,7 +90,7 @@ cl_kernel CLRenderer< V , F >::getKernel() const
 }
 
 template< class V , class F >
-CLFrameVariant &CLRenderer< V , F >::getCLFrame()
+const CLFrameVariant &CLRenderer< V , F >::getCLFrame() const
 {
     this->frameVariant_.setValue(( CLFrame< F > *) clFrame_ );
     return this->frameVariant_ ;

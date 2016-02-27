@@ -26,7 +26,7 @@ public:
 
     void loadFinalFrame() override ;
 
-    CLFrameVariant &getFinalFrame( ) override;
+    const CLFrameVariant &getFinalFrame( ) const override;
 
     uint framesCount() const ;
 

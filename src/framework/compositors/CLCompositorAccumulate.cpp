@@ -80,6 +80,7 @@ void CLCompositorAccumulate< T >::composite( )
     //if first frame, it is already written to collageFrame, return.
     if( compositedFramesCount_ == 1 )
     {
+        TIC( compositingProfile.compositing_TIMER );
 
         //        LOG_DEBUG("Frame[%d] as Collage Buffer", frameIndex );
         //make first loaded frame buffer as collage frame.
@@ -126,6 +127,7 @@ void CLCompositorAccumulate< T >::composite( )
 template< class T >
 void CLCompositorAccumulate< T >::loadFinalFrame()
 {
+    TOC( compositingProfile.compositing_TIMER );
     //    LOG_DEBUG("Reading CollageFrame[%d]" , collageBufferFrameIndex_ );
     finalFrameReadout_->readOtherDeviceData( commandQueue_ ,
                                              *finalFrame_ ,
@@ -137,9 +139,9 @@ void CLCompositorAccumulate< T >::loadFinalFrame()
 }
 
 template< class T >
-CLFrameVariant &CLCompositorAccumulate< T >::getFinalFrame()
+const CLFrameVariant &CLCompositorAccumulate< T >::getFinalFrame() const
 {
-    this->finalFrameVariant_= QVariant::fromValue( finalFrameReadout_  );
+    this->finalFrameVariant_ = QVariant::fromValue( finalFrameReadout_  );
     return this->finalFrameVariant_ ;
 }
 

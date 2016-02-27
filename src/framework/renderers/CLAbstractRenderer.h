@@ -54,7 +54,7 @@ public:
       */
     virtual cl_kernel getKernel( ) const = 0;
 
-    virtual CLFrameVariant &getCLFrame( ) = 0;
+    virtual const CLFrameVariant &getCLFrame( ) const = 0;
 
     virtual const Coordinates3D &getCurrentCenter() const = 0 ;
 
@@ -144,7 +144,7 @@ protected:
      */
     const uint frameHeight_ ;
 
-    CLFrameVariant frameVariant_ ;
+    mutable CLFrameVariant frameVariant_ ;
 };
 
 #endif // CLABSTRACTRENDERER_H

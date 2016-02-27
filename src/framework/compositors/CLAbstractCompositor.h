@@ -26,7 +26,7 @@ public:
 
     virtual void loadFinalFrame( ) = 0 ;
 
-    virtual CLFrameVariant &getFinalFrame() = 0 ;
+    virtual const CLFrameVariant &getFinalFrame() const = 0 ;
 
     uint64_t getGPUIndex( ) const;
 
@@ -77,9 +77,9 @@ protected:
 
     cl_command_queue commandQueue_ ;
 
-    QVector< CLAbstractRenderer *> renderers_ ;
+    QVector< const CLAbstractRenderer *> renderers_ ;
 
-    CLFrameVariant finalFrameVariant_ ;
+    mutable CLFrameVariant finalFrameVariant_ ;
 
     bool readOutReady_ ;
 };
