@@ -9,15 +9,15 @@ include_directories( ${PROJECT_BINARY_DIR} )
 
 ### Adding the source files to the CMake source tree
 SET( OCL_MGPUVS_SOURCE_FILES
-    framework/CLAbstractRenderer.cpp
-    framework/CLAbstractCompositor.cpp
-    framework/CLCompositorAccumulate.cpp
+    framework/renderers/CLAbstractRenderer.cpp
+    framework/compositors/CLAbstractCompositor.cpp
+    framework/compositors/CLCompositorAccumulate.cpp
     framework/ParallelRendering.cpp
-    framework/CLRenderer.cpp
+    framework/renderers/CLRenderer.cpp
     framework/TaskRender.cpp
     framework/TaskCollect.cpp
     framework/TaskComposite.cpp
-    framework/CLCompositor.cpp
+    framework/compositors/CLCompositor.cpp
     framework/TaskMakePixmap.cpp
     framework/virtual/VirtualParallelRendering.cpp
     framework/virtual/VirtualCLRenderer.cpp
@@ -49,13 +49,14 @@ SET( OCL_MGPUVS_SOURCE_FILES
 
 ### Adding the header files to the CMake source tree
 SET( OCL_MGPUVS_HEADER_FILES
-    framework/CLAbstractRenderer.h
-    framework/CLAbstractCompositor.h
-    framework/CLCompositorAccumulate.h
-    framework/CLCompositor.h
-    framework/CLCompositor.ipp
-    framework/CLRenderer.h
-    framework/CLRenderer.ipp
+    framework/renderers/CLAbstractRenderer.h
+    framework/compositors/CLAbstractCompositor.h
+    framework/compositors/CLCompositorAccumulate.h
+    framework/compositors/CLCompositorAccumulate.ipp
+    framework/compositors/CLCompositor.h
+    framework/compositors/CLCompositor.ipp
+    framework/renderers/CLRenderer.h
+    framework/renderers/CLRenderer.ipp
     framework/TaskCollect.h
     framework/TaskComposite.h
     framework/TaskMakePixmap.h
