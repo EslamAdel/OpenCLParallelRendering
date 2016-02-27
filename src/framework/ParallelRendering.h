@@ -305,7 +305,7 @@ protected:
     RenderingTasks  renderingTasks_ ;
     CollectingTasks collectingTasks_ ;
     CompositingTasks compositingTasks_ ;
-    TaskMakePixmap *collagePixmapTask_;
+    TaskMakePixmap *finalFramePixmapTask_;
     MakePixmapTasks makePixmapTasks_ ;
 
     //Volume Data

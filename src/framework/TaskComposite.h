@@ -37,8 +37,6 @@ protected:
 private:
     CLAbstractCompositor *compositor_ ;
     CLRenderer *renderer_  ;
-    bool firstTime_ ;
-
 };
 
 #endif // TASKCOMPOSITE_H

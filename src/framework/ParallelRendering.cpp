@@ -117,8 +117,10 @@ void ParallelRendering::addCLRenderer( const uint64_t gpuIndex)
     renderingTasks_[ renderer ] = taskRender;
 
 
-    TaskMakePixmap *taskPixmap = new TaskMakePixmap( renderer->getCLFrame() ,
-                                                     renderer );
+    TaskMakePixmap *taskPixmap = new TaskMakePixmap( );
+    taskPixmap->setFrame( renderer->getCLFrame( ));
+    taskPixmap->setRenderer( renderer );
+
     makePixmapTasks_[ renderer ] = taskPixmap ;
 
     // Set the maximum number of active threads of the rendering thread pool and
@@ -167,17 +169,17 @@ void ParallelRendering::addCLCompositor( const uint64_t gpuIndex )
     // OpenCL buffers.
     if( inUseGPUs_.size() > 1 )
     {
-        auto compositor = new CLCompositor( gpuIndex ,
-                                            frameWidth_ ,
-                                            frameHeight_ );
+        auto compositor = new CLCompositor< uint >( gpuIndex ,
+                                                    frameWidth_ ,
+                                                    frameHeight_ );
         compositor_ =
                 static_cast< CLAbstractCompositor * >( compositor );
     }
     else
     {
-        auto compositor = new CLCompositorAccumulate( gpuIndex ,
-                                                      frameWidth_ ,
-                                                      frameHeight_ );
+        auto compositor = new CLCompositorAccumulate< uint >( gpuIndex ,
+                                                              frameWidth_ ,
+                                                              frameHeight_ );
         compositor_ =
                 static_cast< CLAbstractCompositor * >( compositor );
     }
@@ -185,10 +187,9 @@ void ParallelRendering::addCLCompositor( const uint64_t gpuIndex )
 
     LOG_DEBUG("[DONE] Initialize Compositing Unit");
 
-    collagePixmapTask_ =
-            new TaskMakePixmap( compositor_->getFinalFrame( ));
+    finalFramePixmapTask_ = new TaskMakePixmap( );
 
-    connect( collagePixmapTask_ ,
+    connect( finalFramePixmapTask_ ,
              SIGNAL( pixmapReady_SIGNAL( QPixmap* , const CLRenderer* )) ,
              this , SLOT(pixmapReady_SLOT( QPixmap* , const CLRenderer* )));
     // Frame index will be assigned to each rendering GPU (rednering node).
@@ -363,7 +364,10 @@ void ParallelRendering::compositingFinished_SLOT()
     TOC( frameworkProfile.renderingLoop_TIMER );
 
 #ifndef BENCHMARKING
-    pixmapMakerPool_.start( collagePixmapTask_ );
+    finalFramePixmapTask_->setFrame(
+                compositor_->getFinalFrame().value< CLFrame< uint >*>( ));
+
+    pixmapMakerPool_.start( finalFramePixmapTask_ );
 #endif
 
     if( pendingTransformations_ )
@@ -411,70 +415,70 @@ void ParallelRendering::pixmapReady_SLOT( QPixmap *pixmap,
         emit this->frameReady_SIGNAL( pixmap , renderer );
 }
 
-void ParallelRendering::updateRotationX_SLOT(int angle)
+void ParallelRendering::updateRotationX_SLOT( int angle )
 {
     transformation_.rotation.x = angle ;
     if( renderersReady_ ) applyTransformation_();
     pendingTransformations_ = true ;
 }
 
-void ParallelRendering::updateRotationY_SLOT(int angle)
+void ParallelRendering::updateRotationY_SLOT( int angle )
 {
     transformation_.rotation.y = angle ;
     if( renderersReady_ ) applyTransformation_();
     else pendingTransformations_ = true ;
 }
 
-void ParallelRendering::updateRotationZ_SLOT(int angle)
+void ParallelRendering::updateRotationZ_SLOT( int angle )
 {
     transformation_.rotation.z = angle ;
     if( renderersReady_ ) applyTransformation_();
     else pendingTransformations_ = true ;
 }
 
-void ParallelRendering::updateTranslationX_SLOT(int distance)
+void ParallelRendering::updateTranslationX_SLOT( int distance )
 {
     transformation_.translation.x = distance;
     if( renderersReady_ ) applyTransformation_();
     else pendingTransformations_ = true ;
 }
 
-void ParallelRendering::updateTranslationY_SLOT(int distance)
+void ParallelRendering::updateTranslationY_SLOT( int distance )
 {
     transformation_.translation.y = distance;
     if( renderersReady_ ) applyTransformation_();
     else pendingTransformations_ = true ;
 }
 
-void ParallelRendering::updateTranslationZ_SLOT(int distance)
+void ParallelRendering::updateTranslationZ_SLOT( int distance )
 {
     transformation_.translation.z = distance;
     if( renderersReady_ ) applyTransformation_();
     else pendingTransformations_ = true ;
 }
 
-void ParallelRendering::updateScaleX_SLOT(int distance)
+void ParallelRendering::updateScaleX_SLOT( int distance )
 {
     transformation_.scale.x = distance;
     if( renderersReady_ ) applyTransformation_();
     else pendingTransformations_ = true ;
 }
 
-void ParallelRendering::updateScaleY_SLOT(int distance)
+void ParallelRendering::updateScaleY_SLOT( int distance )
 {
     transformation_.scale.y = distance;
     if( renderersReady_ ) applyTransformation_();
     else pendingTransformations_ = true ;
 }
 
-void ParallelRendering::updateScaleZ_SLOT(int distance)
+void ParallelRendering::updateScaleZ_SLOT( int distance )
 {
     transformation_.scale.z = distance;
     if( renderersReady_ ) applyTransformation_();
     else pendingTransformations_ = true ;
 }
 
-void ParallelRendering::updateScaleXYZ_SLOT(int distance)
+void ParallelRendering::updateScaleXYZ_SLOT( int distance )
 {
     transformation_.scale.x = distance;
     transformation_.scale.y = distance;
@@ -483,21 +487,21 @@ void ParallelRendering::updateScaleXYZ_SLOT(int distance)
     else pendingTransformations_ = true ;
 }
 
-void ParallelRendering::updateImageBrightness_SLOT(float brightness)
+void ParallelRendering::updateImageBrightness_SLOT( float brightness )
 {
     transformation_.brightness = brightness;
     if( renderersReady_ ) applyTransformation_();
     else pendingTransformations_ = true ;
 }
 
-void ParallelRendering::updateVolumeDensity_SLOT(float density)
+void ParallelRendering::updateVolumeDensity_SLOT( float density )
 {
     transformation_.volumeDensity = density;
     if( renderersReady_ ) applyTransformation_();
     else pendingTransformations_ = true ;
 }
 
-void ParallelRendering::updateTransferFunctionScale_SLOT(float scale)
+void ParallelRendering::updateTransferFunctionScale_SLOT( float scale )
 {
     transformation_.transferFunctionScale =scale;
     if( renderersReady_ ) applyTransformation_();
@@ -506,7 +510,7 @@ void ParallelRendering::updateTransferFunctionScale_SLOT(float scale)
 
 }
 
-void ParallelRendering::updateTransferFunctionOffset_SLOT(float offset)
+void ParallelRendering::updateTransferFunctionOffset_SLOT( float offset )
 {
     transformation_.transferFunctionOffset = offset ;
     if( renderersReady_ ) applyTransformation_();
@@ -515,7 +519,7 @@ void ParallelRendering::updateTransferFunctionOffset_SLOT(float offset)
 
 }
 
-void ParallelRendering::tranferFunctionFlag_SLOT(int flag)
+void ParallelRendering::tranferFunctionFlag_SLOT( int flag )
 {
     for( auto renderingDevice : inUseGPUs_ )
     {
@@ -527,7 +531,7 @@ void ParallelRendering::tranferFunctionFlag_SLOT(int flag)
 }
 
 
-void ParallelRendering::benchmark_()
+void ParallelRendering::benchmark_( )
 {
 
     for( auto it : renderers_ )
@@ -545,9 +549,9 @@ void ParallelRendering::benchmark_()
     }
 
     COMPOSITING_PROFILE_TAG( compositor_ );
-//    PRINT( compositingProfile.threadSpawning_TIMER ) ;
-//    PRINT( compositingProfile.accumulatingFrame_TIMER ) ;
-//    PRINT( compositingProfile.loadCollageFromDevice_TIMER ) ;
+    //    PRINT( compositingProfile.threadSpawning_TIMER ) ;
+    //    PRINT( compositingProfile.accumulatingFrame_TIMER ) ;
+    //    PRINT( compositingProfile.loadCollageFromDevice_TIMER ) ;
     PRINT( compositingProfile.compositing_TIMER ) ;
 
 

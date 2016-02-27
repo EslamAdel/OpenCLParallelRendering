@@ -1,19 +1,21 @@
 #include "CLCompositorAccumulate.h"
 
-CLCompositorAccumulate::CLCompositorAccumulate( const uint64_t gpuIndex ,
-                                                const uint frameWidth ,
-                                                const uint frameHeight )
+template< class T >
+CLCompositorAccumulate< T >::CLCompositorAccumulate( const uint64_t gpuIndex ,
+                                                     const uint frameWidth ,
+                                                     const uint frameHeight )
     : CLAbstractCompositor( gpuIndex ) ,
       frameDimensions_( Dimensions2D( frameWidth , frameHeight ))
 {
     compositedFramesCount_ = 0 ;
     framesCount_ = 0 ;
 
-    initializeKernel_();
-    initializeBuffers_();
+    initializeKernel_( );
+    initializeBuffers_( );
 }
 
-void CLCompositorAccumulate::allocateFrame( CLRenderer *renderer )
+template< class T >
+void CLCompositorAccumulate< T >::allocateFrame( CLRenderer *renderer )
 {
 
     if( renderers_.contains( renderer ))
@@ -23,8 +25,8 @@ void CLCompositorAccumulate::allocateFrame( CLRenderer *renderer )
 
     renderers_ << renderer ;
 
-    CLFrame32 *frame =
-            new CLFrame32( renderer->getCLFrame()->getFrameDimensions( ));
+    CLFrame< T > *frame =
+            new CLFrame< T >( renderer->getCLFrame()->getFrameDimensions( ));
 
     frame->createDeviceData( context_ );
 
@@ -34,8 +36,9 @@ void CLCompositorAccumulate::allocateFrame( CLRenderer *renderer )
 
 }
 
-void CLCompositorAccumulate::collectFrame( CLRenderer *renderer ,
-                                           const cl_bool block )
+template< class T >
+void CLCompositorAccumulate< T >::collectFrame( CLRenderer *renderer ,
+                                                const cl_bool block )
 {
 #ifdef BENCHMARKING
     //    direct copy frame from rendering device to the host pointer
@@ -64,7 +67,8 @@ void CLCompositorAccumulate::collectFrame( CLRenderer *renderer ,
     loadedFrames_.enqueue( frames_[ renderer ] );
 }
 
-void CLCompositorAccumulate::composite( )
+template< class T >
+void CLCompositorAccumulate< T >::composite( )
 {
     if( ++compositedFramesCount_ == framesCount_ )
         readOutReady_ = true ;
@@ -72,6 +76,7 @@ void CLCompositorAccumulate::composite( )
     //if first frame, it is already written to collageFrame, return.
     if( compositedFramesCount_ == 1 )
     {
+
         //        LOG_DEBUG("Frame[%d] as Collage Buffer", frameIndex );
         //make first loaded frame buffer as collage frame.
         finalFrame_ = loadedFrames_.dequeue() ;
@@ -114,7 +119,8 @@ void CLCompositorAccumulate::composite( )
     //    LOG_DEBUG("[DONE] Accumulating Frame[%d]", frameIndex );
 }
 
-void CLCompositorAccumulate::loadFinalFrame()
+template< class T >
+void CLCompositorAccumulate< T >::loadFinalFrame()
 {
     //    LOG_DEBUG("Reading CollageFrame[%d]" , collageBufferFrameIndex_ );
     finalFrameReadout_->readOtherDeviceData( commandQueue_ ,
@@ -126,31 +132,37 @@ void CLCompositorAccumulate::loadFinalFrame()
     readOutReady_ = false ;
 }
 
-CLFrame<uint> *&CLCompositorAccumulate::getFinalFrame()
+template< class T >
+CLFrameVariant &CLCompositorAccumulate< T >::getFinalFrame()
 {
-    return finalFrameReadout_ ;
+    this->finalFrameVariant_= QVariant::fromValue( finalFrameReadout_  );
+    return this->finalFrameVariant_ ;
 }
 
-uint CLCompositorAccumulate::framesCount() const
+template< class T >
+uint CLCompositorAccumulate< T >::framesCount() const
 {
     return framesCount_ ;
 }
 
-uint8_t CLCompositorAccumulate::getCompositedFramesCount() const
+template< class T >
+uint8_t CLCompositorAccumulate< T >::getCompositedFramesCount() const
 {
     return compositedFramesCount_ ;
 }
 
-void CLCompositorAccumulate::initializeBuffers_()
+template< class T >
+void CLCompositorAccumulate< T >::initializeBuffers_()
 {
     LOG_DEBUG("Initializing Buffers ...");
 
-    finalFrameReadout_ = new CLFrame32( frameDimensions_ );
+    finalFrameReadout_ = new CLFrame< T >( frameDimensions_ );
 
     LOG_DEBUG("[DONE] Initializing Buffers ...");
 }
 
-void CLCompositorAccumulate::initializeKernel_()
+template< class T >
+void CLCompositorAccumulate< T >::initializeKernel_()
 {
     LOG_DEBUG( "Initializing an OpenCL Kernel ... " );
 
@@ -160,3 +172,5 @@ void CLCompositorAccumulate::initializeKernel_()
 
     LOG_DEBUG( "[DONE] Initializing an OpenCL Kernel ... " );
 }
+
+#include "CLCompositorAccumulate.ipp"

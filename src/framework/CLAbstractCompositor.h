@@ -1,25 +1,23 @@
 #ifndef CLABSTRACTCOMPOSITOR_H
 #define CLABSTRACTCOMPOSITOR_H
 
-
 #include <Headers.hh>
-
 #include <QVector>
-#include "oclHWDL.h"
 
+#include "oclHWDL.h"
 #include "CLRenderer.h"
 #include "Logger.h"
-
+#include "CLFrameVariants.hh"
+#include "ProfilingExterns.h"
 
 class CLAbstractCompositor : public QObject
 {
     Q_OBJECT
 
 public:
-    CLAbstractCompositor(  const uint64_t gpuIndex  );
+    CLAbstractCompositor( const uint64_t gpuIndex  );
 
     virtual void allocateFrame( CLRenderer *renderer ) = 0 ;
-
 
     virtual void collectFrame( CLRenderer *renderer ,
                                const cl_bool block ) = 0;
@@ -28,12 +26,11 @@ public:
 
     virtual void loadFinalFrame( ) = 0 ;
 
-    virtual CLFrame< uint > *&getFinalFrame() = 0 ;
+    virtual CLFrameVariant &getFinalFrame() = 0 ;
 
     uint64_t getGPUIndex( ) const;
 
-    bool readOutReady() const ;
-
+    bool readOutReady( ) const ;
 
 private:
     /**
@@ -52,7 +49,7 @@ protected:
      * Allocate framesCount_ buffers on the compositng device, in addition
      * to the collage buffer.
      */
-    virtual void initializeBuffers_() = 0 ;
+    virtual void initializeBuffers_( ) = 0 ;
 
     /**
      * @brief initializeKernel_
@@ -60,7 +57,7 @@ protected:
      * the collage buffer is passed to the rewinding kernel, as it will
      * always be rewinded after compositing is completely done.
      */
-    virtual void initializeKernel_() = 0 ;
+    virtual void initializeKernel_( ) = 0 ;
 
 private:
     /**
@@ -82,9 +79,9 @@ protected:
 
     QVector< CLRenderer *> renderers_ ;
 
+    CLFrameVariant finalFrameVariant_ ;
+
     bool readOutReady_ ;
-
-
 };
 
 #endif // CLABSTRACTCOMPOSITOR_H

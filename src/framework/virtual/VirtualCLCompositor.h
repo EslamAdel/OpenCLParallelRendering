@@ -4,18 +4,13 @@
 #include "CLCompositor.h"
 #include "VirtualCLRenderer.h"
 
-class VirtualCLCompositor : public CLCompositor
+template< class T >
+class VirtualCLCompositor : public CLCompositor< T >
 {
 public:
     VirtualCLCompositor( const uint64_t gpuIndex ,
-                            const uint frameWidth ,
-                            const uint frameHeight );
-
-
-//    void collectFrame( const uint8_t frameIndex ,
-//                       cl_command_queue sourceCmdQueue ,
-//                       CLFrame32 &sourceFrame ,
-//                       const cl_bool block );
+                         const uint frameWidth ,
+                         const uint frameHeight );
 };
 
 #endif // VIRTUALCLCompositor_H

@@ -36,18 +36,18 @@ void VirtualParallelRendering::addCLCompositor(const uint64_t gpuIndex)
     LOG_DEBUG("Adding Virtual Compositing Node");
 
 
-    compositor_ =
-            new VirtualCLCompositor( gpuIndex ,
-                                     frameWidth_ ,
-                                     frameHeight_ );
+    compositor_ = ( CLAbstractCompositor * )
+            new CLCompositor< uint >( gpuIndex ,
+                                      frameWidth_ ,
+                                      frameHeight_ );
 
 
 
 
-    this->collagePixmapTask_ =
-            new TaskMakePixmap( compositor_->getFinalFrame() );
+//    this->collagePixmapTask_ =
+//            new TaskMakePixmap( compositor_->getFinalFrame() );
 
-    connect( this->collagePixmapTask_ ,
+    connect( this->finalFramePixmapTask_ ,
              SIGNAL( pixmapReady_SIGNAL( QPixmap* , const CLRenderer* )) ,
              this , SLOT(pixmapReady_SLOT( QPixmap* , const CLRenderer* )));
     // Frame index will be assigned to each rendering GPU (rednering node).
@@ -176,8 +176,8 @@ void VirtualParallelRendering::compositingFinished_SLOT()
 
     //this->pixmapMakerPool_.start( collagePixmapTask_ );
 
-    emit this->finalFrameReady_SIGNAL(
-                &compositor_->getFinalFrame()->getFramePixmap() );
+//    emit this->finalFrameReady_SIGNAL(
+//                &compositor_->getFinalFrame()->getFramePixmap() );
 
     if( this->pendingTransformations_ )
         applyTransformation_();

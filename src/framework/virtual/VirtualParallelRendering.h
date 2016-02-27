@@ -49,7 +49,7 @@ private:
 
     //for virtual GPUs only.
     std::vector< VirtualCLRenderer* > renderers_ ;
-    VirtualCLCompositor *compositor_ ;
+    CLAbstractCompositor *compositor_ ;
     const uint virtualGPUsCount_ ;
 
     std::vector< TaskComposite* > compositingTasks_ ;

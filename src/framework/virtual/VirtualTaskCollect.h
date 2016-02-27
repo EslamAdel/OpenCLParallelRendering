@@ -13,7 +13,7 @@ class VirtualTaskCollect : public QObject , public QRunnable
 public:
 
     VirtualTaskCollect( VirtualCLRenderer *renderer ,
-                        VirtualCLCompositor *compositor );
+                        CLAbstractCompositor *compositor );
 
 
 signals:
@@ -25,7 +25,7 @@ protected:
 
 private:
     VirtualCLRenderer *renderer_;
-    VirtualCLCompositor *compositor_;
+    CLAbstractCompositor *compositor_;
 
 };
 

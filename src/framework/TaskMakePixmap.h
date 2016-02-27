@@ -11,8 +11,12 @@ class TaskMakePixmap : public QObject , public QRunnable
 {
     Q_OBJECT
 public:
-    TaskMakePixmap( CLFrame< uint > *frame ,
-                    const CLRenderer* clRenderer_ = nullptr );
+    TaskMakePixmap( );
+
+    void setFrame( CLFrame< uint > *frame );
+    void setRenderer( CLRenderer *renderer );
+
+
 protected:
     void run() ;
 
@@ -20,8 +24,8 @@ signals:
     void pixmapReady_SIGNAL(  QPixmap *pixmap , const CLRenderer* clRenderer);
 
 private:
-    CLFrame32 *frame_ ;
-    const CLRenderer *clRenderer_;
+    CLFrame< uint > *frame_ ;
+    CLRenderer *clRenderer_ ;
 
 };
 

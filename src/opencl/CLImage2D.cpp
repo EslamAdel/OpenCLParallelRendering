@@ -12,6 +12,12 @@ CLImage2D< T >::CLImage2D( const Dimensions2D dimensions ,
 }
 
 template< class T >
+CLImage2D< T >::CLImage2D( )
+{
+
+}
+
+template< class T >
 void CLImage2D< T >::createDeviceData( cl_context context )
 {
     LOG_DEBUG( "Creating an OpenCL image: %dx%d ",

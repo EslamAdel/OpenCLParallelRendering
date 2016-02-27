@@ -20,9 +20,9 @@ public:
      * @param volume
      * @param precision
      */
-    CLFrame( const Dimensions2D dimensions ,
-             T* data = nullptr );
+    CLFrame( const Dimensions2D dimensions );
 
+    CLFrame( );
 
     ~CLFrame() ;
 
@@ -75,8 +75,13 @@ public:
     bool inSameContext( const CLFrame<T> &frame ) const ;
 
 
+    bool dimensionsDefined( ) const ;
+
 protected:
     void releaseDeviceData_();
+
+
+    void initializeHostBuffers_( );
 
     //Temporary solution as namesapce SystemUtilites cannot be found
     //by compiler.
@@ -92,16 +97,18 @@ protected:
 
     QPixmap frame_ ;
 
-    const Dimensions2D dimensions_ ;
+    Dimensions2D dimensions_ ;
 
     cl_context context_ ;
 
     //flags
     bool pixmapSynchronized_ ;
     bool inDevice_ ;
+    bool dimensionsDefined_ ;
 };
 
 
 typedef CLFrame< uint > CLFrame32 ;
+
 
 #endif // CLFrame_H

@@ -8,20 +8,12 @@ TaskComposite::TaskComposite( CLAbstractCompositor *compositor ,
 {
     compositor_ = compositor ;
     setAutoDelete( false );
-    firstTime_ = true ;
 }
 
 
 void TaskComposite::run()
 {
-
     TOC( compositingProfile.threadSpawning_TIMER ) ;
-
-    if( firstTime_ )
-    {
-        TIC( compositingProfile.compositing_TIMER );
-        firstTime_ = false ;
-    }
 
     compositor_->composite();
 
@@ -29,9 +21,6 @@ void TaskComposite::run()
     {
         compositor_->loadFinalFrame();
         emit this->compositingFinished_SIGNAL();
-        firstTime_ = true ;
-        TOC( compositingProfile.compositing_TIMER );
     }
-
 }
 

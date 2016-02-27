@@ -384,7 +384,8 @@ void RenderingWindow_Gui::captureView_SLOT()
 
 
     LOG_DEBUG("Saving resultant frame");
-    QPixmap pic( parallelRenderer_->getCLCompositor().getFinalFrame()->
+    QPixmap pic( parallelRenderer_->getCLCompositor().getFinalFrame().
+                 value< CLFrame< uint > *>()->
                  getFramePixmap().
                  scaledToHeight( width ).scaledToWidth( height ));
     pic.save( newDir + "/result.jpg");

@@ -7,9 +7,8 @@
 
 #include <QQueue>
 
-typedef std::unordered_map< const CLRenderer * , CLFrame32* > Frames ;
 
-
+template< class T >
 class CLCompositorAccumulate : public CLAbstractCompositor
 {
 public:
@@ -17,17 +16,17 @@ public:
                             const uint frameWidth ,
                             const uint frameHeight );
 
-    virtual void allocateFrame( CLRenderer *renderer ) override ;
+    void allocateFrame( CLRenderer *renderer ) override ;
 
 
-    virtual void collectFrame( CLRenderer *renderer ,
+    void collectFrame( CLRenderer *renderer ,
                                const cl_bool block ) override ;
 
-    virtual void composite() override ;
+    void composite() override ;
 
-    virtual void loadFinalFrame() override ;
+    void loadFinalFrame() override ;
 
-    CLFrame< uint > *&getFinalFrame();
+    CLFrameVariant &getFinalFrame( ) override;
 
     uint framesCount() const ;
 
@@ -53,15 +52,16 @@ protected:
 
     uint8_t compositedFramesCount_ ;
 
-    CLFrame< uint > *currentFrame_ ;
-    CLFrame< uint > *finalFrame_ ;
+    CLFrame< T > *currentFrame_ ;
+    CLFrame< T > *finalFrame_ ;
 
-    CLFrame< uint > *finalFrameReadout_ ;
+    CLFrame< T > *finalFrameReadout_ ;
 
     //empty
-    Frames frames_ ;
-    QQueue< CLFrame< uint >* > loadedFrames_ ;
+    std::unordered_map< const CLRenderer * ,
+                        CLFrame< T >* > frames_ ;
 
+    QQueue< CLFrame< T >* > loadedFrames_ ;
 
 };
 

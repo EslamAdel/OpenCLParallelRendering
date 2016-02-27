@@ -13,6 +13,8 @@ public:
                 const cl_channel_order channelOrder = CL_RGBA ,
                 const cl_channel_type channelType = CL_UNORM_INT8  );
 
+    CLImage2D( );
+
     virtual void createDeviceData( cl_context context ) override;
 
 
@@ -33,6 +35,9 @@ private :
 };
 
 
+
 typedef CLImage2D< uint > CLImage32 ;
+
+
 
 #endif // CLIMAGE2D_H

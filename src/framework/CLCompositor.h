@@ -9,37 +9,37 @@
 #include <unordered_map>
 #include "CLAbstractCompositor.h"
 
+template< class T >
 class CLCompositor : public CLAbstractCompositor
 {
-    Q_OBJECT
 public:
 
     CLCompositor( const uint64_t gpuIndex ,
                   const uint frameWidth ,
                   const uint frameHeight ) ;
 
-    ~CLCompositor();
+    ~CLCompositor( );
 
-    virtual void allocateFrame( CLRenderer *renderer ) override ;
+    void allocateFrame( CLRenderer *renderer ) override ;
 
-    virtual void collectFrame( CLRenderer *renderer ,
+    void collectFrame( CLRenderer *renderer ,
                                const cl_bool block ) override ;
 
-    virtual void composite() override ;
+    void composite( ) override ;
 
-    virtual void loadFinalFrame() override ;
+    void loadFinalFrame( ) override ;
 
-    CLFrame< uint > *&getFinalFrame();
+    CLFrameVariant &getFinalFrame( ) override;
 
-    uint framesCount() const ;
+    uint framesCount( ) const ;
 
-    uint8_t getCompositedFramesCount() const;
+    uint8_t getCompositedFramesCount( ) const;
 
 protected :
 
-    virtual void initializeBuffers_() override ;
+    void initializeBuffers_( ) override ;
 
-    virtual void initializeKernel_() override ;
+    void initializeKernel_( ) override ;
 
 protected:
     CLXRayCompositingKernel *compositingKernel_ ;
@@ -50,14 +50,14 @@ protected:
 
     uint framesInCompositor_ ;
 
-    CLImage2D< uint > *finalFrame_ ;
+    CLImage2D< T > *finalFrame_ ;
 
-    CLImage2D< uint > *finalFrameReadout_ ;
+    CLImage2D< T > *finalFrameReadout_ ;
 
     //empty
-    CLImage2DArray< uint > *imagesArray_ ;
+    CLImage2DArray< T > *imagesArray_ ;
 
-    CLBuffer< uint > *depthIndex_ ;
+    CLBuffer< T > *depthIndex_ ;
 };
 
 #endif // CLCompositor_H

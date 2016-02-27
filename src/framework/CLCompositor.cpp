@@ -10,9 +10,10 @@
 
 #include <QtAlgorithms>
 
-CLCompositor::CLCompositor(const uint64_t gpuIndex,
-                           const uint frameWidth ,
-                           const uint frameHeight )
+template< class T >
+CLCompositor< T >::CLCompositor( const uint64_t gpuIndex,
+                                 const uint frameWidth ,
+                                 const uint frameHeight )
     : CLAbstractCompositor( gpuIndex ) ,
       frameDimensions_( frameWidth , frameHeight )
 {
@@ -24,13 +25,14 @@ CLCompositor::CLCompositor(const uint64_t gpuIndex,
     initializeBuffers_();
 }
 
-
-CLCompositor::~CLCompositor()
+template< class T >
+CLCompositor< T >::~CLCompositor()
 {
 
 }
 
-void CLCompositor::allocateFrame( CLRenderer *renderer )
+template< class T >
+void CLCompositor< T >::allocateFrame( CLRenderer *renderer )
 {
     if( renderers_.contains( renderer ))
         return ;
@@ -38,7 +40,7 @@ void CLCompositor::allocateFrame( CLRenderer *renderer )
     renderer->setFrameIndex( renderers_.size( ));
 
     renderers_ << renderer ;
-    imagesArray_->resize( imagesArray_->size() + 1 ,
+    imagesArray_->resize( renderers_.size( ) ,
                           context_ );
 
     if( depthIndex_ == nullptr )
@@ -57,10 +59,10 @@ void CLCompositor::allocateFrame( CLRenderer *renderer )
 
 }
 
-void CLCompositor::collectFrame( CLRenderer *renderer ,
-                                 const cl_bool block )
+template< class T >
+void CLCompositor< T >::collectFrame( CLRenderer *renderer ,
+                                      const cl_bool block )
 {
-
 #ifdef BENCHMARKING
     imagesArray_->readOtherDeviceData( renderer->getCommandQueue() ,
                                        renderer->getFrameIndex() ,
@@ -73,7 +75,6 @@ void CLCompositor::collectFrame( CLRenderer *renderer ,
 
     imagesArray_->setFrameData( renderer->getFrameIndex() ,
                                 renderer->getCLFrame()->getHostData( ));
-
 #endif
     imagesArray_->loadFrameDataToDevice( renderer->getFrameIndex() ,
                                          commandQueue_ ,
@@ -81,10 +82,13 @@ void CLCompositor::collectFrame( CLRenderer *renderer ,
     framesInCompositor_++;
 }
 
-void CLCompositor::composite()
+template< class T >
+void CLCompositor< T >::composite( )
 {
     if( framesInCompositor_ != imagesArray_->size( ))
         return ;
+
+    TIC( compositingProfile.compositing_TIMER );
 
     qStableSort( renderers_.begin() , renderers_.end() ,
                  CLRenderer::lessThan );
@@ -94,10 +98,10 @@ void CLCompositor::composite()
     for( CLRenderer *renderer : renderers_ )
         depthIndex << renderer->getFrameIndex();
 
-//    for( CLRenderer *renderer : renderers_ )
-//        LOG_DEBUG("Depth<%d>: %f" ,
-//                  renderer->getFrameIndex() ,
-//                  renderer->getCurrentCenter().z );
+    //    for( CLRenderer *renderer : renderers_ )
+    //        LOG_DEBUG("Depth<%d>: %f" ,
+    //                  renderer->getFrameIndex() ,
+    //                  renderer->getCurrentCenter().z );
 
 
     depthIndex_->setHostData( depthIndex );
@@ -127,55 +131,54 @@ void CLCompositor::composite()
 
     clFinish( commandQueue_ );
 
+    TOC( compositingProfile.compositing_TIMER );
+
     framesInCompositor_ = 0 ;
     readOutReady_ = true ;
 }
 
-void CLCompositor::loadFinalFrame()
+template< class T >
+void CLCompositor< T >::loadFinalFrame()
 {
-    //    LOG_DEBUG("Reading CollageFrame" );
     finalFrameReadout_->readOtherDeviceData( commandQueue_ ,
                                              *finalFrame_ ,
                                              CL_TRUE );
-    //    LOG_DEBUG("[DONE] Reading CollageFrame"  );
-
     readOutReady_ = false ;
 }
 
-CLFrame<uint> *&CLCompositor::getFinalFrame()
+template< class T >
+CLFrameVariant &CLCompositor<T>::getFinalFrame()
 {
-    return ( CLFrame< uint > *&) finalFrameReadout_  ;
+    this->finalFrameVariant_.setValue(( CLFrame< T > *) finalFrameReadout_ );
+    return this->finalFrameVariant_ ;
 }
 
-
-
-uint CLCompositor::framesCount() const
+template< class T >
+uint CLCompositor< T >::framesCount() const
 {
     return framesCount_ ;
 }
 
-
-void CLCompositor::initializeBuffers_()
+template< class T >
+void CLCompositor< T >::initializeBuffers_()
 {
-
     LOG_DEBUG("Initializing Buffers ...");
 
-    finalFrame_ = new CLImage2D< uint >( frameDimensions_ );
-    finalFrameReadout_ = new CLImage2D< uint >( frameDimensions_ );
+    finalFrame_ = new CLImage2D< T >( frameDimensions_ );
+    finalFrameReadout_ = new CLImage2D< T >( frameDimensions_ );
 
     finalFrame_->createDeviceData( context_ );
 
-    imagesArray_ = new CLImage2DArray< uint >( frameDimensions_.x ,
-                                               frameDimensions_.y ,
-                                               0 );
-
+    imagesArray_ = new CLImage2DArray< T >( frameDimensions_.x ,
+                                            frameDimensions_.y ,
+                                            0 );
 
     compositingKernel_->setCollageFrame( finalFrame_->getDeviceData( ));
     LOG_DEBUG("[DONE] Initializing Buffers ...");
-
 }
 
-void CLCompositor::initializeKernel_()
+template< class T >
+void CLCompositor< T >::initializeKernel_()
 {
     LOG_DEBUG( "Initializing an OpenCL Kernel ... " );
     compositingKernel_ =
@@ -184,3 +187,4 @@ void CLCompositor::initializeKernel_()
     LOG_DEBUG( "[DONE] Initializing an OpenCL Kernel ... " );
 }
 
+#include "CLCompositor.ipp"

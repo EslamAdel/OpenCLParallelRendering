@@ -3,21 +3,29 @@
 #include <Logger.h>
 
 template< class T >
-CLFrame< T >::CLFrame( const Dimensions2D dimensions ,
-                       T *data )
+CLFrame< T >::CLFrame( const Dimensions2D dimensions )
     : dimensions_( dimensions ),
-      hostData_( data ) ,
       pixmapSynchronized_( false ) ,
       inDevice_( false )
 {
     if( typeid(T) != typeid(uint) )
         LOG_ERROR("Images other than uint/pixel is not supported!");
 
-    if( data == nullptr )
-        hostData_ = new T[ dimensions.imageSize() ];
+    hostData_ = new T[ dimensions.imageSize() ];
 
     rgbaFrame_ = new uchar[ dimensions.imageSize() * 4 ];
 
+}
+
+template< class T >
+CLFrame< T >::CLFrame( )
+    : hostData_( nullptr ) ,
+      rgbaFrame_( nullptr )
+{
+    if( typeid(T) != typeid( uint ))
+        LOG_ERROR("Images other than uint/pixel is not supported!");
+
+    dimensionsDefined_ = false ;
 }
 
 template< class T >
@@ -237,9 +245,15 @@ bool CLFrame< T >::isInDevice() const
 }
 
 template< class T >
-bool CLFrame< T >::inSameContext(const CLFrame<T> &frame ) const
+bool CLFrame< T >::inSameContext( const CLFrame<T> &frame ) const
 {
     return frame.isInDevice() && ( frame.getContext() == context_ ) ;
+}
+
+template< class T >
+bool CLFrame< T >::dimensionsDefined( ) const
+{
+    return dimensionsDefined_;
 }
 
 template< class T >
@@ -249,6 +263,7 @@ void CLFrame< T >::releaseDeviceData_()
         clReleaseMemObject( deviceData_ );
 
 }
+
 
 template< class T >
 void CLFrame< T >::convertColorToRGBA_( uint Color ,

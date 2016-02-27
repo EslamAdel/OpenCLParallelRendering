@@ -89,6 +89,7 @@ SET( OCL_MGPUVS_HEADER_FILES
     opencl/CLXRayCompositingKernel.h
     opencl/CLXRayRenderingKernel.h
     opencl/CLBuffer.h
+    opencl/CLFrameVariants.hh
     profiling/Profiles.hh
     profiling/ProfilingExterns.h
     system/Logger.h

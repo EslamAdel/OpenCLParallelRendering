@@ -21,7 +21,7 @@ template< class T >
 CLContext< T >::CLContext(const uint64_t gpuIndex ,
                           const uint frameWidth ,
                           const uint frameHeight ,
-                          const Volume<T>* volume )
+                          const Volume< T >* volume )
     : volume_( volume ) ,
       gpuIndex_( gpuIndex ) ,
       frameWidth_( frameWidth ),
@@ -67,7 +67,7 @@ void CLContext< T >::initializeContext_()
 }
 
 template< class T >
-void CLContext<T>::initializeKernel_()
+void CLContext< T >::initializeKernel_()
 {
     LOG_DEBUG( "Initializing an OpenCL Kernel ... " );
 
@@ -171,7 +171,7 @@ void CLContext< T >::handleKernel(std::string string)
     kernel_ = activeRenderingKernel_->getKernelObject();
 
     // Create an OpenCL volume
-    clVolume_ = new CLVolume<T>( volume_, VOLUME_CL_UNSIGNED_INT8 );
+    clVolume_ = new CLVolume< T >( volume_, VOLUME_CL_UNSIGNED_INT8 );
     volumeArray_ = clVolume_->createDeviceVolume( context_ );
 
     // Create transfer function texture (this is the default HEAT MAP)
@@ -450,21 +450,17 @@ template< class T >
 void CLContext< T >::createPixelBuffer( const uint frameWidth,
                                         const uint frameHeight )
 {
-
     gridSize_[0] = SystemUtilities::roundUp(LOCAL_SIZE_X, frameWidth );
     gridSize_[1] = SystemUtilities::roundUp( LOCAL_SIZE_Y, frameHeight );
 
     Dimensions2D dimensions( gridSize_[0] , gridSize_[1]);
     clFrame_ = new CLFrame< uint >( dimensions );
     clFrame_->createDeviceData( context_ );
-
-
 }
 
 template< class T >
-void CLContext<T>::loadVolume_( const Volume<T> *volume )
+void CLContext< T >::loadVolume_( const Volume< T > *volume )
 {
-
     //TODO : leakage control
 
     volume_ = volume;
