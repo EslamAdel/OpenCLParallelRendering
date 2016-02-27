@@ -35,7 +35,6 @@ SET( OCL_MGPUVS_SOURCE_FILES
     opencl/CLImage2D.cpp
     opencl/CLImage2DArray.cpp
     opencl/CLRenderingKernel.cpp
-    opencl/CLRewindFrameKernel.cpp
     opencl/CLTransferFunction.cpp
     opencl/CLVolume.cpp
     opencl/CLXRayCompositingKernel.cpp
@@ -83,8 +82,6 @@ SET( OCL_MGPUVS_HEADER_FILES
     opencl/CLImage2D.h
     opencl/CLImage2D.ipp
     opencl/CLImage2DArray.h
-    opencl/CLRenderingKernel.h
-    opencl/CLRewindFrameKernel.h
     opencl/CLTransferFunction.h
     opencl/CLVolume.h
     opencl/CLVolume.ipp
