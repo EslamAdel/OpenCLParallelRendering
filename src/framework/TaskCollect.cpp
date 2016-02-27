@@ -1,7 +1,7 @@
 #include "TaskCollect.h"
 #include "Logger.h"
 
-TaskCollect::TaskCollect( CLRenderer *renderer ,
+TaskCollect::TaskCollect( CLAbstractRenderer *renderer ,
                           CLAbstractCompositor *compositor )
     : renderer_( renderer ) ,
       compositor_( compositor )

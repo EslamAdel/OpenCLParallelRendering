@@ -121,9 +121,9 @@ void RenderingWindow_Gui::intializeConnections_()
     //parallelRenderer_
     connect( parallelRenderer_ ,
              SIGNAL( frameReady_SIGNAL( QPixmap * ,
-                                        const CLRenderer* )),
+                                        const CLAbstractRenderer* )),
              this , SLOT( frameReady_SLOT( QPixmap * ,
-                                           const CLRenderer* )));
+                                           const CLAbstractRenderer* )));
 
     connect( parallelRenderer_ , SIGNAL( finalFrameReady_SIGNAL( QPixmap* )) ,
              this , SLOT( collageFrameReady_SLOT( QPixmap* )));
@@ -169,7 +169,7 @@ void RenderingWindow_Gui::displayFrame_( QPixmap *frame , uint id )
 }
 
 void RenderingWindow_Gui::frameReady_SLOT( QPixmap *frame ,
-                                           const CLRenderer *renderer )
+                                           const CLAbstractRenderer *renderer )
 {
     uint index = renderer->getFrameIndex();
 
@@ -396,9 +396,11 @@ void RenderingWindow_Gui::captureView_SLOT()
     {
 
         LOG_DEBUG("Saving frame<%d>", gpuIndex );
+        CLFrame< uint > *sourceFrame =
+                parallelRenderer_->getCLRenderer( gpuIndex ).
+                getCLFrame().value< CLFrame< uint > *>() ;
 
-        QPixmap framePixmap( parallelRenderer_->
-                             getCLRenderer( gpuIndex ).getCLFrame()->
+        QPixmap framePixmap( sourceFrame->
                              getFramePixmap().
                              scaledToHeight( width ).
                              scaledToWidth( height ));

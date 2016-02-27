@@ -16,10 +16,10 @@ public:
                             const uint frameWidth ,
                             const uint frameHeight );
 
-    void allocateFrame( CLRenderer *renderer ) override ;
+    void allocateFrame( CLAbstractRenderer *renderer ) override ;
 
 
-    void collectFrame( CLRenderer *renderer ,
+    void collectFrame( CLAbstractRenderer *renderer ,
                                const cl_bool block ) override ;
 
     void composite() override ;
@@ -58,7 +58,7 @@ protected:
     CLFrame< T > *finalFrameReadout_ ;
 
     //empty
-    std::unordered_map< const CLRenderer * ,
+    std::unordered_map< const CLAbstractRenderer * ,
                         CLFrame< T >* > frames_ ;
 
     QQueue< CLFrame< T >* > loadedFrames_ ;

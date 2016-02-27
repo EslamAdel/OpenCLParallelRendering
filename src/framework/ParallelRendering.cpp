@@ -81,7 +81,7 @@ void ParallelRendering::discoverAllNodes()
 
 }
 
-void ParallelRendering::addCLRenderer( const uint64_t gpuIndex)
+void ParallelRendering::addCLRenderer( const uint64_t gpuIndex )
 {
     // if device already occupied by a rendering node, return.
     if( inUseGPUs_.contains( listGPUs_.at( gpuIndex ))) return;
@@ -92,10 +92,12 @@ void ParallelRendering::addCLRenderer( const uint64_t gpuIndex)
     // will be accessed by multithreads. So,
     // they should not be modified during the life of the threads.
 
-    CLRenderer *renderer = new CLRenderer( gpuIndex,
-                                           frameWidth_ ,
-                                           frameHeight_ ,
-                                           transformationAsync_ );
+    CLAbstractRenderer *renderer
+            = ( CLAbstractRenderer* )
+              new CLRenderer< uchar , uint >( gpuIndex,
+                                              frameWidth_ ,
+                                              frameHeight_ ,
+                                              transformationAsync_ );
 
     ATTACH_RENDERING_PROFILE( renderer );
     ATTACH_COLLECTING_PROFILE( renderer );
@@ -118,7 +120,7 @@ void ParallelRendering::addCLRenderer( const uint64_t gpuIndex)
 
 
     TaskMakePixmap *taskPixmap = new TaskMakePixmap( );
-    taskPixmap->setFrame( renderer->getCLFrame( ));
+    taskPixmap->setFrame( renderer->getCLFrame( ).value< CLFrame< uint > *>());
     taskPixmap->setRenderer( renderer );
 
     makePixmapTasks_[ renderer ] = taskPixmap ;
@@ -131,12 +133,14 @@ void ParallelRendering::addCLRenderer( const uint64_t gpuIndex)
 
     // Map the signal emitted from rendering node after rendering is finished
     // to the corresponding slot.
-    connect( renderer , SIGNAL( finishedRendering( CLRenderer* )),
-             this , SLOT( finishedRendering_SLOT( CLRenderer* )));
+    connect( renderer , SIGNAL( finishedRendering( CLAbstractRenderer* )),
+             this , SLOT( finishedRendering_SLOT( CLAbstractRenderer* )));
 
     connect( taskPixmap ,
-             SIGNAL(pixmapReady_SIGNAL(QPixmap*,const CLRenderer*)) ,
-             this , SLOT(pixmapReady_SLOT(QPixmap*,const CLRenderer*)));
+             SIGNAL(pixmapReady_SIGNAL( QPixmap*,
+                                       const CLAbstractRenderer* )) ,
+             this , SLOT(pixmapReady_SLOT( QPixmap*,
+                                           const CLAbstractRenderer* )));
 }
 
 int ParallelRendering::getCLRenderersCount() const
@@ -190,8 +194,10 @@ void ParallelRendering::addCLCompositor( const uint64_t gpuIndex )
     finalFramePixmapTask_ = new TaskMakePixmap( );
 
     connect( finalFramePixmapTask_ ,
-             SIGNAL( pixmapReady_SIGNAL( QPixmap* , const CLRenderer* )) ,
-             this , SLOT(pixmapReady_SLOT( QPixmap* , const CLRenderer* )));
+             SIGNAL( pixmapReady_SIGNAL( QPixmap* ,
+                                         const CLAbstractRenderer* )) ,
+             this , SLOT(pixmapReady_SLOT( QPixmap* ,
+                                           const CLAbstractRenderer* )));
     // Frame index will be assigned to each rendering GPU (rednering node).
     // As a start, consider each frame will be indexed in the next for-loop.
 
@@ -229,8 +235,8 @@ void ParallelRendering::addCLCompositor( const uint64_t gpuIndex )
         // Map signals from collecting tasks and compositing tasks to the
         // correspondint slots.
         connect( collectingTask ,
-                 SIGNAL( frameLoadedToDevice_SIGNAL( CLRenderer* )) ,
-                 this , SLOT( frameLoadedToDevice_SLOT( CLRenderer* )));
+                 SIGNAL( frameLoadedToDevice_SIGNAL( CLAbstractRenderer* )) ,
+                 this , SLOT( frameLoadedToDevice_SLOT( CLAbstractRenderer* )));
 
         connect( compositingTask , SIGNAL( compositingFinished_SIGNAL( )) ,
                  this , SLOT( compositingFinished_SLOT( )));
@@ -263,7 +269,9 @@ void ParallelRendering::distributeBaseVolume1D()
         LOG_DEBUG( "Loading subVolume to device" );
 
         auto subVolume = bricks[ i++ ];
-        renderers_[ renderingDevice ]->loadVolume( subVolume );
+        VolumeVariant volume = VolumeVariant::fromValue( subVolume );
+
+        renderers_[ renderingDevice ]->loadVolume( volume );
 
         LOG_DEBUG( "[DONE] Loading subVolume to GPU <%d>",
                    renderers_[ renderingDevice ]->getGPUIndex( ));
@@ -315,7 +323,7 @@ void ParallelRendering::syncTransformation_()
 }
 
 
-CLRenderer &ParallelRendering::getCLRenderer( const uint64_t gpuIndex )
+CLAbstractRenderer &ParallelRendering::getCLRenderer( const uint64_t gpuIndex )
 {
     // handle some minor exceptions.
     auto device = listGPUs_.at( gpuIndex );
@@ -348,7 +356,7 @@ uint ParallelRendering::getFrameHeight() const
     return frameHeight_;
 }
 
-void ParallelRendering::finishedRendering_SLOT( CLRenderer *renderer )
+void ParallelRendering::finishedRendering_SLOT( CLAbstractRenderer *renderer )
 {
     //    LOG_DEBUG("Finished Rendering");
 
@@ -390,7 +398,7 @@ void ParallelRendering::compositingFinished_SLOT()
 
 }
 
-void ParallelRendering::frameLoadedToDevice_SLOT( CLRenderer *renderer )
+void ParallelRendering::frameLoadedToDevice_SLOT( CLAbstractRenderer *renderer )
 {
     TIC( compositingProfile.threadSpawning_TIMER );
 
@@ -406,7 +414,7 @@ void ParallelRendering::frameLoadedToDevice_SLOT( CLRenderer *renderer )
 }
 
 void ParallelRendering::pixmapReady_SLOT( QPixmap *pixmap,
-                                          const CLRenderer *renderer )
+                                          const CLAbstractRenderer *renderer )
 {
     LOG_DEBUG("Pixmap ready");
     if( renderer == nullptr )
@@ -521,11 +529,7 @@ void ParallelRendering::updateTransferFunctionOffset_SLOT( float offset )
 
 void ParallelRendering::tranferFunctionFlag_SLOT( int flag )
 {
-    for( auto renderingDevice : inUseGPUs_ )
-    {
-        CLRenderer* renderer = renderers_[ renderingDevice ];
-        renderer->setTransferFunctionFlag(flag);
-    }
+    transformation_.transferFunctionFlag = flag ;
     if( renderersReady_ ) applyTransformation_();
     else pendingTransformations_ = true ;
 }
@@ -536,7 +540,7 @@ void ParallelRendering::benchmark_( )
 
     for( auto it : renderers_ )
     {
-        CLRenderer *renderer = it.second ;
+        CLAbstractRenderer *renderer = it.second ;
 
         RENDERING_PROFILE_TAG( renderer );
         PRINT( RENDERING_PROFILE( renderer ).threadSpawning_TIMER );

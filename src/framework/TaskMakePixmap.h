@@ -14,18 +14,18 @@ public:
     TaskMakePixmap( );
 
     void setFrame( CLFrame< uint > *frame );
-    void setRenderer( CLRenderer *renderer );
+    void setRenderer( CLAbstractRenderer *renderer );
 
 
 protected:
     void run() ;
 
 signals:
-    void pixmapReady_SIGNAL(  QPixmap *pixmap , const CLRenderer* clRenderer);
+    void pixmapReady_SIGNAL(  QPixmap *pixmap , const CLAbstractRenderer* clRenderer);
 
 private:
     CLFrame< uint > *frame_ ;
-    CLRenderer *clRenderer_ ;
+    CLAbstractRenderer *clRenderer_ ;
 
 };
 

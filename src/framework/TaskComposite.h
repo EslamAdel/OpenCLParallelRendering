@@ -22,7 +22,7 @@ public:
      * @param compositedFramesCount
      */
     TaskComposite( CLAbstractCompositor *compositor ,
-                   CLRenderer *cLRenderer );
+                   CLAbstractRenderer *cLRenderer );
 
 signals:
     /**
@@ -36,7 +36,7 @@ protected:
 
 private:
     CLAbstractCompositor *compositor_ ;
-    CLRenderer *renderer_  ;
+    CLAbstractRenderer *renderer_  ;
 };
 
 #endif // TASKCOMPOSITE_H

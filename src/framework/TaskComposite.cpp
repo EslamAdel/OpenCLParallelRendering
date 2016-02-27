@@ -3,7 +3,7 @@
 
 #include "Logger.h"
 TaskComposite::TaskComposite( CLAbstractCompositor *compositor ,
-                             CLRenderer *renderer)
+                              CLAbstractRenderer *renderer)
     : renderer_( renderer )
 {
     compositor_ = compositor ;

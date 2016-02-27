@@ -34,6 +34,9 @@ public:
      */
     cl_mem createDeviceVolume( cl_context context );
 
+
+    cl_mem getDeviceData( ) const ;
+
 private:
 
     /**
@@ -45,6 +48,9 @@ private:
      * @brief precision_
      */
     const VOLUME_PRECISION precision_;
+
+
+    cl_mem deviceData_ ;
 };
 
 #endif // RENDERING_CLVOLUME_H

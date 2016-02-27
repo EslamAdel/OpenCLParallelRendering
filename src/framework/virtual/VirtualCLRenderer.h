@@ -6,7 +6,7 @@
 
 
 
-class VirtualCLRenderer : public CLRenderer
+class VirtualCLRenderer : public CLRenderer< uchar , uint >
 {
 public:
     VirtualCLRenderer( const uint64_t gpuIndex,

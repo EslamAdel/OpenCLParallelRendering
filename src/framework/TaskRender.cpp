@@ -1,6 +1,6 @@
 #include "TaskRender.h"
 
-TaskRender::TaskRender( CLRenderer &cLRenderer )
+TaskRender::TaskRender( CLAbstractRenderer &cLRenderer )
     : cLRenderer_( cLRenderer )
 {
     setAutoDelete( false );

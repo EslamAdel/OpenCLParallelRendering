@@ -42,7 +42,13 @@ void CLXRayRenderingKernel::setFrameBuffer( cl_mem frameBuffer )
     cl_int error = clSetKernelArg( kernelObject_, X_RAY_FRAME_BUFFER_ARG,
                                    sizeof( cl_mem ),
                                    ( void* ) &frameBuffer );
-    oclCheckErrorEX( error, CL_SUCCESS, 0 );
+
+    if( error != CL_SUCCESS )
+    {
+        oclHWDL::Error::checkCLError( error );
+        LOG_ERROR("Exiting Due to OpenCL Error!");
+    }
+
 }
 
 void CLXRayRenderingKernel::setFrameWidth( uint width )
@@ -50,7 +56,11 @@ void CLXRayRenderingKernel::setFrameWidth( uint width )
     cl_int error = clSetKernelArg( kernelObject_, X_RAY_FRAME_WIDTH_ARG,
                                    sizeof( uint ),
                                    &width );
-    oclCheckErrorEX( error, CL_SUCCESS, 0 );
+    if( error != CL_SUCCESS )
+    {
+        oclHWDL::Error::checkCLError( error );
+        LOG_ERROR("Exiting Due to OpenCL Error!");
+    }
 }
 
 void CLXRayRenderingKernel::setFrameHeight( uint height )
@@ -58,7 +68,11 @@ void CLXRayRenderingKernel::setFrameHeight( uint height )
     cl_int error = clSetKernelArg( kernelObject_, X_RAY_FRAME_HEIGHT_ARG,
                                    sizeof( uint ),
                                    &height );
-    oclCheckErrorEX( error, CL_SUCCESS, 0 );
+    if( error != CL_SUCCESS )
+    {
+        oclHWDL::Error::checkCLError( error );
+        LOG_ERROR("Exiting Due to OpenCL Error!");
+    }
 }
 
 void CLXRayRenderingKernel::setVolumeData( cl_mem data )
@@ -66,7 +80,11 @@ void CLXRayRenderingKernel::setVolumeData( cl_mem data )
     cl_int error = clSetKernelArg( kernelObject_, X_RAY_VOLUME_ARRAY_ARG,
                                    sizeof( cl_mem ),
                                    ( void* ) &data );
-    oclCheckErrorEX( error, CL_SUCCESS, 0 );
+    if( error != CL_SUCCESS )
+    {
+        oclHWDL::Error::checkCLError( error );
+        LOG_ERROR("Exiting Due to OpenCL Error!");
+    }
 }
 
 void CLXRayRenderingKernel::setVolumeSampler( cl_sampler sampler )
@@ -74,7 +92,11 @@ void CLXRayRenderingKernel::setVolumeSampler( cl_sampler sampler )
     cl_int error = clSetKernelArg( kernelObject_, X_RAY_VOLUME_SAMPLER_ARG,
                                    sizeof( cl_sampler ),
                                    &sampler );
-    oclCheckErrorEX( error, CL_SUCCESS, 0 );
+    if( error != CL_SUCCESS )
+    {
+        oclHWDL::Error::checkCLError( error );
+        LOG_ERROR("Exiting Due to OpenCL Error!");
+    }
 }
 
 void CLXRayRenderingKernel::setImageBrightnessFactor( float brightness )
@@ -82,7 +104,11 @@ void CLXRayRenderingKernel::setImageBrightnessFactor( float brightness )
     cl_int error = clSetKernelArg( kernelObject_, X_RAY_IMAGE_BRIGHTNESS_ARG,
                                    sizeof( float ),
                                    &brightness );
-    oclCheckErrorEX( error, CL_SUCCESS, 0 );
+    if( error != CL_SUCCESS )
+    {
+        oclHWDL::Error::checkCLError( error );
+        LOG_ERROR("Exiting Due to OpenCL Error!");
+    }
 }
 
 void CLXRayRenderingKernel::setVolumeDensityFactor( float density )
@@ -90,7 +116,11 @@ void CLXRayRenderingKernel::setVolumeDensityFactor( float density )
     cl_int error = clSetKernelArg( kernelObject_, X_RAY_VOLUME_DENSITY_ARG,
                                    sizeof( float ),
                                    &density );
-    oclCheckErrorEX( error, CL_SUCCESS, 0 );
+    if( error != CL_SUCCESS )
+    {
+        oclHWDL::Error::checkCLError( error );
+        LOG_ERROR("Exiting Due to OpenCL Error!");
+    }
 }
 
 void CLXRayRenderingKernel::setInverseViewMatrix( cl_mem matrix )
@@ -98,7 +128,11 @@ void CLXRayRenderingKernel::setInverseViewMatrix( cl_mem matrix )
     cl_int error = clSetKernelArg( kernelObject_, X_RAY_INVERSE_MATRIX_ARG,
                                    sizeof( cl_mem ),
                                    ( void* ) &matrix );
-    oclCheckErrorEX( error, CL_SUCCESS, 0 );
+    if( error != CL_SUCCESS )
+    {
+        oclHWDL::Error::checkCLError( error );
+        LOG_ERROR("Exiting Due to OpenCL Error!");
+    }
 }
 
 void CLXRayRenderingKernel::setTransferFunctionData(cl_mem data)
@@ -106,7 +140,11 @@ void CLXRayRenderingKernel::setTransferFunctionData(cl_mem data)
     cl_int error = clSetKernelArg(kernelObject_,X_RAY_TRANSFER_FUNCTION_DATA_ARG,
                                   sizeof( cl_mem ),
                                   (void *) &data);
-    oclCheckErrorEX(error,CL_SUCCESS, 0);
+    if( error != CL_SUCCESS )
+    {
+        oclHWDL::Error::checkCLError( error );
+        LOG_ERROR("Exiting Due to OpenCL Error!");
+    }
 }
 
 void CLXRayRenderingKernel::setTransferFunctionOffset(float offset)
@@ -114,7 +152,11 @@ void CLXRayRenderingKernel::setTransferFunctionOffset(float offset)
     cl_int error = clSetKernelArg(kernelObject_,X_RAY_TRANSFER_FUNCTION_OFFSET_ARG,
                                   sizeof( float ),
                                   (void* ) &offset);
-    oclCheckErrorEX(error,CL_SUCCESS,0);
+    if( error != CL_SUCCESS )
+    {
+        oclHWDL::Error::checkCLError( error );
+        LOG_ERROR("Exiting Due to OpenCL Error!");
+    }
 }
 
 void CLXRayRenderingKernel::setTransferFunctionSampler(cl_sampler sampler)
@@ -122,7 +164,11 @@ void CLXRayRenderingKernel::setTransferFunctionSampler(cl_sampler sampler)
     cl_int error = clSetKernelArg( kernelObject_, X_RAY_TRANSFER_FUNCTION_SAMPLER_ARG,
                                    sizeof( cl_sampler ),
                                    &sampler );
-    oclCheckErrorEX( error, CL_SUCCESS, 0 );
+    if( error != CL_SUCCESS )
+    {
+        oclHWDL::Error::checkCLError( error );
+        LOG_ERROR("Exiting Due to OpenCL Error!");
+    }
 }
 
 void CLXRayRenderingKernel::setTransferFunctionScale(float scale)
@@ -130,7 +176,11 @@ void CLXRayRenderingKernel::setTransferFunctionScale(float scale)
     cl_int error = clSetKernelArg(kernelObject_,X_RAY_TRANSFER_FUNCTION_SCALE_ARG,
                                   sizeof( float ),
                                   (void *)&scale);
-    oclCheckErrorEX(error,CL_SUCCESS,0);
+    if( error != CL_SUCCESS )
+    {
+        oclHWDL::Error::checkCLError( error );
+        LOG_ERROR("Exiting Due to OpenCL Error!");
+    }
 }
 
 void CLXRayRenderingKernel::setTransferFunctionFlag(int enableTransferFunction)
@@ -138,5 +188,9 @@ void CLXRayRenderingKernel::setTransferFunctionFlag(int enableTransferFunction)
     cl_int error = clSetKernelArg( kernelObject_, X_RAY_TRANSFER_FUNCTION_FLAG_ARG,
                                    sizeof( int ),
                                    &enableTransferFunction );
-    oclCheckErrorEX( error, CL_SUCCESS, 0 );
+    if( error != CL_SUCCESS )
+    {
+        oclHWDL::Error::checkCLError( error );
+        LOG_ERROR("Exiting Due to OpenCL Error!");
+    }
 }

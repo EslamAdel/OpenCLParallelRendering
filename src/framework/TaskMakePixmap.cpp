@@ -13,7 +13,7 @@ void TaskMakePixmap::setFrame( CLFrame<uint> *frame )
     frame_ = frame ;
 }
 
-void TaskMakePixmap::setRenderer( CLRenderer *renderer )
+void TaskMakePixmap::setRenderer( CLAbstractRenderer *renderer )
 {
     clRenderer_ = renderer ;
 }

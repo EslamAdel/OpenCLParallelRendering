@@ -17,9 +17,9 @@ class CLAbstractCompositor : public QObject
 public:
     CLAbstractCompositor( const uint64_t gpuIndex  );
 
-    virtual void allocateFrame( CLRenderer *renderer ) = 0 ;
+    virtual void allocateFrame( CLAbstractRenderer *renderer ) = 0 ;
 
-    virtual void collectFrame( CLRenderer *renderer ,
+    virtual void collectFrame( CLAbstractRenderer *renderer ,
                                const cl_bool block ) = 0;
 
     virtual void composite( ) = 0 ;
@@ -77,7 +77,7 @@ protected:
 
     cl_command_queue commandQueue_ ;
 
-    QVector< CLRenderer *> renderers_ ;
+    QVector< CLAbstractRenderer *> renderers_ ;
 
     CLFrameVariant finalFrameVariant_ ;
 

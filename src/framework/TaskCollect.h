@@ -30,7 +30,7 @@ public:
      * @param frameIndex
      * The index of the rendered frame.
      */
-    TaskCollect( CLRenderer *renderer ,
+    TaskCollect( CLAbstractRenderer *renderer ,
                  CLAbstractCompositor *compositor );
 
 signals:
@@ -42,13 +42,13 @@ signals:
      * CLRenderer and the CLCompositor and the frameIndex_ .
      * Considering each CLRenderer is mapped to a CLCompositor.
      */
-    void frameLoadedToDevice_SIGNAL( CLRenderer *renderer );
+    void frameLoadedToDevice_SIGNAL( CLAbstractRenderer *renderer );
 
 protected:
     void run();
 
 private:
-    CLRenderer *renderer_;
+    CLAbstractRenderer *renderer_;
     CLAbstractCompositor *compositor_;
 
 };

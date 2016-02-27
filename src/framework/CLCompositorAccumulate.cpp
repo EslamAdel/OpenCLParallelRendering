@@ -15,7 +15,7 @@ CLCompositorAccumulate< T >::CLCompositorAccumulate( const uint64_t gpuIndex ,
 }
 
 template< class T >
-void CLCompositorAccumulate< T >::allocateFrame( CLRenderer *renderer )
+void CLCompositorAccumulate< T >::allocateFrame( CLAbstractRenderer *renderer )
 {
 
     if( renderers_.contains( renderer ))
@@ -26,7 +26,8 @@ void CLCompositorAccumulate< T >::allocateFrame( CLRenderer *renderer )
     renderers_ << renderer ;
 
     CLFrame< T > *frame =
-            new CLFrame< T >( renderer->getCLFrame()->getFrameDimensions( ));
+            new CLFrame< T >( renderer->getCLFrame().value< CLFrame< T > *>()->
+                              getFrameDimensions( ));
 
     frame->createDeviceData( context_ );
 
@@ -37,26 +38,29 @@ void CLCompositorAccumulate< T >::allocateFrame( CLRenderer *renderer )
 }
 
 template< class T >
-void CLCompositorAccumulate< T >::collectFrame( CLRenderer *renderer ,
+void CLCompositorAccumulate< T >::collectFrame( CLAbstractRenderer *renderer ,
                                                 const cl_bool block )
 {
+
+    CLFrame< T > *sourceFrame =
+            renderer->getCLFrame().value< CLFrame< T > *>( );
+
 #ifdef BENCHMARKING
     //    direct copy frame from rendering device to the host pointer
     //    of the compositing frame.
     //    more effiecent.
     frames_[ renderer ]->
             readOtherDeviceData( renderer->getCommandQueue() ,
-                                 *renderer->getCLFrame() ,
+                                 *sourceFrame ,
                                  block );
 
 #else
 
-    frames_[ renderer ]->
-            copyHostData( renderer->getCLFrame()->getHostData( ));
+    sourceFrame->readDeviceData( renderer->getCommandQueue() ,
+                                 block );
 
-    renderer->getCLFrame()->
-            readDeviceData( renderer->getCommandQueue() ,
-                            block );
+    frames_[ renderer ]->
+            copyHostData( sourceFrame->getHostData( ));
 
 #endif
     frames_[ renderer ]->

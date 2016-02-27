@@ -25,8 +25,8 @@ void VirtualParallelRendering::addCLRenderer( const uint64_t gpuIndex )
     this->rendererPool_.setMaxThreadCount( renderers_.size( ));
     this->collectorPool_.setMaxThreadCount( renderers_.size( ));
 
-    connect( renderer , SIGNAL( finishedRendering( CLRenderer* )),
-             this , SLOT( finishedRendering_SLOT( CLRenderer* )));
+    connect( renderer , SIGNAL( finishedRendering( CLAbstractRenderer* )),
+             this , SLOT( finishedRendering_SLOT( CLAbstractRenderer* )));
 
 
 }
@@ -36,20 +36,36 @@ void VirtualParallelRendering::addCLCompositor(const uint64_t gpuIndex)
     LOG_DEBUG("Adding Virtual Compositing Node");
 
 
-    compositor_ = ( CLAbstractCompositor * )
-            new CLCompositor< uint >( gpuIndex ,
-                                      frameWidth_ ,
-                                      frameHeight_ );
+    if( inUseGPUs_.size() > 1 )
+    {
+        auto compositor = new CLCompositor< uint >( gpuIndex ,
+                                                    frameWidth_ ,
+                                                    frameHeight_ );
+        compositor_ =
+                static_cast< CLAbstractCompositor * >( compositor );
+    }
+    else
+    {
+        auto compositor = new CLCompositorAccumulate< uint >( gpuIndex ,
+                                                              frameWidth_ ,
+                                                              frameHeight_ );
+        compositor_ =
+                static_cast< CLAbstractCompositor * >( compositor );
+    }
 
 
+    LOG_DEBUG("[DONE] Initialize Compositing Unit");
+
+    this->finalFramePixmapTask_ = new TaskMakePixmap( );
 
 
-//    this->collagePixmapTask_ =
-//            new TaskMakePixmap( compositor_->getFinalFrame() );
+    connect( finalFramePixmapTask_ ,
+             SIGNAL( pixmapReady_SIGNAL( QPixmap* ,
+                                         const CLAbstractRenderer* )) ,
+             this , SLOT(pixmapReady_SLOT( QPixmap* ,
+                                           const CLAbstractRenderer* )));
 
-    connect( this->finalFramePixmapTask_ ,
-             SIGNAL( pixmapReady_SIGNAL( QPixmap* , const CLRenderer* )) ,
-             this , SLOT(pixmapReady_SLOT( QPixmap* , const CLRenderer* )));
+
     // Frame index will be assigned to each rendering GPU (rednering node).
     // As a start, consider each frame will be indexed in the next for-loop.
 
@@ -115,7 +131,6 @@ void VirtualParallelRendering::distributeBaseVolume1D()
         LOG_ERROR( "No deployed devices to distribute volume!");
 
 
-    //    QVector< Volume8 *> bricks = this->baseVolume_->getBricksXAxis( nDevices );
     QVector< Volume8 *> bricks = baseVolume_->heuristicBricking( nDevices );
 
     int i = 0;
@@ -125,7 +140,7 @@ void VirtualParallelRendering::distributeBaseVolume1D()
         LOG_DEBUG( "Loading subVolume to device" );
 
         auto subVolume = bricks[ i++ ];
-        renderer->loadVolume( subVolume );
+        renderer->loadVolume( VolumeVariant::fromValue( subVolume ));
 
         LOG_DEBUG( "[DONE] Loading subVolume to GPU <%d>",
                    renderer->getGPUIndex( ));
@@ -158,12 +173,17 @@ void VirtualParallelRendering::frameLoadedToDevice_SLOT( VirtualCLRenderer *rend
 {
     LOG_DEBUG("Frame<%d> Loaded to Device" , renderer->getGPUIndex() );
 
-    emit this->frameReady_SIGNAL( &renderer->getCLFrame()->getFramePixmap() , renderer  );
+    emit this->frameReady_SIGNAL( &renderer->
+                                  getCLFrame().value< CLFrame< uint >* >()->
+                                  getFramePixmap() ,
+                                  renderer  );
+
     //accumulate the recently loaded frame to the collage frame.
     compositorPool_.start( compositingTasks_[ renderer->getGPUIndex() ] );
 }
 
-void VirtualParallelRendering::finishedRendering_SLOT(CLRenderer *finishedRenderer)
+void VirtualParallelRendering::finishedRendering_SLOT(
+        CLAbstractRenderer *finishedRenderer )
 {
 
     collectorPool_.start( collectingTasks_[ finishedRenderer->getGPUIndex() ]);
@@ -174,10 +194,11 @@ void VirtualParallelRendering::compositingFinished_SLOT()
 {
     LOG_DEBUG("[DONE] Compositing");
 
-    //this->pixmapMakerPool_.start( collagePixmapTask_ );
 
-//    emit this->finalFrameReady_SIGNAL(
-//                &compositor_->getFinalFrame()->getFramePixmap() );
+
+    emit this->finalFrameReady_SIGNAL(
+                &compositor_->getFinalFrame().value< CLFrame< uint >*>()->
+                getFramePixmap( ));
 
     if( this->pendingTransformations_ )
         applyTransformation_();

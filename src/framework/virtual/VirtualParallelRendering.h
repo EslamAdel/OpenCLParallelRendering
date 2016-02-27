@@ -38,7 +38,7 @@ public:
 public slots:
     void frameLoadedToDevice_SLOT( VirtualCLRenderer *renderer );
 
-    void finishedRendering_SLOT( CLRenderer *renderer );
+    void finishedRendering_SLOT( CLAbstractRenderer *renderer );
 
     void compositingFinished_SLOT( );
 

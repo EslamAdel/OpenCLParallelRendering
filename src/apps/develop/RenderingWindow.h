@@ -3,7 +3,6 @@
 
 #include <QtWidgets>
 #include <QMainWindow>
-#include <CLContext.h>
 #include <Headers.hh>
 #include "ParallelRendering.h"
 #include "VirtualParallelRendering.h"
@@ -44,7 +43,7 @@ private:
     void displayFrame_( QPixmap *frame , uint id );
 
 public slots:
-    void frameReady_SLOT( QPixmap *frame, const CLRenderer *renderer );
+    void frameReady_SLOT( QPixmap *frame, const CLAbstractRenderer *renderer );
     void collageFrameReady_SLOT( QPixmap *finalFrame ) ;
 
 private slots:

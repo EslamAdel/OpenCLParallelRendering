@@ -20,9 +20,9 @@ public:
 
     ~CLCompositor( );
 
-    void allocateFrame( CLRenderer *renderer ) override ;
+    void allocateFrame( CLAbstractRenderer *renderer ) override ;
 
-    void collectFrame( CLRenderer *renderer ,
+    void collectFrame( CLAbstractRenderer *renderer ,
                                const cl_bool block ) override ;
 
     void composite( ) override ;

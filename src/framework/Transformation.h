@@ -11,6 +11,7 @@ struct Transformation
     Coordinates3D scale ;
     float brightness ;
     float volumeDensity ;
+    int transferFunctionFlag ;
     float transferFunctionScale ;
     float transferFunctionOffset ;
 

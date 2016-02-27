@@ -55,9 +55,9 @@ void RenderingWindow::intializeConnections_()
     //parallelRenderer_
     connect( parallelRenderer_ ,
              SIGNAL( frameReady_SIGNAL( QPixmap * ,
-                                        const CLRenderer* )),
+                                        const CLAbstractRenderer* )),
              this , SLOT( frameReady_SLOT( QPixmap * ,
-                                           const CLRenderer* )));
+                                           const CLAbstractRenderer* )));
 
     connect( parallelRenderer_ , SIGNAL( finalFrameReady_SIGNAL( QPixmap* )) ,
              this , SLOT( collageFrameReady_SLOT( QPixmap* )));
@@ -120,7 +120,7 @@ void RenderingWindow::displayFrame_( QPixmap *frame , uint id )
 }
 
 void RenderingWindow::frameReady_SLOT( QPixmap *frame ,
-                                       const CLRenderer *renderer )
+                                       const CLAbstractRenderer *renderer )
 {
 
     uint index = renderer->getFrameIndex();

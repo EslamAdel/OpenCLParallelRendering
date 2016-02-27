@@ -10,7 +10,7 @@ RenderingProfile &getRenderingProfile( RenderingProfiles &profiles , uint gpuInd
 }
 
 CollectingProfile &getCollectingProfile( CollectingProfiles &profiles ,
-                                         CLRenderer *renderer)
+                                         CLAbstractRenderer *renderer)
 {
     return *profiles[ renderer ];
 }
@@ -18,7 +18,7 @@ CollectingProfile &getCollectingProfile( CollectingProfiles &profiles ,
 
 
 RenderingProfile &getRenderingProfile( RenderingProfiles &profiles,
-                                       CLRenderer *renderer)
+                                       CLAbstractRenderer *renderer)
 {
     return *profiles[ renderer ] ;
 }

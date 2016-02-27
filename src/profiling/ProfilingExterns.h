@@ -150,10 +150,10 @@ RenderingProfile &getRenderingProfile( RenderingProfiles &profiles ,
                                        uint gpuIndex );
 
 RenderingProfile &getRenderingProfile( RenderingProfiles &profiles ,
-                                       CLRenderer *renderer  );
+                                       CLAbstractRenderer *renderer  );
 
 CollectingProfile &getCollectingProfile( CollectingProfiles &profile ,
-                                         CLRenderer* renderer );
+                                         CLAbstractRenderer* renderer );
 
 
 

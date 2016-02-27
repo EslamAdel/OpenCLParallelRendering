@@ -35,7 +35,6 @@ cl_mem CLVolume< T >::createDeviceVolume( cl_context context )
     const Dimensions3D dimensions = volume_->getDimensions();
     T* originalData = volume_->getData( );
 
-    cl_mem deviceVolume;
 
     switch ( precision_ )
     {
@@ -52,7 +51,7 @@ cl_mem CLVolume< T >::createDeviceVolume( cl_context context )
             // No need to copy the data into another array with a
             // different format.
 
-            deviceVolume = clCreateImage3D( context,
+            deviceData_ = clCreateImage3D( context,
                              CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
                              &format,
                              dimensions.x, dimensions.y, dimensions.z,
@@ -70,7 +69,7 @@ cl_mem CLVolume< T >::createDeviceVolume( cl_context context )
                 volumeData[ i ] = static_cast< uint8_t >( originalData[ i ] );
             }
 
-            deviceVolume = clCreateImage3D( context,
+            deviceData_ = clCreateImage3D( context,
                              CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
                              &format,
                              dimensions.x, dimensions.y, dimensions.z,
@@ -134,7 +133,14 @@ cl_mem CLVolume< T >::createDeviceVolume( cl_context context )
     }
     LOG_DEBUG( "[DONE] Creating an OpenCL volume " );
 
-    return deviceVolume;
+    return deviceData_;
+}
+
+
+template< class T >
+cl_mem CLVolume< T >::getDeviceData() const
+{
+    return deviceData_ ;
 }
 
 #include <CLVolume.ipp>

@@ -32,7 +32,7 @@ CLCompositor< T >::~CLCompositor()
 }
 
 template< class T >
-void CLCompositor< T >::allocateFrame( CLRenderer *renderer )
+void CLCompositor< T >::allocateFrame( CLAbstractRenderer *renderer )
 {
     if( renderers_.contains( renderer ))
         return ;
@@ -60,21 +60,25 @@ void CLCompositor< T >::allocateFrame( CLRenderer *renderer )
 }
 
 template< class T >
-void CLCompositor< T >::collectFrame( CLRenderer *renderer ,
+void CLCompositor< T >::collectFrame( CLAbstractRenderer *renderer ,
                                       const cl_bool block )
 {
+
+    CLFrame< T > *sourceFrame =
+            renderer->getCLFrame().value< CLFrame< T > *>( );
+
 #ifdef BENCHMARKING
     imagesArray_->readOtherDeviceData( renderer->getCommandQueue() ,
                                        renderer->getFrameIndex() ,
-                                       *renderer->getCLFrame() ,
+                                       *sourceFrame,
                                        block );
 #else
-    renderer->getCLFrame()->
-            readDeviceData( renderer->getCommandQueue() ,
-                            block );
+
+    sourceFrame->readDeviceData( renderer->getCommandQueue() ,
+                                 block );
 
     imagesArray_->setFrameData( renderer->getFrameIndex() ,
-                                renderer->getCLFrame()->getHostData( ));
+                                sourceFrame->getHostData( ));
 #endif
     imagesArray_->loadFrameDataToDevice( renderer->getFrameIndex() ,
                                          commandQueue_ ,
@@ -91,11 +95,11 @@ void CLCompositor< T >::composite( )
     TIC( compositingProfile.compositing_TIMER );
 
     qStableSort( renderers_.begin() , renderers_.end() ,
-                 CLRenderer::lessThan );
+                 CLAbstractRenderer::lessThan );
 
     QVector< uint > depthIndex ;
 
-    for( CLRenderer *renderer : renderers_ )
+    for( CLAbstractRenderer *renderer : renderers_ )
         depthIndex << renderer->getFrameIndex();
 
     //    for( CLRenderer *renderer : renderers_ )

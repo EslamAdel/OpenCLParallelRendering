@@ -3,7 +3,6 @@
 
 
 #include <QMainWindow>
-#include <CLContext.h>
 #include <Headers.hh>
 #include <vector>
 #include <QLabel>
@@ -30,6 +29,8 @@ class RenderingWindow_Gui : public QMainWindow
         TransformationTabIndex ,
         TransferFunctionTabIndex
     };
+
+
 public:
 
 
@@ -54,7 +55,7 @@ private:
     void displayFrame_( QPixmap *frame , uint id );
 
 public slots:
-    void frameReady_SLOT(QPixmap *frame, const CLRenderer *renderer );
+    void frameReady_SLOT(QPixmap *frame, const CLAbstractRenderer *renderer );
     void collageFrameReady_SLOT( QPixmap *finalFrame ) ;
 
 private slots:

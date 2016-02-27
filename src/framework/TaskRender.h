@@ -12,13 +12,13 @@
 class TaskRender : public QRunnable
 {
 public:
-    TaskRender( CLRenderer &cLRenderer  );
+    TaskRender( CLAbstractRenderer &cLRenderer  );
 
 protected:
     void run();
 
 private:
-    CLRenderer &cLRenderer_;
+    CLAbstractRenderer &cLRenderer_;
 
 
 };

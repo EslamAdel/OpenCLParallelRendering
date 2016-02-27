@@ -49,9 +49,14 @@ struct FrameworkProfile
 };
 
 
-typedef std::unordered_map<const CLRenderer* , RenderingProfile* > RenderingProfiles;
-typedef std::unordered_map<const CLRenderer* , CollectingProfile*> CollectingProfiles;
-typedef std::unordered_map<const CLRenderer* , CompositingProfile*> CompositingProfiles;
+typedef std::unordered_map< const CLAbstractRenderer* ,
+                            RenderingProfile* > RenderingProfiles;
+
+typedef std::unordered_map< const CLAbstractRenderer* ,
+                            CollectingProfile* > CollectingProfiles;
+
+typedef std::unordered_map< const CLAbstractRenderer* ,
+                            CompositingProfile* > CompositingProfiles;
 
 
 

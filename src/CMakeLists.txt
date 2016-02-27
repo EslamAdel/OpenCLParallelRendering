@@ -9,6 +9,7 @@ include_directories( ${PROJECT_BINARY_DIR} )
 
 ### Adding the source files to the CMake source tree
 SET( OCL_MGPUVS_SOURCE_FILES
+    framework/CLAbstractRenderer.cpp
     framework/CLAbstractCompositor.cpp
     framework/CLCompositorAccumulate.cpp
     framework/ParallelRendering.cpp
@@ -17,7 +18,6 @@ SET( OCL_MGPUVS_SOURCE_FILES
     framework/TaskCollect.cpp
     framework/TaskComposite.cpp
     framework/CLCompositor.cpp
-    framework/CLContext.cpp
     framework/TaskMakePixmap.cpp
     framework/virtual/VirtualParallelRendering.cpp
     framework/virtual/VirtualCLRenderer.cpp
@@ -49,12 +49,13 @@ SET( OCL_MGPUVS_SOURCE_FILES
 
 ### Adding the header files to the CMake source tree
 SET( OCL_MGPUVS_HEADER_FILES
+    framework/CLAbstractRenderer.h
     framework/CLAbstractCompositor.h
     framework/CLCompositorAccumulate.h
-    framework/CLContext.h
-    framework/CLContext.ipp
     framework/CLCompositor.h
+    framework/CLCompositor.ipp
     framework/CLRenderer.h
+    framework/CLRenderer.ipp
     framework/TaskCollect.h
     framework/TaskComposite.h
     framework/TaskMakePixmap.h
@@ -90,6 +91,7 @@ SET( OCL_MGPUVS_HEADER_FILES
     opencl/CLXRayRenderingKernel.h
     opencl/CLBuffer.h
     opencl/CLFrameVariants.hh
+    opencl/CLVolumeVariants.hh
     profiling/Profiles.hh
     profiling/ProfilingExterns.h
     system/Logger.h
