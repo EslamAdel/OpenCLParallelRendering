@@ -114,6 +114,8 @@ set( OCL_MGPUVS_KERNELS
 
 include_directories( framework )
 include_directories( framework/virtual )
+include_directories( framework/compositors )
+include_directories( framework/renderers )
 include_directories( auxillary )
 include_directories( common )
 include_directories( data )
