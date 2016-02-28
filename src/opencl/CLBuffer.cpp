@@ -42,7 +42,7 @@ void CLBuffer< T >::writeDeviceData( cl_command_queue cmdQueue ,
     error =
             clEnqueueWriteBuffer( cmdQueue , deviceData_ , blocking ,
                                   0 , size_ * sizeof( T ) , hostData_ ,
-                                  0 , NULL , NULL );
+                                  0 , 0 , 0 );
 
     if( error != CL_SUCCESS )
     {
@@ -61,7 +61,7 @@ void CLBuffer< T >::readDeviceData( cl_command_queue cmdQueue ,
     error =
             clEnqueueReadBuffer( cmdQueue , deviceData_ , blocking ,
                                  0 , size_ * sizeof( T ) , hostData_ ,
-                                 0 , NULL , NULL );
+                                 0 , 0 , 0 );
 
     if( error != CL_SUCCESS )
     {
@@ -75,9 +75,12 @@ void CLBuffer< T >::resize( u_int64_t newSize )
 {
     size_ = newSize ;
 
-    std::realloc( hostData_ , newSize );
+    if( void* mem = std::realloc( hostData_ , newSize ))
+        hostData_ = static_cast< T* >( mem );
+    else
+        LOG_ERROR("Bad Alloc!");
 
-    if( deviceData_ != NULL )
+    if( deviceData_ != 0 )
     {
         releaseDeviceData_();
         createDeviceData( context_ );

@@ -9,7 +9,33 @@ CLVolume< T >::CLVolume( const Volume< T >* volume,
     : volume_( volume )
     , precision_( precision )
 {
+    imageDescriptor_.image_type = CL_MEM_OBJECT_IMAGE3D ;
 
+    imageDescriptor_.image_width = volume->getDimensions().x ;
+
+    imageDescriptor_.image_height = volume->getDimensions().y ;
+
+    imageDescriptor_.image_depth = volume->getDimensions().z ;
+
+    imageDescriptor_.image_row_pitch =
+            volume->getDimensions().x * sizeof( T );
+
+    imageDescriptor_.image_slice_pitch =
+            volume->getDimensions().x *
+            volume->getDimensions().y * sizeof( T );
+
+    imageDescriptor_.num_mip_levels = 0 ;
+
+    imageDescriptor_.num_samples = 0 ;
+
+    imageDescriptor_.buffer = 0 ;
+
+
+    flags_ = CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR ;
+
+    // Always use the CL_INTENSITY ( I, I, I, I ) to avoid replicating
+    // the data and wasting memory.
+    imageFormat_.image_channel_order = CL_INTENSITY;
 }
 
 template< class T >
@@ -23,107 +49,94 @@ cl_mem CLVolume< T >::createDeviceVolume( cl_context context )
     // Initially, assume that everything is fine
     cl_int error = CL_SUCCESS;
 
-    // Volume format
-    cl_image_format format;
-
-    // Always use the CL_INTENSITY ( I, I, I, I ) to avoid replicating
-    // the data and wasting memory.
-    format.image_channel_order = CL_INTENSITY;
-
-
-
-    const Dimensions3D dimensions = volume_->getDimensions();
-    T* originalData = volume_->getData( );
-
-
     switch ( precision_ )
     {
-    case( VOLUME_CL_UNSIGNED_INT8 ):
-    {
-        LOG_DEBUG( "CL_UNORM_INT8" );
-        format.image_channel_data_type = CL_UNORM_INT8;
-
-        // The array that will be uploaded to the device
-        uint8_t* volumeData;
-
-        if( typeid( volume_ ) == typeid( uint8_t ))
+        case( VOLUME_CL_UNSIGNED_INT8 ):
         {
-            // No need to copy the data into another array with a
-            // different format.
+            LOG_DEBUG( "CL_UNORM_INT8" );
+            imageFormat_.image_channel_data_type = CL_UNORM_INT8;
 
-            deviceData_ = clCreateImage3D( context,
-                             CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
-                             &format,
-                             dimensions.x, dimensions.y, dimensions.z,
-                             dimensions.x, dimensions.x * dimensions.y,
-                             originalData,
-                             &error );
-        }
-        else
-        {
-            // Conversion is needed !
-            volumeData = new uint8_t[ dimensions.volumeSize( ) ];
-
-            for( uint64_t i = 0; i < dimensions.volumeSize( ); i++ )
+            if( typeid( volume_ ) == typeid( uint8_t ))
             {
-                volumeData[ i ] = static_cast< uint8_t >( originalData[ i ] );
+                // No need to copy the data into another array with a
+                // different format.
+                deviceData_ =
+                        clCreateImage( context,
+                                       flags_ ,
+                                       &imageFormat_ ,
+                                       &imageDescriptor_ ,
+                                       ( void* ) volume_->getData() ,
+                                       &error );
+            }
+            else
+            {
+                // Conversion is needed !
+                const size_t volumeSize
+                        = volume_->getDimensions().volumeSize( );
+
+                uint8_t *volumeData = new uint8_t[ volumeSize ];
+
+                for( uint64_t i = 0 ; i <  volumeSize ;  i++ )
+                {
+                    volumeData[ i ] =
+                            static_cast< uint8_t >( volume_->getData()[ i ] );
+                }
+
+                deviceData_ =
+                        clCreateImage( context,
+                                       flags_ ,
+                                       &imageFormat_ ,
+                                       &imageDescriptor_ ,
+                                       ( void* ) volumeData ,
+                                       &error );
+
+                // Free the converted data
+                delete [] volumeData;
             }
 
-            deviceData_ = clCreateImage3D( context,
-                             CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
-                             &format,
-                             dimensions.x, dimensions.y, dimensions.z,
-                             dimensions.x, dimensions.x * dimensions.y,
-                             volumeData,
-                             &error );
+        }   break;
 
-            // Free the converted data
-            delete [] volumeData;
-        }
+            imageFormat_.image_channel_data_type = CL_UNORM_INT16;
 
-    }   break;
+        case( VOLUME_CL_UNSIGNED_INT16 ):
+            if( typeid( volume_ ) == typeid( uint16_t ))
+            {
 
-        format.image_channel_data_type = CL_UNORM_INT16;
+            }
+            else
+            {
 
-    case( VOLUME_CL_UNSIGNED_INT16 ):
-        if( typeid( volume_ ) == typeid( uint16_t ))
-        {
+            }
+            break;
 
-        }
-        else
-        {
+        case( VOLUME_CL_HALF_FLOAT ):
 
-        }
-        break;
+            imageFormat_.image_channel_data_type = CL_HALF_FLOAT;
+            if( typeid( volume_ ) == typeid( half ))
+            {
 
-    case( VOLUME_CL_HALF_FLOAT ):
+            }
+            else
+            {
 
-        format.image_channel_data_type = CL_HALF_FLOAT;
-        if( typeid( volume_ ) == typeid( half ))
-        {
+            }
+            break;
 
-        }
-        else
-        {
+            imageFormat_.image_channel_data_type = CL_FLOAT;
 
-        }
-        break;
+        case( VOLUME_CL_FLOAT ):
+            if( typeid( volume_ ) == typeid( float ))
+            {
 
-         format.image_channel_data_type = CL_FLOAT;
+            }
+            else
+            {
 
-    case( VOLUME_CL_FLOAT ):
-        if( typeid( volume_ ) == typeid( float ))
-        {
+            }
 
-        }
-        else
-        {
-
-        }
-
-        break;
-    default:
-        break;
+            break;
+        default:
+            break;
     }
 
     if( error != CL_SUCCESS )

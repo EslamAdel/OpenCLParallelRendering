@@ -49,6 +49,9 @@ private:
      */
     const VOLUME_PRECISION precision_;
 
+    cl_image_desc imageDescriptor_ ;
+    cl_image_format imageFormat_ ;
+    cl_mem_flags flags_ ;
 
     cl_mem deviceData_ ;
 };
