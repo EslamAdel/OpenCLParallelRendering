@@ -20,7 +20,7 @@ public:
 
     void createDeviceData( cl_context context );
 
-    void setFrameData( const uint index , T *data );
+    void setFrameData( const uint index , const T *data );
 
     void loadFrameDataToDevice( const uint index ,
                                 cl_command_queue commandQueue,
@@ -57,9 +57,10 @@ private:
     cl_mem deviceData_ ;
 
     cl_image_format imageFormat_ ;
+    cl_image_desc imageDescriptor_ ;
+
     float frameDepth_;
     QVector< T* > framesData_ ;
-    QVector< bool > framesSet_ ;
 
     cl_context context_ ;
     bool inDevice_ ;

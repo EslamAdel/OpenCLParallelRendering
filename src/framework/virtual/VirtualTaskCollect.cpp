@@ -1,8 +1,9 @@
 #include "VirtualTaskCollect.h"
 #include "Logger.h"
 
-VirtualTaskCollect::VirtualTaskCollect( VirtualCLRenderer *renderer,
-                                        CLAbstractCompositor *compositor )
+VirtualTaskCollect::VirtualTaskCollect(
+        CLAbstractRenderer *renderer,
+        CLAbstractCompositor *compositor )
     : renderer_( renderer ) ,
       compositor_( compositor )
 {

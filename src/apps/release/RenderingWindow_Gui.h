@@ -56,7 +56,7 @@ private:
 
 public slots:
     void frameReady_SLOT(QPixmap *frame, const CLAbstractRenderer *renderer );
-    void collageFrameReady_SLOT( QPixmap *finalFrame ) ;
+    void finalFrameReady_SLOT( QPixmap *finalFrame ) ;
 
 private slots:
 

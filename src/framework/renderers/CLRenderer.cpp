@@ -144,7 +144,7 @@ void CLRenderer< V , F >::renderFrame()
                                            localSize,
                                            0,
                                            0,
-                                           0);
+                                           0 );
 
 
 
@@ -201,18 +201,13 @@ void CLRenderer< V , F >::handleKernel_( std::string string )
     };
 
     // Transfer function format
-    cl_image_format tfFormat;
-    tfFormat.image_channel_order = CL_RGBA;
-    tfFormat.image_channel_data_type =  CL_FLOAT;
+    clTransferFunction = new CLTransferFunction( 9 , transferFunctionTable );
+    clTransferFunction->createDeviceData( context_ );
+    clTransferFunction->writeDeviceData( commandQueue_ , CL_TRUE );
 
-    // Upload the transfer function to the volume.
-    // TODO: Fix the hardcoded values.
-    transferFunctionArray_ = clCreateImage2D
-                             ( context_,
-                               CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
-                               &tfFormat, 9,1, sizeof( float ) * 9 * 4,
-                               transferFunctionTable, &clErrorCode );
+
     oclHWDL::Error::checkCLError(clErrorCode);
+
 
     // Create samplers (same as texture in OpenGL) for transfer function
     // and the volume for linear interpolation and nearest interpolation.
@@ -245,13 +240,14 @@ void CLRenderer< V , F >::handleKernel_( std::string string )
     activeRenderingKernel_->setVolumeSampler
             (linearFiltering_ ? linearVolumeSampler_ : nearestVolumeSampler_);
 
-    activeRenderingKernel_->setTransferFunctionData(transferFunctionArray_);
+    activeRenderingKernel_->
+            setTransferFunctionData( clTransferFunction->getDeviceData( ));
 
     activeRenderingKernel_->setTransferFunctionSampler(transferFunctionSampler_);
 
     int enableTF = 0 ;
 
-    activeRenderingKernel_->setTransferFunctionFlag(enableTF);
+    activeRenderingKernel_->setTransferFunctionFlag( enableTF );
 
     //    activeRenderingKernel_->setTransferFunctionOffset(transferOffset);
 
@@ -293,8 +289,8 @@ void CLRenderer< V , F >::freeBuffers_()
     if( clVolume_->getDeviceData( ))
         clReleaseMemObject( clVolume_->getDeviceData( ));
 
-    if( transferFunctionArray_ )
-        clReleaseMemObject( transferFunctionArray_ );
+    if( clTransferFunction->getDeviceData() )
+        clReleaseMemObject( clTransferFunction->getDeviceData( ));
 
     if( clFrame_->getDeviceData() )
         clReleaseMemObject( clFrame_->getDeviceData( ));

@@ -15,18 +15,23 @@ CLImage2DArray< T >::CLImage2DArray( const uint width ,
       deviceData_( NULL )
 {
 
-    if( typeid( T ) != typeid( uint ) )
-        LOG_ERROR("Not supperted type!");
-
     for( auto i = 0 ; i < arraySize ; i++ )
     {
-        framesData_.push_back( new T[ width * height ] );
-        framesSet_.push_back( false );
+        framesData_.push_back( new T[ width * height * 4 ] );
     }
 
     imageFormat_.image_channel_order = channelOrder ;
     imageFormat_.image_channel_data_type = channelType ;
 
+    imageDescriptor_.image_type = CL_MEM_OBJECT_IMAGE3D ;
+    imageDescriptor_.image_width = width_ ;
+    imageDescriptor_.image_height = height_ ;
+    imageDescriptor_.image_depth = arraySize_ ;
+    imageDescriptor_.image_row_pitch = 0 ;
+    imageDescriptor_.image_slice_pitch = 0 ;
+    imageDescriptor_.num_mip_levels = 0 ;
+    imageDescriptor_.num_samples = 0 ;
+    imageDescriptor_.buffer = 0 ;
 
     inDevice_ = false ;
 }
@@ -61,10 +66,8 @@ void CLImage2DArray< T >::createDeviceData( cl_context context )
     cl_int error = CL_SUCCESS;
 
     deviceData_ =
-            clCreateImage3D( context , CL_MEM_READ_ONLY | CL_MEM_HOST_WRITE_ONLY ,
-                             &imageFormat_ , width_ , height_ ,
-                             arraySize_ , 0 , 0 , NULL , &error ) ;
-
+            clCreateImage( context , CL_MEM_READ_ONLY | CL_MEM_HOST_WRITE_ONLY ,
+                           &imageFormat_ , &imageDescriptor_ , 0 , &error ) ;
 
     if( error != CL_SUCCESS )
     {
@@ -78,7 +81,7 @@ void CLImage2DArray< T >::createDeviceData( cl_context context )
 }
 
 template< class T >
-void CLImage2DArray< T >::setFrameData( const uint index , T *data )
+void CLImage2DArray< T >::setFrameData( const uint index , const T *data )
 {
     if( index >= arraySize_ )
         LOG_ERROR("Out of range index!");
@@ -88,8 +91,6 @@ void CLImage2DArray< T >::setFrameData( const uint index , T *data )
         std::copy( &data[0] ,
                 &data[ width_ * height_ - 1 ] ,
                 &framesData_[ index ][0] );
-
-//        framesSet_[ index ] = true ;
     }
 }
 
@@ -99,10 +100,10 @@ void CLImage2DArray< T >::loadFrameDataToDevice( const uint index ,
                                                  cl_command_queue  commandQueue ,
                                                  cl_bool blocking )
 {
-//    if( ! framesSet_[ index ] )
-//        LOG_ERROR("Frame data has not been set!");
+    //    if( ! framesSet_[ index ] )
+    //        LOG_ERROR("Frame data has not been set!");
 
-    if( index >= size() )
+    if( index >= size( ))
         LOG_ERROR("index exceeds the limit");
 
 
@@ -112,10 +113,10 @@ void CLImage2DArray< T >::loadFrameDataToDevice( const uint index ,
     const size_t region[] = { width_ , height_ , 1 } ;
 
     error = clEnqueueWriteImage( commandQueue , deviceData_ , blocking ,
-                                 origin , region , width_ * sizeof( uint ) ,
-                                 width_ * height_ * sizeof( uint ) ,
+                                 origin , region , width_ * sizeof( T )  ,
+                                 width_ * height_ * sizeof( T )  ,
                                  ( const void * ) framesData_[ index ] , 0 ,
-                                 NULL , NULL ) ;
+                                 0 , 0 ) ;
 
     if( error != CL_SUCCESS )
     {
@@ -143,10 +144,11 @@ template< class T >
 void CLImage2DArray< T >::resize( const uint newArraySize ,
                                   cl_context context )
 {
-    releaseDeviceData_();
+    releaseDeviceData_( );
     arraySize_ = newArraySize ;
+    imageDescriptor_.image_depth = newArraySize ;
 
-    int delta = newArraySize - framesData_.size();
+    int delta = (int) newArraySize - (int) framesData_.size( );
 
     if( delta <= 0 )
         framesData_.resize( newArraySize );
@@ -156,12 +158,13 @@ void CLImage2DArray< T >::resize( const uint newArraySize ,
             framesData_.push_back( new T[ width_ * height_ ]);
 
 
-    createDeviceData( ( context_ != NULL )? context_ : context );
+    releaseDeviceData_( );
+    createDeviceData(( context_ != NULL )? context_ : context );
 
 }
 
 template< class T >
-size_t CLImage2DArray< T >::size() const
+size_t CLImage2DArray< T >::size( ) const
 {
     return arraySize_ ;
 }
@@ -169,7 +172,7 @@ size_t CLImage2DArray< T >::size() const
 template< class T >
 void CLImage2DArray< T >::readOtherDeviceData( cl_command_queue cmdQueue ,
                                                const uint index,
-                                               const CLFrame<T> &source,
+                                               const CLFrame< T > &source,
                                                cl_bool blocking)
 {
     if( source.getFrameDimensions() != Dimensions2D( width_ , height_ ))
@@ -180,7 +183,7 @@ void CLImage2DArray< T >::readOtherDeviceData( cl_command_queue cmdQueue ,
                                  source.getDeviceData() , blocking ,
                                  0 , width_ * height_ * sizeof(T) ,
                                  ( void * ) framesData_[ index ] ,
-                                 0 , NULL , NULL);
+                                 0 , 0 , 0 );
 
     if( error != CL_SUCCESS )
     {
@@ -202,7 +205,7 @@ void CLImage2DArray< T >::releaseDeviceData_()
         clReleaseMemObject( deviceData_ );
 
     inDevice_ = false ;
-
-
+    deviceData_ = 0 ;
 }
+
 #include "CLImage2DArray.ipp"

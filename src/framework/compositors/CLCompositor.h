@@ -57,7 +57,7 @@ protected:
     //empty
     CLImage2DArray< T > *imagesArray_ ;
 
-    CLBuffer< T > *depthIndex_ ;
+    CLBuffer< uint > *depthIndex_ ;
 };
 
 #endif // CLCompositor_H

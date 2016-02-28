@@ -1,17 +1,21 @@
 #include "VirtualCLRenderer.h"
 
-VirtualCLRenderer::VirtualCLRenderer( const uint64_t gpuIndex,
+
+template< class V , class F >
+VirtualCLRenderer< V , F >::VirtualCLRenderer( const uint64_t gpuIndex,
                                       const uint frameWidth ,
                                       const uint frameHeight ,
                                       const Transformation &transformation )
-    : CLRenderer( 0 , frameWidth , frameHeight , transformation  ) ,
+    : CLRenderer< V , F >( 0 , frameWidth , frameHeight , transformation  ) ,
       gpuIndex_VIRTUAL_( gpuIndex )
 {
 
 }
 
-uint64_t VirtualCLRenderer::getGPUIndex() const
+template< class V , class F >
+uint64_t VirtualCLRenderer< V , F >::getGPUIndex() const
 {
     return gpuIndex_VIRTUAL_ ;
 }
 
+#include "VirtualCLRenderer.ipp"

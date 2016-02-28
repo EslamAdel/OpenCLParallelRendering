@@ -20,11 +20,11 @@ public:
      * @param volume
      * @param precision
      */
-    CLFrame( const Dimensions2D dimensions );
+    CLFrame( const Dimensions2D dimensions  );
 
     CLFrame( );
 
-    ~CLFrame() ;
+    ~CLFrame( ) ;
 
 public:
 
@@ -36,7 +36,9 @@ public:
      */
 
     //TODO : new class FrameImage that inherit from this class.
-    virtual void createDeviceData( cl_context context );
+    virtual void createDeviceData( cl_context context ,
+                                   const cl_mem_flags flags
+                                   = CL_MEM_READ_WRITE );
 
 
     virtual void writeDeviceData(  cl_command_queue cmdQueue ,
@@ -58,11 +60,9 @@ public:
 
     virtual QPixmap &getFramePixmap() ;
 
-    virtual void setHostData( T *data );
+    virtual void copyHostData( const T *data );
 
-    virtual void copyHostData( T *data );
-
-    virtual void copyHostData( CLFrame< T > &sourceFrame );
+    virtual void copyHostData( const CLFrame< T > &sourceFrame );
 
     virtual cl_mem getDeviceData() const;
 
@@ -72,7 +72,7 @@ public:
 
     bool isInDevice() const ;
 
-    bool inSameContext( const CLFrame<T> &frame ) const ;
+    bool inSameContext( const CLFrame< T > &frame ) const ;
 
 
     bool dimensionsDefined( ) const ;
@@ -86,7 +86,8 @@ protected:
     //Temporary solution as namesapce SystemUtilites cannot be found
     //by compiler.
     void convertColorToRGBA_( uint Color,
-                              uint8_t &r, uint8_t &g, uint8_t &b, uint8_t &a );
+                              uint8_t &r , uint8_t &g,
+                              uint8_t &b , uint8_t &a );
 protected:
 
     T *hostData_;
@@ -105,6 +106,7 @@ protected:
     bool pixmapSynchronized_ ;
     bool inDevice_ ;
     bool dimensionsDefined_ ;
+
 };
 
 

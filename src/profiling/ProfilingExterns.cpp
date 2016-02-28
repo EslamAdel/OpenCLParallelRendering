@@ -1,7 +1,8 @@
 
 #include "ProfilingExterns.h"
 
-RenderingProfile &getRenderingProfile( RenderingProfiles &profiles , uint gpuIndex )
+RenderingProfile &getRenderingProfile( const RenderingProfiles &profiles ,
+                                       const uint gpuIndex )
 {
     for( auto it : profiles )
         if( it.first->getGPUIndex() == gpuIndex  )
@@ -9,18 +10,18 @@ RenderingProfile &getRenderingProfile( RenderingProfiles &profiles , uint gpuInd
 
 }
 
-CollectingProfile &getCollectingProfile( CollectingProfiles &profiles ,
-                                         CLAbstractRenderer *renderer)
+CollectingProfile &getCollectingProfile( const CollectingProfiles &profiles ,
+                                         const CLAbstractRenderer *renderer)
 {
-    return *profiles[ renderer ];
+    return *profiles.at( renderer );
 }
 
 
 
-RenderingProfile &getRenderingProfile( RenderingProfiles &profiles,
-                                       CLAbstractRenderer *renderer)
+RenderingProfile &getRenderingProfile( const RenderingProfiles &profiles,
+                                       const CLAbstractRenderer *renderer)
 {
-    return *profiles[ renderer ] ;
+    return *profiles.at( renderer ) ;
 }
 
 

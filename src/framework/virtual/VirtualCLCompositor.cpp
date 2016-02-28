@@ -10,3 +10,4 @@ VirtualCLCompositor< T >::VirtualCLCompositor( const uint64_t gpuIndex ,
 
 }
 
+#include "VirtualCLCompositor.ipp"

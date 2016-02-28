@@ -8,7 +8,7 @@ TaskMakePixmap::TaskMakePixmap(  )
     setAutoDelete( false );
 }
 
-void TaskMakePixmap::setFrame( CLFrame<uint> *frame )
+void TaskMakePixmap::setFrame( CLFrame< uint > *frame )
 {
     frame_ = frame ;
 }

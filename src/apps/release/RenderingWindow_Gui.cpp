@@ -126,7 +126,7 @@ void RenderingWindow_Gui::intializeConnections_()
                                            const CLAbstractRenderer* )));
 
     connect( parallelRenderer_ , SIGNAL( finalFrameReady_SIGNAL( QPixmap* )) ,
-             this , SLOT( collageFrameReady_SLOT( QPixmap* )));
+             this , SLOT( finalFrameReady_SLOT( QPixmap* )));
 }
 
 
@@ -179,8 +179,10 @@ void RenderingWindow_Gui::frameReady_SLOT( QPixmap *frame ,
         displayFrame_( frame , index );
 }
 
-void RenderingWindow_Gui::collageFrameReady_SLOT( QPixmap *finalFrame )
+void RenderingWindow_Gui::finalFrameReady_SLOT( QPixmap *finalFrame )
 {
+    LOG_DEBUG("Set Final Frame" );
+
     finalFrame_ = finalFrame;
     ui->frameContainerResult->
             setPixmap( finalFrame->scaled( ui->frameContainerResult->width( ) ,

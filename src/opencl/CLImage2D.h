@@ -15,8 +15,10 @@ public:
 
     CLImage2D( );
 
-    virtual void createDeviceData( cl_context context ) override;
-
+    virtual void createDeviceData( cl_context context ,
+                                   const cl_mem_flags flags
+                                   = CL_MEM_WRITE_ONLY |
+                                     CL_MEM_HOST_READ_ONLY  ) override;
 
     virtual void writeDeviceData(  cl_command_queue cmdQueue ,
                                    const cl_bool blocking ) override;
@@ -30,8 +32,10 @@ public:
 
 
 
-private :
+protected :
     cl_image_format imageFormat_ ;
+    cl_image_desc   imageDescriptor_ ;
+
 };
 
 

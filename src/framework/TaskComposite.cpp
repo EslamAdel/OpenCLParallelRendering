@@ -15,12 +15,12 @@ void TaskComposite::run()
 {
     TOC( compositingProfile.threadSpawning_TIMER ) ;
 
-    compositor_->composite();
+    compositor_->composite( );
 
     if( compositor_->readOutReady( ))
     {
-        compositor_->loadFinalFrame();
-        emit this->compositingFinished_SIGNAL();
+        compositor_->loadFinalFrame( );
+        emit this->compositingFinished_SIGNAL( );
     }
 }
 

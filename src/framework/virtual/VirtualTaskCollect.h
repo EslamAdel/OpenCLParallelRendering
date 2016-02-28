@@ -12,19 +12,20 @@ class VirtualTaskCollect : public QObject , public QRunnable
 
 public:
 
-    VirtualTaskCollect( VirtualCLRenderer *renderer ,
+    VirtualTaskCollect( CLAbstractRenderer *renderer ,
                         CLAbstractCompositor *compositor );
 
 
 signals:
 
-    void frameLoadedToDevice_SIGNAL( VirtualCLRenderer *renderer );
+    void frameLoadedToDevice_SIGNAL(
+            CLAbstractRenderer *renderer );
 
 protected:
     void run();
 
 private:
-    VirtualCLRenderer *renderer_;
+    CLAbstractRenderer *renderer_;
     CLAbstractCompositor *compositor_;
 
 };

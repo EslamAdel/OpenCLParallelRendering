@@ -5,6 +5,8 @@
 #include "Volume.h"
 #include "Transformation.h"
 #include <CLVolume.h>
+#include "CLTransferFunction.h"
+
 #include <CLXRayRenderingKernel.h>
 
 
@@ -93,7 +95,7 @@ private:
     /**
      * @brief transferFunctionArray_
      */
-    cl_mem transferFunctionArray_;
+    CLTransferFunction *clTransferFunction ;
 
     /**
      * @brief linearVolumeSampler_

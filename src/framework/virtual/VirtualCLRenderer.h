@@ -5,8 +5,8 @@
 
 
 
-
-class VirtualCLRenderer : public CLRenderer< uchar , uint >
+template< class V ,  class F >
+class VirtualCLRenderer : public CLRenderer< V , F >
 {
 public:
     VirtualCLRenderer( const uint64_t gpuIndex,
@@ -20,5 +20,7 @@ public:
 private:
     const uint64_t gpuIndex_VIRTUAL_ ;
 };
+
+
 
 #endif // VirtualCLRenderer_H

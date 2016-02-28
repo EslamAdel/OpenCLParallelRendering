@@ -60,7 +60,7 @@ void RenderingWindow::intializeConnections_()
                                            const CLAbstractRenderer* )));
 
     connect( parallelRenderer_ , SIGNAL( finalFrameReady_SIGNAL( QPixmap* )) ,
-             this , SLOT( collageFrameReady_SLOT( QPixmap* )));
+             this , SLOT( finalFrameReady_SLOT( QPixmap* )));
 
 
     //sliders
@@ -129,7 +129,7 @@ void RenderingWindow::frameReady_SLOT( QPixmap *frame ,
         displayFrame_( frame , index );
 }
 
-void RenderingWindow::collageFrameReady_SLOT( QPixmap *finalFrame )
+void RenderingWindow::finalFrameReady_SLOT( QPixmap *finalFrame )
 {
 
     LOG_DEBUG("Final Frame ready ");

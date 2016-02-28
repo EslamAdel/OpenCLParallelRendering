@@ -61,8 +61,10 @@ SET( OCL_MGPUVS_HEADER_FILES
     framework/TaskMakePixmap.h
     framework/TaskRender.h
     framework/virtual/VirtualCLCompositor.h
+    framework/virtual/VirtualCLCompositor.ipp
     framework/virtual/VirtualParallelRendering.h
     framework/virtual/VirtualCLRenderer.h
+    framework/virtual/VirtualCLRenderer.ipp
     framework/virtual/VirtualTaskCollect.h
     framework/Transformation.h
     auxillary/half.hpp
@@ -82,7 +84,9 @@ SET( OCL_MGPUVS_HEADER_FILES
     opencl/CLImage2D.h
     opencl/CLImage2D.ipp
     opencl/CLImage2DArray.h
+    opencl/CLImage2DArray.ipp
     opencl/CLTransferFunction.h
+
     opencl/CLVolume.h
     opencl/CLVolume.ipp
     opencl/CLXRayCompositingKernel.h

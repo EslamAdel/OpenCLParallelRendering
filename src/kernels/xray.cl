@@ -166,7 +166,8 @@ __kernel void xray( __global    uint* frameBuffer,
         if(enableTranferFunction != 0)
         {
         // lookup in transfer function texture
-        float2 transfer_pos = (float2)((intensity.x-transferOffset)*transferScale, 0.5f);
+        float2 transfer_pos = (float2)(( intensity.x - transferOffset ) *
+                                         transferScale , 0.5f );
          col = read_imagef(transferFunc, transferFuncSampler, transfer_pos);
          }
          else

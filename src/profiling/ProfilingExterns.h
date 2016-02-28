@@ -29,18 +29,18 @@
     }while( 0 )
 
 #define RENDERING_PROFILE_TAG( renderer )\
-    do{ printf("Statistics: Rendering on GPU <%d>\n" , renderer->getGPUIndex() ); }\
+    do{ printf("Statistics: Rendering on GPU <%lo>\n" , renderer->getGPUIndex() ); }\
     while( 0 )
 
 #define COLLECTING_PROFILE_TAG( renderer , compositor )\
     do{\
-    printf("Statistics: Data Transfer from GPU <%d> --> Host --> GPU <%d>\n" ,\
+    printf("Statistics: Data Transfer from GPU <%lo> --> Host --> GPU <%lo>\n" ,\
     renderer->getGPUIndex() , compositor->getGPUIndex() ) ; }\
     while( 0 )
 
 #define COMPOSITING_PROFILE_TAG( compositor )\
     do{\
-    printf("Statistics: Compositing on GPU <%d>\n", compositor->getGPUIndex() ) ;}\
+    printf("Statistics: Compositing on GPU <%lo>\n", compositor->getGPUIndex() ) ;}\
     while( 0 )
 
 #define FRAMEWORK_PROFILE_TAG()\
@@ -146,14 +146,14 @@ extern CompositingProfile compositingProfile;
 extern FrameworkProfile frameworkProfile;
 extern uint testFrames ;
 
-RenderingProfile &getRenderingProfile( RenderingProfiles &profiles ,
-                                       uint gpuIndex );
+RenderingProfile &getRenderingProfile( const RenderingProfiles &profiles ,
+                                       const uint gpuIndex );
 
-RenderingProfile &getRenderingProfile( RenderingProfiles &profiles ,
-                                       CLAbstractRenderer *renderer  );
+RenderingProfile &getRenderingProfile( const RenderingProfiles &profiles ,
+                                       const CLAbstractRenderer *renderer  );
 
-CollectingProfile &getCollectingProfile( CollectingProfiles &profile ,
-                                         CLAbstractRenderer* renderer );
+CollectingProfile &getCollectingProfile( const CollectingProfiles &profile ,
+                                         const CLAbstractRenderer* renderer );
 
 
 

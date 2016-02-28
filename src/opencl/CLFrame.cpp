@@ -3,17 +3,14 @@
 #include <Logger.h>
 
 template< class T >
-CLFrame< T >::CLFrame( const Dimensions2D dimensions )
+CLFrame< T >::CLFrame( const Dimensions2D dimensions  )
     : dimensions_( dimensions ),
       pixmapSynchronized_( false ) ,
       inDevice_( false )
 {
-    if( typeid(T) != typeid(uint) )
-        LOG_ERROR("Images other than uint/pixel is not supported!");
-
     hostData_ = new T[ dimensions.imageSize() ];
 
-    rgbaFrame_ = new uchar[ dimensions.imageSize() * 4 ];
+    rgbaFrame_ = new uchar[ dimensions.imageSize() * 4  ];
 
 }
 
@@ -22,29 +19,31 @@ CLFrame< T >::CLFrame( )
     : hostData_( nullptr ) ,
       rgbaFrame_( nullptr )
 {
-    if( typeid(T) != typeid( uint ))
-        LOG_ERROR("Images other than uint/pixel is not supported!");
-
     dimensionsDefined_ = false ;
 }
 
 template< class T >
 CLFrame< T >::~CLFrame()
 {
-    clReleaseMemObject( deviceData_ );
+    releaseDeviceData_();
+
+    delete hostData_ ;
+
+    delete rgbaFrame_ ;
 }
 
 template< class T >
-void CLFrame< T >::createDeviceData( cl_context context )
+void CLFrame< T >::createDeviceData( cl_context context ,
+                                     const cl_mem_flags flags )
 {
     LOG_DEBUG( "Creating an OpenCL image " );
 
     // Initially, assume that everything is fine
     cl_int error = CL_SUCCESS;
     deviceData_ = clCreateBuffer( context,
-                                  CL_MEM_READ_WRITE ,
-                                  dimensions_.imageSize() *sizeof(uint),
-                                  NULL ,
+                                  flags ,
+                                  dimensions_.imageSize() * sizeof( T ) ,
+                                  0 ,
                                   &error );
     if( error != CL_SUCCESS )
     {
@@ -69,9 +68,9 @@ void CLFrame< T >::writeDeviceData( cl_command_queue cmdQueue ,
     // Initially, assume that everything is fine
     cl_int error = CL_SUCCESS;
     error = clEnqueueWriteBuffer( cmdQueue , deviceData_ , blocking ,
-                                  0 , dimensions_.imageSize() * sizeof(T) ,
+                                  0 , dimensions_.imageSize() * sizeof( T ) ,
                                   ( const void *) hostData_ ,
-                                  0 , NULL , NULL );
+                                  0 , 0 , 0 );
 
     if( error != CL_SUCCESS )
     {
@@ -88,7 +87,7 @@ void CLFrame< T >::readDeviceData( cl_command_queue cmdQueue ,
     error = clEnqueueReadBuffer( cmdQueue, deviceData_ , blocking ,
                                  0 , dimensions_.imageSize() * sizeof(T) ,
                                  ( void * ) hostData_ ,
-                                 0 , NULL , NULL);
+                                 0 , 0 , 0);
 
     if( error != CL_SUCCESS )
     {
@@ -108,10 +107,11 @@ void CLFrame< T >::readOtherDeviceData( cl_command_queue sourceCmdQueue ,
         LOG_ERROR("Dimensions mismatch!");
 
     static cl_int error = CL_SUCCESS;
-    error = clEnqueueReadBuffer( sourceCmdQueue , sourceFrame.getDeviceData() , blocking ,
-                                 0 , dimensions_.imageSize() * sizeof(T) ,
+    error = clEnqueueReadBuffer( sourceCmdQueue , sourceFrame.getDeviceData() ,
+                                 blocking ,
+                                 0 , dimensions_.imageSize() * sizeof( T )  ,
                                  ( void * ) hostData_ ,
-                                 0 , NULL , NULL);
+                                 0 , 0 , 0 );
 
     if( error != CL_SUCCESS )
     {
@@ -124,7 +124,7 @@ void CLFrame< T >::readOtherDeviceData( cl_command_queue sourceCmdQueue ,
 
 template< class T >
 void CLFrame< T >::copyDeviceData( cl_command_queue cmdQueue ,
-                                   const CLFrame<T> &frame ,
+                                   const CLFrame< T > &frame ,
                                    const cl_bool blocking )
 {
     if( ! inSameContext( frame ))
@@ -137,8 +137,8 @@ void CLFrame< T >::copyDeviceData( cl_command_queue cmdQueue ,
     error = clEnqueueCopyBuffer( cmdQueue ,
                                  frame.getDeviceData() , deviceData_ ,
                                  0 , 0 ,
-                                 dimensions_.imageSize() * sizeof(T) ,
-                                 0 , NULL , NULL ) ;
+                                 dimensions_.imageSize() * sizeof( T ) ,
+                                 0 , 0 , 0 ) ;
 
     if( error != CL_SUCCESS )
     {
@@ -163,20 +163,18 @@ QPixmap &CLFrame<T>::getFramePixmap()
 {
     if( pixmapSynchronized_ ) return frame_ ;
 
-    u_int8_t r, g, b, a;
-    uint rgba;
 
-    for(int i = 0; i < dimensions_.imageSize() ; i++)
+    for( int i = 0; i < dimensions_.imageSize() ; i++)
     {
-        rgba = hostData_[i];
-
+        u_int8_t r, g, b, a;
+        uint rgba = hostData_[i];
 
         convertColorToRGBA_( rgba, r, g, b, a );
 
-        rgbaFrame_[4*i] = r;
-        rgbaFrame_[4*i + 1] = g;
-        rgbaFrame_[4*i + 2] = b;
-        rgbaFrame_[4*i + 3] = a;
+        rgbaFrame_[ 4 * i ] = r;
+        rgbaFrame_[ 4 * i + 1 ] = g;
+        rgbaFrame_[ 4 * i + 2 ] = b;
+        rgbaFrame_[ 4 * i + 3 ] = a;
     }
 
     // Create a QImage and send it back to the rendering window.
@@ -189,25 +187,15 @@ QPixmap &CLFrame<T>::getFramePixmap()
 }
 
 template< class T >
-void CLFrame< T >::setHostData( T *data)
+void CLFrame< T >::copyHostData( const T *data )
 {
-    if( hostData_ != data )
-    {
-        delete hostData_ ;
-        hostData_ = data ;
-    }
-
-}
-
-template< class T >
-void CLFrame< T >::copyHostData( T *data )
-{
-    std::copy( &data[ 0 ] , &data[ dimensions_.imageSize() - 1 ] , hostData_ );
+    std::copy( &data[ 0 ] , &data[ dimensions_.imageSize() - 1 ] ,
+            hostData_ );
     pixmapSynchronized_ = false ;
 }
 
 template< class T >
-void CLFrame< T >::copyHostData( CLFrame<T> &sourceFrame )
+void CLFrame< T >::copyHostData( const CLFrame< T > &sourceFrame )
 {
     const T *hostData_SOURCE = sourceFrame.getHostData();
     const uint64_t frameSize = sourceFrame.getFrameDimensions().imageSize() ;
@@ -245,7 +233,7 @@ bool CLFrame< T >::isInDevice() const
 }
 
 template< class T >
-bool CLFrame< T >::inSameContext( const CLFrame<T> &frame ) const
+bool CLFrame< T >::inSameContext( const CLFrame< T > &frame ) const
 {
     return frame.isInDevice() && ( frame.getContext() == context_ ) ;
 }

@@ -3,7 +3,8 @@
 
 #include <Headers.hh>
 
-template class CLFrame< uint32_t >;
+template class CLFrame< uint >;
+template class CLFrame< float >;
 
 
 #endif // RENDERING_CLIMAGE_IPP

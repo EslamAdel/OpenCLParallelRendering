@@ -4,7 +4,7 @@
 #include <Headers.hh>
 
 
-template class CLImage2D< uint32_t >;
-
+template class CLImage2D< uint >;
+template class CLImage2D< float >;
 
 #endif // CLIMAGE2D_IPP

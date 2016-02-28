@@ -30,7 +30,7 @@ DEFINE_PROFILES
 
 
 
-ParallelRendering::ParallelRendering( Volume<uchar> *volume ,
+ParallelRendering::ParallelRendering( Volume< uchar > *volume ,
                                       const uint frameWidth ,
                                       const uint frameHeight )
     : baseVolume_( volume ),

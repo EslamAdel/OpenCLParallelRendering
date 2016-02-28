@@ -14,10 +14,11 @@ VirtualParallelRendering::VirtualParallelRendering( Volume<uchar> *volume,
 
 void VirtualParallelRendering::addCLRenderer( const uint64_t gpuIndex )
 {
-    auto *renderer = new VirtualCLRenderer( gpuIndex,
-                                            frameWidth_ ,
-                                            frameHeight_ ,
-                                            transformationAsync_ );
+    auto *renderer =
+            new VirtualCLRenderer< uchar , uint >( gpuIndex,
+                                                   frameWidth_ ,
+                                                   frameHeight_ ,
+                                                   transformationAsync_ );
 
     renderers_.push_back( renderer );
     renderer->setFrameIndex( gpuIndex );
@@ -37,22 +38,13 @@ void VirtualParallelRendering::addCLCompositor(const uint64_t gpuIndex)
 
 
     if( inUseGPUs_.size() > 1 )
-    {
-        auto compositor = new CLCompositor< uint >( gpuIndex ,
-                                                    frameWidth_ ,
-                                                    frameHeight_ );
-        compositor_ =
-                static_cast< CLAbstractCompositor * >( compositor );
-    }
+        compositor_ = new CLCompositor< uint >( gpuIndex ,
+                                                frameWidth_ ,
+                                                frameHeight_ );
     else
-    {
-        auto compositor = new CLCompositorAccumulate< uint >( gpuIndex ,
-                                                              frameWidth_ ,
-                                                              frameHeight_ );
-        compositor_ =
-                static_cast< CLAbstractCompositor * >( compositor );
-    }
-
+        compositor_ = new CLCompositorAccumulate< uint >( gpuIndex ,
+                                                          frameWidth_ ,
+                                                          frameHeight_ );
 
     LOG_DEBUG("[DONE] Initialize Compositing Unit");
 
@@ -74,7 +66,7 @@ void VirtualParallelRendering::addCLCompositor(const uint64_t gpuIndex)
 
     // for each rendering task finished, a collecting task and a
     // compositing task will follow!
-    for( VirtualCLRenderer *renderer : renderers_ )
+    for( CLAbstractRenderer *renderer : renderers_ )
     {
 
         compositor_->allocateFrame( renderer );
@@ -104,8 +96,8 @@ void VirtualParallelRendering::addCLCompositor(const uint64_t gpuIndex)
         // Map signals from collecting tasks and compositing tasks to the
         // correspondint slots.
         connect( collectingTask ,
-                 SIGNAL( frameLoadedToDevice_SIGNAL( VirtualCLRenderer* )) ,
-                 this , SLOT( frameLoadedToDevice_SLOT( VirtualCLRenderer* )));
+                 SIGNAL( frameLoadedToDevice_SIGNAL( CLAbstractRenderer* )) ,
+                 this , SLOT( frameLoadedToDevice_SLOT( CLAbstractRenderer* )));
 
         connect( compositingTask , SIGNAL(compositingFinished_SIGNAL( )) ,
                  this , SLOT(compositingFinished_SLOT( )));
@@ -169,7 +161,7 @@ void VirtualParallelRendering::startRendering()
     LOG_INFO("[DONE] Triggering Rendering Nodes");
 }
 
-void VirtualParallelRendering::frameLoadedToDevice_SLOT( VirtualCLRenderer *renderer )
+void VirtualParallelRendering::frameLoadedToDevice_SLOT( CLAbstractRenderer *renderer )
 {
     LOG_DEBUG("Frame<%d> Loaded to Device" , renderer->getGPUIndex() );
 
@@ -215,7 +207,7 @@ void VirtualParallelRendering::applyTransformation_()
     // fetch new transformations if exists.
     this->syncTransformation_();
 
-    for( VirtualCLRenderer *renderer : renderers_ )
+    for( CLAbstractRenderer *renderer : renderers_ )
     {
         LOG_DEBUG("Triggering renderer[%d]:%p" , renderer->getGPUIndex() ,
                   renderer );

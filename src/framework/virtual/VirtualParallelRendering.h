@@ -36,7 +36,8 @@ public:
     void startRendering();
 
 public slots:
-    void frameLoadedToDevice_SLOT( VirtualCLRenderer *renderer );
+    void frameLoadedToDevice_SLOT(
+            CLAbstractRenderer *renderer );
 
     void finishedRendering_SLOT( CLAbstractRenderer *renderer );
 
@@ -48,7 +49,7 @@ protected:
 private:
 
     //for virtual GPUs only.
-    std::vector< VirtualCLRenderer* > renderers_ ;
+    std::vector< CLAbstractRenderer* > renderers_ ;
     CLAbstractCompositor *compositor_ ;
     const uint virtualGPUsCount_ ;
 
