@@ -145,7 +145,7 @@ private:
     /**
      * @brief clFrame_
      */
-    CLFrame< F > *clFrame_ ;
+    CLImage2D< F > *clFrame_ ;
 
     /**
      * @brief inverseMatrix_

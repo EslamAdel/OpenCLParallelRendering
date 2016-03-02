@@ -2,6 +2,11 @@
 #include <typeinfo>
 #include <Logger.h>
 
+
+// map [0.f , 1.f] => [0 , 255]
+#define F2B( f ) (( f ) >= 1.0 ? 255 : (short)( ( f ) * 256.0 ))
+
+
 template< class T >
 CLFrame< T >::CLFrame( const Dimensions2D dimensions  )
     : dimensions_( dimensions ),
@@ -10,14 +15,24 @@ CLFrame< T >::CLFrame( const Dimensions2D dimensions  )
 {
     hostData_ = new T[ dimensions.imageSize() ];
 
-    rgbaFrame_ = new uchar[ dimensions.imageSize() * 4  ];
+    // RGBA image
+    if( typeid( T ) == typeid( uint ))
+    {
+        pixmapData_ = new uchar[ dimensions.imageSize() * 4  ];
+
+    }
+    // Intensity image
+    else if( typeid( T ) == typeid( float ))
+    {
+        pixmapData_ = new uchar[ dimensions.imageSize()  ];
+    }
 
 }
 
 template< class T >
 CLFrame< T >::CLFrame( )
     : hostData_( nullptr ) ,
-      rgbaFrame_( nullptr )
+      pixmapData_( nullptr )
 {
     dimensionsDefined_ = false ;
 }
@@ -29,7 +44,7 @@ CLFrame< T >::~CLFrame()
 
     delete hostData_ ;
 
-    delete rgbaFrame_ ;
+    delete pixmapData_ ;
 }
 
 template< class T >
@@ -164,23 +179,40 @@ QPixmap &CLFrame<T>::getFramePixmap()
     if( pixmapSynchronized_ ) return frame_ ;
 
 
-    for( int i = 0; i < dimensions_.imageSize() ; i++)
+    if( typeid( T ) == typeid( uint ))
     {
-        u_int8_t r, g, b, a;
-        uint rgba = hostData_[i];
+        for( int i = 0; i < dimensions_.imageSize() ; i++)
+        {
+            u_int8_t r, g, b, a;
+            uint rgba = hostData_[i];
 
-        convertColorToRGBA_( rgba, r, g, b, a );
+            convertColorToRGBA_( rgba, r, g, b, a );
 
-        rgbaFrame_[ 4 * i ] = r;
-        rgbaFrame_[ 4 * i + 1 ] = g;
-        rgbaFrame_[ 4 * i + 2 ] = b;
-        rgbaFrame_[ 4 * i + 3 ] = a;
+            pixmapData_[ 4 * i ] = r;
+            pixmapData_[ 4 * i + 1 ] = g;
+            pixmapData_[ 4 * i + 2 ] = b;
+            pixmapData_[ 4 * i + 3 ] = a;
+        }
+
+        // Create a QImage and send it back to the rendering window.
+        const QImage image( pixmapData_,
+                            dimensions_.x , dimensions_.y ,
+                            QImage::Format_ARGB32);
+        frame_ = frame_.fromImage( image );
+
     }
 
-    // Create a QImage and send it back to the rendering window.
-    const QImage image( rgbaFrame_,
-                        dimensions_.x , dimensions_.y , QImage::Format_ARGB32);
-    frame_ = frame_.fromImage( image );
+    else if( typeid( T ) == typeid( float ))
+    {
+        for( int i = 0; i < dimensions_.imageSize() ; i++)
+            pixmapData_[ i ] = F2B( hostData_[i] );
+
+        // Create a QImage and send it back to the rendering window.
+        const QImage image( pixmapData_,
+                            dimensions_.x , dimensions_.y ,
+                            QImage::Format_Grayscale8 );
+        frame_ = frame_.fromImage( image );
+    }
 
     return frame_ ;
 

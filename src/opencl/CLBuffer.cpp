@@ -145,4 +145,26 @@ void CLBuffer< T >::releaseDeviceData_( )
     deviceData_ = NULL ;
 }
 
+template< class T >
+QDataStream &operator>>( QDataStream &stream ,
+                         CLBuffer< T > &buffer )
+{
+
+    LOG_ERROR("Not Implemented yet!");
+    return stream ;
+}
+
+template< class T >
+QDataStream &operator<<( QDataStream &stream ,
+                         CLBuffer< T > &buffer )
+{
+
+
+    LOG_ERROR("Not Implemented yet!");
+
+    return stream ;
+}
+
 #include <CLBuffer.ipp>
+
+

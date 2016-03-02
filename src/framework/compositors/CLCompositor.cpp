@@ -64,8 +64,8 @@ void CLCompositor< T >::collectFrame( CLAbstractRenderer *renderer ,
                                       const cl_bool block )
 {
 
-    CLFrame< T > *sourceFrame =
-            renderer->getCLFrame().value< CLFrame< T > *>( );
+    CLImage2D< T > *sourceFrame =
+            renderer->getCLFrame().value< CLImage2D< T > *>( );
 
 #ifdef BENCHMARKING
     imagesArray_->readOtherDeviceData( renderer->getCommandQueue() ,
@@ -153,7 +153,7 @@ void CLCompositor< T >::loadFinalFrame()
 template< class T >
 const CLFrameVariant &CLCompositor<T>::getFinalFrame() const
 {
-    this->finalFrameVariant_.setValue(( CLFrame< T > *) finalFrameReadout_ );
+    this->finalFrameVariant_.setValue(( CLImage2D< T > *) finalFrameReadout_ );
     return this->finalFrameVariant_ ;
 }
 
@@ -168,14 +168,18 @@ void CLCompositor< T >::initializeBuffers_()
 {
     LOG_DEBUG("Initializing Buffers ...");
 
-    finalFrame_ = new CLImage2D< T >( frameDimensions_ );
-    finalFrameReadout_ = new CLImage2D< T >( frameDimensions_ );
+    finalFrame_ = new CLImage2D< T >( frameDimensions_ , CL_INTENSITY ,
+                                      CL_FLOAT );
+    finalFrameReadout_ = new CLImage2D< T >( frameDimensions_ , CL_INTENSITY ,
+                                             CL_FLOAT );
 
     finalFrame_->createDeviceData( context_ );
 
     imagesArray_ = new CLImage2DArray< T >( frameDimensions_.x ,
                                             frameDimensions_.y ,
-                                            0 );
+                                            0 ,
+                                            CL_INTENSITY ,
+                                            CL_FLOAT );
 
     compositingKernel_->setCollageFrame( finalFrame_->getDeviceData( ));
     LOG_DEBUG("[DONE] Initializing Buffers ...");

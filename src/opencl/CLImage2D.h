@@ -28,7 +28,7 @@ public:
 
     virtual void readOtherDeviceData( cl_command_queue sourceCmdQueue ,
                                       const CLFrame< T > &sourceFrame ,
-                                      const cl_bool blocking ) override ;
+                                      const cl_bool blocking ) override;
 
 
 

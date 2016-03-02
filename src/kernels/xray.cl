@@ -20,23 +20,23 @@
  * look at the following link
  * http://www.siggraph.org/education/materials/HyperGraph/raytrace/rtinter3.htm
  */
-int intersectBox( float4 rayOrigin, float4 rayDirection,
-                  float4 pMin, float4 pMax,
+int intersectBox( const float4 rayOrigin, const float4 rayDirection,
+                  const float4 pMin, const float4 pMax,
                   float* tNear, float* tFar)
 {
     // Compute the intersection of the ray with all the six planes of the
     // bounding box.
-    float4 invR = ( float4 )( 1.f, 1.f, 1.f, 1.f) / rayDirection;
-    float4 tPMin = invR * ( pMin - rayOrigin );
-    float4 tPMax = invR * ( pMax - rayOrigin );
+    const float4 invR = ( float4 )( 1.f, 1.f, 1.f, 1.f) / rayDirection;
+    const float4 tPMin = invR * ( pMin - rayOrigin );
+    const float4 tPMax = invR * ( pMax - rayOrigin );
 
     // Re-order the intersections to find smallest and largest on each axis.
-    float4 tMin = min( tPMax, tPMin );
-    float4 tMax = max( tPMax, tPMin );
+    const float4 tMin = min( tPMax, tPMin );
+    const float4 tMax = max( tPMax, tPMin );
 
     // Find the largest < tMin > and the smallest < tMax >.
-    float tMinLargest = max( max( tMin.x, tMin.y ), max( tMin.x, tMin.z ));
-    float tMaxSmallest = min( min( tMax.x, tMax.y ), min( tMax.x, tMax.z ));
+    const float tMinLargest = max( max( tMin.x, tMin.y ), max( tMin.x, tMin.z ));
+    const float tMaxSmallest = min( min( tMax.x, tMax.y ), min( tMax.x, tMax.z ));
 
     *tNear = tMinLargest;
     *tFar = tMaxSmallest;
@@ -78,39 +78,42 @@ uint rgbaFloatToInt( float4 rgba )
  * @param volume
  * @param volumeSampler
  */
-__kernel void xray( __global    uint* frameBuffer,
-                                uint width, uint height,
-                                float density, float brightness,
+__kernel void xray( __write_only image2d_t frameBuffer,
+                    uint width,
+                    uint height,
+                    float density,
+                    float brightness,
                     __constant  float* invViewMatrix,
                     __read_only image3d_t volume,
-                    sampler_t   volumeSampler,
-                    float transferOffset,
+                    sampler_t   volumeSampler /**,
+
+                    __constant float transferOffset,
                     float transferScale,
                     __read_only image2d_t transferFunc,
                     sampler_t transferFuncSampler,
-                    int enableTranferFunction
+                    int enableTranferFunction **/
                     )
 {
-    uint x = get_global_id( 0 );
-    uint y = get_global_id( 1 );
+    const uint x = get_global_id( 0 );
+    const uint y = get_global_id( 1 );
 
-    float u = ( x / ( float ) width ) * 2.f - 1.f;
-    float v = ( y / ( float ) height ) * 2.f - 1.f;
+    const float u = ( x / ( float ) width ) * 2.f - 1.f;
+    const float v = ( y / ( float ) height ) * 2.f - 1.f;
 
     // float T_STEP = 0.f1f;
-    float4 boxMin = ( float4 )( -1.f, -1.f, -1.f, 1.f );
-    float4 boxMax = ( float4 )( 1.f, 1.f, 1.f, 1.f );
+    const float4 boxMin = ( float4 )( -1.f, -1.f, -1.f, 1.f );
+    const float4 boxMax = ( float4 )( 1.f, 1.f, 1.f, 1.f );
 
     // Calculate eye ray in world space
-    float4 eyeRayOrigin;
     float4 eyeRayDirection;
 
-    eyeRayOrigin = ( float4 )( invViewMatrix[ 3  ],
+    const float4 eyeRayOrigin =
+                   ( float4 )( invViewMatrix[ 3  ],
                                invViewMatrix[ 7  ],
                                invViewMatrix[ 11 ],
                                1.f );
 
-    float4 direction = normalize((( float4 )( u, v, -2.f, 0.f )));
+    const float4 direction = normalize((( float4 )( u, v, -2.f, 0.f )));
     eyeRayDirection.x = dot( direction, (( float4 )( invViewMatrix[ 0  ],
                                                      invViewMatrix[ 1  ],
                                                      invViewMatrix[ 2  ],
@@ -136,8 +139,9 @@ __kernel void xray( __global    uint* frameBuffer,
         if(( x < width ) && ( y < height ))
         {
             // Get the 1D index of the pixel to set its color, and return
-            uint index = ( y * width ) + x;
-            frameBuffer[ index ] = 0;
+            const float4 nullPixel = ( float4 )( 0.f , 0.f , 0.f , 0.f );
+            const int2 location = (int2)( x , y );
+            write_imagef( frameBuffer , location , nullPixel );
         }
         return;
     }
@@ -161,23 +165,25 @@ __kernel void xray( __global    uint* frameBuffer,
 
         // Sample the 3D volume data using the _volumeSampler_ at the specified
         // positions along the ray.
-        float4 intensity = read_imagef( volume, volumeSampler, position );
+        const float4 intensity = read_imagef( volume, volumeSampler, position );
+
+/**
         float4 col;
         if(enableTranferFunction != 0)
         {
         // lookup in transfer function texture
-        float2 transfer_pos = (float2)(( intensity.x - transferOffset ) *
+            float2 transfer_pos = (float2)(( intensity.x - transferOffset ) *
                                          transferScale , 0.5f );
-         col = read_imagef(transferFunc, transferFuncSampler, transfer_pos);
+            col = read_imagef(transferFunc, transferFuncSampler, transfer_pos);
          }
          else
             col = intensity;
-
+**/
         // Accumulate the result by mixing what is currently in the
         // _intensityBuffer_ with the new intensity value that was sampled from
         // the volume, with the corrsponding alpha components
-        float alpha = col.w * density ;
-        intensityBuffer = mix( intensityBuffer, col,
+        float alpha = intensity.w * density ;
+        intensityBuffer = mix( intensityBuffer, intensity ,
                              ( float4 )( alpha, alpha, alpha, alpha ));
 
         // Get the parametric value of the next sample along the ray
@@ -193,7 +199,7 @@ __kernel void xray( __global    uint* frameBuffer,
     if(( x < width ) && ( y < height ))
     {
         // Get a 1D index of the pixel in the _frameBuffer_
-        uint index = ( y * width ) + x;
-        frameBuffer[ index ] = rgbaFloatToInt( intensityBuffer );
+        const int2 location = (int2)( x , y );
+        write_imagef( frameBuffer , location , intensityBuffer );
     }
 }

@@ -3,7 +3,7 @@
 
 #include <oclHWDL.h>
 #include <QVector>
-#include "CLFrame.h"
+#include "CLImage2D.h"
 
 template< class T >
 class CLImage2DArray
@@ -41,7 +41,7 @@ public:
 
     void readOtherDeviceData( cl_command_queue cmdQueue ,
                               const uint index ,
-                              const CLFrame< T > &source ,
+                              const CLImage2D< T > &source ,
                               cl_bool blocking ) ;
 
     bool inDevice() const ;

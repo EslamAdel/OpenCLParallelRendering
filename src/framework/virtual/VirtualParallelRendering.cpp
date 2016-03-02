@@ -15,10 +15,10 @@ VirtualParallelRendering::VirtualParallelRendering( Volume<uchar> *volume,
 void VirtualParallelRendering::addCLRenderer( const uint64_t gpuIndex )
 {
     auto *renderer =
-            new VirtualCLRenderer< uchar , uint >( gpuIndex,
-                                                   frameWidth_ ,
-                                                   frameHeight_ ,
-                                                   transformationAsync_ );
+            new VirtualCLRenderer< uchar , float >( gpuIndex,
+                                                    frameWidth_ ,
+                                                    frameHeight_ ,
+                                                    transformationAsync_ );
 
     renderers_.push_back( renderer );
     renderer->setFrameIndex( gpuIndex );
@@ -38,13 +38,12 @@ void VirtualParallelRendering::addCLCompositor(const uint64_t gpuIndex)
 
 
     if( inUseGPUs_.size() > 1 )
-        compositor_ = new CLCompositor< uint >( gpuIndex ,
-                                                frameWidth_ ,
-                                                frameHeight_ );
+        compositor_ = new CLCompositor< float >( gpuIndex ,
+                                                 frameWidth_ ,
+                                                 frameHeight_ );
     else
-        compositor_ = new CLCompositorAccumulate< uint >( gpuIndex ,
-                                                          frameWidth_ ,
-                                                          frameHeight_ );
+        LOG_ERROR("Signle GPU not supported for the moment!");
+
 
     LOG_DEBUG("[DONE] Initialize Compositing Unit");
 
@@ -166,7 +165,7 @@ void VirtualParallelRendering::frameLoadedToDevice_SLOT( CLAbstractRenderer *ren
     LOG_DEBUG("Frame<%d> Loaded to Device" , renderer->getGPUIndex() );
 
     emit this->frameReady_SIGNAL( &renderer->
-                                  getCLFrame().value< CLFrame< uint >* >()->
+                                  getCLFrame().value< CLImage2D< float >* >()->
                                   getFramePixmap() ,
                                   renderer  );
 
@@ -189,7 +188,7 @@ void VirtualParallelRendering::compositingFinished_SLOT()
 
 
     emit this->finalFrameReady_SIGNAL(
-                &compositor_->getFinalFrame().value< CLFrame< uint >*>()->
+                &compositor_->getFinalFrame().value< CLImage2D< float >*>()->
                 getFramePixmap( ));
 
     if( this->pendingTransformations_ )

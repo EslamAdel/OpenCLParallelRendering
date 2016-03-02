@@ -39,7 +39,7 @@ void CLRenderer< V , F >::createPixelBuffer_()
     gridSize_[1] = SystemUtilities::roundUp( LOCAL_SIZE_Y, frameHeight_ );
 
     Dimensions2D dimensions( gridSize_[0] , gridSize_[1]);
-    clFrame_ = new CLFrame< F >( dimensions );
+    clFrame_ = new CLImage2D< F >( dimensions , CL_INTENSITY , CL_FLOAT );
     clFrame_->createDeviceData( context_ );
 }
 
@@ -92,7 +92,7 @@ cl_kernel CLRenderer< V , F >::getKernel() const
 template< class V , class F >
 const CLFrameVariant &CLRenderer< V , F >::getCLFrame() const
 {
-    this->frameVariant_.setValue(( CLFrame< F > *) clFrame_ );
+    this->frameVariant_.setValue(( CLImage2D< F > *) clFrame_ );
     return this->frameVariant_ ;
 }
 
@@ -126,6 +126,7 @@ void CLRenderer< V , F >::renderFrame()
     activeRenderingKernel_->
             setImageBrightnessFactor( transformation_.brightness );
 
+  /**
     activeRenderingKernel_->
             setTransferFunctionFlag( transformation_.transferFunctionFlag );
 
@@ -134,7 +135,7 @@ void CLRenderer< V , F >::renderFrame()
 
     activeRenderingKernel_->
             setTransferFunctionScale( transformation_.transferFunctionScale );
-
+**/
     // Enqueue the kernel for execution
     clErrorCode |= clEnqueueNDRangeKernel( commandQueue_,
                                            kernel_ ,
@@ -186,6 +187,8 @@ void CLRenderer< V , F >::handleKernel_( std::string string )
     clVolume_ = new CLVolume< V >( volume_ , VOLUME_CL_UNSIGNED_INT8 );
     clVolume_->createDeviceVolume( context_ );
 
+/**
+
     // Create transfer function texture (this is the default HEAT MAP)
     float transferFunctionTable[] =
     {
@@ -208,14 +211,15 @@ void CLRenderer< V , F >::handleKernel_( std::string string )
 
     oclHWDL::Error::checkCLError(clErrorCode);
 
-
     // Create samplers (same as texture in OpenGL) for transfer function
     // and the volume for linear interpolation and nearest interpolation.
     transferFunctionSampler_ = clCreateSampler( context_, true,
                                                 CL_ADDRESS_CLAMP_TO_EDGE,
                                                 CL_FILTER_LINEAR, &clErrorCode );
-    oclHWDL::Error::checkCLError(clErrorCode);
 
+
+    oclHWDL::Error::checkCLError(clErrorCode);
+**/
     linearVolumeSampler_ = clCreateSampler( context_, true,
                                             CL_ADDRESS_CLAMP_TO_EDGE,
                                             CL_FILTER_LINEAR, &clErrorCode );
@@ -240,6 +244,7 @@ void CLRenderer< V , F >::handleKernel_( std::string string )
     activeRenderingKernel_->setVolumeSampler
             (linearFiltering_ ? linearVolumeSampler_ : nearestVolumeSampler_);
 
+    /**
     activeRenderingKernel_->
             setTransferFunctionData( clTransferFunction->getDeviceData( ));
 
@@ -252,7 +257,7 @@ void CLRenderer< V , F >::handleKernel_( std::string string )
     //    activeRenderingKernel_->setTransferFunctionOffset(transferOffset);
 
     //    activeRenderingKernel_->setTransferFunctionScale(transferScale);
-
+**/
     inverseMatrix_ = clCreateBuffer( context_,
                                      CL_MEM_READ_ONLY,
                                      12 * sizeof( float ), 0,

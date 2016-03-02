@@ -8,7 +8,7 @@
 
 
 Q_DECLARE_METATYPE( CLFrame< uint >* )
-Q_DECLARE_METATYPE( CLImage2D< uint >* )
+Q_DECLARE_METATYPE( CLImage2D< float >* )
 
 typedef QVariant CLFrameVariant ;
 

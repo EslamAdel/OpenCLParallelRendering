@@ -3,16 +3,34 @@
 
 #include "oclHWDL.h"
 #include <QVector>
+#include <QDataStream>
+
+
+// Forward declarations
+template<class T> class CLBuffer;
+
+template<class T> QDataStream&
+operator<<( QDataStream& stream ,
+            const CLBuffer< T > &buffer );
+
+template<class T> QDataStream&
+operator>>( QDataStream& stream ,
+            CLBuffer< T > &buffer );
+
+
 
 template< class T >
 class CLBuffer
 {
 public:
 
+
+    CLBuffer();
+
     CLBuffer( const u_int64_t size );
 
 
-    ~CLBuffer() ;
+    ~CLBuffer( ) ;
 
 public:
     //TODO : new class FrameImage that inherit from this class.
@@ -44,6 +62,11 @@ public:
 private:
     void releaseDeviceData_();
 
+    friend QDataStream& operator<< <>(  QDataStream& stream ,
+                                        const CLBuffer< T > &buffer );
+
+    friend QDataStream& operator>> <>( QDataStream& stream ,
+                                       CLBuffer< T > &buffer );
 
 private:
     u_int64_t size_ ;
@@ -57,5 +80,24 @@ private:
     bool inDevice_ ;
 
 };
+
+
+template< class T >
+QDataStream& operator<<( QDataStream& stream ,
+                         const CLBuffer< T > &buffer );
+
+template< class T >
+QDataStream& operator>>( QDataStream& stream ,
+                         CLBuffer< T > &buffer );
+
+
+//#define REGISTER_STREAM_OPERATOR()\
+//    do{ \
+//    qRegisterMetaTypeStreamOperators< CLBuffer< uint > >\
+//    ("CLBuffer< uint >") ;\
+//    }while( 0 )
+
+
+
 
 #endif // CLBUFFER_H

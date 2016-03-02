@@ -94,7 +94,7 @@ void ParallelRendering::addCLRenderer( const uint64_t gpuIndex )
 
     CLAbstractRenderer *renderer
             = ( CLAbstractRenderer* )
-              new CLRenderer< uchar , uint >( gpuIndex,
+              new CLRenderer< uchar , float >( gpuIndex,
                                               frameWidth_ ,
                                               frameHeight_ ,
                                               transformationAsync_ );
@@ -120,7 +120,8 @@ void ParallelRendering::addCLRenderer( const uint64_t gpuIndex )
 
 
     TaskMakePixmap *taskPixmap = new TaskMakePixmap( );
-    taskPixmap->setFrame( renderer->getCLFrame( ).value< CLFrame< uint > *>());
+    taskPixmap->setFrame( renderer->getCLFrame( ).
+                          value< CLImage2D< float > *>());
     taskPixmap->setRenderer( renderer );
 
     makePixmapTasks_[ renderer ] = taskPixmap ;
@@ -172,14 +173,12 @@ void ParallelRendering::addCLCompositor( const uint64_t gpuIndex )
     // Instead, use the CLCompositorAccumulate that is based on regular
     // OpenCL buffers.
     if( inUseGPUs_.size() > 1 )
-        compositor_ = new CLCompositor< uint >( gpuIndex ,
+        compositor_ = new CLCompositor< float >( gpuIndex ,
                                                 frameWidth_ ,
                                                 frameHeight_ );
 
     else
-        compositor_ = new CLCompositorAccumulate< uint >( gpuIndex ,
-                                                          frameWidth_ ,
-                                                          frameHeight_ );
+        LOG_ERROR("Will add support to single GPU later");
 
 
     LOG_DEBUG("[DONE] Initialize Compositing Unit");
@@ -367,7 +366,7 @@ void ParallelRendering::compositingFinished_SLOT()
 
 #ifndef BENCHMARKING
     finalFramePixmapTask_->setFrame(
-                compositor_->getFinalFrame().value< CLFrame< uint >*>( ));
+                compositor_->getFinalFrame().value< CLImage2D< float >*>( ));
 
     pixmapMakerPool_.start( finalFramePixmapTask_ );
 #endif

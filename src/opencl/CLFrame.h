@@ -94,7 +94,7 @@ protected:
 
     cl_mem deviceData_ ;
 
-    uchar *rgbaFrame_;
+    uchar *pixmapData_;
 
     QPixmap frame_ ;
 

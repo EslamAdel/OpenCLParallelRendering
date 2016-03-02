@@ -4,7 +4,7 @@
 #include <Headers.hh>
 
 
-template class CLImage2DArray< uint >;
+template class CLImage2DArray< float >;
 
 
 #endif // CLIMAGE2DARRAY_IPP

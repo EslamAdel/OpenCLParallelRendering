@@ -72,12 +72,12 @@ void xray_compositing_patch( __write_only image2d_t collageFrame ,
 
     for( int i = 0 ; i < framesCount ; i++ )
     {
-        uint currentDepth = depthIndex[ i ];
-        int4 location = (int4)( x , y , currentDepth , 0 );
-        float4 sample = read_imagef( framesArray , sampler , location ) ;
+        const uint currentDepth = depthIndex[ i ];
+        const int4 location = (int4)( x , y , currentDepth , 0 );
+        const float4 sample = read_imagef( framesArray , sampler , location ) ;
         color = mix( color , sample  ,  sample.w   );
     }
-    int2 locate = (int2)( x , y );
+    const int2 locate = (int2)( x , y );
 
     write_imagef( collageFrame , locate , color ) ;
 }

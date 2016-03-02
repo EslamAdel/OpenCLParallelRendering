@@ -13,7 +13,7 @@ class TaskMakePixmap : public QObject , public QRunnable
 public:
     TaskMakePixmap( );
 
-    void setFrame( CLFrame< uint > *frame );
+    void setFrame( CLImage2D< float > *frame );
     void setRenderer( CLAbstractRenderer *renderer );
 
 
@@ -24,7 +24,7 @@ signals:
     void pixmapReady_SIGNAL(  QPixmap *pixmap , const CLAbstractRenderer* clRenderer);
 
 private:
-    CLFrame< uint > *frame_ ;
+    CLImage2D< float > *frame_ ;
     CLAbstractRenderer *clRenderer_ ;
 
 };

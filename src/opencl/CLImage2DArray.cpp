@@ -172,23 +172,28 @@ size_t CLImage2DArray< T >::size( ) const
 template< class T >
 void CLImage2DArray< T >::readOtherDeviceData( cl_command_queue cmdQueue ,
                                                const uint index,
-                                               const CLFrame< T > &source,
-                                               cl_bool blocking)
+                                               const CLImage2D< T > &source ,
+                                               cl_bool blocking )
 {
     if( source.getFrameDimensions() != Dimensions2D( width_ , height_ ))
         LOG_ERROR("Dimensions mismatch!");
 
-    static cl_int error = CL_SUCCESS;
-    error = clEnqueueReadBuffer( cmdQueue ,
-                                 source.getDeviceData() , blocking ,
-                                 0 , width_ * height_ * sizeof(T) ,
-                                 ( void * ) framesData_[ index ] ,
-                                 0 , 0 , 0 );
+    cl_int error = CL_SUCCESS;
+
+    const size_t origin[] = { 0 , 0 , 0 } ;
+    const size_t region[] = { width_ , height_ , 1 } ;
+
+    error = clEnqueueReadImage( cmdQueue , source.getDeviceData() , blocking ,
+                                origin , region , width_ * sizeof( T )  ,
+                                width_ * height_ * sizeof( T )  ,
+                                ( void * ) framesData_[ index ] , 0 ,
+                                0 , 0  );
 
     if( error != CL_SUCCESS )
     {
         oclHWDL::Error::checkCLError( error );
-        LOG_ERROR("OpenCL Error!");
+        LOG_ERROR("OpenCL Error! Index=%d R(%d,%d)",
+                  origin[2] , region[0] , region[1] );
     }
 }
 

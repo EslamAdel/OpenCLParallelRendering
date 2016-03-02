@@ -56,6 +56,7 @@ SET( OCL_MGPUVS_HEADER_FILES
     framework/compositors/CLCompositor.ipp
     framework/renderers/CLRenderer.h
     framework/renderers/CLRenderer.ipp
+    framework/ParallelRendering.h
     framework/TaskCollect.h
     framework/TaskComposite.h
     framework/TaskMakePixmap.h
@@ -100,7 +101,7 @@ SET( OCL_MGPUVS_HEADER_FILES
     system/LogLevel.hh
     system/oclUtils.h
     system/Utilities.h
-    system/Colors.hh  )
+    system/Colors.hh )
 
 
 ### Adding the kernels to the CMake source tree
@@ -157,7 +158,7 @@ set_property( TARGET ${OCL_MGPUVS_LIBRARY} PROPERTY IMPORTED_LOCATION
     ${CMAKE_BINARY_DIRECTORY}/lib${OCL_MGPUVS_LIBRARY} )
 
 install( TARGETS ${OCL_MGPUVS_LIBRARY} DESTINATION lib )
-install( FILES ${OCL_MGPUVS_HEADER_FILES} DESTINATION include )
+install( FILES ${OCL_MGPUVS_HEADER_FILES} DESTINATION include/${OCL_MGPUVS_LIBRARY} )
 
 
 ### ---------------------- BENCHMARK LIBRARY SETTING ---------------------------###
@@ -185,9 +186,6 @@ set_property( TARGET ${OCL_MGPUVS_LIBRARY_BENCHMARK} PROPERTY IMPORTED_LOCATION
 
 
 install( TARGETS ${OCL_MGPUVS_LIBRARY_BENCHMARK} DESTINATION lib )
-install( FILES ${OCL_MGPUVS_HEADER_FILES} DESTINATION include )
-
-
 
 
 ### ------------------------------------------------------------------------------###
