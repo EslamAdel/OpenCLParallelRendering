@@ -10,6 +10,9 @@
 #include "CLFrameVariants.hh"
 #include "ProfilingExterns.h"
 
+#define LOCAL_SIZE_X    16
+#define LOCAL_SIZE_Y    16
+
 class CLAbstractCompositor : public QObject
 {
     Q_OBJECT

@@ -32,11 +32,11 @@ struct CompositingProfile : public GeneralProfile
 {
     CompositingProfile() : accumulatingFrame_TIMER("Accumulating Frame on Compositor") ,
                            compositing_TIMER("Total Compositing Time on Compositor") ,
-                           loadCollageFromDevice_TIMER("Loading Collage Buffer from Compositor"){}
+                           loadFinalFromDevice_TIMER("Loading Final Buffer from Compositor"){}
     Timer64 threadSpawning_TIMER;
     Timer64 accumulatingFrame_TIMER;
     Timer64 compositing_TIMER ;
-    Timer64 loadCollageFromDevice_TIMER ;
+    Timer64 loadFinalFromDevice_TIMER ;
 };
 
 

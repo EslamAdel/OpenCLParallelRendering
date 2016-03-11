@@ -26,7 +26,7 @@ void CLCompositorAccumulate< T >::allocateFrame( CLAbstractRenderer *renderer )
     renderers_ << renderer ;
 
     CLFrame< T > *frame =
-            new CLFrame< T >( renderer->getCLFrame().value< CLFrame< T > *>()->
+            new CLFrame< T >( renderer->getCLFrame().value< CLImage2D< T > *>()->
                               getFrameDimensions( ));
 
     frame->createDeviceData( context_ );
@@ -43,18 +43,7 @@ void CLCompositorAccumulate< T >::collectFrame( CLAbstractRenderer *renderer ,
 {
 
     CLFrame< T > *sourceFrame =
-            renderer->getCLFrame().value< CLFrame< T > *>( );
-
-#ifdef BENCHMARKING
-    //    direct copy frame from rendering device to the host pointer
-    //    of the compositing frame.
-    //    more effiecent.
-    frames_[ renderer ]->
-            readOtherDeviceData( renderer->getCommandQueue() ,
-                                 *sourceFrame ,
-                                 block );
-
-#else
+            renderer->getCLFrame().value< CLImage2D< T > *>( );
 
     sourceFrame->readDeviceData( renderer->getCommandQueue() ,
                                  block );
@@ -62,7 +51,6 @@ void CLCompositorAccumulate< T >::collectFrame( CLAbstractRenderer *renderer ,
     frames_[ renderer ]->
             copyHostData( sourceFrame->getHostData( ));
 
-#endif
     frames_[ renderer ]->
             writeDeviceData( commandQueue_ ,
                              block );

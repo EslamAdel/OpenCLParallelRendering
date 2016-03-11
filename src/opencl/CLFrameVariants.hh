@@ -7,7 +7,7 @@
 #include "CLImage2D.h"
 
 
-Q_DECLARE_METATYPE( CLFrame< uint >* )
+Q_DECLARE_METATYPE( CLFrame< float >* )
 Q_DECLARE_METATYPE( CLImage2D< float >* )
 
 typedef QVariant CLFrameVariant ;

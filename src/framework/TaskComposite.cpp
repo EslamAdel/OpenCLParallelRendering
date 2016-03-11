@@ -19,7 +19,9 @@ void TaskComposite::run()
 
     if( compositor_->readOutReady( ))
     {
+        TIC( compositingProfile.loadFinalFromDevice_TIMER );
         compositor_->loadFinalFrame( );
+        TOC( compositingProfile.loadFinalFromDevice_TIMER );
         emit this->compositingFinished_SIGNAL( );
     }
 }

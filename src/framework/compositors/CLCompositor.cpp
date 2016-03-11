@@ -111,7 +111,7 @@ void CLCompositor< T >::composite( )
     depthIndex_->setHostData( depthIndex );
     depthIndex_->writeDeviceData( commandQueue_ , CL_TRUE );
 
-    const size_t localSize[ ] = { 1 , 1  } ;
+    const size_t localSize[ ] = { LOCAL_SIZE_X , LOCAL_SIZE_Y  } ;
     const size_t globalSize[ ] = { frameDimensions_.x ,
                                    frameDimensions_.y };
 

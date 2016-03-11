@@ -95,6 +95,9 @@ public:
      */
     virtual void distributeBaseVolume1D( );
 
+    virtual void distributeBaseVolumeWeighted();
+
+    virtual void distributeBaseVolumeMemoryWeighted();
 
     /**
      * @brief startRendering

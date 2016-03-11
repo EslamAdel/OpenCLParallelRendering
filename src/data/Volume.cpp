@@ -44,7 +44,7 @@ Volume< T >::Volume( const Coordinates3D brickCoordinates,
     data_ = brickData ;
     mmapAddr_ = nullptr ;
 
-//    addBoundingBox_();
+    //    addBoundingBox_();
 
 
 }
@@ -207,13 +207,13 @@ Volume< T >* Volume<T>::getBrick( const u_int64_t xi, const u_int64_t xf,
     // The relative center of the brick for the OpenGL unti texture,
     // with respect to the "unity" base volume.
     Coordinates3D brickUnitCubeCenter( brickCoordinates.x  /
-                                      ( dimensions_.x / unitCubeScaleFactors_.x )  ,
+                                       ( dimensions_.x / unitCubeScaleFactors_.x )  ,
 
                                        brickCoordinates.y  /
-                                      ( dimensions_.y / unitCubeScaleFactors_.y ) ,
+                                       ( dimensions_.y / unitCubeScaleFactors_.y ) ,
 
                                        brickCoordinates.z /
-                                      ( dimensions_.z / unitCubeScaleFactors_.z ));
+                                       ( dimensions_.z / unitCubeScaleFactors_.z ));
 
     // Scale the brick in a unit cube for the OpenGL texture
     Coordinates3D brickUnitCubeScaleFactors
@@ -225,14 +225,6 @@ Volume< T >* Volume<T>::getBrick( const u_int64_t xi, const u_int64_t xf,
 
               float( brickDimensions.z * unitCubeScaleFactors_.z ) /
               dimensions_.z );
-
-    //    std::cout << "center " << brickUnitCubeCenter.x
-    //              << " " << brickUnitCubeCenter.y << " "
-    //              <<  brickUnitCubeCenter.z << std::endl;
-
-    //    std::cout << brickUnitCubeScaleFactors.x << " "
-    //              << brickUnitCubeScaleFactors.y << " "
-    //              <<  brickUnitCubeScaleFactors.z << std::endl;
 
     // The array that will be filled with the brick data
     T* brickData = new T[ brickDimensions.volumeSize() ];
@@ -267,7 +259,7 @@ Volume< T >* Volume<T>::getBrick( const u_int64_t xi, const u_int64_t xf,
 }
 
 template< class T >
-QVector<Volume<T> *> Volume< T >::getBricksXAxis( uint partitions ) const
+QVector< Volume< T > * > Volume< T >::getBricksXAxis( uint partitions ) const
 {
     // Decompose the base volume for each rendering device
     // evenly over the X-axis.
@@ -304,7 +296,7 @@ QVector<Volume<T> *> Volume< T >::getBricksXAxis( uint partitions ) const
 }
 
 template< class T >
-QVector<Volume<T> *> Volume< T >::getBricksYAxis( uint partitions ) const
+QVector< Volume< T > * > Volume< T >::getBricksYAxis( uint partitions ) const
 {
     // Decompose the base volume for each rendering device
     // evenly over the X-axis.
@@ -340,7 +332,7 @@ QVector<Volume<T> *> Volume< T >::getBricksYAxis( uint partitions ) const
 }
 
 template< class T >
-QVector<Volume<T> *> Volume< T >::getBricksZAxis(uint partitions) const
+QVector< Volume< T > * > Volume< T >::getBricksZAxis(uint partitions) const
 {
     // Decompose the base volume for each rendering device
     // evenly over the X-axis.
@@ -376,12 +368,11 @@ QVector<Volume<T> *> Volume< T >::getBricksZAxis(uint partitions) const
 }
 
 template< class T >
-QVector<Volume<T> *>
+QVector< Volume< T > * >
 Volume< T >::heuristicBricking( const uint partitions ) const
 {
     if ( partitions == 0 )
-        return
-                QVector< Volume< T > *>();
+        return QVector< Volume< T > *>();
 
 
     LOG_DEBUG( "partitions = %d ", partitions );
@@ -399,26 +390,6 @@ Volume< T >::heuristicBricking( const uint partitions ) const
         else
             internalBricks << getBricksZAxis( 2 );
 
-        LOG_DEBUG("Internal Brick #1: D(%d,%d,%d)" ,
-                  internalBricks[0]->getDimensions().x ,
-                internalBricks[0]->getDimensions().y ,
-                internalBricks[0]->getDimensions().z );
-
-        LOG_DEBUG("Internal Brick #1: C(%f,%f,%f)" ,
-                  internalBricks[0]->getUnitCubeCenter().x ,
-                internalBricks[0]->getUnitCubeCenter().y  ,
-                internalBricks[0]->getUnitCubeCenter().z  );
-
-        LOG_DEBUG("Internal Brick #2: D(%d,%d,%d)" ,
-                  internalBricks[1]->getDimensions().x ,
-                internalBricks[1]->getDimensions().y ,
-                internalBricks[1]->getDimensions().z );
-
-        LOG_DEBUG("Internal Brick #2: C(%f,%f,%f)" ,
-                  internalBricks[1]->getUnitCubeCenter().x ,
-                internalBricks[1]->getUnitCubeCenter().y  ,
-                internalBricks[1]->getUnitCubeCenter().z  );
-
         return  internalBricks[ 0 ]->heuristicBricking( partitions / 2 )
                 << internalBricks[ 1 ]->heuristicBricking( partitions / 2 );
     }
@@ -433,6 +404,55 @@ Volume< T >::heuristicBricking( const uint partitions ) const
         else
             return getBricksZAxis( partitions );
     }
+}
+
+template< class T >
+QVector< Volume< T > *>
+Volume< T >::weightedBricking1D( const QVector< uint > &scores )
+{
+    uint totalScore = 0 ;
+    for( const uint score : scores )
+        totalScore += score ;
+
+    QVector< float > xDimensionFractions ;
+    for( const uint score : scores )
+        xDimensionFractions.append( (float)score / (float)totalScore );
+
+    QVector< u_int64_t > newXDimensions;
+    for( const float xFraction : xDimensionFractions )
+        newXDimensions.append(  xFraction * dimensions_.x );
+
+
+    QVector< Volume< T > *> bricks;
+    u_int64_t xInitial = 0;
+    u_int64_t xFinal = 0 ;
+
+    for( uint i = 0 ; i < newXDimensions.size() - 1 ; i++ )
+    {
+        xInitial = xFinal ;
+        xFinal += newXDimensions[ i ];
+
+        Volume< T > *brick = getBrick( xInitial ,
+                                       xFinal ,
+                                       0 ,
+                                       dimensions_.y ,
+                                       0 ,
+                                       dimensions_.z );
+        bricks.push_back( brick );
+
+    }
+
+    Volume< T > *brick = getBrick( xFinal ,
+                                   dimensions_.x ,
+                                   0 ,
+                                   dimensions_.y ,
+                                   0 ,
+                                   dimensions_.z );
+
+    bricks.push_back( brick );
+
+    return bricks;
+
 }
 
 template< class T >

@@ -39,9 +39,4 @@ protected :
 };
 
 
-
-typedef CLImage2D< uint > CLImage32 ;
-
-
-
 #endif // CLIMAGE2D_H

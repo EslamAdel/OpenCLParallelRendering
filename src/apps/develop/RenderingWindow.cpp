@@ -132,7 +132,7 @@ void RenderingWindow::frameReady_SLOT( QPixmap *frame ,
 void RenderingWindow::finalFrameReady_SLOT( QPixmap *finalFrame )
 {
 
-    LOG_DEBUG("Final Frame ready ");
+//    LOG_DEBUG("Final Frame ready ");
     if( finalFrame->isNull() )
         LOG_ERROR("NULL pixmap");
 

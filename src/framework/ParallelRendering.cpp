@@ -95,9 +95,9 @@ void ParallelRendering::addCLRenderer( const uint64_t gpuIndex )
     CLAbstractRenderer *renderer
             = ( CLAbstractRenderer* )
               new CLRenderer< uchar , float >( gpuIndex,
-                                              frameWidth_ ,
-                                              frameHeight_ ,
-                                              transformationAsync_ );
+                                               frameWidth_ ,
+                                               frameHeight_ ,
+                                               transformationAsync_ );
 
     ATTACH_RENDERING_PROFILE( renderer );
     ATTACH_COLLECTING_PROFILE( renderer );
@@ -174,11 +174,13 @@ void ParallelRendering::addCLCompositor( const uint64_t gpuIndex )
     // OpenCL buffers.
     if( inUseGPUs_.size() > 1 )
         compositor_ = new CLCompositor< float >( gpuIndex ,
-                                                frameWidth_ ,
-                                                frameHeight_ );
+                                                 frameWidth_ ,
+                                                 frameHeight_ );
 
     else
-        LOG_ERROR("Will add support to single GPU later");
+        compositor_ = new CLCompositorAccumulate< float >( gpuIndex ,
+                                                           frameWidth_ ,
+                                                           frameHeight_ );
 
 
     LOG_DEBUG("[DONE] Initialize Compositing Unit");
@@ -256,6 +258,64 @@ void ParallelRendering::distributeBaseVolume1D()
     QVector< Volume8 *> bricks = baseVolume_->heuristicBricking( nDevices );
     int i = 0;
 
+    for( auto renderingDevice  : inUseGPUs_ )
+    {
+        LOG_DEBUG( "Loading subVolume to device" );
+
+        auto subVolume = bricks[ i++ ];
+        VolumeVariant volume = VolumeVariant::fromValue( subVolume );
+
+        renderers_[ renderingDevice ]->loadVolume( volume );
+
+        LOG_DEBUG( "[DONE] Loading subVolume to GPU <%d>",
+                   renderers_[ renderingDevice ]->getGPUIndex( ));
+    }
+
+    emit this->frameworkReady_SIGNAL();
+}
+
+void ParallelRendering::distributeBaseVolumeWeighted()
+{
+    QVector< uint > computingPowerScores ;
+    for( const oclHWDL::Device *device : inUseGPUs_ )
+    {
+        computingPowerScores.append( device->getMaxComputeUnits( ));
+    }
+
+    QVector< Volume8 *> bricks =
+            baseVolume_->weightedBricking1D( computingPowerScores );
+
+    int i = 0;
+    for( auto renderingDevice  : inUseGPUs_ )
+    {
+        LOG_DEBUG( "Loading subVolume to device" );
+
+        auto subVolume = bricks[ i++ ];
+        VolumeVariant volume = VolumeVariant::fromValue( subVolume );
+
+        renderers_[ renderingDevice ]->loadVolume( volume );
+
+        LOG_DEBUG( "[DONE] Loading subVolume to GPU <%d>",
+                   renderers_[ renderingDevice ]->getGPUIndex( ));
+    }
+
+    emit this->frameworkReady_SIGNAL();
+
+}
+
+void ParallelRendering::distributeBaseVolumeMemoryWeighted()
+{
+
+    QVector< uint > memoryScores ;
+    for( const oclHWDL::Device *device : inUseGPUs_ )
+    {
+        memoryScores.append( device->getGlobalMemorySize() / 1024 );
+    }
+
+    QVector< Volume8 *> bricks =
+            baseVolume_->weightedBricking1D( memoryScores );
+
+    int i = 0;
     for( auto renderingDevice  : inUseGPUs_ )
     {
         LOG_DEBUG( "Loading subVolume to device" );
@@ -409,7 +469,6 @@ void ParallelRendering::frameLoadedToDevice_SLOT( CLAbstractRenderer *renderer )
 void ParallelRendering::pixmapReady_SLOT( QPixmap *pixmap,
                                           const CLAbstractRenderer *renderer )
 {
-    LOG_DEBUG("Pixmap ready");
     if( renderer == nullptr )
         emit this->finalFrameReady_SIGNAL( pixmap );
     else
@@ -548,7 +607,7 @@ void ParallelRendering::benchmark_( )
     COMPOSITING_PROFILE_TAG( compositor_ );
     //    PRINT( compositingProfile.threadSpawning_TIMER ) ;
     //    PRINT( compositingProfile.accumulatingFrame_TIMER ) ;
-    //    PRINT( compositingProfile.loadCollageFromDevice_TIMER ) ;
+    PRINT( compositingProfile.loadFinalFromDevice_TIMER ) ;
     PRINT( compositingProfile.compositing_TIMER ) ;
 
 

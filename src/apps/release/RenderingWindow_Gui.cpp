@@ -387,7 +387,7 @@ void RenderingWindow_Gui::captureView_SLOT()
 
     LOG_DEBUG("Saving resultant frame");
     QPixmap pic( parallelRenderer_->getCLCompositor().getFinalFrame().
-                 value< CLFrame< uint > *>()->
+                 value< CLFrame< float > *>()->
                  getFramePixmap().
                  scaledToHeight( width ).scaledToWidth( height ));
     pic.save( newDir + "/result.jpg");
@@ -398,9 +398,9 @@ void RenderingWindow_Gui::captureView_SLOT()
     {
 
         LOG_DEBUG("Saving frame<%d>", gpuIndex );
-        CLFrame< uint > *sourceFrame =
+        CLFrame< float > *sourceFrame =
                 parallelRenderer_->getCLRenderer( gpuIndex ).
-                getCLFrame().value< CLFrame< uint > *>() ;
+                getCLFrame().value< CLFrame< float > *>() ;
 
         QPixmap framePixmap( sourceFrame->
                              getFramePixmap().

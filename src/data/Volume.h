@@ -188,6 +188,10 @@ public: // Public functions
     QVector< Volume< T > *>
     heuristicBricking( const uint partitions ) const;
 
+    QVector< Volume< T > *>
+    weightedBricking1D( const QVector< uint > &scores );
+
+
 protected: // Protected functions
 
     /**
