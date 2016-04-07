@@ -87,10 +87,10 @@ SET( OCL_MGPUVS_HEADER_FILES
     opencl/CLImage2DArray.h
     opencl/CLImage2DArray.ipp
     opencl/CLTransferFunction.h
-
     opencl/CLVolume.h
     opencl/CLVolume.ipp
     opencl/CLXRayCompositingKernel.h
+    opencl/CLRenderingKernel.h
     opencl/CLXRayRenderingKernel.h
     opencl/CLBuffer.h
     opencl/CLFrameVariants.hh
