@@ -3,6 +3,12 @@
 
 #include "CLFrame.h"
 
+
+
+// Forward declaration
+template< class T > class SerializableFrame ;
+
+
 template< class T >
 class CLImage2D : public CLFrame< T >
 {
@@ -35,6 +41,10 @@ public:
 protected :
     cl_image_format imageFormat_ ;
     cl_image_desc   imageDescriptor_ ;
+
+private:
+    friend class SerializableFrame< T > ;
+
 
 };
 
