@@ -117,7 +117,7 @@ void Volume< T >::loadVolumeData_( const std::string prefix )
 }
 
 template< class T >
-void Volume< T >::mapVolumeData(const std::string prefix)
+void Volume< T >::mapVolumeData( const std::string prefix )
 {
     int fd;
 
@@ -131,11 +131,11 @@ void Volume< T >::mapVolumeData(const std::string prefix)
     fd = open(filePath.c_str(), O_RDONLY);
     if ( fd == -1 )
     {
-        LOG_ERROR( "Could not open the volume file [%s]", filePath.c_str() );
+        LOG_ERROR( "Could not open the volume file [%s]", filePath.c_str( ));
     }
 
     //Map the volume to virtual addresses
-    mmapAddr_=(T* ) mmap(NULL,sizeInBytes_, PROT_READ, MAP_PRIVATE, fd, 0);
+    mmapAddr_= ( T* ) mmap( NULL, sizeInBytes_, PROT_READ, MAP_PRIVATE, fd, 0);
 
     //Close the file
     close(fd);

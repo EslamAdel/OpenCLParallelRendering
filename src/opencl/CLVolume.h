@@ -13,6 +13,8 @@ enum VOLUME_PRECISION
     VOLUME_CL_FLOAT
 };
 
+
+
 template< class T >
 class CLVolume
 {

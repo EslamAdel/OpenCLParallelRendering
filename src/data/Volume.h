@@ -11,6 +11,11 @@
 #include <unistd.h>
 #include <QVector>
 
+
+// Forward declaration
+template< class T > class SerializableVolume;
+
+
 template < class T >
 class Volume
 {
@@ -230,6 +235,8 @@ protected: // Protected functions
     virtual void zeroPad_();
 
 protected: // Protected (private) member variables
+
+    friend class SerializableVolume< T > ;
 
     /**
      * @brief dimensions_
