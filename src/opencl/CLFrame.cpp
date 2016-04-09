@@ -239,6 +239,21 @@ void CLFrame< T >::copyHostData( const CLFrame< T > &sourceFrame )
 
 }
 
+template< class T >
+void CLFrame< T >::setHostData( T *data , bool copy )
+{
+    if( data == hostData_ )
+        return ;
+    else if( copy )
+        copyHostData( data );
+    else
+    {
+        if( hostData_ != nullptr ) delete hostData_ ;
+        hostData_ = data ;
+        pixmapSynchronized_ = false ;
+    }
+}
+
 
 template< class T >
 cl_mem CLFrame< T >::getDeviceData() const

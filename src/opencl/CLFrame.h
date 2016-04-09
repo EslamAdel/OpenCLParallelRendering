@@ -64,6 +64,14 @@ public:
 
     virtual void copyHostData( const CLFrame< T > &sourceFrame );
 
+    /**
+     * @brief setHostData
+     * @param data
+     * @param copy
+     */
+    virtual void setHostData( T *data ,
+                              bool copy = true );
+
     virtual cl_mem getDeviceData() const;
 
     const Dimensions2D &getFrameDimensions() const;
