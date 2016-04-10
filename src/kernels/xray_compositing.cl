@@ -5,8 +5,8 @@ void xray_compositing_accumulate(   __global float* finalFrame ,
 {
     const uint index = get_global_id(0);
 
-    const float4
-    finalColor = clamp(  frame[ index ] + collageFrame[ index ]  , 0.f , 1.f );
+    const float
+    finalColor = clamp(  frame[ index ] + finalFrame[ index ]  , 0.f , 1.f );
 
 
     finalFrame[ index ] = finalColor ;
