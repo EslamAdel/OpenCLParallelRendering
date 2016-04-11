@@ -80,6 +80,9 @@ SET( OCL_MGPUVS_HEADER_FILES
     geometry/Vector2.h
     geometry/Vector3.h
     geometry/Vector4.h
+    geometry/Vector2.ipp
+    geometry/Vector3.ipp
+    geometry/Vector4.ipp
     opencl/CLFrame.h
     opencl/CLFrame.ipp
     opencl/CLImage2D.h

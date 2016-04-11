@@ -240,11 +240,11 @@ void CLFrame< T >::copyHostData( const CLFrame< T > &sourceFrame )
 }
 
 template< class T >
-void CLFrame< T >::setHostData( T *data , bool copy )
+void CLFrame< T >::setHostData( T *data , bool deepCopy )
 {
     if( data == hostData_ )
         return ;
-    else if( copy )
+    else if( deepCopy )
         copyHostData( data );
     else
     {

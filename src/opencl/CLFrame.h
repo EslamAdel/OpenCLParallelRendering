@@ -70,7 +70,7 @@ public:
      * @param copy
      */
     virtual void setHostData( T *data ,
-                              bool copy = true );
+                              bool deepCopy = true );
 
     virtual cl_mem getDeviceData() const;
 

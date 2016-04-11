@@ -37,6 +37,8 @@ public: // Constructors
             T *brickData,
             const bool drawBoundingBox = false ) ;
 
+
+
     ~Volume();
 
 public: // Public functions
