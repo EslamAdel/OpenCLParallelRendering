@@ -4,10 +4,12 @@
 CLAbstractRenderer::CLAbstractRenderer( const uint64_t gpuIndex ,
                                         const uint frameWidth ,
                                         const uint frameHeight ,
+                                        const std::string kernelDirectory ,
                                         QObject *parent )
     : gpuIndex_( gpuIndex ) ,
       frameWidth_( frameWidth ) ,
       frameHeight_( frameHeight ) ,
+      kernelDirectory_( kernelDirectory ),
       QObject(parent)
 {
 

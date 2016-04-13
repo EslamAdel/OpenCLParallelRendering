@@ -16,7 +16,8 @@ class CLRenderer : public CLAbstractRenderer
 public:
     CLRenderer( const uint64_t gpuIndex,
                 const uint frameWidth , const uint frameHeight ,
-                const Transformation &transformation );
+                const Transformation &transformation ,
+                const std::string kernelDirectory = "." );
 
     ~CLRenderer();
 

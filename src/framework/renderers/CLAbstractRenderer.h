@@ -13,6 +13,7 @@ class CLAbstractRenderer : public QObject
 public:
     explicit CLAbstractRenderer( const uint64_t gpuIndex ,
                                  const uint frameWidth , const uint frameHeight ,
+                                 const std::string kernelDirectory  ,
                                  QObject *parent = 0 );
 
 
@@ -105,6 +106,11 @@ private:
     void createCommandQueue_( );
 
 protected:
+
+    /**
+     * @brief kernelDirectory_
+     */
+    const std::string kernelDirectory_ ;
     /**
      * @brief gpuIndex_
      * Selected GPU, where the volume rendering kernel will be executed.
@@ -144,6 +150,9 @@ protected:
      */
     const uint frameHeight_ ;
 
+    /**
+     * @brief frameVariant_
+     */
     mutable CLFrameVariant frameVariant_ ;
 };
 

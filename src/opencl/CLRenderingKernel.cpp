@@ -17,7 +17,7 @@ void CLRenderingKernel::buildKernel_( const std::string extraBuildOptions )
     // Create a kernel context, that should handle every thing that is
     // relevant to the kernel.
     kernelContext_ = new oclHWDL::KernelContext
-            ( kernelDirectory_, kernelFile_, clContext_, 0 , 0 );
+            ( kernelDirectory_ , kernelFile_, clContext_, 0 , 0 );
 
     // Add the build options.
     // TODO: Check the support of the hardware to CL_DEVICE_IMAGE_SUPPORT

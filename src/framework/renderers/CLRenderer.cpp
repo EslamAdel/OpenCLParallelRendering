@@ -14,8 +14,9 @@
 template< class V , class F >
 CLRenderer< V , F >::CLRenderer( const uint64_t gpuIndex ,
                                  const uint frameWidth, const uint frameHeight,
-                                 const Transformation &transformation )
-    : CLAbstractRenderer( gpuIndex , frameWidth , frameHeight ) ,
+                                 const Transformation &transformation ,
+                                 const std::string kernelDirectory)
+    : CLAbstractRenderer( gpuIndex , frameWidth , frameHeight , kernelDirectory ) ,
       transformation_( transformation )
 {
     LOG_INFO( "Creating Context on Node with GPU <%d>", gpuIndex );
@@ -165,7 +166,12 @@ void CLRenderer< V , F >::initializeKernel_()
     /// Add all the rendering kernel here, and set the selected to be the
     /// activeRenderingKernel_
     CLXRayRenderingKernel* xrayRenderingKernel =
-            new CLXRayRenderingKernel( context_ );
+            new CLXRayRenderingKernel( context_ ,
+                                       "/usr/local/share");
+
+    // TODO: instead of providing "/usr/local/share" use
+    // the CMake configuration to replace the directory of the kernels.
+
     renderingKernels_.push_back( xrayRenderingKernel );
     activeRenderingKernel_ =  xrayRenderingKernel;
 
@@ -409,7 +415,7 @@ void CLRenderer< V , F >::paint()
 
 
     //Set he current center after transformation
-    currentCenter_ = center;
+//    currentCenter_ = center;
 
     //Arrange the matrix in column-major order as expected from the rendering kernel
     inverseMatrixArray_[  0 ] = modelViewMatrix[  0 ];
