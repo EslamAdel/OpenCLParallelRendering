@@ -62,11 +62,6 @@ public:
                        const uint frameHeight = 512 );
 
 
-    /**
-     * @brief discoverAllNodes
-     * Create and attache CLRenderers to the available GPUs on machine.
-     */
-    void discoverAllNodes();
 
     /**
      * @brief addCLRenderer
@@ -77,6 +72,10 @@ public:
     virtual void addCLRenderer( const uint64_t gpuIndex );
 
 
+    /**
+     * @brief getCLRenderersCount
+     * @return
+     */
     virtual int getCLRenderersCount() const ;
 
 
@@ -95,8 +94,14 @@ public:
      */
     virtual void distributeBaseVolume1D( );
 
+    /**
+     * @brief distributeBaseVolumeWeighted
+     */
     virtual void distributeBaseVolumeWeighted();
 
+    /**
+     * @brief distributeBaseVolumeMemoryWeighted
+     */
     virtual void distributeBaseVolumeMemoryWeighted();
 
     /**
@@ -122,13 +127,24 @@ public:
      */
     virtual uint getMachineGPUsCount() const;
 
+    /**
+     * @brief getFrameWidth
+     * @return
+     */
     uint getFrameWidth() const ;
 
+    /**
+     * @brief getFrameHeight
+     * @return
+     */
     uint getFrameHeight() const ;
 
 
 signals:
 
+    /**
+     * @brief frameworkReady_SIGNAL
+     */
     void frameworkReady_SIGNAL( );
 
     /**
@@ -148,6 +164,9 @@ signals:
     void finalFrameReady_SIGNAL( QPixmap *finalFrame );
 
 
+    /**
+     * @brief finishedCompositing_SIGNAL
+     */
     void finishedCompositing_SIGNAL( );
 
 
@@ -291,26 +310,61 @@ protected:
      */
     void syncTransformation_();
 
+    /**
+     * @brief benchmark_
+     */
     void benchmark_() ;
 
 protected :
     //oclHWDl utilities
+    /**
+     * @brief clHardware_
+     */
     oclHWDL::Hardware               clHardware_;
+
+    /**
+     * @brief inUseGPUs_
+     */
     QSet< const oclHWDL::Device* >  inUseGPUs_;
+
+    /**
+     * @brief listGPUs_
+     */
     oclHWDL::Devices                listGPUs_;
 
 private:
-    //The workers, each node is attached to a single device.
-    CLRenderers        renderers_;
-    CLAbstractCompositor     *compositor_;
+    /**
+     * @brief renderers_
+     */
+    CLRenderers renderers_;
+
+    /**
+     * @brief compositor_
+     */
+    CLAbstractCompositor *compositor_;
+
 
 protected:
 
     //threadpools
+    /**
+     * @brief rendererPool_
+     */
     QThreadPool rendererPool_  ; //[producer] for collector pool.
+
+    /**
+     * @brief compositorPool_
+     */
     QThreadPool compositorPool_; //[consumer] for collector pool.
+
+    /**
+     * @brief collectorPool_
+     */
     QThreadPool collectorPool_ ; //[producer] for renderer pool AND
                                  //[consumer] for renderer pool.
+    /**
+     * @brief pixmapMakerPool_
+     */
     QThreadPool pixmapMakerPool_;
 
     //QRunnables to be executed concurrently.

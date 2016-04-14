@@ -73,13 +73,7 @@ ParallelRendering::ParallelRendering( Volume< uchar > *volume ,
     compositorPool_.setMaxThreadCount( 1 );
 }
 
-void ParallelRendering::discoverAllNodes()
-{
 
-    for(uint64_t gpuIndex = 0 ;  gpuIndex < listGPUs_.size() ; gpuIndex++ )
-        addCLRenderer( gpuIndex );
-
-}
 
 void ParallelRendering::addCLRenderer( const uint64_t gpuIndex )
 {
