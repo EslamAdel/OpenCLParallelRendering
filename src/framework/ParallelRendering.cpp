@@ -37,7 +37,6 @@ ParallelRendering::ParallelRendering( Volume< uchar > *volume ,
       frameWidth_( frameWidth ),
       frameHeight_( frameHeight ),
       renderersReady_( false ),
-      compositorSpecified_( false ),
       compositedFramesCount_( 0 )
 {
 
@@ -148,95 +147,69 @@ void ParallelRendering::addCLCompositor( const uint64_t gpuIndex )
 {
     LOG_INFO("Linking Rendering Units with Compositing Unit...");
 
-    // handle some errors, TODO: more robust handling for errors.
     if( gpuIndex >= listGPUs_.size() )
         LOG_ERROR("Choose GPU index from [0-%d]", listGPUs_.size() - 1 );
 
-    if( compositorSpecified_ )
-    {
-        LOG_WARNING("Compositing Node already attached to GPU <%d>" ,
-                    compositor_->getGPUIndex( ));
-        return ;
-    }
+    LOG_DEBUG("Initialize Compositor");
 
-    LOG_DEBUG("Initialize Compositing Unit");
-
-    // If only a single CLRenderer exists, don't use CLCompositor,
-    // because compositing is done in a patch using image3d_t
-    // while image3d_t doesn't allow occupancy by a single image slice.
-    // Instead, use the CLCompositorAccumulate that is based on regular
-    // OpenCL buffers.
+    // If multiple renderers deployed, use compositor.
+    // Otherwise, no compositing to be performed.
     if( inUseGPUs_.size() > 1 )
         compositor_ = new CLCompositor< float >( gpuIndex ,
                                                  frameWidth_ ,
                                                  frameHeight_ );
 
-    else
-        compositor_ = new CLCompositorAccumulate< float >( gpuIndex ,
-                                                           frameWidth_ ,
-                                                           frameHeight_ );
 
-
-    LOG_DEBUG("[DONE] Initialize Compositing Unit");
+    LOG_DEBUG("[DONE] Initialize Compositor");
 
     finalFramePixmapTask_ = new TaskMakePixmap( );
-
     connect( finalFramePixmapTask_ ,
              SIGNAL( pixmapReady_SIGNAL( QPixmap* ,
                                          const CLAbstractRenderer* )) ,
              this , SLOT(pixmapReady_SLOT( QPixmap* ,
                                            const CLAbstractRenderer* )));
-    // Frame index will be assigned to each rendering GPU (rednering node).
-    // As a start, consider each frame will be indexed in the next for-loop.
-
-
-    uint frameIndex = 0 ;
 
     // for each rendering task finished, a collecting task and a
-    // compositing task will follow!
-    for( auto renderingDevice : inUseGPUs_ )
-    {
-        auto renderer = renderers_[ renderingDevice ];
+    // compositing task will be assigned!
+    if( inUseGPUs_.size() > 1 )
+        for( auto renderingDevice : inUseGPUs_ )
+        {
+            auto renderer = renderers_[ renderingDevice ];
 
-        LOG_DEBUG("Connecting CLRenderer< %d >" ,
-                  renderer->getGPUIndex( ));
+            LOG_DEBUG("Connecting CLRenderer< %d >" ,
+                      renderer->getGPUIndex( ));
 
-        //register a frame to be allocated in the compositor device.
-        compositor_->allocateFrame( renderer );
+            //register a frame to be allocated in the compositor device.
+            compositor_->allocateFrame( renderer );
 
-        TaskComposite *compositingTask =
-                new TaskComposite( compositor_ ,
-                                   renderer );
+            TaskComposite *compositingTask =
+                    new TaskComposite( compositor_ ,
+                                       renderer );
 
-        compositingTasks_[ renderer ] = compositingTask ;
+            compositingTasks_[ renderer ] = compositingTask ;
 
-        // Now add collectingTasks that transfer buffer from The rendering device
-        // (rendering node) to the compositing device (compositing node),
-        auto collectingTask =
-                new TaskCollect( renderer , compositor_ );
+            // Now add collectingTasks that transfer buffer from The rendering device
+            // (rendering node) to the compositing device (compositing node),
+            auto collectingTask =
+                    new TaskCollect( renderer , compositor_ );
 
-        // Add the collecting task to
-        // the map < rendering node , collecting task >
-        collectingTasks_[ renderer ] = collectingTask ;
-
-
-        // Map signals from collecting tasks and compositing tasks to the
-        // correspondint slots.
-        connect( collectingTask ,
-                 SIGNAL( frameLoadedToDevice_SIGNAL( CLAbstractRenderer* )) ,
-                 this , SLOT( frameLoadedToDevice_SLOT( CLAbstractRenderer* )));
-
-        connect( compositingTask , SIGNAL( compositingFinished_SIGNAL( )) ,
-                 this , SLOT( compositingFinished_SLOT( )));
-
-        frameIndex++ ;
-    }
+            // Add the collecting task to
+            // the map < rendering node , collecting task >
+            collectingTasks_[ renderer ] = collectingTask ;
 
 
-    compositorSpecified_ = true ;
+            // Map signals from collecting tasks and compositing tasks to the
+            // correspondint slots.
+            connect( collectingTask ,
+                     SIGNAL( frameLoadedToDevice_SIGNAL( CLAbstractRenderer* )) ,
+                     this , SLOT( frameLoadedToDevice_SLOT( CLAbstractRenderer* )));
+
+            connect( compositingTask , SIGNAL( compositingFinished_SIGNAL( )) ,
+                     this , SLOT( compositingFinished_SLOT( )));
+        }
+
 
     LOG_INFO("[DONE] Linking Rendering Units with Compositing Unit...");
-
 }
 
 
@@ -351,11 +324,11 @@ void ParallelRendering::applyTransformation_()
 
     for( const oclHWDL::Device *renderingDevice : inUseGPUs_ )
     {
-        const CLAbstractRenderer *renderer = renderers_.at( renderingDevice );
+        const CLAbstractRenderer *renderer = renderers_[ renderingDevice ];
 
         TIC( renderingProfiles.at( renderer )->threadSpawning_TIMER );
         // Spawn threads and start rendering on each rendering node.
-        rendererPool_.start( renderingTasks_.at( renderer ));
+        rendererPool_.start( renderingTasks_[ renderer ]);
     }
 
     pendingTransformations_ = false;
@@ -378,7 +351,7 @@ ParallelRendering::getCLRenderer( const uint64_t gpuIndex ) const
     if(!( inUseGPUs_.contains( device )))
         LOG_ERROR("No such rendering node!");
 
-    return *renderers_.at( device );
+    return *renderers_[ device ];
 
 }
 
@@ -407,9 +380,25 @@ void ParallelRendering::finishedRendering_SLOT( CLAbstractRenderer *renderer )
 {
     //    LOG_DEBUG("Finished Rendering");
 
-    TIC( collectingProfiles.at( renderer )->threadSpawning_TIMER );
+    if( renderers_.size() > 1 )
+    {
+        TIC( collectingProfiles.at( renderer )->threadSpawning_TIMER );
+        collectorPool_.start( collectingTasks_[ renderer ]);
+    }
+    else
+    {
+        CLImage2D< float > *rendererdFrame =
+                renderer->getCLFrame().value< CLImage2D< float > *>( );
 
-    collectorPool_.start( collectingTasks_.at( renderer ));
+        rendererdFrame->readDeviceData( renderer->getCommandQueue() ,
+                                        CL_TRUE );
+        QPixmap &pixmap = rendererdFrame->getFramePixmap();
+
+        emit this->finalFrameReady_SIGNAL( &pixmap );
+
+        renderersReady_ = true ;
+
+    }
 
 }
 
@@ -452,10 +441,10 @@ void ParallelRendering::frameLoadedToDevice_SLOT( CLAbstractRenderer *renderer )
     //    LOG_DEBUG("Frame[%d] Loaded to device" , node->getFrameIndex( ));
 
     //accumulate the recently loaded frame to the collage frame.
-    compositorPool_.start( compositingTasks_.at( renderer ) );
+    compositorPool_.start( compositingTasks_[ renderer ]);
 
 #ifndef BENCHMARKING
-    pixmapMakerPool_.start( makePixmapTasks_.at( renderer ));
+    pixmapMakerPool_.start( makePixmapTasks_[ renderer ]);
 #endif
 
 }
@@ -584,9 +573,9 @@ void ParallelRendering::tranferFunctionFlag_SLOT( int flag )
 void ParallelRendering::benchmark_( )
 {
 
-    for( auto it : renderers_ )
+    for( CLAbstractRenderer *renderer : renderers_ )
     {
-        CLAbstractRenderer *renderer = it.second ;
+//        CLAbstractRenderer *renderer = renderers_[ device ] ;
 
         RENDERING_PROFILE_TAG( renderer );
         PRINT( RENDERING_PROFILE( renderer ).threadSpawning_TIMER );

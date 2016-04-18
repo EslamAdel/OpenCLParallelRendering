@@ -8,6 +8,7 @@
 #include <QObject>
 #include <QList>
 #include <QSet>
+#include <QMap>
 #include <QThreadPool>
 
 #include <oclHWDL.h>
@@ -24,20 +25,31 @@
 #include "CLVolumeVariants.hh"
 #include "Transformation.h"
 
-typedef std::unordered_map< const oclHWDL::Device*,
-                            CLAbstractRenderer*> CLRenderers;
+//typedef std::unordered_map< const oclHWDL::Device*,
+//                            CLAbstractRenderer*> CLRenderers;
 
-typedef std::unordered_map< const CLAbstractRenderer* ,
-                            TaskRender*> RenderingTasks;
+//typedef std::unordered_map< const CLAbstractRenderer* ,
+//                            TaskRender*> RenderingTasks;
 
-typedef std::unordered_map< const CLAbstractRenderer* ,
-                            TaskComposite*> CompositingTasks;
+//typedef std::unordered_map< const CLAbstractRenderer* ,
+//                            TaskComposite*> CompositingTasks;
 
-typedef std::unordered_map< const CLAbstractRenderer* ,
-                            TaskCollect*> CollectingTasks;
+//typedef std::unordered_map< const CLAbstractRenderer* ,
+//                            TaskCollect*> CollectingTasks;
 
-typedef std::unordered_map< const CLAbstractRenderer* ,
-                            TaskMakePixmap*> MakePixmapTasks;
+//typedef std::unordered_map< const CLAbstractRenderer* ,
+//                            TaskMakePixmap*> MakePixmapTasks;
+
+
+typedef QMap< const oclHWDL::Device*, CLAbstractRenderer*> CLRenderers;
+
+typedef QMap< const CLAbstractRenderer* , TaskRender*> RenderingTasks;
+
+typedef QMap< const CLAbstractRenderer* , TaskComposite*> CompositingTasks;
+
+typedef QMap< const CLAbstractRenderer* , TaskCollect*> CollectingTasks;
+
+typedef QMap< const CLAbstractRenderer* , TaskMakePixmap*> MakePixmapTasks;
 
 /**
  * @brief The ParallelRendering class
@@ -388,7 +400,6 @@ protected:
     //flags
     bool pendingTransformations_;
     bool renderersReady_;
-    bool compositorSpecified_;
 
     //counters
     uint8_t activeRenderers_;

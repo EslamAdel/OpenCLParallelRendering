@@ -36,7 +36,6 @@ void VirtualParallelRendering::addCLCompositor(const uint64_t gpuIndex)
 {
     LOG_DEBUG("Adding Virtual Compositing Node");
 
-
     if( inUseGPUs_.size() > 1 )
         compositor_ = new CLCompositor< float >( gpuIndex ,
                                                  frameWidth_ ,
@@ -46,22 +45,13 @@ void VirtualParallelRendering::addCLCompositor(const uint64_t gpuIndex)
 
 
     LOG_DEBUG("[DONE] Initialize Compositing Unit");
-
     this->finalFramePixmapTask_ = new TaskMakePixmap( );
-
 
     connect( finalFramePixmapTask_ ,
              SIGNAL( pixmapReady_SIGNAL( QPixmap* ,
                                          const CLAbstractRenderer* )) ,
              this , SLOT(pixmapReady_SLOT( QPixmap* ,
                                            const CLAbstractRenderer* )));
-
-
-    // Frame index will be assigned to each rendering GPU (rednering node).
-    // As a start, consider each frame will be indexed in the next for-loop.
-
-
-    int frameIndex = 0 ;
 
     // for each rendering task finished, a collecting task and a
     // compositing task will follow!
@@ -101,11 +91,7 @@ void VirtualParallelRendering::addCLCompositor(const uint64_t gpuIndex)
         connect( compositingTask , SIGNAL(compositingFinished_SIGNAL( )) ,
                  this , SLOT(compositingFinished_SLOT( )));
 
-        frameIndex++ ;
     }
-
-
-    this->compositorSpecified_ = true ;
 }
 
 void VirtualParallelRendering::distributeBaseVolume1D()
