@@ -1,5 +1,4 @@
 #include "Volume.h"
-#include "VolumeUtilities.h"
 #include "Logger.h"
 
 template< class T >
@@ -62,11 +61,11 @@ Volume< T >::Volume( const BrickParameters< T > brickParameters ,
 {
 
     // The array that will be filled with the brick data
-    data_ = new T[ brickParameters.brickDimensions_.volumeSize() ];
-    dimensions_ = brickParameters.brickDimensions_ ;
-    coordinates_ = brickParameters.brickCoordinates_ ;
-    unitCubeCenter_ = brickParameters.brickUnitCubeCenter_ ;
-    unitCubeScaleFactors_ = brickParameters.brickUnitCubeScaleFactors_ ;
+    data_ = new T[ brickParameters.dimensions_.volumeSize() ];
+    dimensions_ = brickParameters.dimensions_ ;
+    coordinates_ = brickParameters.coordinates_ ;
+    unitCubeCenter_ = brickParameters.unitCubeCenter_ ;
+    unitCubeScaleFactors_ = brickParameters.unitCubeScaleFactors_ ;
 
 //    LOG_DEBUG("Coor(%f,%f,%f),D(%d,%d,%d),unitCenter(%f,%f,%f),"
 //              "unitScale(%f,%f,%f)",
@@ -76,17 +75,16 @@ Volume< T >::Volume( const BrickParameters< T > brickParameters ,
 //              unitCubeScaleFactors_.x , unitCubeScaleFactors_.y ,
 //              unitCubeScaleFactors_.z );
 
-    uint64_t sum = 0 ;
-    for( uint64_t i = 0; i < brickParameters.brickDimensions_.x; i++ )
+    for( uint64_t i = 0; i < brickParameters.dimensions_.x; i++ )
     {
-        for( uint64_t j = 0; j < brickParameters.brickDimensions_.y; j++ )
+        for( uint64_t j = 0; j < brickParameters.dimensions_.y; j++ )
         {
-            for( uint64_t k = 0; k < brickParameters.brickDimensions_.z; k++ )
+            for( uint64_t k = 0; k < brickParameters.dimensions_.z; k++ )
             {
                 // The 1D index of the extracted brick
                 const uint64_t brickIndex =
                         VolumeUtilities::get1DIndex(
-                            i, j, k, brickParameters.brickDimensions_ );
+                            i, j, k, brickParameters.dimensions_ );
 
                 // The 1D index of the original 'big' volume
                 const uint64_t volumeIndex =
@@ -99,12 +97,10 @@ Volume< T >::Volume( const BrickParameters< T > brickParameters ,
                 //Get brick data from the big volume
                 data_[ brickIndex ] =
                         brickParameters.baseData_[ volumeIndex ] ;
-                sum += data_[ brickIndex ];
             }
         }
     }
 
-    LOG_DEBUG("sum=%d",sum);
 }
 
 template< class T >
@@ -251,19 +247,19 @@ Volume< T >* Volume<T>::getBrick( const u_int64_t xi, const u_int64_t xf,
             getBrickParameters( xi , xf , yi , yf , zi , zf );
 
 
-    T *brickData = new T[ brickParameters.brickDimensions_.volumeSize() ];
+    T *brickData = new T[ brickParameters.dimensions_.volumeSize() ];
 
     uint64_t sum = 0;
-    for( uint64_t i = 0; i < brickParameters.brickDimensions_.x; i++ )
+    for( uint64_t i = 0; i < brickParameters.dimensions_.x; i++ )
     {
-        for( uint64_t j = 0; j < brickParameters.brickDimensions_.y; j++ )
+        for( uint64_t j = 0; j < brickParameters.dimensions_.y; j++ )
         {
-            for( uint64_t k = 0; k < brickParameters.brickDimensions_.z; k++ )
+            for( uint64_t k = 0; k < brickParameters.dimensions_.z; k++ )
             {
                 // The 1D index of the extracted brick
                 const uint64_t brickIndex =
                         VolumeUtilities::get1DIndex(
-                            i, j, k, brickParameters.brickDimensions_ );
+                            i, j, k, brickParameters.dimensions_ );
 
                 // The 1D index of the original 'big' volume
                 const uint64_t volumeIndex =
@@ -344,10 +340,10 @@ BrickParameters<T> Volume< T >::getBrickParameters( const u_int64_t xi ,
 
     brickParameters.baseData_ = ( data_ == nullptr )? mmapAddr_ : data_ ;
     brickParameters.baseDimensions_ = dimensions_ ;
-    brickParameters.brickDimensions_ = brickDimensions ;
-    brickParameters.brickCoordinates_ = brickCoordinates ;
-    brickParameters.brickUnitCubeCenter_ = brickUnitCubeCenter ;
-    brickParameters.brickUnitCubeScaleFactors_ = brickUnitCubeScaleFactors ;
+    brickParameters.dimensions_ = brickDimensions ;
+    brickParameters.coordinates_ = brickCoordinates ;
+    brickParameters.unitCubeCenter_ = brickUnitCubeCenter ;
+    brickParameters.unitCubeScaleFactors_ = brickUnitCubeScaleFactors ;
 
     return brickParameters ;
 

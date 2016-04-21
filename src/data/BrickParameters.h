@@ -17,12 +17,12 @@ private:
     friend class Volume< T > ;
     friend class SerializableVolume< T > ;
 
-    Dimensions3D brickDimensions_ ;
+    Dimensions3D dimensions_ ;
     Dimensions3D baseDimensions_ ;
     Dimensions3D origin_ ;
-    Coordinates3D brickCoordinates_ ;
-    Coordinates3D brickUnitCubeCenter_ ;
-    Coordinates3D brickUnitCubeScaleFactors_ ;
+    Coordinates3D coordinates_ ;
+    Coordinates3D unitCubeCenter_ ;
+    Coordinates3D unitCubeScaleFactors_ ;
     T *baseData_ ;
 
 };

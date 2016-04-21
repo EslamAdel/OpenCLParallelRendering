@@ -11,6 +11,7 @@
 #include <unistd.h>
 #include <QVector>
 #include "BrickParameters.h"
+#include "VolumeUtilities.h"
 
 // Forward declaration
 template< class T > class SerializableVolume;
