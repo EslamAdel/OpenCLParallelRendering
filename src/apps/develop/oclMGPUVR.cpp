@@ -58,7 +58,8 @@ int main(int argc, char *argv[])
 
     parallelRenderer.addCLCompositor( compositorGPUIndex );
 
-    parallelRenderer.distributeBaseVolumeWeighted();
+//    parallelRenderer.distributeBaseVolumeMemoryWeighted();
+    parallelRenderer.distributeBaseVolume1D();
 
     RenderingWindow rw( &parallelRenderer ) ;
     rw.show();

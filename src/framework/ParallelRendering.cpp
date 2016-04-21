@@ -249,7 +249,7 @@ void ParallelRendering::distributeBaseVolumeWeighted()
         computingPowerScores.append( device->getMaxComputeUnits( ));
     }
 
-    QVector< Volume8 *> bricks =
+    QVector< BrickParameters< uchar > > bricks =
             baseVolume_->weightedBricking1D( computingPowerScores );
 
     int i = 0;
@@ -257,7 +257,7 @@ void ParallelRendering::distributeBaseVolumeWeighted()
     {
         LOG_DEBUG( "Loading subVolume to device" );
 
-        auto subVolume = bricks[ i++ ];
+        Volume< uchar > *subVolume = new Volume< uchar >( bricks[ i++ ]);
         VolumeVariant volume = VolumeVariant::fromValue( subVolume );
 
         renderers_[ renderingDevice ]->loadVolume( volume );
@@ -279,7 +279,7 @@ void ParallelRendering::distributeBaseVolumeMemoryWeighted()
         memoryScores.append( device->getGlobalMemorySize() / 1024 );
     }
 
-    QVector< Volume8 *> bricks =
+    QVector< BrickParameters< uchar > > bricks =
             baseVolume_->weightedBricking1D( memoryScores );
 
     int i = 0;
@@ -287,7 +287,7 @@ void ParallelRendering::distributeBaseVolumeMemoryWeighted()
     {
         LOG_DEBUG( "Loading subVolume to device" );
 
-        auto subVolume = bricks[ i++ ];
+        Volume< uchar > *subVolume = new Volume< uchar >( bricks[ i++ ]);
         VolumeVariant volume = VolumeVariant::fromValue( subVolume );
 
         renderers_[ renderingDevice ]->loadVolume( volume );

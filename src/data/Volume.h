@@ -10,7 +10,7 @@
 #include <sys/mman.h>
 #include <unistd.h>
 #include <QVector>
-
+#include "BrickParameters.h"
 
 // Forward declaration
 template< class T > class SerializableVolume;
@@ -30,6 +30,15 @@ public: // Constructors
     Volume( const std::string prefix,
             const bool drawBoundingBox = false );
 
+    /**
+     * @brief Volume
+     * @param brickCoordinates
+     * @param brickDimensions
+     * @param brickUnitCubeCenter
+     * @param brickUnitCubeScaleFactors
+     * @param brickData
+     * @param drawBoundingBox
+     */
     Volume( const Coordinates3D brickCoordinates ,
             const Dimensions3D brickDimensions ,
             const Coordinates3D brickUnitCubeCenter ,
@@ -38,6 +47,12 @@ public: // Constructors
             const bool drawBoundingBox = false ) ;
 
 
+    /**
+     * @brief Volume
+     * @param brickParameters
+     */
+    Volume( const BrickParameters< T > brickParameters ,
+            const bool drawBoundingBox = false );
 
     ~Volume();
 
@@ -50,10 +65,22 @@ public: // Public functions
     Dimensions3D getDimensions() const;
 
 
+    /**
+     * @brief getCubeCenter
+     * @return
+     */
     Coordinates3D getCubeCenter() const;
 
+    /**
+     * @brief getUnitCubeCenter
+     * @return
+     */
     Coordinates3D getUnitCubeCenter() const;
 
+    /**
+     * @brief getUnitCubeScaleFactors
+     * @return
+     */
     Coordinates3D getUnitCubeScaleFactors() const;
 
     /**
@@ -177,6 +204,16 @@ public: // Public functions
     Image<T>* getProjectionZ() const;
 
 
+    /**
+     * @brief getBrick
+     * @param xi
+     * @param xf
+     * @param yi
+     * @param yf
+     * @param zi
+     * @param zf
+     * @return
+     */
     Volume<T> *getBrick( const u_int64_t xi ,
                          const u_int64_t xf ,
                          const u_int64_t yi ,
@@ -185,17 +222,59 @@ public: // Public functions
                          const u_int64_t zf ) const ;
 
 
+    /**
+     * @brief getBrickParameters
+     * @param xi
+     * @param xf
+     * @param yi
+     * @param yf
+     * @param zi
+     * @param zf
+     * @return
+     */
+    BrickParameters< T > getBrickParameters( const u_int64_t xi ,
+                                             const u_int64_t xf ,
+                                             const u_int64_t yi ,
+                                             const u_int64_t yf ,
+                                             const u_int64_t zi ,
+                                             const u_int64_t zf ) const ;
+
+    /**
+     * @brief getBricksXAxis
+     * @param partitions
+     * @return
+     */
     QVector< Volume< T > *> getBricksXAxis( uint partitions ) const;
 
+    /**
+     * @brief getBricksYAxis
+     * @param partitions
+     * @return
+     */
     QVector< Volume< T > *> getBricksYAxis( uint partitions ) const;
 
+    /**
+     * @brief getBricksZAxis
+     * @param partitions
+     * @return
+     */
     QVector< Volume< T > *> getBricksZAxis( uint partitions ) const;
 
 
+    /**
+     * @brief heuristicBricking
+     * @param partitions
+     * @return
+     */
     QVector< Volume< T > *>
     heuristicBricking( const uint partitions ) const;
 
-    QVector< Volume< T > *>
+    /**
+     * @brief weightedBricking1D
+     * @param scores
+     * @return
+     */
+    QVector< BrickParameters< T > >
     weightedBricking1D( const QVector< uint > &scores );
 
 
@@ -245,10 +324,19 @@ protected: // Protected (private) member variables
      */
     Dimensions3D dimensions_;
 
+    /**
+     * @brief coordinates_
+     */
     Coordinates3D coordinates_ ;
 
+    /**
+     * @brief unitCubeCenter_
+     */
     Coordinates3D unitCubeCenter_;
 
+    /**
+     * @brief unitCubeScaleFactors_
+     */
     Coordinates3D unitCubeScaleFactors_;
 
     /**

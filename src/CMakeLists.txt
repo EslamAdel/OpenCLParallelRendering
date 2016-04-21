@@ -28,6 +28,7 @@ SET( OCL_MGPUVS_SOURCE_FILES
     data/Image.cpp
     data/TransferFunction.cpp
     data/Volume.cpp
+    data/BrickParameters.cpp
     geometry/Vector2.cpp
     geometry/Vector3.cpp
     geometry/Vector4.cpp
@@ -77,6 +78,8 @@ SET( OCL_MGPUVS_HEADER_FILES
     data/TransferFunction.h
     data/Volume.h
     data/VolumeVariant.hh
+    data/BrickParameters.h
+    data/BrickParameters.ipp
     geometry/Vector2.h
     geometry/Vector3.h
     geometry/Vector4.h

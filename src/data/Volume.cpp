@@ -24,9 +24,6 @@ Volume< T >::Volume( const std::string prefix, const bool drawBoundingBox )
     LOG_DEBUG("Volume Created: %dx%dx%d",
               dimensions_.x , dimensions_.y , dimensions_.z );
 
-
-
-
 }
 
 template< class T >
@@ -35,18 +32,79 @@ Volume< T >::Volume( const Coordinates3D brickCoordinates,
                      const Coordinates3D brickUnitCubeCenter,
                      const Coordinates3D brickUnitCubeScaleFactors,
                      T *brickData, const bool drawBoundingBox )
-    : drawBoundingBox_( drawBoundingBox )
+    : drawBoundingBox_( drawBoundingBox ),
+      data_( nullptr ),
+      mmapAddr_( nullptr )
 {
+
     coordinates_    = brickCoordinates ;
     dimensions_     = brickDimensions ;
     unitCubeCenter_ = brickUnitCubeCenter ;
     unitCubeScaleFactors_ = brickUnitCubeScaleFactors ;
     data_ = brickData ;
-    mmapAddr_ = nullptr ;
 
+//    LOG_DEBUG("Coor(%f,%f,%f),D(%d,%d,%d),unitCenter(%f,%f,%f),"
+//              "unitScale(%f,%f,%f)",
+//              coordinates_.x , coordinates_.y , coordinates_.z ,
+//              dimensions_.x , dimensions_.y , dimensions_.z ,
+//              unitCubeCenter_.x , unitCubeCenter_.y , unitCubeCenter_.z ,
+//              unitCubeScaleFactors_.x , unitCubeScaleFactors_.y ,
+//              unitCubeScaleFactors_.z );
     //    addBoundingBox_();
+}
 
+template< class T >
+Volume< T >::Volume( const BrickParameters< T > brickParameters ,
+                     const bool drawBoundingBox )
+    : drawBoundingBox_( drawBoundingBox ),
+      data_( nullptr ),
+      mmapAddr_( nullptr )
+{
 
+    // The array that will be filled with the brick data
+    data_ = new T[ brickParameters.brickDimensions_.volumeSize() ];
+    dimensions_ = brickParameters.brickDimensions_ ;
+    coordinates_ = brickParameters.brickCoordinates_ ;
+    unitCubeCenter_ = brickParameters.brickUnitCubeCenter_ ;
+    unitCubeScaleFactors_ = brickParameters.brickUnitCubeScaleFactors_ ;
+
+//    LOG_DEBUG("Coor(%f,%f,%f),D(%d,%d,%d),unitCenter(%f,%f,%f),"
+//              "unitScale(%f,%f,%f)",
+//              coordinates_.x , coordinates_.y , coordinates_.z ,
+//              dimensions_.x , dimensions_.y , dimensions_.z ,
+//              unitCubeCenter_.x , unitCubeCenter_.y , unitCubeCenter_.z ,
+//              unitCubeScaleFactors_.x , unitCubeScaleFactors_.y ,
+//              unitCubeScaleFactors_.z );
+
+    uint64_t sum = 0 ;
+    for( uint64_t i = 0; i < brickParameters.brickDimensions_.x; i++ )
+    {
+        for( uint64_t j = 0; j < brickParameters.brickDimensions_.y; j++ )
+        {
+            for( uint64_t k = 0; k < brickParameters.brickDimensions_.z; k++ )
+            {
+                // The 1D index of the extracted brick
+                const uint64_t brickIndex =
+                        VolumeUtilities::get1DIndex(
+                            i, j, k, brickParameters.brickDimensions_ );
+
+                // The 1D index of the original 'big' volume
+                const uint64_t volumeIndex =
+                        VolumeUtilities::get1DIndex(
+                            brickParameters.origin_.x + i,
+                            brickParameters.origin_.y + j,
+                            brickParameters.origin_.z + k ,
+                            brickParameters.baseDimensions_ );
+
+                //Get brick data from the big volume
+                data_[ brickIndex ] =
+                        brickParameters.baseData_[ volumeIndex ] ;
+                sum += data_[ brickIndex ];
+            }
+        }
+    }
+
+    LOG_DEBUG("sum=%d",sum);
 }
 
 template< class T >
@@ -70,7 +128,7 @@ uint64_t Volume< T >::getSizeZ() const
 template< class T >
 uint64_t Volume< T >::getSizeInBytes() const
 {
-    return sizeInBytes_;
+    return dimensions_.volumeSize() * sizeof( T );
 }
 
 template< class T >
@@ -135,7 +193,8 @@ void Volume< T >::mapVolumeData( const std::string prefix )
     }
 
     //Map the volume to virtual addresses
-    mmapAddr_= ( T* ) mmap( NULL, sizeInBytes_, PROT_READ, MAP_PRIVATE, fd, 0);
+    mmapAddr_= ( T* ) mmap( NULL , sizeInBytes_ , PROT_READ ,
+                            MAP_PRIVATE , fd , 0 );
 
     //Close the file
     close(fd);
@@ -188,35 +247,87 @@ Volume< T >* Volume<T>::getBrick( const u_int64_t xi, const u_int64_t xf,
                                   const u_int64_t yi, const u_int64_t yf,
                                   const u_int64_t zi, const u_int64_t zf ) const
 {
+    const BrickParameters< T > brickParameters =
+            getBrickParameters( xi , xf , yi , yf , zi , zf );
+
+
+    T *brickData = new T[ brickParameters.brickDimensions_.volumeSize() ];
+
+    uint64_t sum = 0;
+    for( uint64_t i = 0; i < brickParameters.brickDimensions_.x; i++ )
+    {
+        for( uint64_t j = 0; j < brickParameters.brickDimensions_.y; j++ )
+        {
+            for( uint64_t k = 0; k < brickParameters.brickDimensions_.z; k++ )
+            {
+                // The 1D index of the extracted brick
+                const uint64_t brickIndex =
+                        VolumeUtilities::get1DIndex(
+                            i, j, k, brickParameters.brickDimensions_ );
+
+                // The 1D index of the original 'big' volume
+                const uint64_t volumeIndex =
+                        get1DIndex( brickParameters.origin_.x + i,
+                                    brickParameters.origin_.y + j,
+                                    brickParameters.origin_.z + k );
+
+                //Get brick data from the big volume
+                brickData[ brickIndex ] =
+                        brickParameters.baseData_[ volumeIndex ] ;
+
+                sum += brickData[ brickIndex ];
+            }
+        }
+    }
+    LOG_DEBUG("sum=%d",sum);
+
+
+    return new Volume< T >( brickParameters );
+    //    return new Volume< T >( brickParameters.brickCoordinates_ ,
+    //                            brickParameters.brickDimensions_ ,
+    //                            brickParameters.brickUnitCubeCenter_ ,
+    //                            brickParameters.brickUnitCubeScaleFactors_ ,
+    //                            brickData );
+}
+
+template< class T >
+BrickParameters<T> Volume< T >::getBrickParameters( const u_int64_t xi ,
+                                                    const u_int64_t xf ,
+                                                    const u_int64_t yi ,
+                                                    const u_int64_t yf ,
+                                                    const u_int64_t zi ,
+                                                    const u_int64_t zf ) const
+{
     // The dimensions of the extracted brick
-    Dimensions3D brickDimensions( xf - xi , yf - yi , zf - zi );
+    const Dimensions3D brickDimensions( xf - xi , yf - yi , zf - zi );
 
 
-    Coordinates3D offset( coordinates_.x - dimensions_.x / 2.f ,
-                          coordinates_.y - dimensions_.y / 2.f ,
-                          coordinates_.z - dimensions_.z / 2.f );
+    const Coordinates3D offset( coordinates_.x - dimensions_.x / 2.f ,
+                                coordinates_.y - dimensions_.y / 2.f ,
+                                coordinates_.z - dimensions_.z / 2.f );
 
     // The center of the extraced brick, with respect to the real base volume.
-    Coordinates3D brickCoordinates( xi + brickDimensions.x / 2.f +
-                                    offset.x ,
-                                    yi + brickDimensions.y / 2.f +
-                                    offset.y ,
-                                    zi + brickDimensions.z / 2.f +
-                                    offset.z );
+    const Coordinates3D brickCoordinates( xi + brickDimensions.x / 2.f +
+                                          offset.x ,
+                                          yi + brickDimensions.y / 2.f +
+                                          offset.y ,
+                                          zi + brickDimensions.z / 2.f +
+                                          offset.z );
 
     // The relative center of the brick for the OpenGL unti texture,
     // with respect to the "unity" base volume.
-    Coordinates3D brickUnitCubeCenter( brickCoordinates.x  /
-                                       ( dimensions_.x / unitCubeScaleFactors_.x )  ,
+    const Coordinates3D brickUnitCubeCenter(
+                brickCoordinates.x  /
+                ( dimensions_.x / unitCubeScaleFactors_.x )  ,
 
-                                       brickCoordinates.y  /
-                                       ( dimensions_.y / unitCubeScaleFactors_.y ) ,
+                brickCoordinates.y  /
+                ( dimensions_.y / unitCubeScaleFactors_.y ) ,
 
-                                       brickCoordinates.z /
-                                       ( dimensions_.z / unitCubeScaleFactors_.z ));
+                brickCoordinates.z /
+                ( dimensions_.z / unitCubeScaleFactors_.z ));
 
     // Scale the brick in a unit cube for the OpenGL texture
-    Coordinates3D brickUnitCubeScaleFactors
+    const Coordinates3D brickUnitCubeScaleFactors
             ( float( brickDimensions.x * unitCubeScaleFactors_.x ) /
               dimensions_.x,
 
@@ -226,36 +337,20 @@ Volume< T >* Volume<T>::getBrick( const u_int64_t xi, const u_int64_t xf,
               float( brickDimensions.z * unitCubeScaleFactors_.z ) /
               dimensions_.z );
 
-    // The array that will be filled with the brick data
-    T* brickData = new T[ brickDimensions.volumeSize() ];
+    BrickParameters< T > brickParameters;
+    brickParameters.origin_.x = xi ;
+    brickParameters.origin_.y = yi ;
+    brickParameters.origin_.z = zi ;
 
-    for( uint64_t i = 0; i < brickDimensions.x; i++ )
-    {
-        for( uint64_t j = 0; j < brickDimensions.y; j++ )
-        {
-            for( uint64_t k = 0; k < brickDimensions.z; k++ )
-            {
-                // The 1D index of the extracted brick
-                const uint64_t brickIndex =
-                        VolumeUtilities::get1DIndex( i, j, k, brickDimensions );
+    brickParameters.baseData_ = ( data_ == nullptr )? mmapAddr_ : data_ ;
+    brickParameters.baseDimensions_ = dimensions_ ;
+    brickParameters.brickDimensions_ = brickDimensions ;
+    brickParameters.brickCoordinates_ = brickCoordinates ;
+    brickParameters.brickUnitCubeCenter_ = brickUnitCubeCenter ;
+    brickParameters.brickUnitCubeScaleFactors_ = brickUnitCubeScaleFactors ;
 
-                // The 1D index of the original 'big' volume
-                const uint64_t volumeIndex =
-                        get1DIndex( xi + i, yi + j, zi + k );
+    return brickParameters ;
 
-                //Get Brick Data From whole volume that has mapped
-                brickData[ brickIndex ] = ( data_ == nullptr )?
-                                              mmapAddr_[ volumeIndex ] :
-                                              data_ [ volumeIndex ];
-            }
-        }
-    }
-
-    return new Volume< T >( brickCoordinates,
-                            brickDimensions,
-                            brickUnitCubeCenter,
-                            brickUnitCubeScaleFactors,
-                            brickData );
 }
 
 template< class T >
@@ -407,7 +502,7 @@ Volume< T >::heuristicBricking( const uint partitions ) const
 }
 
 template< class T >
-QVector< Volume< T > *>
+QVector< BrickParameters< T > >
 Volume< T >::weightedBricking1D( const QVector< uint > &scores )
 {
     uint totalScore = 0 ;
@@ -423,7 +518,7 @@ Volume< T >::weightedBricking1D( const QVector< uint > &scores )
         newXDimensions.append(  xFraction * dimensions_.x );
 
 
-    QVector< Volume< T > *> bricks;
+    QVector< BrickParameters< T > > bricks;
     u_int64_t xInitial = 0;
     u_int64_t xFinal = 0 ;
 
@@ -432,22 +527,22 @@ Volume< T >::weightedBricking1D( const QVector< uint > &scores )
         xInitial = xFinal ;
         xFinal += newXDimensions[ i ];
 
-        Volume< T > *brick = getBrick( xInitial ,
-                                       xFinal ,
-                                       0 ,
-                                       dimensions_.y ,
-                                       0 ,
-                                       dimensions_.z );
+        BrickParameters< T > brick = getBrickParameters( xInitial ,
+                                                         xFinal ,
+                                                         0 ,
+                                                         dimensions_.y ,
+                                                         0 ,
+                                                         dimensions_.z );
         bricks.push_back( brick );
 
     }
 
-    Volume< T > *brick = getBrick( xFinal ,
-                                   dimensions_.x ,
-                                   0 ,
-                                   dimensions_.y ,
-                                   0 ,
-                                   dimensions_.z );
+    BrickParameters< T > brick = getBrickParameters( xFinal ,
+                                                     dimensions_.x ,
+                                                     0 ,
+                                                     dimensions_.y ,
+                                                     0 ,
+                                                     dimensions_.z );
 
     bricks.push_back( brick );
 
@@ -536,7 +631,7 @@ Image<T>* Volume< T >::getSliceX( const u_int64_t x ) const
     {
         for( u_int64_t j = 0; j < dimensions_.z; j++ )
         {
-            sliceData[sliceIndex] = data_ != NULL ? data_[get1DIndex(x, i, j)]
+            sliceData[sliceIndex] = data_ != nullptr ? data_[get1DIndex(x, i, j)]
                                              : mmapAddr_[get1DIndex(x, i, j)];
             sliceIndex++;
         }
@@ -557,7 +652,7 @@ Image<T>* Volume< T >::getSliceY( const u_int64_t y ) const
     {
         for( u_int64_t j = 0; j < dimensions_.z; j++ )
         {
-            sliceData[sliceIndex] = data_ != NULL ? data_[get1DIndex(i, y ,j)]
+            sliceData[sliceIndex] = data_ != nullptr ? data_[get1DIndex(i, y ,j)]
                                              : mmapAddr_[get1DIndex(i, y , j)];
             sliceIndex++;
         }
@@ -578,7 +673,7 @@ Image<T>* Volume< T >::getSliceZ( const u_int64_t z ) const
     {
         for( u_int64_t j = 0; j < dimensions_.y; j++ )
         {
-            sliceData[sliceIndex] = data_ != NULL ? data_[get1DIndex(i, j ,z)]
+            sliceData[sliceIndex] = data_ != nullptr ? data_[get1DIndex(i, j ,z)]
                                              : mmapAddr_[get1DIndex(i, j ,z)];
             sliceIndex++;
         }
@@ -607,7 +702,7 @@ Image< T >* Volume< T >::getProjectionX( ) const
             for( u_int64_t j = 0; j < dimensions_.z; j++ )
             {
                 sliceDataFloat[pixelIndex] +=
-                        data_ != NULL ? data_[get1DIndex(sliceIdx, i, j)]
+                        data_ != nullptr ? data_[get1DIndex(sliceIdx, i, j)]
                                  : mmapAddr_[get1DIndex(sliceIdx, i, j)];
                 pixelIndex++;
             }
@@ -648,7 +743,7 @@ Image<T> * Volume< T >::getProjectionY() const
             for( u_int64_t j = 0; j < dimensions_.z; j++ )
             {
                 sliceDataFloat[pixelIndex] +=
-                        data_ != NULL ? data_[get1DIndex(i, sliceIdx , j)]
+                        data_ != nullptr ? data_[get1DIndex(i, sliceIdx , j)]
                                  : mmapAddr_[get1DIndex(i, sliceIdx , j)];
 
                 pixelIndex++;
@@ -690,7 +785,7 @@ Image<T>* Volume<T>::getProjectionZ() const
             for( u_int64_t j = 0; j < dimensions_.y; j++ )
             {
                 sliceDataFloat[pixelIndex] +=
-                        data_ != NULL ? data_[get1DIndex(i, j ,sliceIdx )]
+                        data_ != nullptr ? data_[get1DIndex(i, j ,sliceIdx )]
                                  : mmapAddr_[get1DIndex(i, j ,sliceIdx)];
                 pixelIndex++;
             }
