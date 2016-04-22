@@ -247,35 +247,35 @@ Volume< T >* Volume<T>::getBrick( const u_int64_t xi, const u_int64_t xf,
             getBrickParameters( xi , xf , yi , yf , zi , zf );
 
 
-    T *brickData = new T[ brickParameters.dimensions_.volumeSize() ];
+//    T *brickData = new T[ brickParameters.dimensions_.volumeSize() ];
 
-    uint64_t sum = 0;
-    for( uint64_t i = 0; i < brickParameters.dimensions_.x; i++ )
-    {
-        for( uint64_t j = 0; j < brickParameters.dimensions_.y; j++ )
-        {
-            for( uint64_t k = 0; k < brickParameters.dimensions_.z; k++ )
-            {
-                // The 1D index of the extracted brick
-                const uint64_t brickIndex =
-                        VolumeUtilities::get1DIndex(
-                            i, j, k, brickParameters.dimensions_ );
+//    uint64_t sum = 0;
+//    for( uint64_t i = 0; i < brickParameters.dimensions_.x; i++ )
+//    {
+//        for( uint64_t j = 0; j < brickParameters.dimensions_.y; j++ )
+//        {
+//            for( uint64_t k = 0; k < brickParameters.dimensions_.z; k++ )
+//            {
+//                // The 1D index of the extracted brick
+//                const uint64_t brickIndex =
+//                        VolumeUtilities::get1DIndex(
+//                            i, j, k, brickParameters.dimensions_ );
 
-                // The 1D index of the original 'big' volume
-                const uint64_t volumeIndex =
-                        get1DIndex( brickParameters.origin_.x + i,
-                                    brickParameters.origin_.y + j,
-                                    brickParameters.origin_.z + k );
+//                // The 1D index of the original 'big' volume
+//                const uint64_t volumeIndex =
+//                        get1DIndex( brickParameters.origin_.x + i,
+//                                    brickParameters.origin_.y + j,
+//                                    brickParameters.origin_.z + k );
 
-                //Get brick data from the big volume
-                brickData[ brickIndex ] =
-                        brickParameters.baseData_[ volumeIndex ] ;
+//                //Get brick data from the big volume
+//                brickData[ brickIndex ] =
+//                        brickParameters.baseData_[ volumeIndex ] ;
 
-                sum += brickData[ brickIndex ];
-            }
-        }
-    }
-    LOG_DEBUG("sum=%d",sum);
+//                sum += brickData[ brickIndex ];
+//            }
+//        }
+//    }
+//    LOG_DEBUG("sum=%d",sum);
 
 
     return new Volume< T >( brickParameters );
