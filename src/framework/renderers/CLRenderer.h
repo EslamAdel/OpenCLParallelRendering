@@ -6,13 +6,24 @@
 #include "Transformation.h"
 #include <CLVolume.h>
 #include "CLTransferFunction.h"
-
 #include <CLXRayRenderingKernel.h>
+#include <QMap>
 
 
 template < class V , class F >
 class CLRenderer : public CLAbstractRenderer
 {
+
+public:
+    enum RenderingKernels
+    {
+        KERNEL_Xray = 0 ,
+        KERNEL_MinIntensity ,
+        KERNEL_MaxIntensity ,
+        KERNEL_IsoSurface
+    };
+
+
 public:
     CLRenderer( const uint64_t gpuIndex,
                 const uint frameWidth , const uint frameHeight ,
@@ -94,9 +105,9 @@ private:
     cl_mem inverseMatrix_;
 
     /**
-     * @brief transferFunctionArray_
+     * @brief renderingKernels_
      */
-    CLTransferFunction *clTransferFunction ;
+    QMap< RenderingKernels , CLRenderingKernel* > renderingKernels_ ;
 
     /**
      * @brief linearVolumeSampler_
@@ -108,20 +119,20 @@ private:
      */
     cl_sampler nearestVolumeSampler_;
 
-    /**
-     * @brief transferFunctionSampler_
-     */
-    cl_sampler transferFunctionSampler_;
+//    /**
+//     * @brief transferFunctionSampler_
+//     */
+//    cl_sampler transferFunctionSampler_;
 
-    /**
-     * @brief tfOffset_
-     */
-    float tfOffset_;
+//    /**
+//     * @brief tfOffset_
+//     */
+//    float tfOffset_;
 
-    /**
-     * @brief tfScale_
-     */
-    float tfScale_;
+//    /**
+//     * @brief tfScale_
+//     */
+//    float tfScale_;
 
     /**
      * @brief linearFiltering_
@@ -133,11 +144,8 @@ private:
      */
     size_t gridSize_[ 2 ];
 
-    /**
-     * @brief renderingKernels_
-     */
-    std::vector< CLRenderingKernel* > renderingKernels_;
 
+    QMap<
     /**
      * @brief activeRenderingKernel_
      */
@@ -152,7 +160,6 @@ private:
      * @brief inverseMatrix_
      */
     float inverseMatrixArray_[ 12 ];
-
 
 };
 

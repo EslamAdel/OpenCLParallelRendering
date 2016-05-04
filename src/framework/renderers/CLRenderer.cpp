@@ -193,39 +193,6 @@ void CLRenderer< V , F >::handleKernel_( std::string string )
     clVolume_ = new CLVolume< V >( volume_ , VOLUME_CL_UNSIGNED_INT8 );
     clVolume_->createDeviceVolume( context_ );
 
-/**
-
-    // Create transfer function texture (this is the default HEAT MAP)
-    float transferFunctionTable[] =
-    {
-        0.0, 0.0, 0.0, 0.0,
-        1.0, 0.0, 0.0, 1.0,
-        1.0, 0.5, 0.0, 1.0,
-        1.0, 1.0, 0.0, 1.0,
-        0.0, 1.0, 0.0, 1.0,
-        0.0, 1.0, 1.0, 1.0,
-        0.0, 0.0, 1.0, 1.0,
-        1.0, 0.0, 1.0, 1.0,
-        0.0, 0.0, 0.0, 0.0,
-    };
-
-    // Transfer function format
-    clTransferFunction = new CLTransferFunction( 9 , transferFunctionTable );
-    clTransferFunction->createDeviceData( context_ );
-    clTransferFunction->writeDeviceData( commandQueue_ , CL_TRUE );
-
-
-    oclHWDL::Error::checkCLError(clErrorCode);
-
-    // Create samplers (same as texture in OpenGL) for transfer function
-    // and the volume for linear interpolation and nearest interpolation.
-    transferFunctionSampler_ = clCreateSampler( context_, true,
-                                                CL_ADDRESS_CLAMP_TO_EDGE,
-                                                CL_FILTER_LINEAR, &clErrorCode );
-
-
-    oclHWDL::Error::checkCLError(clErrorCode);
-**/
     linearVolumeSampler_ = clCreateSampler( context_, true,
                                             CL_ADDRESS_CLAMP_TO_EDGE,
                                             CL_FILTER_LINEAR, &clErrorCode );
@@ -264,15 +231,20 @@ void CLRenderer< V , F >::handleKernel_( std::string string )
 
     //    activeRenderingKernel_->setTransferFunctionScale(transferScale);
 **/
+
     inverseMatrix_ = clCreateBuffer( context_,
                                      CL_MEM_READ_ONLY,
                                      12 * sizeof( float ), 0,
                                      &clErrorCode );
+
     oclHWDL::Error::checkCLError(clErrorCode);
+
 
     activeRenderingKernel_->setInverseViewMatrix( inverseMatrix_);
 
+
     oclHWDL::Error::checkCLError(clErrorCode);
+
 
     LOG_DEBUG("[DONE] Handling Kernel..");
 
@@ -294,14 +266,14 @@ void CLRenderer< V , F >::freeBuffers_()
     if( nearestVolumeSampler_ )
         clReleaseSampler( nearestVolumeSampler_ );
 
-    if( transferFunctionSampler_ )
-        clReleaseSampler( transferFunctionSampler_ );
+//    if( transferFunctionSampler_ )
+//        clReleaseSampler( transferFunctionSampler_ );
 
     if( clVolume_->getDeviceData( ))
         clReleaseMemObject( clVolume_->getDeviceData( ));
 
-    if( clTransferFunction->getDeviceData() )
-        clReleaseMemObject( clTransferFunction->getDeviceData( ));
+//    if( clTransferFunction->getDeviceData() )
+//        clReleaseMemObject( clTransferFunction->getDeviceData( ));
 
     if( clFrame_->getDeviceData() )
         clReleaseMemObject( clFrame_->getDeviceData( ));

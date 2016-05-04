@@ -181,7 +181,7 @@ void CLCompositor< T >::initializeBuffers_()
                                             CL_INTENSITY ,
                                             CL_FLOAT );
 
-    compositingKernel_->setCollageFrame( finalFrame_->getDeviceData( ));
+    compositingKernel_->setFinalFrame( finalFrame_->getDeviceData( ));
     LOG_DEBUG("[DONE] Initializing Buffers ...");
 }
 

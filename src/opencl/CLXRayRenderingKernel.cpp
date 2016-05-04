@@ -135,62 +135,62 @@ void CLXRayRenderingKernel::setInverseViewMatrix( cl_mem matrix )
     }
 }
 
-void CLXRayRenderingKernel::setTransferFunctionData(cl_mem data)
-{
-    cl_int error = clSetKernelArg(kernelObject_,X_RAY_TRANSFER_FUNCTION_DATA_ARG,
-                                  sizeof( cl_mem ),
-                                  (void *) &data);
-    if( error != CL_SUCCESS )
-    {
-        oclHWDL::Error::checkCLError( error );
-        LOG_ERROR("Exiting Due to OpenCL Error!");
-    }
-}
+//void CLXRayRenderingKernel::setTransferFunctionData(cl_mem data)
+//{
+//    cl_int error = clSetKernelArg(kernelObject_,X_RAY_TRANSFER_FUNCTION_DATA_ARG,
+//                                  sizeof( cl_mem ),
+//                                  (void *) &data);
+//    if( error != CL_SUCCESS )
+//    {
+//        oclHWDL::Error::checkCLError( error );
+//        LOG_ERROR("Exiting Due to OpenCL Error!");
+//    }
+//}
 
-void CLXRayRenderingKernel::setTransferFunctionOffset(float offset)
-{
-    cl_int error = clSetKernelArg(kernelObject_,X_RAY_TRANSFER_FUNCTION_OFFSET_ARG,
-                                  sizeof( float ),
-                                  (void* ) &offset);
-    if( error != CL_SUCCESS )
-    {
-        oclHWDL::Error::checkCLError( error );
-        LOG_ERROR("Exiting Due to OpenCL Error!");
-    }
-}
+//void CLXRayRenderingKernel::setTransferFunctionOffset(float offset)
+//{
+//    cl_int error = clSetKernelArg(kernelObject_,X_RAY_TRANSFER_FUNCTION_OFFSET_ARG,
+//                                  sizeof( float ),
+//                                  (void* ) &offset);
+//    if( error != CL_SUCCESS )
+//    {
+//        oclHWDL::Error::checkCLError( error );
+//        LOG_ERROR("Exiting Due to OpenCL Error!");
+//    }
+//}
 
-void CLXRayRenderingKernel::setTransferFunctionSampler(cl_sampler sampler)
-{
-    cl_int error = clSetKernelArg( kernelObject_, X_RAY_TRANSFER_FUNCTION_SAMPLER_ARG,
-                                   sizeof( cl_sampler ),
-                                   &sampler );
-    if( error != CL_SUCCESS )
-    {
-        oclHWDL::Error::checkCLError( error );
-        LOG_ERROR("Exiting Due to OpenCL Error!");
-    }
-}
+//void CLXRayRenderingKernel::setTransferFunctionSampler(cl_sampler sampler)
+//{
+//    cl_int error = clSetKernelArg( kernelObject_, X_RAY_TRANSFER_FUNCTION_SAMPLER_ARG,
+//                                   sizeof( cl_sampler ),
+//                                   &sampler );
+//    if( error != CL_SUCCESS )
+//    {
+//        oclHWDL::Error::checkCLError( error );
+//        LOG_ERROR("Exiting Due to OpenCL Error!");
+//    }
+//}
 
-void CLXRayRenderingKernel::setTransferFunctionScale(float scale)
-{
-    cl_int error = clSetKernelArg(kernelObject_,X_RAY_TRANSFER_FUNCTION_SCALE_ARG,
-                                  sizeof( float ),
-                                  (void *)&scale);
-    if( error != CL_SUCCESS )
-    {
-        oclHWDL::Error::checkCLError( error );
-        LOG_ERROR("Exiting Due to OpenCL Error!");
-    }
-}
+//void CLXRayRenderingKernel::setTransferFunctionScale(float scale)
+//{
+//    cl_int error = clSetKernelArg(kernelObject_,X_RAY_TRANSFER_FUNCTION_SCALE_ARG,
+//                                  sizeof( float ),
+//                                  (void *)&scale);
+//    if( error != CL_SUCCESS )
+//    {
+//        oclHWDL::Error::checkCLError( error );
+//        LOG_ERROR("Exiting Due to OpenCL Error!");
+//    }
+//}
 
-void CLXRayRenderingKernel::setTransferFunctionFlag(int enableTransferFunction)
-{
-    cl_int error = clSetKernelArg( kernelObject_, X_RAY_TRANSFER_FUNCTION_FLAG_ARG,
-                                   sizeof( int ),
-                                   &enableTransferFunction );
-    if( error != CL_SUCCESS )
-    {
-        oclHWDL::Error::checkCLError( error );
-        LOG_ERROR("Exiting Due to OpenCL Error!");
-    }
-}
+//void CLXRayRenderingKernel::setTransferFunctionFlag(int enableTransferFunction)
+//{
+//    cl_int error = clSetKernelArg( kernelObject_, X_RAY_TRANSFER_FUNCTION_FLAG_ARG,
+//                                   sizeof( int ),
+//                                   &enableTransferFunction );
+//    if( error != CL_SUCCESS )
+//    {
+//        oclHWDL::Error::checkCLError( error );
+//        LOG_ERROR("Exiting Due to OpenCL Error!");
+//    }
+//}

@@ -65,35 +65,35 @@ public:
      */
     void setInverseViewMatrix( cl_mem matrix );
 
-    /**
-     * @brief setTransferFunctionData
-     * @param data
-     */
-    void setTransferFunctionData(cl_mem data);
+//    /**
+//     * @brief setTransferFunctionData
+//     * @param data
+//     */
+//    void setTransferFunctionData( cl_mem data );
 
-    /**
-     * @brief setTransferFunctionOffset
-     * @param offset
-     */
-    void setTransferFunctionOffset(float offset);
+//    /**
+//     * @brief setTransferFunctionOffset
+//     * @param offset
+//     */
+//    void setTransferFunctionOffset( float offset );
 
-    /**
-     * @brief setTransferFunctionSampler
-     * @param sampler
-     */
-    void setTransferFunctionSampler(cl_sampler sampler);
+//    /**
+//     * @brief setTransferFunctionSampler
+//     * @param sampler
+//     */
+//    void setTransferFunctionSampler( cl_sampler sampler );
 
-    /**
-     * @brief setTransferFunctionScale
-     * @param scale
-     */
-    void setTransferFunctionScale(float scale);
+//    /**
+//     * @brief setTransferFunctionScale
+//     * @param scale
+//     */
+//    void setTransferFunctionScale( float scale );
 
-    /**
-     * @brief setTransferFunctionFlag
-     * @param enableTransferFunction
-     */
-    void setTransferFunctionFlag(int enableTransferFunction);
+//    /**
+//     * @brief setTransferFunctionFlag
+//     * @param enableTransferFunction
+//     */
+//    void setTransferFunctionFlag( int enableTransferFunction );
 
 private:
 

@@ -109,35 +109,35 @@ public:
      */
     virtual void setInverseViewMatrix( cl_mem matrix ) = 0;
 
-    /**
-     * @brief setTransferFunctionData
-     * @param data
-     */
-    virtual void setTransferFunctionData( cl_mem data );
+//    /**
+//     * @brief setTransferFunctionData
+//     * @param data
+//     */
+//    virtual void setTransferFunctionData( cl_mem data );
 
-    /**
-     * @brief setTransferFunctionSampler
-     * @param sampler
-     */
-    virtual void setTransferFunctionSampler( cl_sampler sampler );
+//    /**
+//     * @brief setTransferFunctionSampler
+//     * @param sampler
+//     */
+//    virtual void setTransferFunctionSampler( cl_sampler sampler );
 
-    /**
-     * @brief setTransferFunctionOffset
-     * @param offset
-     */
-    virtual void setTransferFunctionOffset( float offset );
+//    /**
+//     * @brief setTransferFunctionOffset
+//     * @param offset
+//     */
+//    virtual void setTransferFunctionOffset( float offset );
 
-    /**
-     * @brief setTransferFunctionScale
-     * @param scale
-     */
-    virtual void setTransferFunctionScale( float scale );
+//    /**
+//     * @brief setTransferFunctionScale
+//     * @param scale
+//     */
+//    virtual void setTransferFunctionScale( float scale );
 
-    /**
-     * @brief setTransferFunctionFlag
-     * @param enableTransferFunction
-     */
-    virtual void setTransferFunctionFlag(int enableTransferFunction);
+//    /**
+//     * @brief setTransferFunctionFlag
+//     * @param enableTransferFunction
+//     */
+//    virtual void setTransferFunctionFlag(int enableTransferFunction);
 
     /**
      * @brief releaseKernel

@@ -75,7 +75,7 @@ void CLCompositorAccumulate< T >::composite( )
         finalFrame_ = loadedFrames_.dequeue() ;
 
         compositingKernel_->
-                setCollageFrame( finalFrame_->getDeviceData( ));
+                setFinalFrame( finalFrame_->getDeviceData( ));
         return ;
     }
 
