@@ -12,37 +12,84 @@ template < class V , class F >
 class CLRenderer : public CLAbstractRenderer
 {
 public:
+    /**
+     * @brief CLRenderer
+     * @param gpuIndex
+     * @param frameWidth
+     * @param frameHeight
+     * @param transformation
+     * @param kernelDirectory
+     */
     CLRenderer( const uint64_t gpuIndex,
                 const uint frameWidth , const uint frameHeight ,
                 const Transformation &transformation ,
                 const std::string kernelDirectory = "." );
 
+
     ~CLRenderer();
 
+    /**
+     * @brief loadVolume
+     * @param volume
+     */
     void loadVolume( const VolumeVariant &volume ) override ;
 
+    /**
+     * @brief applyTransformation
+     */
     void applyTransformation( ) override ;
 
+    /**
+     * @brief setFrameIndex
+     * @param frameIndex
+     */
     void setFrameIndex( const uint frameIndex  ) override;
 
+    /**
+     * @brief getCurrentCenter
+     * @return
+     */
     const Coordinates3D &getCurrentCenter() const override ;
 
+    /**
+     * @brief getFrameIndex
+     * @return
+     */
     uint getFrameIndex( ) const override ;
 
+    /**
+     * @brief getCLFrame
+     * @return
+     */
     const CLFrameVariant &getCLFrame( ) const override;
 
 protected:
 
+    /**
+     * @brief renderFrame
+     */
     void renderFrame() override ;
 
+    /**
+     * @brief createPixelBuffer_
+     */
     void createPixelBuffer_() override ;
 
+    /**
+     * @brief initializeKernels_
+     */
     void initializeKernels_() override ;
 
+    /**
+     * @brief freeBuffers_
+     */
     void freeBuffers_() override ;
 
 private:
 
+    /**
+     * @brief paint_
+     */
     void paint_( );
 
 

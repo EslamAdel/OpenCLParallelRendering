@@ -17,16 +17,37 @@ class CLAbstractRenderer : public QObject
 {
     Q_OBJECT
 public:
+
+    /**
+     * @brief CLAbstractRenderer
+     * @param gpuIndex
+     * @param frameWidth
+     * @param frameHeight
+     * @param kernelDirectory
+     * @param parent
+     */
     explicit CLAbstractRenderer( const uint64_t gpuIndex ,
                                  const uint frameWidth , const uint frameHeight ,
                                  const std::string kernelDirectory  ,
                                  QObject *parent = 0 );
 
 
+    /**
+     * @brief setFrameIndex
+     * @param frameIndex
+     */
     virtual void setFrameIndex( const uint frameIndex  ) = 0 ;
 
+    /**
+     * @brief loadVolume
+     * @param volume
+     */
     virtual void loadVolume( const VolumeVariant &volume ) = 0 ;
 
+    /**
+     * @brief getGPUIndex
+     * @return
+     */
     virtual uint64_t getGPUIndex( ) const ;
 
     /**
@@ -54,30 +75,67 @@ public:
     cl_command_queue getCommandQueue( ) const;
 
 
+    /**
+     * @brief applyTransformation
+     */
     virtual void applyTransformation() = 0 ;
 
 
+    /**
+     * @brief getCLFrame
+     * @return
+     */
     virtual const CLFrameVariant &getCLFrame( ) const = 0;
 
+    /**
+     * @brief getCurrentCenter
+     * @return
+     */
     virtual const Coordinates3D &getCurrentCenter() const = 0 ;
 
+    /**
+     * @brief getFrameIndex
+     * @return
+     */
     virtual uint getFrameIndex( ) const = 0 ;
 
 
+    /**
+     * @brief switchRenderingKernel
+     * @param type
+     */
     void switchRenderingKernel( const RenderingMode type ) ;
 
 
+    /**
+     * @brief lessThan
+     * @param lhs
+     * @param rhs
+     * @return
+     */
     static bool lessThan( const CLAbstractRenderer* lhs ,
                           const CLAbstractRenderer* rhs );
 
 protected:
 
+    /**
+     * @brief renderFrame
+     */
     virtual void renderFrame( ) = 0 ;
 
+    /**
+     * @brief createPixelBuffer_
+     */
     virtual void createPixelBuffer_( ) = 0;
 
+    /**
+     * @brief initializeKernels_
+     */
     virtual void initializeKernels_( ) = 0;
 
+    /**
+     * @brief freeBuffers_
+     */
     virtual void freeBuffers_( ) = 0 ;
 
 signals:

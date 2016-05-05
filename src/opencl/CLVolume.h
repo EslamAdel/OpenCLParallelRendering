@@ -18,6 +18,7 @@ enum VOLUME_PRECISION
 template< class T >
 class CLVolume
 {
+    Q_DISABLE_COPY( CLVolume )
 public:
 
     /**
@@ -51,10 +52,24 @@ private:
      */
     const VOLUME_PRECISION precision_;
 
+    /**
+     * @brief imageDescriptor_
+     */
     cl_image_desc imageDescriptor_ ;
+
+    /**
+     * @brief imageFormat_
+     */
     cl_image_format imageFormat_ ;
+
+    /**
+     * @brief flags_
+     */
     cl_mem_flags flags_ ;
 
+    /**
+     * @brief deviceData_
+     */
     cl_mem deviceData_ ;
 };
 

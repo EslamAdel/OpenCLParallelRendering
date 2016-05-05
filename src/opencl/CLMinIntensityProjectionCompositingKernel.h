@@ -8,6 +8,13 @@ class CLMinIntensityProjectionCompositingKernel : public CLCompositingKernel
 {
 public:
 
+    /**
+     * @brief CLMinIntensityProjectionCompositingKernel
+     * @param clContext
+     * @param kernelName
+     * @param kernelFile
+     * @param kernelDirectory
+     */
     CLMinIntensityProjectionCompositingKernel(
             const cl_context clContext ,
             const std::string kernelName = "minIntensityProjection_compositing" ,

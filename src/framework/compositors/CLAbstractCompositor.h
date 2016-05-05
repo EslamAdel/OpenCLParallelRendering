@@ -23,26 +23,66 @@ class CLAbstractCompositor : public QObject
     Q_OBJECT
 
 public:
+
+    /**
+     * @brief CLAbstractCompositor
+     * @param gpuIndex
+     * @param frameWidth
+     * @param frameHeight
+     * @param kernelDirectory
+     * @param parent
+     */
     CLAbstractCompositor( const uint64_t gpuIndex ,
                           const uint frameWidth , const uint frameHeight ,
                           const std::string kernelDirectory  ,
                           QObject *parent = 0  );
 
+    /**
+     * @brief allocateFrame
+     * @param renderer
+     */
     virtual void allocateFrame( CLAbstractRenderer *renderer ) = 0 ;
 
+    /**
+     * @brief collectFrame
+     * @param renderer
+     * @param block
+     */
     virtual void collectFrame( CLAbstractRenderer *renderer ,
                                const cl_bool block ) = 0;
 
+    /**
+     * @brief composite
+     */
     virtual void composite( ) = 0 ;
 
+    /**
+     * @brief loadFinalFrame
+     */
     virtual void loadFinalFrame( ) = 0 ;
 
+    /**
+     * @brief getFinalFrame
+     * @return
+     */
     virtual const CLFrameVariant &getFinalFrame() const = 0 ;
 
+    /**
+     * @brief getGPUIndex
+     * @return
+     */
     uint64_t getGPUIndex( ) const;
 
+    /**
+     * @brief readOutReady
+     * @return
+     */
     bool readOutReady( ) const ;
 
+    /**
+     * @brief switchCompositingKernel
+     * @param mode
+     */
     void switchCompositingKernel( const RenderingMode mode ) ;
 
 private:
@@ -86,6 +126,9 @@ private:
 
 protected:
 
+    /**
+     * @brief frameDimensions_
+     */
     const Dimensions2D frameDimensions_;
 
     /**

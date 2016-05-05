@@ -14,6 +14,13 @@ private:
     };
 
 public:
+    /**
+     * @brief CLXRayRenderingKernel
+     * @param clContext
+     * @param kernelDirectory
+     * @param kernelFile
+     * @param kernelName
+     */
     CLXRayRenderingKernel( cl_context clContext = NULL,
                            const std::string kernelDirectory = ".",
                            const std::string kernelFile = "xray.cl" ,
@@ -21,20 +28,24 @@ public:
 
 public:
 
-    RenderingMode getRenderingKernelType( ) const override ;
+    /**
+     * @brief getRenderingKernelType
+     * @return
+     */
+    virtual RenderingMode getRenderingKernelType( ) const final ;
 
 
     /**
      * @brief setVolumeDensityFactor
      * @param density
      */
-    void setVolumeDensityFactor( float density ) override;
+    virtual void setVolumeDensityFactor( float density ) final;
 
     /**
      * @brief setImageBrightnessFactor
      * @param brightness
      */
-    void setImageBrightnessFactor( float brightness ) override;
+    virtual void setImageBrightnessFactor( float brightness ) final;
 
 
 
@@ -43,7 +54,7 @@ protected:
     /**
      * @brief retrieveKernelObject_
      */
-    void retrieveKernelObject_( ) override ;
+    virtual void retrieveKernelObject_( ) final ;
 
 private:
 

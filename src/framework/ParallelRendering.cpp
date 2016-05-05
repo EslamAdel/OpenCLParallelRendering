@@ -90,7 +90,8 @@ void ParallelRendering::addCLRenderer( const uint64_t gpuIndex )
               new CLRenderer< uchar , float >( gpuIndex,
                                                frameWidth_ ,
                                                frameHeight_ ,
-                                               transformationAsync_  );
+                                               transformationAsync_  ,
+                                               "/usr/local/share" );
 
     ATTACH_RENDERING_PROFILE( renderer );
     ATTACH_COLLECTING_PROFILE( renderer );
@@ -157,7 +158,8 @@ void ParallelRendering::addCLCompositor( const uint64_t gpuIndex )
     if( inUseGPUs_.size() > 1 )
         compositor_ = new CLCompositor< float >( gpuIndex ,
                                                  frameWidth_ ,
-                                                 frameHeight_ );
+                                                 frameHeight_ ,
+                                                 "/usr/local/share" );
 
 
     LOG_DEBUG("[DONE] Initialize Compositor");

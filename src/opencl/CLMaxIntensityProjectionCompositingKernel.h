@@ -8,6 +8,13 @@ class CLMaxIntensityProjectionCompositingKernel : public CLCompositingKernel
 {
 public:
 
+    /**
+     * @brief CLMaxIntensityProjectionCompositingKernel
+     * @param clContext
+     * @param kernelName
+     * @param kernelFile
+     * @param kernelDirectory
+     */
     CLMaxIntensityProjectionCompositingKernel(
             const cl_context clContext ,
             const std::string kernelName = "maxIntensityProjection_compositing" ,

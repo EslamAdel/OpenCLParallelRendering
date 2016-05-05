@@ -19,6 +19,8 @@ enum RenderingMode
 class CLRenderingKernel
 {
 
+    Q_DISABLE_COPY( CLRenderingKernel )
+
 protected:
     enum KernelArgument
     {

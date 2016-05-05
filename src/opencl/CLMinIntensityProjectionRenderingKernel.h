@@ -13,6 +13,13 @@ private:
     };
 
 public:
+    /**
+     * @brief CLMinIntensityProjectionRenderingKernel
+     * @param sharedContext
+     * @param kernelDirectory
+     * @param kernelFile
+     * @param kernelName
+     */
     CLMinIntensityProjectionRenderingKernel(
             cl_context sharedContext = NULL,
             const std::string kernelDirectory = ".",
@@ -21,20 +28,24 @@ public:
 
 public:
 
-    RenderingMode getRenderingKernelType( ) const override ;
+    /**
+     * @brief getRenderingKernelType
+     * @return
+     */
+    virtual RenderingMode getRenderingKernelType( ) const final ;
 
 
     /**
      * @brief setVolumeDensityFactor
      * @param density
      */
-    void setVolumeDensityFactor( float density ) override;
+    virtual void setVolumeDensityFactor( float density ) final;
 
     /**
      * @brief setImageBrightnessFactor
      * @param brightness
      */
-    void setImageBrightnessFactor( float brightness ) override;
+    virtual void setImageBrightnessFactor( float brightness ) final;
 
 
 
@@ -43,7 +54,7 @@ protected:
     /**
      * @brief retrieveKernelObject_
      */
-    void retrieveKernelObject_( ) override ;
+    virtual void retrieveKernelObject_( ) final ;
 
 private:
 

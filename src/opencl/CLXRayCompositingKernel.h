@@ -7,6 +7,13 @@ class CLXRayCompositingKernel : public CLCompositingKernel
 {
 
 public:
+    /**
+     * @brief CLXRayCompositingKernel
+     * @param clContext
+     * @param kernelName
+     * @param kernelFile
+     * @param kernelDirectory
+     */
     CLXRayCompositingKernel(
             const cl_context clContext ,
             const std::string kernelName = "xray_compositing_accumulate" ,
