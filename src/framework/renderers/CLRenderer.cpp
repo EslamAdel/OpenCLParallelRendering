@@ -116,7 +116,7 @@ void CLRenderer< V , F >::renderFrame()
 
 
     clErrorCode |= clEnqueueWriteBuffer( commandQueue_,
-                                         inverseMatrix_,
+                                         inverseMatrix_ ,
                                          CL_FALSE,
                                          0,
                                          12 * sizeof( float ),
@@ -163,55 +163,48 @@ void CLRenderer< V , F >::initializeKernels_()
 {
     LOG_DEBUG( "Initializing an OpenCL Kernels ... " );
 
+    // Assuming that every thing is going in the right direction.
     cl_int clErrorCode = CL_SUCCESS;
 
 
     linearVolumeSampler_ = clCreateSampler( context_, true,
                                             CL_ADDRESS_CLAMP_TO_EDGE,
                                             CL_FILTER_LINEAR, &clErrorCode );
-    oclHWDL::Error::checkCLError(clErrorCode);
 
 
     nearestVolumeSampler_ = clCreateSampler( context_, true,
                                              CL_ADDRESS_REPEAT,
                                              CL_FILTER_NEAREST,
                                              &clErrorCode );
-    oclHWDL::Error::checkCLError(clErrorCode);
+
+    inverseMatrix_ = clCreateBuffer( context_,
+                                     CL_MEM_READ_ONLY,
+                                     12 * sizeof( float ), 0,
+                                     &clErrorCode );
 
 
-    activeRenderingKernel_ =  renderingKernels_[ RenderingMode::RENDERING_MODE_Xray ];
 
-
-    for( CLRenderingKernel* renderingKernel : renderingKernels_.values( ))
+    if( clErrorCode != CL_SUCCESS )
     {
-        // Assuming that every thing is going in the right direction.
-        cl_int clErrorCode = CL_SUCCESS;
+        oclHWDL::Error::checkCLError( clErrorCode );
+        LOG_ERROR("Exiting Due to OpenCL Error!");
+    }
 
+
+    for( const RenderingMode mode : renderingKernels_.keys())
+    {
+        CLRenderingKernel* renderingKernel = renderingKernels_[ mode ];
 
         renderingKernel->setFrameBuffer( clFrame_->getDeviceData() );
         renderingKernel->setFrameWidth( clFrame_->getFrameDimensions().x );
         renderingKernel->setFrameHeight( clFrame_->getFrameDimensions().y );
 
+        renderingKernel->setInverseViewMatrix( inverseMatrix_ );
 
         renderingKernel->setVolumeData( clVolume_->getDeviceData( ));
 
         renderingKernel->setVolumeSampler
                 ( linearFiltering_ ? linearVolumeSampler_ : nearestVolumeSampler_);
-
-        inverseMatrix_ = clCreateBuffer( context_,
-                                         CL_MEM_READ_ONLY,
-                                         12 * sizeof( float ), 0,
-                                         &clErrorCode );
-
-        oclHWDL::Error::checkCLError( clErrorCode );
-
-
-        renderingKernel->setInverseViewMatrix( inverseMatrix_);
-
-
-        oclHWDL::Error::checkCLError( clErrorCode );
-
-
     }
 
     LOG_DEBUG( "[DONE] Initializing an OpenCL Kernels ... " );

@@ -1,11 +1,19 @@
 #include "CLAbstractCompositor.h"
 
 
-CLAbstractCompositor::CLAbstractCompositor( const uint64_t gpuIndex )
-    : gpuIndex_( gpuIndex )
+CLAbstractCompositor::CLAbstractCompositor( const uint64_t gpuIndex,
+                                            const uint frameWidth,
+                                            const uint frameHeight,
+                                            const std::string kernelDirectory,
+                                            QObject *parent)
+    : gpuIndex_( gpuIndex ) ,
+      kernelDirectory_( kernelDirectory ),
+      frameDimensions_( frameWidth , frameHeight ),
+      QObject(parent)
 {
     readOutReady_ = false ;
     initializeContext_( );
+    compositingKernels_ = allocateKernels_();
 }
 
 uint64_t CLAbstractCompositor::getGPUIndex() const
@@ -16,6 +24,15 @@ uint64_t CLAbstractCompositor::getGPUIndex() const
 bool CLAbstractCompositor::readOutReady() const
 {
     return readOutReady_ ;
+}
+
+void CLAbstractCompositor::switchCompositingKernel( const RenderingMode mode )
+{
+    QMutexLocker lock( &switchKernelMutex_ );
+
+    if( compositingKernels_.contains( mode ))
+
+        activeCompositingKernel_ = compositingKernels_[ mode ];
 }
 
 void CLAbstractCompositor::selectGPU_()
@@ -47,6 +64,39 @@ void CLAbstractCompositor::initializeContext_()
     createCommandQueue_( );
 
     LOG_DEBUG( "[DONE] Initializing an OpenCL context ... " );
+}
+
+
+CLCompositingKernels CLAbstractCompositor::allocateKernels_( ) const
+{
+
+    CLCompositingKernels kernels ;
+
+
+    kernels[ RenderingMode::RENDERING_MODE_Xray ] =
+            new CLXRayCompositingKernel( context_ ,
+                                         "xray_compositing_patch" ,
+                                         "xray_compositing.cl" ,
+                                         kernelDirectory_ );
+
+
+    kernels[ RenderingMode::RENDERING_MODE_MinIntensity ] =
+            new CLMinIntensityProjectionCompositingKernel(
+                context_ ,
+                "minIntensityProjection_compositing" ,
+                "minIntensityProjection_compositing.cl",
+                kernelDirectory_ );
+
+
+    kernels[ RenderingMode::RENDERING_MODE_MaxIntensity ] =
+            new CLMaxIntensityProjectionCompositingKernel(
+                context_ ,
+                "maxIntensityProjection_compositing" ,
+                "maxIntensityProjection_compositing.cl" ,
+                kernelDirectory_ );
+
+
+    return kernels;
 }
 
 void CLAbstractCompositor::createCommandQueue_()

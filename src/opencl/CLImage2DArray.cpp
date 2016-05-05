@@ -144,6 +144,9 @@ template< class T >
 void CLImage2DArray< T >::resize( const uint newArraySize ,
                                   cl_context context )
 {
+    if( arraySize_ == newArraySize )
+        return ;
+
     releaseDeviceData_( );
     arraySize_ = newArraySize ;
     imageDescriptor_.image_depth = newArraySize ;

@@ -73,6 +73,9 @@ void CLBuffer< T >::readDeviceData( cl_command_queue cmdQueue ,
 template< class T >
 void CLBuffer< T >::resize( u_int64_t newSize )
 {
+    if( size_ == newSize )
+        return;
+
     size_ = newSize ;
 
     if( void* mem = std::realloc( hostData_ , newSize ))

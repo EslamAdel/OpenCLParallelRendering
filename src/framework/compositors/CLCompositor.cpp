@@ -13,16 +13,17 @@
 template< class T >
 CLCompositor< T >::CLCompositor( const uint64_t gpuIndex,
                                  const uint frameWidth ,
-                                 const uint frameHeight )
-    : CLAbstractCompositor( gpuIndex ) ,
-      frameDimensions_( frameWidth , frameHeight )
+                                 const uint frameHeight ,
+                                 const std::string kernelDirectory )
+    : CLAbstractCompositor( gpuIndex  ,frameWidth , frameHeight, kernelDirectory )
 {
     framesCount_ = 0 ;
     framesInCompositor_ = 0 ;
     depthIndex_ = nullptr;
 
-    initializeKernel_();
     initializeBuffers_();
+    initializeKernel_();
+
 }
 
 template< class T >
@@ -38,24 +39,16 @@ void CLCompositor< T >::allocateFrame( CLAbstractRenderer *renderer )
         return ;
 
     renderer->setFrameIndex( renderers_.size( ));
-
     renderers_ << renderer ;
+
+
     imagesArray_->resize( renderers_.size( ) ,
                           context_ );
 
-    if( depthIndex_ == nullptr )
-    {
-        depthIndex_ = new CLBuffer< uint >( 1 );
-        depthIndex_->createDeviceData( context_ );
-    }
-    else
-        depthIndex_->resize( renderers_.size( ));
+    depthIndex_->resize( renderers_.size( ));
 
 
-    compositingKernel_->setDepthIndex( depthIndex_->getDeviceData( ));
-
-    if( imagesArray_->inDevice())
-        compositingKernel_->setFrame( imagesArray_->getDeviceData( ));
+    updateKernelsArguments();
 
 }
 
@@ -83,12 +76,17 @@ void CLCompositor< T >::collectFrame( CLAbstractRenderer *renderer ,
     imagesArray_->loadFrameDataToDevice( renderer->getFrameIndex() ,
                                          commandQueue_ ,
                                          block );
+
+    QMutexLocker lock( &criticalMutex_ );
+
     framesInCompositor_++;
 }
 
 template< class T >
 void CLCompositor< T >::composite( )
 {
+    QMutexLocker lock( &criticalMutex_ );
+
     if( framesInCompositor_ != imagesArray_->size( ))
         return ;
 
@@ -102,10 +100,6 @@ void CLCompositor< T >::composite( )
     for( const CLAbstractRenderer *renderer : renderers_ )
         depthIndex << renderer->getFrameIndex();
 
-    //    for( CLRenderer *renderer : renderers_ )
-    //        LOG_DEBUG("Depth<%d>: %f" ,
-    //                  renderer->getFrameIndex() ,
-    //                  renderer->getCurrentCenter().z );
 
 
     depthIndex_->setHostData( depthIndex );
@@ -115,9 +109,10 @@ void CLCompositor< T >::composite( )
     const size_t globalSize[ ] = { frameDimensions_.x ,
                                    frameDimensions_.y };
 
+    QMutexLocker kernelLock( &switchKernelMutex_ );
     cl_int clErrorCode =
             clEnqueueNDRangeKernel( commandQueue_ ,
-                                    compositingKernel_->getKernelObject() ,
+                                    activeCompositingKernel_->getKernelObject() ,
                                     2 ,
                                     NULL ,
                                     globalSize ,
@@ -181,18 +176,52 @@ void CLCompositor< T >::initializeBuffers_()
                                             CL_INTENSITY ,
                                             CL_FLOAT );
 
-    compositingKernel_->setFinalFrame( finalFrame_->getDeviceData( ));
+    depthIndex_ = new CLBuffer< uint >( 1 );
+
+    depthIndex_->createDeviceData( context_ );
+
     LOG_DEBUG("[DONE] Initializing Buffers ...");
 }
 
 template< class T >
 void CLCompositor< T >::initializeKernel_()
 {
-    LOG_DEBUG( "Initializing an OpenCL Kernel ... " );
-    compositingKernel_ =
-            new CLXRayCompositingKernel( context_ ,
-                                         "xray_compositing_patch" );
-    LOG_DEBUG( "[DONE] Initializing an OpenCL Kernel ... " );
+    LOG_DEBUG( "Initializing OpenCL Kernels ... " );
+
+    activeCompositingKernel_ =
+            compositingKernels_[ RenderingMode::RENDERING_MODE_Xray ];
+
+    for( CLCompositingKernel* compositingKernel : compositingKernels_.values( ))
+    {
+        // Assuming that every thing is going in the right direction.
+        cl_int clErrorCode = CL_SUCCESS;
+
+        compositingKernel->setFinalFrame( finalFrame_->getDeviceData( ));
+
+        oclHWDL::Error::checkCLError( clErrorCode );
+    }
+
+    LOG_DEBUG( "[DONE] Initializing OpenCL Kernels ... " );
+}
+
+
+template< class T >
+void CLCompositor< T >::updateKernelsArguments()
+{
+
+    for( CLCompositingKernel* compositingKernel : compositingKernels_.values( ))
+    {
+        // Assuming that every thing is going in the right direction.
+        cl_int clErrorCode = CL_SUCCESS;
+
+        compositingKernel->setDepthIndex( depthIndex_->getDeviceData( ));
+
+        oclHWDL::Error::checkCLError( clErrorCode );
+
+        if( imagesArray_->inDevice())
+            compositingKernel->setFrame( imagesArray_->getDeviceData( ));
+    }
+
 }
 
 #include "CLCompositor.ipp"

@@ -3,9 +3,9 @@
 
 #include "Headers.hh"
 #include <oclHWDL/oclHWDL.h>
-#include <QVector>
 #include "Logger.h"
 #include "CLRenderingKernel.h"
+#include <QMap>
 
 class CLCompositingKernel
 {
@@ -50,6 +50,6 @@ private:
 /**
  * @brief CLRenderingKernels
  */
-typedef QMap< RenderingMode , CLRenderingKernel* > CLRenderingKernels;
+typedef QMap< RenderingMode , CLCompositingKernel* > CLCompositingKernels;
 
 #endif // CLCOMPOSITINGKERNEL_H

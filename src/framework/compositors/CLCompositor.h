@@ -8,6 +8,8 @@
 #include "CLBuffer.h"
 #include <unordered_map>
 #include "CLAbstractCompositor.h"
+#include <QMutex>
+#include <QMutexLocker>
 
 template< class T >
 class CLCompositor : public CLAbstractCompositor
@@ -15,15 +17,15 @@ class CLCompositor : public CLAbstractCompositor
 public:
 
     CLCompositor( const uint64_t gpuIndex ,
-                  const uint frameWidth ,
-                  const uint frameHeight ) ;
+                  const uint frameWidth , const uint frameHeight,
+                  const std::string kernelDirectory = "." ) ;
 
     ~CLCompositor( );
 
     void allocateFrame( CLAbstractRenderer *renderer ) override ;
 
     void collectFrame( CLAbstractRenderer *renderer ,
-                               const cl_bool block ) override ;
+                       const cl_bool block ) override ;
 
     void composite( ) override ;
 
@@ -41,10 +43,10 @@ protected :
 
     void initializeKernel_( ) override ;
 
-protected:
-    CLXRayCompositingKernel *compositingKernel_ ;
+    void updateKernelsArguments( )  ;
 
-    const Dimensions2D frameDimensions_;
+
+protected:
 
     uint framesCount_ ;
 
@@ -58,6 +60,8 @@ protected:
     CLImage2DArray< T > *imagesArray_ ;
 
     CLBuffer< uint > *depthIndex_ ;
+
+    QMutex criticalMutex_ ;
 };
 
 #endif // CLCompositor_H

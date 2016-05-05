@@ -1,11 +1,12 @@
 #include "CLCompositorAccumulate.h"
 
 template< class T >
-CLCompositorAccumulate< T >::CLCompositorAccumulate( const uint64_t gpuIndex ,
-                                                     const uint frameWidth ,
-                                                     const uint frameHeight )
-    : CLAbstractCompositor( gpuIndex ) ,
-      frameDimensions_( Dimensions2D( frameWidth , frameHeight ))
+CLCompositorAccumulate< T >::CLCompositorAccumulate(
+        const uint64_t gpuIndex,
+        const uint frameWidth ,
+        const uint frameHeight ,
+        const std::string kernelDirectory )
+    : CLAbstractCompositor( gpuIndex  ,frameWidth , frameHeight, kernelDirectory )
 {
     compositedFramesCount_ = 0 ;
     framesCount_ = 0 ;
@@ -74,7 +75,7 @@ void CLCompositorAccumulate< T >::composite( )
         //make first loaded frame buffer as collage frame.
         finalFrame_ = loadedFrames_.dequeue() ;
 
-        compositingKernel_->
+        activeCompositingKernel_->
                 setFinalFrame( finalFrame_->getDeviceData( ));
         return ;
     }
@@ -84,7 +85,7 @@ void CLCompositorAccumulate< T >::composite( )
     // Assume everything is fine in the begnning
     cl_int clErrorCode = CL_SUCCESS;
 
-    compositingKernel_->setFrame( currentFrameObject );
+    activeCompositingKernel_->setFrame( currentFrameObject );
 
     const size_t localSize[ ] = { 1 } ;
     const size_t globalSize[ ] = { frameDimensions_.imageSize() };
@@ -92,7 +93,7 @@ void CLCompositorAccumulate< T >::composite( )
 
 
     clErrorCode = clEnqueueNDRangeKernel( commandQueue_ ,
-                                          compositingKernel_->getKernelObject() ,
+                                          activeCompositingKernel_->getKernelObject() ,
                                           1 ,
                                           NULL ,
                                           globalSize ,
@@ -160,9 +161,9 @@ void CLCompositorAccumulate< T >::initializeKernel_()
 {
     LOG_DEBUG( "Initializing an OpenCL Kernel ... " );
 
-    compositingKernel_ =
-            new CLXRayCompositingKernel( context_ ,
-                                         "xray_compositing_accumulate" );
+//    activeCompositingKernel_ =
+//            new CLXRayCompositingKernel( context_ ,
+//                                         "xray_compositing_accumulate" );
 
     LOG_DEBUG( "[DONE] Initializing an OpenCL Kernel ... " );
 }

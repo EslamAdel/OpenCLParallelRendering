@@ -37,7 +37,7 @@ const sampler_t sampler   = CLK_NORMALIZED_COORDS_FALSE |
                             CLK_ADDRESS_NONE |
                             CLK_FILTER_LINEAR ;
 __kernel
-void minInensityProjection_compositing( __write_only image2d_t finalFrame ,
+void minIntensityProjection_compositing( __write_only image2d_t finalFrame ,
                              __read_only image3d_t framesArray ,
                              __constant  uint* depthIndex )
 {
@@ -60,13 +60,14 @@ void minInensityProjection_compositing( __write_only image2d_t finalFrame ,
         if the specified relation is true.
         © 2016 Pearson Education, Informit. All rights reserved.
         **/
-        if( sample < minColor )
+        const int4 cmp = isless( sample , minColor ) ;
+        if(  cmp.x )
             minColor = sample ;
 
     }
 
     const int2 locate = (int2)( x , y );
 
-    write_imagef( minColor , locate , color ) ;
+    write_imagef( finalFrame , locate , minColor ) ;
 }
 

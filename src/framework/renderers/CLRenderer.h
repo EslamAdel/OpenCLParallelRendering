@@ -79,6 +79,7 @@ private:
      */
     cl_mem inverseMatrix_;
 
+
     /**
      * @brief linearVolumeSampler_
      */

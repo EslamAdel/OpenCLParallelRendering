@@ -10,7 +10,6 @@ CLAbstractRenderer::CLAbstractRenderer( const uint64_t gpuIndex ,
       frameWidth_( frameWidth ) ,
       frameHeight_( frameHeight ) ,
       kernelDirectory_( kernelDirectory ),
-      renderingKernels_( allocateKernels_( )) ,
       QObject(parent)
 {
 
@@ -20,6 +19,10 @@ CLAbstractRenderer::CLAbstractRenderer( const uint64_t gpuIndex ,
     /// list of all the GPUs connected to the system in a list and select
     /// one of them based on the given GPU ID.
     initializeContext_( );
+    renderingKernels_ = allocateKernels_();
+    activeRenderingKernel_ =
+            renderingKernels_[ RenderingMode::RENDERING_MODE_Xray ];
+
 }
 
 uint64_t CLAbstractRenderer::getGPUIndex() const
@@ -99,6 +102,11 @@ void CLAbstractRenderer::switchRenderingKernel( const RenderingMode type )
 {
     QMutexLocker lock( &switchKernelMutex_ );
 
+    if( !renderingKernels_.contains( type ))
+        return;
+
+    activeRenderingMode_ = type ;
+
     activeRenderingKernel_ = renderingKernels_[ type ];
 }
 
@@ -112,6 +120,14 @@ CLRenderingKernels CLAbstractRenderer::allocateKernels_() const
     kernels[ RenderingMode::RENDERING_MODE_Xray ] =
             new CLXRayRenderingKernel( context_ ,
                                        kernelDirectory_ );
+
+    kernels[ RenderingMode::RENDERING_MODE_MaxIntensity ] =
+            new CLMaxIntensityProjectionRenderingKernel( context_ ,
+                                                         kernelDirectory_ );
+
+    kernels[ RenderingMode::RENDERING_MODE_MinIntensity ] =
+            new CLMinIntensityProjectionRenderingKernel( context_ ,
+                                                         kernelDirectory_ );
 
 
     return kernels ;

@@ -8,8 +8,10 @@
 
 #include "CLFrameVariants.hh"
 #include "CLVolumeVariants.hh"
-#include <CLRenderingKernel.h>
-#include <CLXRayRenderingKernel.h>
+#include "CLRenderingKernel.h"
+#include "CLXRayRenderingKernel.h"
+#include "CLMaxIntensityProjectionRenderingKernel.h"
+#include "CLMinIntensityProjectionRenderingKernel.h"
 
 class CLAbstractRenderer : public QObject
 {
@@ -171,13 +173,17 @@ protected:
     /**
      * @brief renderingKernels_
      */
-    const CLRenderingKernels renderingKernels_ ;
+    CLRenderingKernels renderingKernels_ ;
 
     /**
      * @brief activeRenderingKernel_
      */
     CLRenderingKernel* activeRenderingKernel_;
 
+    /**
+     * @brief activeRenderingMode_
+     */
+    RenderingMode activeRenderingMode_ ;
 };
 
 #endif // CLABSTRACTRENDERER_H

@@ -56,7 +56,7 @@ const sampler_t sampler   = CLK_NORMALIZED_COORDS_FALSE |
 
 
 __kernel
-void maxInensityProjection_compositing( __write_only image2d_t finalFrame ,
+void maxIntensityProjection_compositing( __write_only image2d_t finalFrame ,
                              __read_only image3d_t framesArray ,
                              __constant  uint* depthIndex )
 {
@@ -73,18 +73,14 @@ void maxInensityProjection_compositing( __write_only image2d_t finalFrame ,
         const int4 location = (int4)( x , y , currentDepth , 0 );
         const float4 sample = read_imagef( framesArray , sampler , location ) ;
 
-        /**
-        For vector types, these operators return 0 if
-        the specified relation is false and -1 (i.e., all bits set)
-        if the specified relation is true.
-        © 2016 Pearson Education, Informit. All rights reserved.
-        **/
-        if( sample > maxColor )
+
+        const int4 cmp = isgreater( sample , maxColor ) ;
+        if(  cmp.x )
             maxColor = sample ;
 
     }
 
     const int2 locate = (int2)( x , y );
 
-    write_imagef( maxColor , locate , color ) ;
+    write_imagef( finalFrame , locate , maxColor ) ;
 }

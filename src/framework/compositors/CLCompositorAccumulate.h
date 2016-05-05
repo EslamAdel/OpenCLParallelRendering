@@ -12,9 +12,10 @@ template< class T >
 class CLCompositorAccumulate : public CLAbstractCompositor
 {
 public:
-    CLCompositorAccumulate( const uint64_t gpuIndex ,
+    CLCompositorAccumulate( const uint64_t gpuIndex,
                             const uint frameWidth ,
-                            const uint frameHeight );
+                            const uint frameHeight ,
+                            const std::string kernelDirectory  );
 
     void allocateFrame( CLAbstractRenderer *renderer ) override ;
 
@@ -41,7 +42,6 @@ protected :
     virtual void initializeKernel_() override ;
 
 protected:
-    CLXRayCompositingKernel *compositingKernel_ ;
 
     const Dimensions2D frameDimensions_;
 

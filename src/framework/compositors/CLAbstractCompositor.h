@@ -3,12 +3,17 @@
 
 #include <Headers.hh>
 #include <QVector>
+#include <QMutex>
+#include <QMutexLocker>
 
 #include "oclHWDL.h"
 #include "CLRenderer.h"
 #include "Logger.h"
 #include "CLFrameVariants.hh"
 #include "ProfilingExterns.h"
+#include "CLXRayCompositingKernel.h"
+#include "CLMaxIntensityProjectionCompositingKernel.h"
+#include "CLMinIntensityProjectionCompositingKernel.h"
 
 #define LOCAL_SIZE_X    16
 #define LOCAL_SIZE_Y    16
@@ -18,7 +23,10 @@ class CLAbstractCompositor : public QObject
     Q_OBJECT
 
 public:
-    CLAbstractCompositor( const uint64_t gpuIndex  );
+    CLAbstractCompositor( const uint64_t gpuIndex ,
+                          const uint frameWidth , const uint frameHeight ,
+                          const std::string kernelDirectory  ,
+                          QObject *parent = 0  );
 
     virtual void allocateFrame( CLAbstractRenderer *renderer ) = 0 ;
 
@@ -35,6 +43,8 @@ public:
 
     bool readOutReady( ) const ;
 
+    void switchCompositingKernel( const RenderingMode mode ) ;
+
 private:
     /**
      * @brief selectGPU_
@@ -45,6 +55,12 @@ private:
      * @brief initializeContext_
      */
     void initializeContext_( ) ;
+
+    /**
+     * @brief allocateKernels_
+     * @return
+     */
+    CLCompositingKernels allocateKernels_( ) const;
 
 protected:
     /**
@@ -70,21 +86,67 @@ private:
 
 protected:
 
+    const Dimensions2D frameDimensions_;
+
+    /**
+     * @brief kernelDirectory_
+     */
+    const std::string kernelDirectory_ ;
+
+    /**
+     * @brief gpuIndex_
+     */
     const uint64_t gpuIndex_;
 
+    /**
+     * @brief platform_
+     */
     cl_platform_id platform_;
 
+    /**
+     * @brief device_
+     */
     cl_device_id device_;
 
+    /**
+     * @brief context_
+     */
     cl_context context_;
 
+    /**
+     * @brief commandQueue_
+     */
     cl_command_queue commandQueue_ ;
 
+    /**
+     * @brief renderers_
+     */
     QVector< const CLAbstractRenderer *> renderers_ ;
 
+    /**
+     * @brief finalFrameVariant_
+     */
     mutable CLFrameVariant finalFrameVariant_ ;
 
+    /**
+     * @brief readOutReady_
+     */
     bool readOutReady_ ;
+
+    /**
+     * @brief switchKernelMutex_
+     */
+    QMutex switchKernelMutex_ ;
+
+    /**
+     * @brief renderingKernels_
+     */
+    CLCompositingKernels compositingKernels_ ;
+
+    /**
+     * @brief activeRenderingKernel_
+     */
+    CLCompositingKernel* activeCompositingKernel_;
 };
 
 #endif // CLABSTRACTCOMPOSITOR_H

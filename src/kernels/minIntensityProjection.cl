@@ -78,20 +78,19 @@ uint rgbaFloatToInt( float4 rgba )
  * @param volume
  * @param volumeSampler
  */
-__kernel void minIntensityProjection( __write_only image2d_t frameBuffer,
-                    uint width,
-                    uint height,
-                    float density,
-                    float brightness,
-                    __constant  float* invViewMatrix,
-                    __read_only image3d_t volume,
-                    sampler_t   volumeSampler /**,
+__kernel void minIntensityProjection(  __write_only image2d_t frameBuffer,
 
-                    __constant float transferOffset,
-                    float transferScale,
-                    __read_only image2d_t transferFunc,
-                    sampler_t transferFuncSampler,
-                    int enableTranferFunction **/
+                    uint width, uint height,
+
+                    __constant  float* invViewMatrix,
+
+                    __read_only image3d_t volume,
+
+                    sampler_t   volumeSampler ,
+
+                    float density,
+
+                    float brightness
                     )
 {
     const uint x = get_global_id( 0 );

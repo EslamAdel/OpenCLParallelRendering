@@ -548,6 +548,8 @@ void ParallelRendering::activateRenderingKernel_SLOT( RenderingMode type )
 {
     for( CLAbstractRenderer *renderer : renderers_.values())
         renderer->switchRenderingKernel( type );
+
+    compositor_->switchCompositingKernel( type );
 }
 
 void ParallelRendering::benchmark_( )

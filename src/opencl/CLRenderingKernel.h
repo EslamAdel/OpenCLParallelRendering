@@ -31,6 +31,7 @@ protected:
         KERNEL_ARG_DerivedKernelsOffset
     };
 
+
 public:
 
     /**
