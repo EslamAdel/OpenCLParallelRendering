@@ -1,11 +1,11 @@
-#ifndef CLXRAYRENDERINGKERNEL_H
-#define CLXRAYRENDERINGKERNEL_H
+#ifndef CLMaxIntensityProjectionRENDERINGKERNEL_H
+#define CLMaxIntensityProjectionRENDERINGKERNEL_H
 
 #include <CLRenderingKernel.h>
 
-class CLXRayRenderingKernel : public CLRenderingKernel
-{
 
+class CLMaxIntensityProjectionRenderingKernel : public CLRenderingKernel
+{
 private:
     enum XRayKernelArgument
     {
@@ -14,10 +14,11 @@ private:
     };
 
 public:
-    CLXRayRenderingKernel( cl_context clContext = NULL,
-                           const std::string kernelDirectory = ".",
-                           const std::string kernelFile = "xray.cl" ,
-                           const std::string kernelName = "xray" );
+    CLMaxIntensityProjectionRenderingKernel(
+            cl_context sharedContext = NULL,
+            const std::string kernelDirectory = ".",
+            const std::string kernelFile = "maxIntensityProjection.cl" ,
+            const std::string kernelName = "maxIntensityProjection" );
 
 public:
 
@@ -53,4 +54,5 @@ private:
     const std::string kernelName_;
 };
 
-#endif // CLXRAYRENDERINGKERNEL_H
+
+#endif // CLMaxIntensityProjectionRENDERINGKERNEL_H

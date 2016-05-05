@@ -1,51 +1,17 @@
 #ifndef CLXRayCompositingKernel_H
 #define CLXRayCompositingKernel_H
 
+#include "CLCompositingKernel.h"
 
-#include "Headers.hh"
-#include <oclHWDL/oclHWDL.h>
-#include <QVector>
-
-class CLXRayCompositingKernel
+class CLXRayCompositingKernel : public CLCompositingKernel
 {
-public:
-    enum KernelArguments {
-        CollageFrame = 0 ,
-        Frame ,
-        DepthIndex
-    };
 
+public:
     CLXRayCompositingKernel(
             const cl_context clContext ,
             const std::string kernelName = "xray_compositing_accumulate" ,
             const std::string kernelFile = "xray_compositing.cl" ,
             const std::string kernelDirectory = "." );
-
-
-    virtual void setCollageFrame( const cl_mem collageImage2D );
-
-    virtual void setFrame( const cl_mem frameImage2D );
-
-    virtual void setDepthIndex( const cl_mem depthIndex );
-
-    void releaseKernel( );
-
-    cl_kernel getKernelObject( ) const;
-
-private:
-
-    void buildKernel_( const std::string extraBuildOptions = "" );
-    void retrieveKernelObject_( );
-
-    cl_context clContext_;
-    oclHWDL::KernelContext* kernelContext_;
-    cl_kernel kernelObject_;
-
-    const std::string kernelName_;
-    const std::string kernelDirectory_;
-    const std::string kernelFile_;
-
-
 };
 
 #endif // CLXRayCompositingKernel_H

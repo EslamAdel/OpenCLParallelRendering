@@ -10,6 +10,7 @@ CLAbstractRenderer::CLAbstractRenderer( const uint64_t gpuIndex ,
       frameWidth_( frameWidth ) ,
       frameHeight_( frameHeight ) ,
       kernelDirectory_( kernelDirectory ),
+      renderingKernels_( allocateKernels_( )) ,
       QObject(parent)
 {
 
@@ -91,5 +92,28 @@ void CLAbstractRenderer::createCommandQueue_()
                                           0, &clErrorCode );
 
     oclHWDL::Error::checkCLError(clErrorCode);
+}
+
+
+void CLAbstractRenderer::switchRenderingKernel( const RenderingMode type )
+{
+    QMutexLocker lock( &switchKernelMutex_ );
+
+    activeRenderingKernel_ = renderingKernels_[ type ];
+}
+
+CLRenderingKernels CLAbstractRenderer::allocateKernels_() const
+{
+
+    CLRenderingKernels kernels;
+
+    /// Add all the rendering kernel here, and set the selected to be the
+    /// activeRenderingKernel_
+    kernels[ RenderingMode::RENDERING_MODE_Xray ] =
+            new CLXRayRenderingKernel( context_ ,
+                                       kernelDirectory_ );
+
+
+    return kernels ;
 }
 

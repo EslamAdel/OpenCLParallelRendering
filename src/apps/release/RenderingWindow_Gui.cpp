@@ -105,18 +105,18 @@ void RenderingWindow_Gui::intializeConnections_()
              this , SLOT( captureView_SLOT( )));
 
     // trasnfer function
-    connect( ui->scaleSlider , SIGNAL( valueChanged(int)) ,
-             this , SLOT(newTransferFunctionScale_SLOT(int)) );
+//    connect( ui->scaleSlider , SIGNAL( valueChanged(int)) ,
+//             this , SLOT(newTransferFunctionScale_SLOT(int)) );
 
 
-    connect( ui->offsetSlider , SIGNAL( valueChanged(int)) ,
-             this , SLOT(newTransferFunctionOffset_SLOT(int)) );
+//    connect( ui->offsetSlider , SIGNAL( valueChanged(int)) ,
+//             this , SLOT(newTransferFunctionOffset_SLOT(int)) );
 
-    connect(ui->transferFunctionCheckBox ,SIGNAL(stateChanged(int)),
-            parallelRenderer_,SLOT(tranferFunctionFlag_SLOT(int)));
+//    connect(ui->transferFunctionCheckBox ,SIGNAL(stateChanged(int)),
+//            parallelRenderer_,SLOT(tranferFunctionFlag_SLOT(int)));
 
-    connect(ui->transferFunctionCheckBox ,SIGNAL(stateChanged(int)),
-            this , SLOT(tFunctionSLiderControl_SLOT(int)));
+//    connect(ui->transferFunctionCheckBox ,SIGNAL(stateChanged(int)),
+//            this , SLOT(tFunctionSLiderControl_SLOT(int)));
 
     //parallelRenderer_
     connect( parallelRenderer_ ,
@@ -127,6 +127,21 @@ void RenderingWindow_Gui::intializeConnections_()
 
     connect( parallelRenderer_ , SIGNAL( finalFrameReady_SIGNAL( QPixmap* )) ,
              this , SLOT( finalFrameReady_SLOT( QPixmap* )));
+
+    // Rendering Types
+    connect( ui->xrayButton, SIGNAL( toggled( bool )),
+             this, SLOT( switchRenderingKernel_SLOT( )));
+
+    connect( ui->maxIntensityProjectionButton ,
+             SIGNAL( toggled( bool )) ,
+             this, SLOT( switchRenderingKernel_SLOT( )));
+
+    connect( ui->minIntensityProjectionButton ,
+             SIGNAL( toggled( bool )) ,
+             this , SLOT( switchRenderingKernel_SLOT( )));
+
+    connect( ui->isoSurfaceButton , SIGNAL( toggled( bool )),
+             this , SLOT( switchRenderingKernel_SLOT( )));
 }
 
 
@@ -278,39 +293,39 @@ void RenderingWindow_Gui::newDensity_SLOT(int value)
 
 
 
-void RenderingWindow_Gui::newTransferFunctionScale_SLOT(int value)
-{
-    ui->scaleValue->setText( QString::number(1.0+(float)value/100 ));
+//void RenderingWindow_Gui::newTransferFunctionScale_SLOT(int value)
+//{
+//    ui->scaleValue->setText( QString::number(1.0+(float)value/100 ));
 
-    float scale = 1.0f+float( value ) / 100.0;
-    parallelRenderer_->updateTransferFunctionScale_SLOT( scale );
+//    float scale = 1.0f+float( value ) / 100.0;
+//    parallelRenderer_->updateTransferFunctionScale_SLOT( scale );
 
-}
+//}
 
-void RenderingWindow_Gui::newTransferFunctionOffset_SLOT(int value)
-{
-    ui->offsetValue->setText( QString::number((float) value/100));
+//void RenderingWindow_Gui::newTransferFunctionOffset_SLOT(int value)
+//{
+//    ui->offsetValue->setText( QString::number((float) value/100));
 
-    float offset = float( value ) / 100.0;
-    parallelRenderer_->updateTransferFunctionOffset_SLOT( offset );
+//    float offset = float( value ) / 100.0;
+//    parallelRenderer_->updateTransferFunctionOffset_SLOT( offset );
 
-}
+//}
 
-void RenderingWindow_Gui::tFunctionSLiderControl_SLOT(int state)
-{
-    if(state == 0)
-    {
-        ui->offsetSlider->setEnabled(false);
-        ui->scaleSlider->setEnabled(false);
-    }
-    else
-    {
-        ui->offsetSlider->setEnabled(true);
-        ui->scaleSlider->setEnabled(true);
+//void RenderingWindow_Gui::tFunctionSLiderControl_SLOT(int state)
+//{
+//    if(state == 0)
+//    {
+//        ui->offsetSlider->setEnabled(false);
+//        ui->scaleSlider->setEnabled(false);
+//    }
+//    else
+//    {
+//        ui->offsetSlider->setEnabled(true);
+//        ui->scaleSlider->setEnabled(true);
 
-    }
+//    }
 
-}
+//}
 
 void RenderingWindow_Gui::initializeFramework_SLOT()
 {
@@ -359,6 +374,25 @@ void RenderingWindow_Gui::frameworkReady_SLOT()
 
     intializeConnections_();
     startRendering_();
+}
+
+void RenderingWindow_Gui::switchRenderingKernel_SLOT()
+{
+    if( ui->xrayButton->isChecked( ))
+        parallelRenderer_->
+                activateRenderingKernel_SLOT( RenderingMode::RENDERING_MODE_Xray );
+
+    else if( ui->maxIntensityProjectionButton->isChecked( ))
+        parallelRenderer_->
+                activateRenderingKernel_SLOT( RenderingMode::RENDERING_MODE_MaxIntensity );
+
+    else if(ui->minIntensityProjectionButton->isChecked( ))
+        parallelRenderer_->
+                activateRenderingKernel_SLOT( RenderingMode::RENDERING_MODE_MinIntensity );
+
+    else if(ui->isoSurfaceButton->isChecked())
+        parallelRenderer_->
+                activateRenderingKernel_SLOT( RenderingMode::RENDERING_MODE_IsoSurface );
 }
 
 
@@ -411,4 +445,3 @@ void RenderingWindow_Gui::captureView_SLOT()
 
     }
 }
-

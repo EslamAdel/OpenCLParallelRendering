@@ -18,7 +18,7 @@ const sampler_t sampler =  CLK_FILTER_NEAREST | CLK_NORMALIZED_COORDS_FALSE
                             | CLK_ADDRESS_CLAMP_TO_EDGE;
 
 __kernel
-void xray_compositing_patch( __write_only image2d_t collageFrame ,
+void xray_compositing_patch( __write_only image2d_t finalFrame ,
                              __read_only image3d_t framesArray ,
                              __constant  uint* depthIndex )
 {
@@ -38,7 +38,7 @@ void xray_compositing_patch( __write_only image2d_t collageFrame ,
     }
     const int2 locate = (int2)( x , y );
 
-    write_imagef( collageFrame , locate , color ) ;
+    write_imagef( finalFrame , locate , color ) ;
 }
 
 

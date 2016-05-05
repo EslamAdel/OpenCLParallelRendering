@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>918</width>
+    <width>1031</width>
     <height>694</height>
    </rect>
   </property>
@@ -59,7 +59,7 @@ QRadioButton::inidacator{
    <widget class="QGroupBox" name="groupBox">
     <property name="geometry">
      <rect>
-      <x>440</x>
+      <x>390</x>
       <y>10</y>
       <width>461</width>
       <height>571</height>
@@ -200,7 +200,7 @@ color:#fff;
     <widget class="QLabel" name="frameContainerResult">
      <property name="geometry">
       <rect>
-       <x>50</x>
+       <x>40</x>
        <y>50</y>
        <width>381</width>
        <height>351</height>
@@ -282,10 +282,10 @@ QPushButton:default {
     </property>
     <property name="geometry">
      <rect>
-      <x>20</x>
+      <x>10</x>
       <y>10</y>
-      <width>401</width>
-      <height>631</height>
+      <width>371</width>
+      <height>621</height>
      </rect>
     </property>
     <property name="styleSheet">
@@ -363,7 +363,7 @@ QTabBar::tab:!selected {
        <rect>
         <x>0</x>
         <y>30</y>
-        <width>381</width>
+        <width>361</width>
         <height>221</height>
        </rect>
       </property>
@@ -439,7 +439,7 @@ QListWidget::item:hover {
      <widget class="QPushButton" name="initializeButton">
       <property name="geometry">
        <rect>
-        <x>200</x>
+        <x>180</x>
         <y>460</y>
         <width>181</width>
         <height>61</height>
@@ -484,7 +484,7 @@ QPushButton:default {
        <rect>
         <x>0</x>
         <y>280</y>
-        <width>191</width>
+        <width>171</width>
         <height>241</height>
        </rect>
       </property>
@@ -548,7 +548,7 @@ QListWidget::item:hover {
      <widget class="GPUListView" name="compositingDevice">
       <property name="geometry">
        <rect>
-        <x>200</x>
+        <x>180</x>
         <y>280</y>
         <width>181</width>
         <height>171</height>
@@ -2472,17 +2472,72 @@ border-radius: 4px;
         <string>0</string>
        </property>
       </widget>
-      <zorder>xRotationLabel_2</zorder>
-      <zorder>offsetSlider</zorder>
-      <zorder>scaleValue</zorder>
-      <zorder>yRotationLabel_10</zorder>
-      <zorder>scaleSlider</zorder>
-      <zorder>label_16</zorder>
-      <zorder>transferFunctionCheckBox</zorder>
-      <zorder>xRotationLabel_5</zorder>
-      <zorder>offsetValue</zorder>
-      <zorder>offsetValue</zorder>
      </widget>
+    </widget>
+   </widget>
+   <widget class="QGroupBox" name="groupBox_2">
+    <property name="geometry">
+     <rect>
+      <x>820</x>
+      <y>10</y>
+      <width>211</width>
+      <height>191</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string>Active Kernel</string>
+    </property>
+    <widget class="QRadioButton" name="minIntensityProjectionButton">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>90</y>
+       <width>206</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Min Intensity Projection</string>
+     </property>
+    </widget>
+    <widget class="QRadioButton" name="isoSurfaceButton">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>120</y>
+       <width>206</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Iso-Surface</string>
+     </property>
+    </widget>
+    <widget class="QRadioButton" name="xrayButton">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>30</y>
+       <width>206</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>X-Ray</string>
+     </property>
+    </widget>
+    <widget class="QRadioButton" name="maxIntensityProjectionButton">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>60</y>
+       <width>206</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Max Intensity projection</string>
+     </property>
     </widget>
    </widget>
   </widget>
@@ -2491,7 +2546,7 @@ border-radius: 4px;
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>918</width>
+     <width>1031</width>
      <height>25</height>
     </rect>
    </property>

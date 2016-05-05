@@ -93,16 +93,18 @@ private slots:
 
     void captureView_SLOT() ;
 
-    void newTransferFunctionScale_SLOT(int value);
+//    void newTransferFunctionScale_SLOT(int value);
 
-    void newTransferFunctionOffset_SLOT(int value);
+//    void newTransferFunctionOffset_SLOT(int value);
 
-    void tFunctionSLiderControl_SLOT(int state);
+//    void tFunctionSLiderControl_SLOT(int state);
 
     void initializeFramework_SLOT( );
 
 
     void frameworkReady_SLOT( );
+
+    void switchRenderingKernel_SLOT( );
 
 private:
     Ui::RenderingWindow_Gui *ui;

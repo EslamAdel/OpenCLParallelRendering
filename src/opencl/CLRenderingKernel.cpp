@@ -3,12 +3,12 @@
 
 CLRenderingKernel::CLRenderingKernel( cl_context clContext,
                                       const std::string kernelDirectory,
-                                      const std::string kernelFile )
-    : clContext_( clContext )
-    ,  kernelDirectory_( kernelDirectory )
-    , kernelFile_( kernelFile )
+                                      const std::string kernelFile  )
+    : clContext_( clContext ) ,
+      kernelDirectory_( kernelDirectory ) ,
+      kernelFile_( kernelFile )
 {
-
+    buildKernel_( );
 }
 
 void CLRenderingKernel::buildKernel_( const std::string extraBuildOptions )
@@ -17,7 +17,7 @@ void CLRenderingKernel::buildKernel_( const std::string extraBuildOptions )
     // Create a kernel context, that should handle every thing that is
     // relevant to the kernel.
     kernelContext_ = new oclHWDL::KernelContext
-            ( kernelDirectory_ , kernelFile_, clContext_, 0 , 0 );
+                     ( kernelDirectory_ , kernelFile_, clContext_, 0 , 0 );
 
     // Add the build options.
     // TODO: Check the support of the hardware to CL_DEVICE_IMAGE_SUPPORT
@@ -48,35 +48,91 @@ cl_kernel CLRenderingKernel::getKernelObject( ) const
     return kernelObject_;
 }
 
-void CLRenderingKernel::setTransferFunctionData( cl_mem )
+
+void CLRenderingKernel::setFrameBuffer( cl_mem frameBuffer )
 {
-    LOG_WARNING( "Unimplemented setTransferFunctionData()" );
+    cl_int error = clSetKernelArg( kernelObject_, KERNEL_ARG_FrameBuffer,
+                                   sizeof( cl_mem ),
+                                   ( void* ) &frameBuffer );
+
+    if( error != CL_SUCCESS )
+    {
+        oclHWDL::Error::checkCLError( error );
+        LOG_ERROR("Exiting Due to OpenCL Error!");
+    }
+
 }
 
-void CLRenderingKernel::setTransferFunctionSampler( cl_sampler )
+void CLRenderingKernel::setFrameWidth( uint width )
 {
-    LOG_WARNING( "Unimplemented setTransferFunctionSampler()" );
+    cl_int error = clSetKernelArg( kernelObject_, KERNEL_ARG_FrameWidth ,
+                                   sizeof( uint ),
+                                   &width );
+    if( error != CL_SUCCESS )
+    {
+        oclHWDL::Error::checkCLError( error );
+        LOG_ERROR("Exiting Due to OpenCL Error!");
+    }
 }
 
-void CLRenderingKernel::setTransferFunctionOffset( float )
+void CLRenderingKernel::setFrameHeight( uint height )
 {
-    LOG_WARNING( "Unimplemented setTransferFunctionOffset()" );
+    cl_int error = clSetKernelArg( kernelObject_, KERNEL_ARG_FrameHeight,
+                                   sizeof( uint ),
+                                   &height );
+    if( error != CL_SUCCESS )
+    {
+        oclHWDL::Error::checkCLError( error );
+        LOG_ERROR("Exiting Due to OpenCL Error!");
+    }
 }
 
-void CLRenderingKernel::setTransferFunctionScale( float scale )
+void CLRenderingKernel::setVolumeData( cl_mem data )
 {
-    LOG_WARNING( "Unimplemented setTransferFunctionScale()" );
+    cl_int error = clSetKernelArg( kernelObject_, KERNEL_ARG_Volume ,
+                                   sizeof( cl_mem ),
+                                   ( void* ) &data );
+    if( error != CL_SUCCESS )
+    {
+        oclHWDL::Error::checkCLError( error );
+        LOG_ERROR("Exiting Due to OpenCL Error!");
+    }
 }
 
-void CLRenderingKernel::setTransferFunctionFlag(int enableTransferFunction)
+void CLRenderingKernel::setVolumeSampler( cl_sampler sampler )
 {
-     LOG_WARNING( "Unimplemented setTransferFunctionFlag()" );
+    cl_int error = clSetKernelArg( kernelObject_, KERNEL_ARG_VolumeSampler ,
+                                   sizeof( cl_sampler ),
+                                   &sampler );
+    if( error != CL_SUCCESS )
+    {
+        oclHWDL::Error::checkCLError( error );
+        LOG_ERROR("Exiting Due to OpenCL Error!");
+    }
 }
+
+
+void CLRenderingKernel::setInverseViewMatrix( cl_mem matrix )
+{
+    cl_int error = clSetKernelArg( kernelObject_, KERNEL_ARG_InverseMatrix ,
+                                   sizeof( cl_mem ),
+                                   ( void* ) &matrix );
+    if( error != CL_SUCCESS )
+    {
+        oclHWDL::Error::checkCLError( error );
+        LOG_ERROR("Exiting Due to OpenCL Error!");
+    }
+}
+
 
 void CLRenderingKernel::releaseKernel()
 {
     if( kernelContext_->getProgram( ))
         clReleaseProgram( kernelContext_->getProgram() );
+
+    if( kernelObject_ )
+        clReleaseKernel( kernelObject_ );
+
 }
 
 CLRenderingKernel::~CLRenderingKernel( )

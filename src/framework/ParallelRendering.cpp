@@ -90,7 +90,7 @@ void ParallelRendering::addCLRenderer( const uint64_t gpuIndex )
               new CLRenderer< uchar , float >( gpuIndex,
                                                frameWidth_ ,
                                                frameHeight_ ,
-                                               transformationAsync_ );
+                                               transformationAsync_  );
 
     ATTACH_RENDERING_PROFILE( renderer );
     ATTACH_COLLECTING_PROFILE( renderer );
@@ -544,39 +544,17 @@ void ParallelRendering::updateVolumeDensity_SLOT( float density )
     else pendingTransformations_ = true ;
 }
 
-void ParallelRendering::updateTransferFunctionScale_SLOT( float scale )
+void ParallelRendering::activateRenderingKernel_SLOT( RenderingMode type )
 {
-    transformation_.transferFunctionScale =scale;
-    if( renderersReady_ ) applyTransformation_();
-    else pendingTransformations_ = true ;
-
-
+    for( CLAbstractRenderer *renderer : renderers_.values())
+        renderer->switchRenderingKernel( type );
 }
-
-void ParallelRendering::updateTransferFunctionOffset_SLOT( float offset )
-{
-    transformation_.transferFunctionOffset = offset ;
-    if( renderersReady_ ) applyTransformation_();
-    else pendingTransformations_ = true ;
-
-
-}
-
-void ParallelRendering::tranferFunctionFlag_SLOT( int flag )
-{
-    transformation_.transferFunctionFlag = flag ;
-    if( renderersReady_ ) applyTransformation_();
-    else pendingTransformations_ = true ;
-}
-
 
 void ParallelRendering::benchmark_( )
 {
 
     for( CLAbstractRenderer *renderer : renderers_ )
     {
-//        CLAbstractRenderer *renderer = renderers_[ device ] ;
-
         RENDERING_PROFILE_TAG( renderer );
         PRINT( RENDERING_PROFILE( renderer ).threadSpawning_TIMER );
         PRINT( RENDERING_PROFILE( renderer ).mvMatrix_TIMER );
@@ -588,8 +566,6 @@ void ParallelRendering::benchmark_( )
     }
 
     COMPOSITING_PROFILE_TAG( compositor_ );
-    //    PRINT( compositingProfile.threadSpawning_TIMER ) ;
-    //    PRINT( compositingProfile.accumulatingFrame_TIMER ) ;
     PRINT( compositingProfile.loadFinalFromDevice_TIMER ) ;
     PRINT( compositingProfile.compositing_TIMER ) ;
 

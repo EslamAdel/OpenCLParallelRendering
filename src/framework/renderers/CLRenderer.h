@@ -6,24 +6,11 @@
 #include "Transformation.h"
 #include <CLVolume.h>
 #include "CLTransferFunction.h"
-#include <CLXRayRenderingKernel.h>
 #include <QMap>
-
 
 template < class V , class F >
 class CLRenderer : public CLAbstractRenderer
 {
-
-public:
-    enum RenderingKernels
-    {
-        KERNEL_Xray = 0 ,
-        KERNEL_MinIntensity ,
-        KERNEL_MaxIntensity ,
-        KERNEL_IsoSurface
-    };
-
-
 public:
     CLRenderer( const uint64_t gpuIndex,
                 const uint frameWidth , const uint frameHeight ,
@@ -42,13 +29,6 @@ public:
 
     uint getFrameIndex( ) const override ;
 
-    /**
-      * @brief getKernel
-      * @return
-      */
-    cl_kernel getKernel( ) const override;
-
-
     const CLFrameVariant &getCLFrame( ) const override;
 
 protected:
@@ -57,27 +37,32 @@ protected:
 
     void createPixelBuffer_() override ;
 
-    void initializeKernel_() override ;
-
-    void handleKernel_( std::string string = "" ) override;
+    void initializeKernels_() override ;
 
     void freeBuffers_() override ;
 
 private:
 
-    void paint( );
+    void paint_( );
+
 
 
 private:
 
+    /**
+     * @brief transformation_
+     */
     const Transformation &transformation_ ;
+
     /**
      * @brief currentCenter_
      */
     Coordinates3D currentCenter_ ;
 
+    /**
+     * @brief frameIndex_
+     */
     uint frameIndex_ ;
-
 
     /**
      * @brief volume_
@@ -89,25 +74,10 @@ private:
      */
     CLVolume< V >* clVolume_;
 
-
-    /**
-     * @brief kernelContext_
-     */
-    oclHWDL::KernelContext* kernelContext_;
-    /**
-     * @brief kernel_
-     */
-    cl_kernel kernel_;
-
     /**
      * @brief inverseMatrix_
      */
     cl_mem inverseMatrix_;
-
-    /**
-     * @brief renderingKernels_
-     */
-    QMap< RenderingKernels , CLRenderingKernel* > renderingKernels_ ;
 
     /**
      * @brief linearVolumeSampler_
@@ -118,21 +88,6 @@ private:
      * @brief nearestVolumeSampler_
      */
     cl_sampler nearestVolumeSampler_;
-
-//    /**
-//     * @brief transferFunctionSampler_
-//     */
-//    cl_sampler transferFunctionSampler_;
-
-//    /**
-//     * @brief tfOffset_
-//     */
-//    float tfOffset_;
-
-//    /**
-//     * @brief tfScale_
-//     */
-//    float tfScale_;
 
     /**
      * @brief linearFiltering_
@@ -145,12 +100,6 @@ private:
     size_t gridSize_[ 2 ];
 
 
-    QMap<
-    /**
-     * @brief activeRenderingKernel_
-     */
-    CLRenderingKernel* activeRenderingKernel_;
-
     /**
      * @brief clFrame_
      */
@@ -160,7 +109,6 @@ private:
      * @brief inverseMatrix_
      */
     float inverseMatrixArray_[ 12 ];
-
 };
 
 

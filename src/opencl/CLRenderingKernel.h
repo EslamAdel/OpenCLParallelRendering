@@ -3,19 +3,34 @@
 
 #include <Headers.hh>
 #include <oclHWDL/oclHWDL.h>
+#include <QMap>
 
-enum RENDERING_KERNEL_TYPE
+enum RenderingMode
 {
-    ALPHA_BLENDEING,
-    X_RAY,
-    MAXIMUM_INTENSITY_PROJECTION,
-    MINIMUM_INTENSITY_PROJECTION,
-    AVERAGE_INTENSITY_PROJECTION,
-    ISO_SURFACE
+    RENDERING_MODE_Xray = 0 ,
+    RENDERING_MODE_MinIntensity ,
+    RENDERING_MODE_MaxIntensity ,
+    RENDERING_MODE_AverageIntensity ,
+    RENDERING_MODE_IsoSurface ,
+    RENDERING_MODE_AlphaBlending
 };
+
 
 class CLRenderingKernel
 {
+
+protected:
+    enum KernelArgument
+    {
+        KERNEL_ARG_FrameBuffer = 0 ,
+        KERNEL_ARG_FrameWidth ,
+        KERNEL_ARG_FrameHeight ,
+        KERNEL_ARG_InverseMatrix ,
+        KERNEL_ARG_Volume ,
+        KERNEL_ARG_VolumeSampler ,
+        KERNEL_ARG_DerivedKernelsOffset
+    };
+
 public:
 
     /**
@@ -59,37 +74,43 @@ public:
      * @brief getRenderingKernelType
      * @return
      */
-    virtual RENDERING_KERNEL_TYPE getRenderingKernelType( ) const = 0;
+    virtual RenderingMode getRenderingKernelType( ) const = 0;
 
     /**
      * @brief setFrameBuffer
      * @param frameBuffer
      */
-    virtual void setFrameBuffer( cl_mem frameBuffer ) = 0;
+    void setFrameBuffer( cl_mem frameBuffer );
 
     /**
      * @brief setFrameWidth
      * @param width
      */
-    virtual void setFrameWidth( uint width ) = 0;
+    void setFrameWidth( uint width );
 
     /**
      * @brief setFrameHeight
      * @param height
      */
-    virtual void setFrameHeight( uint height ) = 0;
+    void setFrameHeight( uint height );
 
     /**
      * @brief setVolumeData
      * @param data
      */
-    virtual void setVolumeData( cl_mem data ) = 0;
+    void setVolumeData( cl_mem data );
 
     /**
      * @brief setVolumeSampler
      * @param sampler
      */
-    virtual void setVolumeSampler( cl_sampler sampler ) = 0;
+    void setVolumeSampler( cl_sampler sampler );
+
+    /**
+     * @brief setInverseViewMatrix
+     * @param matrix
+     */
+    void setInverseViewMatrix( cl_mem matrix );
 
     /**
      * @brief setVolumeDensityFactor
@@ -103,41 +124,6 @@ public:
      */
     virtual void setImageBrightnessFactor( float brightness ) = 0;
 
-    /**
-     * @brief setInverseViewMatrix
-     * @param matrix
-     */
-    virtual void setInverseViewMatrix( cl_mem matrix ) = 0;
-
-//    /**
-//     * @brief setTransferFunctionData
-//     * @param data
-//     */
-//    virtual void setTransferFunctionData( cl_mem data );
-
-//    /**
-//     * @brief setTransferFunctionSampler
-//     * @param sampler
-//     */
-//    virtual void setTransferFunctionSampler( cl_sampler sampler );
-
-//    /**
-//     * @brief setTransferFunctionOffset
-//     * @param offset
-//     */
-//    virtual void setTransferFunctionOffset( float offset );
-
-//    /**
-//     * @brief setTransferFunctionScale
-//     * @param scale
-//     */
-//    virtual void setTransferFunctionScale( float scale );
-
-//    /**
-//     * @brief setTransferFunctionFlag
-//     * @param enableTransferFunction
-//     */
-//    virtual void setTransferFunctionFlag(int enableTransferFunction);
 
     /**
      * @brief releaseKernel
@@ -187,12 +173,13 @@ protected:
      /**
       * @brief kernelType_
       */
-     RENDERING_KERNEL_TYPE kernelType_;
+     RenderingMode kernelType_;
+
 };
 
 /**
  * @brief CLRenderingKernels
  */
-typedef std::vector< CLRenderingKernel* > CLRenderingKernels;
+typedef QMap< RenderingMode , CLRenderingKernel* > CLRenderingKernels;
 
 #endif // CLRENDERINGKERNEL_H

@@ -36,10 +36,15 @@ SET( OCL_MGPUVS_SOURCE_FILES
     opencl/CLImage2D.cpp
     opencl/CLImage2DArray.cpp
     opencl/CLRenderingKernel.cpp
+    opencl/CLCompositingKernel.cpp
     opencl/CLTransferFunction.cpp
     opencl/CLVolume.cpp
     opencl/CLXRayCompositingKernel.cpp
     opencl/CLXRayRenderingKernel.cpp
+    opencl/CLMaxIntensityProjectionRenderingKernel.cpp
+    opencl/CLMinIntensityProjectionRenderingKernel.cpp
+    opencl/CLMinIntensityProjectionCompositingKernel.cpp
+    opencl/CLMaxIntensityProjectionCompositingKernel.cpp
     opencl/CLBuffer.cpp
     profiling/ProfilingExterns.cpp
     system/oclUtils.cpp
@@ -97,7 +102,12 @@ SET( OCL_MGPUVS_HEADER_FILES
     opencl/CLVolume.ipp
     opencl/CLXRayCompositingKernel.h
     opencl/CLRenderingKernel.h
+    opencl/CLCompositingKernel.h
     opencl/CLXRayRenderingKernel.h
+    opencl/CLMaxIntensityProjectionRenderingKernel.h
+    opencl/CLMinIntensityProjectionRenderingKernel.h
+    opencl/CLMinIntensityProjectionCompositingKernel.h
+    opencl/CLMaxIntensityProjectionCompositingKernel.h
     opencl/CLBuffer.h
     opencl/CLFrameVariants.hh
     opencl/CLVolumeVariants.hh
@@ -115,6 +125,10 @@ set( OCL_MGPUVS_KERNELS
     kernels/volumeRender.cl
     kernels/xray.cl
     kernels/xray_compositing.cl
+    kernels/maxIntensityProjection.cl
+    kernels/maxIntensityProjection_compositing.cl
+    kernels/minIntensityProjection.cl
+    kernels/minIntensityProjection_compositing.cl
 )
 
 

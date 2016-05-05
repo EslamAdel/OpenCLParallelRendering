@@ -1,11 +1,10 @@
-#ifndef CLXRAYRENDERINGKERNEL_H
-#define CLXRAYRENDERINGKERNEL_H
+#ifndef CLMinIntensityProjectionRENDERINGKERNEL_H
+#define CLMinIntensityProjectionRENDERINGKERNEL_H
 
 #include <CLRenderingKernel.h>
 
-class CLXRayRenderingKernel : public CLRenderingKernel
+class CLMinIntensityProjectionRenderingKernel : public CLRenderingKernel
 {
-
 private:
     enum XRayKernelArgument
     {
@@ -14,10 +13,11 @@ private:
     };
 
 public:
-    CLXRayRenderingKernel( cl_context clContext = NULL,
-                           const std::string kernelDirectory = ".",
-                           const std::string kernelFile = "xray.cl" ,
-                           const std::string kernelName = "xray" );
+    CLMinIntensityProjectionRenderingKernel(
+            cl_context sharedContext = NULL,
+            const std::string kernelDirectory = ".",
+            const std::string kernelFile = "minIntensityProjection.cl" ,
+            const std::string kernelName = "minIntensityProjection" );
 
 public:
 
@@ -53,4 +53,4 @@ private:
     const std::string kernelName_;
 };
 
-#endif // CLXRAYRENDERINGKERNEL_H
+#endif // CLMinIntensityProjectionRENDERINGKERNEL_H

@@ -2,10 +2,14 @@
 #define CLABSTRACTRENDERER_H
 
 #include <QObject>
+#include <QMutex>
+#include <QMutexLocker>
 #include <oclHWDL.h>
 
 #include "CLFrameVariants.hh"
 #include "CLVolumeVariants.hh"
+#include <CLRenderingKernel.h>
+#include <CLXRayRenderingKernel.h>
 
 class CLAbstractRenderer : public QObject
 {
@@ -49,17 +53,17 @@ public:
 
 
     virtual void applyTransformation() = 0 ;
-    /**
-      * @brief getKernel
-      * @return
-      */
-    virtual cl_kernel getKernel( ) const = 0;
+
 
     virtual const CLFrameVariant &getCLFrame( ) const = 0;
 
     virtual const Coordinates3D &getCurrentCenter() const = 0 ;
 
     virtual uint getFrameIndex( ) const = 0 ;
+
+
+    void switchRenderingKernel( const RenderingMode type ) ;
+
 
     static bool lessThan( const CLAbstractRenderer* lhs ,
                           const CLAbstractRenderer* rhs );
@@ -70,9 +74,7 @@ protected:
 
     virtual void createPixelBuffer_( ) = 0;
 
-    virtual void initializeKernel_( ) = 0;
-
-    virtual void handleKernel_(std::string string = "") = 0 ;
+    virtual void initializeKernels_( ) = 0;
 
     virtual void freeBuffers_( ) = 0 ;
 
@@ -105,6 +107,11 @@ private:
      */
     void createCommandQueue_( );
 
+    /**
+     * @brief allocateKernels_
+     * @return
+     */
+    CLRenderingKernels allocateKernels_( ) const;
 protected:
 
     /**
@@ -154,6 +161,23 @@ protected:
      * @brief frameVariant_
      */
     mutable CLFrameVariant frameVariant_ ;
+
+
+    /**
+     * @brief switchKernelMutex_
+     */
+    QMutex switchKernelMutex_ ;
+
+    /**
+     * @brief renderingKernels_
+     */
+    const CLRenderingKernels renderingKernels_ ;
+
+    /**
+     * @brief activeRenderingKernel_
+     */
+    CLRenderingKernel* activeRenderingKernel_;
+
 };
 
 #endif // CLABSTRACTRENDERER_H

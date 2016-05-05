@@ -1,7 +1,7 @@
-#include "CLXRayCompositingKernel.h"
+#include "CLMaxIntensityProjectionCompositingKernel.h"
 
 
-CLXRayCompositingKernel::CLXRayCompositingKernel( const cl_context clContext ,
+CLMaxIntensityProjectionCompositingKernel::CLMaxIntensityProjectionCompositingKernel( const cl_context clContext ,
                                                   const std::string kernelName ,
                                                   const std::string kernelFile ,
                                                   const std::string kernelDirectory )

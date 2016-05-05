@@ -25,21 +25,6 @@
 #include "CLVolumeVariants.hh"
 #include "Transformation.h"
 
-//typedef std::unordered_map< const oclHWDL::Device*,
-//                            CLAbstractRenderer*> CLRenderers;
-
-//typedef std::unordered_map< const CLAbstractRenderer* ,
-//                            TaskRender*> RenderingTasks;
-
-//typedef std::unordered_map< const CLAbstractRenderer* ,
-//                            TaskComposite*> CompositingTasks;
-
-//typedef std::unordered_map< const CLAbstractRenderer* ,
-//                            TaskCollect*> CollectingTasks;
-
-//typedef std::unordered_map< const CLAbstractRenderer* ,
-//                            TaskMakePixmap*> MakePixmapTasks;
-
 
 typedef QMap< const oclHWDL::Device*, CLAbstractRenderer*> CLRenderers;
 
@@ -291,22 +276,13 @@ public slots :
      * @param density
      */
     void updateVolumeDensity_SLOT( float density );
-    /**
-     * @brief updateTransferFunctionScale_SLOT
-     * @param scale
-     */
-    void updateTransferFunctionScale_SLOT(float scale);
-    /**
-     * @brief updateTransferFunctionOffset_SLOT
-     * @param offset
-     */
-    void updateTransferFunctionOffset_SLOT(float offset);
 
     /**
-     * @brief tranferFunctionFlag_SLOT
-     * @param flag
+     * @brief activateRenderingKernel_SLOT
      */
-    void tranferFunctionFlag_SLOT(int flag);
+    void activateRenderingKernel_SLOT( RenderingMode type );
+
+
 
 protected:
     /**

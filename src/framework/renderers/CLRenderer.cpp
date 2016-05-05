@@ -48,7 +48,7 @@ void CLRenderer< V , F >::createPixelBuffer_()
 template< class V , class F >
 void CLRenderer< V , F >::applyTransformation( )
 {
-    this->paint( );
+    this->paint_( );
 
     emit this->finishedRendering( this );
 }
@@ -68,7 +68,20 @@ void CLRenderer< V , F >::loadVolume( const VolumeVariant &volume )
     LOG_DEBUG("Loaded Volume D(%d,%d,%d)" , volume_->getDimensions().x ,
               volume_->getDimensions().y , volume_->getDimensions().z );
 
-    initializeKernel_();
+
+
+    // Assume everything is fine in the begnning
+    cl_int clErrorCode = CL_SUCCESS;
+
+    // Create an OpenCL volume
+    clVolume_ = new CLVolume< V >( volume_ , VOLUME_CL_UNSIGNED_INT8 );
+
+    clVolume_->createDeviceVolume( context_ );
+
+    oclHWDL::Error::checkCLError(clErrorCode);
+
+
+    initializeKernels_();
 }
 
 template< class V , class F >
@@ -83,13 +96,6 @@ uint CLRenderer< V , F >::getFrameIndex() const
     return frameIndex_;
 }
 
-
-template< class V , class F >
-cl_kernel CLRenderer< V , F >::getKernel() const
-{
-    return kernel_ ;
-}
-
 template< class V , class F >
 const CLFrameVariant &CLRenderer< V , F >::getCLFrame() const
 {
@@ -97,9 +103,12 @@ const CLFrameVariant &CLRenderer< V , F >::getCLFrame() const
     return this->frameVariant_ ;
 }
 
+
 template< class V , class F >
 void CLRenderer< V , F >::renderFrame()
 {
+    QMutexLocker lock( &this->switchKernelMutex_ );
+
     // update the device view matrix
 
     // Assume everything is fine in the begnning
@@ -127,26 +136,17 @@ void CLRenderer< V , F >::renderFrame()
     activeRenderingKernel_->
             setImageBrightnessFactor( transformation_.brightness );
 
-  /**
-    activeRenderingKernel_->
-            setTransferFunctionFlag( transformation_.transferFunctionFlag );
-
-    activeRenderingKernel_->
-            setTransferFunctionOffset( transformation_.transferFunctionOffset );
-
-    activeRenderingKernel_->
-            setTransferFunctionScale( transformation_.transferFunctionScale );
-**/
     // Enqueue the kernel for execution
-    clErrorCode |= clEnqueueNDRangeKernel( commandQueue_,
-                                           kernel_ ,
-                                           2,
-                                           NULL,
-                                           gridSize_,
-                                           localSize,
-                                           0,
-                                           0,
-                                           0 );
+    clErrorCode |= clEnqueueNDRangeKernel(
+                       commandQueue_,
+                       activeRenderingKernel_->getKernelObject() ,
+                       2,
+                       NULL,
+                       gridSize_,
+                       localSize,
+                       0,
+                       0,
+                       0 );
 
 
 
@@ -159,44 +159,18 @@ void CLRenderer< V , F >::renderFrame()
 }
 
 template< class V , class F >
-void CLRenderer< V , F >::initializeKernel_()
+void CLRenderer< V , F >::initializeKernels_()
 {
-    LOG_DEBUG( "Initializing an OpenCL Kernel ... " );
+    LOG_DEBUG( "Initializing an OpenCL Kernels ... " );
 
-    /// Add all the rendering kernel here, and set the selected to be the
-    /// activeRenderingKernel_
-    CLXRayRenderingKernel* xrayRenderingKernel =
-            new CLXRayRenderingKernel( context_ ,
-                                       "/usr/local/share");
-
-    // TODO: instead of providing "/usr/local/share" use
-    // the CMake configuration to replace the directory of the kernels.
-
-    renderingKernels_.push_back( xrayRenderingKernel );
-    activeRenderingKernel_ =  xrayRenderingKernel;
-
-    handleKernel_( );
-
-    LOG_DEBUG( "[DONE] Initializing an OpenCL Kernel ... " );
-}
-
-template< class V , class F >
-void CLRenderer< V , F >::handleKernel_( std::string string )
-{
-    LOG_DEBUG("Handling Kernel..");
-    // Assuming that every thing is going in the right direction.
     cl_int clErrorCode = CL_SUCCESS;
 
-    kernel_ = activeRenderingKernel_->getKernelObject();
-
-    // Create an OpenCL volume
-    clVolume_ = new CLVolume< V >( volume_ , VOLUME_CL_UNSIGNED_INT8 );
-    clVolume_->createDeviceVolume( context_ );
 
     linearVolumeSampler_ = clCreateSampler( context_, true,
                                             CL_ADDRESS_CLAMP_TO_EDGE,
                                             CL_FILTER_LINEAR, &clErrorCode );
     oclHWDL::Error::checkCLError(clErrorCode);
+
 
     nearestVolumeSampler_ = clCreateSampler( context_, true,
                                              CL_ADDRESS_REPEAT,
@@ -205,60 +179,47 @@ void CLRenderer< V , F >::handleKernel_( std::string string )
     oclHWDL::Error::checkCLError(clErrorCode);
 
 
+    activeRenderingKernel_ =  renderingKernels_[ RenderingMode::RENDERING_MODE_Xray ];
 
 
-    activeRenderingKernel_->setFrameBuffer( clFrame_->getDeviceData() );
-    activeRenderingKernel_->setFrameWidth( clFrame_->getFrameDimensions().x );
-    activeRenderingKernel_->setFrameHeight( clFrame_->getFrameDimensions().y );
+    for( CLRenderingKernel* renderingKernel : renderingKernels_.values( ))
+    {
+        // Assuming that every thing is going in the right direction.
+        cl_int clErrorCode = CL_SUCCESS;
 
 
-    activeRenderingKernel_->setVolumeData( clVolume_->getDeviceData( ));
-
-    activeRenderingKernel_->setVolumeSampler
-            (linearFiltering_ ? linearVolumeSampler_ : nearestVolumeSampler_);
-
-    /**
-    activeRenderingKernel_->
-            setTransferFunctionData( clTransferFunction->getDeviceData( ));
-
-    activeRenderingKernel_->setTransferFunctionSampler(transferFunctionSampler_);
-
-    int enableTF = 0 ;
-
-    activeRenderingKernel_->setTransferFunctionFlag( enableTF );
-
-    //    activeRenderingKernel_->setTransferFunctionOffset(transferOffset);
-
-    //    activeRenderingKernel_->setTransferFunctionScale(transferScale);
-**/
-
-    inverseMatrix_ = clCreateBuffer( context_,
-                                     CL_MEM_READ_ONLY,
-                                     12 * sizeof( float ), 0,
-                                     &clErrorCode );
-
-    oclHWDL::Error::checkCLError(clErrorCode);
+        renderingKernel->setFrameBuffer( clFrame_->getDeviceData() );
+        renderingKernel->setFrameWidth( clFrame_->getFrameDimensions().x );
+        renderingKernel->setFrameHeight( clFrame_->getFrameDimensions().y );
 
 
-    activeRenderingKernel_->setInverseViewMatrix( inverseMatrix_);
+        renderingKernel->setVolumeData( clVolume_->getDeviceData( ));
+
+        renderingKernel->setVolumeSampler
+                ( linearFiltering_ ? linearVolumeSampler_ : nearestVolumeSampler_);
+
+        inverseMatrix_ = clCreateBuffer( context_,
+                                         CL_MEM_READ_ONLY,
+                                         12 * sizeof( float ), 0,
+                                         &clErrorCode );
+
+        oclHWDL::Error::checkCLError( clErrorCode );
 
 
-    oclHWDL::Error::checkCLError(clErrorCode);
+        renderingKernel->setInverseViewMatrix( inverseMatrix_);
 
 
-    LOG_DEBUG("[DONE] Handling Kernel..");
+        oclHWDL::Error::checkCLError( clErrorCode );
 
+
+    }
+
+    LOG_DEBUG( "[DONE] Initializing an OpenCL Kernels ... " );
 }
-
 
 template< class V , class F >
 void CLRenderer< V , F >::freeBuffers_()
 {
-    if( kernel_ )
-        clReleaseKernel( kernel_ );
-
-    if( kernelContext_->getProgram() )
-        clReleaseProgram( kernelContext_->getProgram() );
 
     if( linearVolumeSampler_ )
         clReleaseSampler( linearVolumeSampler_ );
@@ -266,14 +227,8 @@ void CLRenderer< V , F >::freeBuffers_()
     if( nearestVolumeSampler_ )
         clReleaseSampler( nearestVolumeSampler_ );
 
-//    if( transferFunctionSampler_ )
-//        clReleaseSampler( transferFunctionSampler_ );
-
     if( clVolume_->getDeviceData( ))
         clReleaseMemObject( clVolume_->getDeviceData( ));
-
-//    if( clTransferFunction->getDeviceData() )
-//        clReleaseMemObject( clTransferFunction->getDeviceData( ));
 
     if( clFrame_->getDeviceData() )
         clReleaseMemObject( clFrame_->getDeviceData( ));
@@ -289,7 +244,7 @@ void CLRenderer< V , F >::freeBuffers_()
 }
 
 template< class V , class F >
-void CLRenderer< V , F >::paint()
+void CLRenderer< V , F >::paint_()
 {
     TIC( RENDERING_PROFILE( gpuIndex_ ).mvMatrix_TIMER );
     // Use the GLM to create the Model View Matrix.
@@ -342,8 +297,6 @@ void CLRenderer< V , F >::paint()
 
 
 
-
-
     // Scale, Rotate, and then translate.
 
     glmMVMatrix = glm::scale( glmMVMatrix , scaleVector );
@@ -387,7 +340,7 @@ void CLRenderer< V , F >::paint()
 
 
     //Set he current center after transformation
-//    currentCenter_ = center;
+    //    currentCenter_ = center;
 
     //Arrange the matrix in column-major order as expected from the rendering kernel
     inverseMatrixArray_[  0 ] = modelViewMatrix[  0 ];
@@ -411,6 +364,7 @@ void CLRenderer< V , F >::paint()
 
     TOC( RENDERING_PROFILE( gpuIndex_ ).rendering_TIMER );
 }
+
 
 
 #include "CLRenderer.ipp"
