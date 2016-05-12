@@ -5,6 +5,10 @@
 #include "CLRenderer.h"
 #include "ProfilingExterns.h"
 
+
+namespace clpar {
+namespace Task {
+
 /**
  * @brief The TaskRender class
  * Wrap the instruction of rendering frame.
@@ -12,15 +16,18 @@
 class TaskRender : public QRunnable
 {
 public:
-    TaskRender( CLAbstractRenderer &cLRenderer  );
+    TaskRender( Renderer::CLAbstractRenderer &cLRenderer  );
 
 protected:
     void run();
 
 private:
-    CLAbstractRenderer &cLRenderer_;
+    Renderer::CLAbstractRenderer &cLRenderer_;
 
 
 };
+
+}
+}
 
 #endif // TASKRENDER_H

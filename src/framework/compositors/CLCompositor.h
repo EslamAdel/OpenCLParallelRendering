@@ -3,13 +3,12 @@
 
 #include <QPixmap>
 #include "CLXRayCompositingKernel.h"
-#include "CLImage2D.h"
-#include "CLImage2DArray.h"
-#include "CLBuffer.h"
-#include <unordered_map>
 #include "CLAbstractCompositor.h"
 #include <QMutex>
 #include <QMutexLocker>
+
+namespace clpar {
+namespace Compositor {
 
 template< class T >
 class CLCompositor : public CLAbstractCompositor
@@ -33,14 +32,14 @@ public:
      * @brief allocateFrame
      * @param renderer
      */
-    void allocateFrame( CLAbstractRenderer *renderer ) override ;
+    void allocateFrame( Renderer::CLAbstractRenderer *renderer ) override ;
 
     /**
      * @brief collectFrame
      * @param renderer
      * @param block
      */
-    void collectFrame( CLAbstractRenderer *renderer ,
+    void collectFrame( Renderer::CLAbstractRenderer *renderer ,
                        const cl_bool block ) override ;
 
     /**
@@ -57,7 +56,7 @@ public:
      * @brief getFinalFrame
      * @return
      */
-    const CLFrameVariant &getFinalFrame( ) const override;
+    const clData::CLFrameVariant &getFinalFrame( ) const override;
 
     /**
      * @brief framesCount
@@ -86,7 +85,7 @@ protected :
     /**
      * @brief updateKernelsArguments
      */
-    void updateKernelsArguments( )  ;
+    void updateKernelsArguments_( )  ;
 
 
 protected:
@@ -104,12 +103,12 @@ protected:
     /**
      * @brief finalFrame_
      */
-    CLImage2D< T > *finalFrame_ ;
+    clData::CLImage2D< T > *finalFrame_ ;
 
     /**
      * @brief finalFrameReadout_
      */
-    CLImage2D< T > *finalFrameReadout_ ;
+    clData::CLImage2D< T > *finalFrameReadout_ ;
 
 
 
@@ -117,17 +116,20 @@ protected:
     /**
      * @brief imagesArray_
      */
-    CLImage2DArray< T > *imagesArray_ ;
+    clData::CLImage2DArray< T > *imagesArray_ ;
 
     /**
      * @brief depthIndex_
      */
-    CLBuffer< uint > *depthIndex_ ;
+    clData::CLBuffer< uint > *depthIndex_ ;
 
     /**
      * @brief criticalMutex_
      */
     QMutex criticalMutex_ ;
 };
+
+}
+}
 
 #endif // CLCompositor_H

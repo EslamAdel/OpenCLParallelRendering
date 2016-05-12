@@ -8,6 +8,8 @@
 #include "VirtualCLRenderer.h"
 
 
+namespace clpar
+{
 
 class VirtualParallelRendering : public ParallelRendering
 {
@@ -36,10 +38,9 @@ public:
     void startRendering();
 
 public slots:
-    void frameLoadedToDevice_SLOT(
-            CLAbstractRenderer *renderer );
+    void frameLoadedToDevice_SLOT( Renderer::CLAbstractRenderer *renderer );
 
-    void finishedRendering_SLOT( CLAbstractRenderer *renderer );
+    void finishedRendering_SLOT( Renderer::CLAbstractRenderer *renderer );
 
     void compositingFinished_SLOT( );
 
@@ -49,14 +50,15 @@ protected:
 private:
 
     //for virtual GPUs only.
-    std::vector< CLAbstractRenderer* > renderers_ ;
-    CLAbstractCompositor *compositor_ ;
+    std::vector< Renderer::CLAbstractRenderer* > renderers_ ;
+    Compositor::CLAbstractCompositor *compositor_ ;
     const uint virtualGPUsCount_ ;
 
-    std::vector< TaskComposite* > compositingTasks_ ;
-    std::vector< VirtualTaskCollect *> collectingTasks_ ;
-    std::vector< TaskRender * > renderingTasks_ ;
+    std::vector< Task::TaskComposite* > compositingTasks_ ;
+    std::vector< Task::VirtualTaskCollect *> collectingTasks_ ;
+    std::vector< Task::TaskRender * > renderingTasks_ ;
 
 };
 
+}
 #endif // VIRTUALPARALLELRENDERING_H

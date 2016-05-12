@@ -1,7 +1,7 @@
 #include "CLCompositorAccumulate.h"
 
 template< class T >
-CLCompositorAccumulate< T >::CLCompositorAccumulate(
+clpar::Compositor::CLCompositorAccumulate< T >::CLCompositorAccumulate(
         const uint64_t gpuIndex,
         const uint frameWidth ,
         const uint frameHeight ,
@@ -16,7 +16,8 @@ CLCompositorAccumulate< T >::CLCompositorAccumulate(
 }
 
 template< class T >
-void CLCompositorAccumulate< T >::allocateFrame( CLAbstractRenderer *renderer )
+void clpar::Compositor::CLCompositorAccumulate< T >::allocateFrame(
+        Renderer::CLAbstractRenderer *renderer )
 {
 
     if( renderers_.contains( renderer ))
@@ -26,9 +27,10 @@ void CLCompositorAccumulate< T >::allocateFrame( CLAbstractRenderer *renderer )
 
     renderers_ << renderer ;
 
-    CLFrame< T > *frame =
-            new CLFrame< T >( renderer->getCLFrame().value< CLImage2D< T > *>()->
-                              getFrameDimensions( ));
+    clData::CLFrame< T > *frame =
+            new clData::CLFrame< T >(
+                renderer->getCLFrame().value< clData::CLImage2D< T > *>()->
+                getFrameDimensions( ));
 
     frame->createDeviceData( context_ );
 
@@ -39,12 +41,13 @@ void CLCompositorAccumulate< T >::allocateFrame( CLAbstractRenderer *renderer )
 }
 
 template< class T >
-void CLCompositorAccumulate< T >::collectFrame( CLAbstractRenderer *renderer ,
-                                                const cl_bool block )
+void clpar::Compositor::CLCompositorAccumulate< T >::collectFrame(
+        Renderer::CLAbstractRenderer *renderer ,
+        const cl_bool block )
 {
 
-    CLFrame< T > *sourceFrame =
-            renderer->getCLFrame().value< CLImage2D< T > *>( );
+    clData::CLFrame< T > *sourceFrame =
+            renderer->getCLFrame().value< clData::CLImage2D< T > *>( );
 
     sourceFrame->readDeviceData( renderer->getCommandQueue() ,
                                  block );
@@ -61,7 +64,7 @@ void CLCompositorAccumulate< T >::collectFrame( CLAbstractRenderer *renderer ,
 }
 
 template< class T >
-void CLCompositorAccumulate< T >::composite( )
+void clpar::Compositor::CLCompositorAccumulate< T >::composite( )
 {
     if( ++compositedFramesCount_ == framesCount_ )
         readOutReady_ = true ;
@@ -114,7 +117,7 @@ void CLCompositorAccumulate< T >::composite( )
 }
 
 template< class T >
-void CLCompositorAccumulate< T >::loadFinalFrame()
+void clpar::Compositor::CLCompositorAccumulate< T >::loadFinalFrame()
 {
     TOC( compositingProfile.compositing_TIMER );
     //    LOG_DEBUG("Reading CollageFrame[%d]" , collageBufferFrameIndex_ );
@@ -128,42 +131,43 @@ void CLCompositorAccumulate< T >::loadFinalFrame()
 }
 
 template< class T >
-const CLFrameVariant &CLCompositorAccumulate< T >::getFinalFrame() const
+const clpar::clData::CLFrameVariant &
+clpar::Compositor::CLCompositorAccumulate< T >::getFinalFrame() const
 {
     this->finalFrameVariant_ = QVariant::fromValue( finalFrameReadout_  );
     return this->finalFrameVariant_ ;
 }
 
 template< class T >
-uint CLCompositorAccumulate< T >::framesCount() const
+uint clpar::Compositor::CLCompositorAccumulate< T >::framesCount() const
 {
     return framesCount_ ;
 }
 
 template< class T >
-uint8_t CLCompositorAccumulate< T >::getCompositedFramesCount() const
+uint8_t clpar::Compositor::CLCompositorAccumulate< T >::getCompositedFramesCount() const
 {
     return compositedFramesCount_ ;
 }
 
 template< class T >
-void CLCompositorAccumulate< T >::initializeBuffers_()
+void clpar::Compositor::CLCompositorAccumulate< T >::initializeBuffers_()
 {
     LOG_DEBUG("Initializing Buffers ...");
 
-    finalFrameReadout_ = new CLFrame< T >( frameDimensions_ );
+    finalFrameReadout_ = new clData::CLFrame< T >( frameDimensions_ );
 
     LOG_DEBUG("[DONE] Initializing Buffers ...");
 }
 
 template< class T >
-void CLCompositorAccumulate< T >::initializeKernel_()
+void clpar::Compositor::CLCompositorAccumulate< T >::initializeKernel_()
 {
     LOG_DEBUG( "Initializing an OpenCL Kernel ... " );
 
-//    activeCompositingKernel_ =
-//            new CLXRayCompositingKernel( context_ ,
-//                                         "xray_compositing_accumulate" );
+    //    activeCompositingKernel_ =
+    //            new CLXRayCompositingKernel( context_ ,
+    //                                         "xray_compositing_accumulate" );
 
     LOG_DEBUG( "[DONE] Initializing an OpenCL Kernel ... " );
 }

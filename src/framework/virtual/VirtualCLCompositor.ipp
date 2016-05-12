@@ -1,6 +1,6 @@
 #ifndef VIRTUALCLCOMPOSITOR_IPP
 #define VIRTUALCLCOMPOSITOR_IPP
 
-template class VirtualCLCompositor< float > ;
+template class clpar::Compositor::VirtualCLCompositor< float > ;
 
 #endif // VIRTUALCLCOMPOSITOR_IPP

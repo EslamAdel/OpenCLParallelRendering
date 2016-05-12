@@ -2,23 +2,24 @@
 
 #include "Logger.h"
 
-VirtualParallelRendering::VirtualParallelRendering( Volume<uchar> *volume,
-                                                    const uint frameWidth,
-                                                    const uint frameHeight ,
-                                                    const uint virtualGPUsCount)
+clpar::VirtualParallelRendering::VirtualParallelRendering( Volume<uchar> *volume,
+                                                           const uint frameWidth,
+                                                           const uint frameHeight ,
+                                                           const uint virtualGPUsCount)
     : ParallelRendering( volume , frameWidth , frameHeight ) ,
       virtualGPUsCount_( virtualGPUsCount )
 {
     LOG_DEBUG("Virtual Parallel Framework Created");
 }
 
-void VirtualParallelRendering::addCLRenderer( const uint64_t gpuIndex )
+void clpar::VirtualParallelRendering::addCLRenderer( const uint64_t gpuIndex )
 {
     auto *renderer =
-            new VirtualCLRenderer< uchar , float >( gpuIndex,
-                                                    frameWidth_ ,
-                                                    frameHeight_ ,
-                                                    transformationAsync_ );
+            new Renderer::VirtualCLRenderer< uchar , float >(
+                gpuIndex,
+                frameWidth_ ,
+                frameHeight_ ,
+                transformationAsync_ );
 
     renderers_.push_back( renderer );
     renderer->setFrameIndex( gpuIndex );
@@ -32,20 +33,20 @@ void VirtualParallelRendering::addCLRenderer( const uint64_t gpuIndex )
 
 }
 
-void VirtualParallelRendering::addCLCompositor(const uint64_t gpuIndex)
+void clpar::VirtualParallelRendering::addCLCompositor(const uint64_t gpuIndex)
 {
     LOG_DEBUG("Adding Virtual Compositing Node");
 
     if( inUseGPUs_.size() > 1 )
-        compositor_ = new CLCompositor< float >( gpuIndex ,
-                                                 frameWidth_ ,
-                                                 frameHeight_ );
+        compositor_ = new Compositor::CLCompositor< float >( gpuIndex ,
+                                                             frameWidth_ ,
+                                                             frameHeight_ );
     else
         LOG_ERROR("Signle GPU not supported for the moment!");
 
 
     LOG_DEBUG("[DONE] Initialize Compositing Unit");
-    this->finalFramePixmapTask_ = new TaskMakePixmap( );
+    this->finalFramePixmapTask_ = new Task::TaskMakePixmap( );
 
     connect( finalFramePixmapTask_ ,
              SIGNAL( pixmapReady_SIGNAL( QPixmap* ,
@@ -55,12 +56,12 @@ void VirtualParallelRendering::addCLCompositor(const uint64_t gpuIndex)
 
     // for each rendering task finished, a collecting task and a
     // compositing task will follow!
-    for( CLAbstractRenderer *renderer : renderers_ )
+    for( Renderer::CLAbstractRenderer *renderer : renderers_ )
     {
 
         compositor_->allocateFrame( renderer );
 
-        TaskRender *renderingTask = new TaskRender( *renderer );
+        Task::TaskRender *renderingTask = new Task::TaskRender( *renderer );
 
         renderingTasks_.push_back( renderingTask );
 
@@ -68,16 +69,16 @@ void VirtualParallelRendering::addCLCompositor(const uint64_t gpuIndex)
         // Now add collectingTasks that transfer buffer from The rendering device
         // (rendering node) to the compositing device (compositing node),
         auto collectingTask =
-                new VirtualTaskCollect( renderer , compositor_ );
+                new Task::VirtualTaskCollect( renderer , compositor_ );
 
         // Add the collecting task to
         // the map < rendering node , collecting task >
         collectingTasks_.push_back( collectingTask ) ;
 
 
-        TaskComposite *compositingTask =
-                new TaskComposite( compositor_ ,
-                                   renderer );
+        Task::TaskComposite *compositingTask =
+                new Task::TaskComposite( compositor_ ,
+                                         renderer );
 
         compositingTasks_.push_back( compositingTask ) ;
 
@@ -94,7 +95,7 @@ void VirtualParallelRendering::addCLCompositor(const uint64_t gpuIndex)
     }
 }
 
-void VirtualParallelRendering::distributeBaseVolume1D()
+void clpar::VirtualParallelRendering::distributeBaseVolume1D()
 {
     LOG_DEBUG("Distributing Volume");
 
@@ -124,17 +125,17 @@ void VirtualParallelRendering::distributeBaseVolume1D()
     }
 }
 
-int VirtualParallelRendering::getCLRenderersCount() const
+int clpar::VirtualParallelRendering::getCLRenderersCount() const
 {
     return renderers_.size();
 }
 
-uint VirtualParallelRendering::getMachineGPUsCount() const
+uint clpar::VirtualParallelRendering::getMachineGPUsCount() const
 {
     return virtualGPUsCount_;
 }
 
-void VirtualParallelRendering::startRendering()
+void clpar::VirtualParallelRendering::startRendering()
 {
     activeRenderers_ =  renderers_.size();
 
@@ -146,12 +147,14 @@ void VirtualParallelRendering::startRendering()
     LOG_INFO("[DONE] Triggering Rendering Nodes");
 }
 
-void VirtualParallelRendering::frameLoadedToDevice_SLOT( CLAbstractRenderer *renderer )
+void clpar::VirtualParallelRendering::frameLoadedToDevice_SLOT(
+        Renderer::CLAbstractRenderer *renderer )
 {
     LOG_DEBUG("Frame<%d> Loaded to Device" , renderer->getGPUIndex() );
 
     emit this->frameReady_SIGNAL( &renderer->
-                                  getCLFrame().value< CLImage2D< float >* >()->
+                                  getCLFrame().
+                                  value< clData::CLImage2D< float >* >()->
                                   getFramePixmap() ,
                                   renderer  );
 
@@ -159,22 +162,23 @@ void VirtualParallelRendering::frameLoadedToDevice_SLOT( CLAbstractRenderer *ren
     compositorPool_.start( compositingTasks_[ renderer->getGPUIndex() ] );
 }
 
-void VirtualParallelRendering::finishedRendering_SLOT(
-        CLAbstractRenderer *finishedRenderer )
+void clpar::VirtualParallelRendering::finishedRendering_SLOT(
+        Renderer::CLAbstractRenderer *finishedRenderer )
 {
 
     collectorPool_.start( collectingTasks_[ finishedRenderer->getGPUIndex() ]);
 
 }
 
-void VirtualParallelRendering::compositingFinished_SLOT()
+void clpar::VirtualParallelRendering::compositingFinished_SLOT()
 {
     LOG_DEBUG("[DONE] Compositing");
 
 
 
     emit this->finalFrameReady_SIGNAL(
-                &compositor_->getFinalFrame().value< CLImage2D< float >*>()->
+                &compositor_->getFinalFrame().
+                value< clData::CLImage2D< float >*>()->
                 getFramePixmap( ));
 
     if( this->pendingTransformations_ )
@@ -185,14 +189,14 @@ void VirtualParallelRendering::compositingFinished_SLOT()
 
 
 
-void VirtualParallelRendering::applyTransformation_()
+void clpar::VirtualParallelRendering::applyTransformation_()
 {
     this->readyPixmapsCount_ = 0 ;
 
     // fetch new transformations if exists.
     this->syncTransformation_();
 
-    for( CLAbstractRenderer *renderer : renderers_ )
+    for( Renderer::CLAbstractRenderer *renderer : renderers_ )
     {
         LOG_DEBUG("Triggering renderer[%d]:%p" , renderer->getGPUIndex() ,
                   renderer );

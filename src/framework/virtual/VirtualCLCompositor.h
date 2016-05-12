@@ -4,6 +4,11 @@
 #include "CLCompositor.h"
 #include "VirtualCLRenderer.h"
 
+
+namespace clpar {
+namespace Compositor {
+
+
 template< class T >
 class VirtualCLCompositor : public CLCompositor< T >
 {
@@ -12,5 +17,9 @@ public:
                          const uint frameWidth ,
                          const uint frameHeight );
 };
+
+
+}
+}
 
 #endif // VIRTUALCLCompositor_H

@@ -26,15 +26,22 @@
 #include "Transformation.h"
 
 
-typedef QMap< const oclHWDL::Device*, CLAbstractRenderer*> CLRenderers;
 
-typedef QMap< const CLAbstractRenderer* , TaskRender*> RenderingTasks;
 
-typedef QMap< const CLAbstractRenderer* , TaskComposite*> CompositingTasks;
+namespace clpar {
 
-typedef QMap< const CLAbstractRenderer* , TaskCollect*> CollectingTasks;
 
-typedef QMap< const CLAbstractRenderer* , TaskMakePixmap*> MakePixmapTasks;
+
+typedef QMap< const oclHWDL::Device*, Renderer::CLAbstractRenderer*> CLRenderers;
+
+typedef QMap< const Renderer::CLAbstractRenderer* , Task::TaskRender*> RenderingTasks;
+
+typedef QMap< const Renderer::CLAbstractRenderer* , Task::TaskComposite*> CompositingTasks;
+
+typedef QMap< const Renderer::CLAbstractRenderer* , Task::TaskCollect*> CollectingTasks;
+
+typedef QMap< const Renderer::CLAbstractRenderer* , Task::TaskMakePixmap*> MakePixmapTasks;
+
 
 /**
  * @brief The ParallelRendering class
@@ -114,10 +121,10 @@ public:
      * @param gpuIndex
      * @return
      */
-    const CLAbstractRenderer &getCLRenderer( const uint64_t gpuIndex ) const ;
+    const Renderer::CLAbstractRenderer &getCLRenderer( const uint64_t gpuIndex ) const ;
 
 
-    const CLAbstractCompositor &getCLCompositor( ) const ;
+    const Compositor::CLAbstractCompositor &getCLCompositor( ) const ;
     /**
      * @brief machineGPUsCount
      * @return
@@ -148,7 +155,8 @@ signals:
      * @brief framesReady_SIGNAL
      * For each rendered frame done, emit a signal.
      */
-    void frameReady_SIGNAL( QPixmap *pixmap , const CLAbstractRenderer * node );
+    void frameReady_SIGNAL( QPixmap *pixmap ,
+                            const clpar::Renderer::CLAbstractRenderer * node );
 
     /**
      * @brief finalFrameReady_SIGNAL
@@ -178,7 +186,7 @@ public slots :
      * buffers from the rendering GPU to the compositing GPU.
      * @param finishedNode
      */
-    void finishedRendering_SLOT( CLAbstractRenderer *renderer );
+    void finishedRendering_SLOT( clpar::Renderer::CLAbstractRenderer *renderer );
 
     /**
      * @brief compositingFinished_SLOT
@@ -194,7 +202,7 @@ public slots :
      * so this slot initiates a compositing task.
      * @param finishedNode
      */
-    void frameLoadedToDevice_SLOT( CLAbstractRenderer *renderer );
+    void frameLoadedToDevice_SLOT( clpar::Renderer::CLAbstractRenderer *renderer );
 
 
     /**
@@ -208,7 +216,8 @@ public slots :
      * if it is nullptr then it belongs to the CompositorNode,
      * otherwise, it belongs to CLRenderer referenced by the pointer.
      */
-    void pixmapReady_SLOT( QPixmap *pixmap , const CLAbstractRenderer * renderer );
+    void pixmapReady_SLOT( QPixmap *pixmap ,
+                           const clpar::Renderer::CLAbstractRenderer * renderer );
 
     /**
      * @brief updateRotationX_SLOT
@@ -280,7 +289,7 @@ public slots :
     /**
      * @brief activateRenderingKernel_SLOT
      */
-    void activateRenderingKernel_SLOT( RenderingMode type );
+    void activateRenderingKernel_SLOT( clpar::clKernel::RenderingMode type );
 
 
 
@@ -329,7 +338,7 @@ private:
     /**
      * @brief compositor_
      */
-    CLAbstractCompositor *compositor_;
+    Compositor::CLAbstractCompositor *compositor_;
 
 
 protected:
@@ -359,7 +368,7 @@ protected:
     RenderingTasks  renderingTasks_ ;
     CollectingTasks collectingTasks_ ;
     CompositingTasks compositingTasks_ ;
-    TaskMakePixmap *finalFramePixmapTask_;
+    Task::TaskMakePixmap *finalFramePixmapTask_;
     MakePixmapTasks makePixmapTasks_ ;
 
     //Volume Data
@@ -388,4 +397,5 @@ protected:
     const uint frameHeight_ ;
 };
 
+}
 #endif // PARALLELRENDERING_H

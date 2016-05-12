@@ -8,7 +8,7 @@
 #include <QPicture>
 
 
-RenderingWindow::RenderingWindow( ParallelRendering *parallelRenderer ,
+RenderingWindow::RenderingWindow( clpar::ParallelRendering *parallelRenderer ,
                                   QWidget *parent )
     : QMainWindow( parent ),
       ui( new Ui::RenderingWindow )
@@ -25,15 +25,15 @@ RenderingWindow::RenderingWindow( ParallelRendering *parallelRenderer ,
 
     QVector< QLabel* > labels ;
 
-//    ui->frameContainer0->setEnabled( false );
+    //    ui->frameContainer0->setEnabled( false );
     frameContainers_.push_back( ui->frameContainer0 );
     labels.push_back( ui->labelGPU0 );
 
-//    ui->frameContainer1->setEnabled( false );
+    //    ui->frameContainer1->setEnabled( false );
     frameContainers_.push_back( ui->frameContainer1 );
     labels.push_back( ui->labelGPU1 );
 
-//    ui->frameContainer2->setEnabled( false );
+    //    ui->frameContainer2->setEnabled( false );
     frameContainers_.push_back( ui->frameContainer2 );
     labels.push_back( ui->labelGPU2 );
 
@@ -54,10 +54,13 @@ void RenderingWindow::intializeConnections_()
 {
     //parallelRenderer_
     connect( parallelRenderer_ ,
-             SIGNAL( frameReady_SIGNAL( QPixmap * ,
-                                        const CLAbstractRenderer* )),
-             this , SLOT( frameReady_SLOT( QPixmap * ,
-                                           const CLAbstractRenderer* )));
+             SIGNAL( frameReady_SIGNAL(
+                         QPixmap * ,
+                         const clpar::Renderer::CLAbstractRenderer* )),
+             this ,
+             SLOT( frameReady_SLOT(
+                       QPixmap * ,
+                       const clpar::Renderer::CLAbstractRenderer* )));
 
     connect( parallelRenderer_ , SIGNAL( finalFrameReady_SIGNAL( QPixmap* )) ,
              this , SLOT( finalFrameReady_SLOT( QPixmap* )));
@@ -119,8 +122,9 @@ void RenderingWindow::displayFrame_( QPixmap *frame , uint id )
 
 }
 
-void RenderingWindow::frameReady_SLOT( QPixmap *frame ,
-                                       const CLAbstractRenderer *renderer )
+void RenderingWindow::frameReady_SLOT(
+        QPixmap *frame,
+        const clpar::Renderer::CLAbstractRenderer *renderer )
 {
 
     uint index = renderer->getFrameIndex();
@@ -132,7 +136,7 @@ void RenderingWindow::frameReady_SLOT( QPixmap *frame ,
 void RenderingWindow::finalFrameReady_SLOT( QPixmap *finalFrame )
 {
 
-//    LOG_DEBUG("Final Frame ready ");
+    //    LOG_DEBUG("Final Frame ready ");
     if( finalFrame->isNull() )
         LOG_ERROR("NULL pixmap");
 
@@ -208,30 +212,30 @@ void RenderingWindow::captureView_SLOT()
 
     QString date = QDateTime::currentDateTime().toString( "hh-mm-ss" );
 
-//    QString newDir = dir + QString( "/" ) + date +
-//                     QString( "[%1x%2]" ).arg( QString::number( FRAME_WIDTH ) ,
-//                                               QString::number( FRAME_HEIGHT ));
-//    QDir createDir;
-//    createDir.mkdir( newDir );
-//    LOG_DEBUG("New Dir:%s" , newDir.toStdString().c_str() );
+    //    QString newDir = dir + QString( "/" ) + date +
+    //                     QString( "[%1x%2]" ).arg( QString::number( FRAME_WIDTH ) ,
+    //                                               QString::number( FRAME_HEIGHT ));
+    //    QDir createDir;
+    //    createDir.mkdir( newDir );
+    //    LOG_DEBUG("New Dir:%s" , newDir.toStdString().c_str() );
 
 
-//    QPixmap pic( finalFrame_->
-//                 scaledToHeight( FRAME_WIDTH ).scaledToWidth( FRAME_HEIGHT ));
-//    pic.save( newDir + "/result.jpg");
+    //    QPixmap pic( finalFrame_->
+    //                 scaledToHeight( FRAME_WIDTH ).scaledToWidth( FRAME_HEIGHT ));
+    //    pic.save( newDir + "/result.jpg");
 
-//    int i = 0;
-//    for( const QLabel *frame : frameContainers_ )
-//    {
-//        if( frame->isEnabled() )
-//        {
-//            QPixmap framePixmap( parallelRenderer_->getCLRenderer( i ).
-//                                 getCLFrame()->getFramePixmap().
-//                                 scaledToHeight( FRAME_WIDTH ).
-//                                 scaledToWidth( FRAME_HEIGHT ));
+    //    int i = 0;
+    //    for( const QLabel *frame : frameContainers_ )
+    //    {
+    //        if( frame->isEnabled() )
+    //        {
+    //            QPixmap framePixmap( parallelRenderer_->getCLRenderer( i ).
+    //                                 getCLFrame()->getFramePixmap().
+    //                                 scaledToHeight( FRAME_WIDTH ).
+    //                                 scaledToWidth( FRAME_HEIGHT ));
 
-//            framePixmap.save( newDir + QString("/GPU%1.jpg").arg(i++) );
-//        }
-//    }
+    //            framePixmap.save( newDir + QString("/GPU%1.jpg").arg(i++) );
+    //        }
+    //    }
 }
 

@@ -2,10 +2,15 @@
 #define CLCOMPOSITORACCUMULATE_H
 #include "CLAbstractCompositor.h"
 #include <unordered_map>
-#include "CLFrame.h"
+
 #include "CLXRayCompositingKernel.h"
 
 #include <QQueue>
+
+
+namespace clpar { namespace Compositor {
+
+
 
 
 template< class T >
@@ -17,17 +22,17 @@ public:
                             const uint frameHeight ,
                             const std::string kernelDirectory  );
 
-    void allocateFrame( CLAbstractRenderer *renderer ) override ;
+    void allocateFrame( Renderer::CLAbstractRenderer *renderer ) override ;
 
 
-    void collectFrame( CLAbstractRenderer *renderer ,
+    void collectFrame( Renderer::CLAbstractRenderer *renderer ,
                                const cl_bool block ) override ;
 
     void composite() override ;
 
     void loadFinalFrame() override ;
 
-    const CLFrameVariant &getFinalFrame( ) const override;
+    const clData::CLFrameVariant &getFinalFrame( ) const override;
 
     uint framesCount() const ;
 
@@ -52,17 +57,20 @@ protected:
 
     uint8_t compositedFramesCount_ ;
 
-    CLFrame< T > *currentFrame_ ;
-    CLFrame< T > *finalFrame_ ;
+    clData::CLFrame< T > *currentFrame_ ;
+    clData::CLFrame< T > *finalFrame_ ;
 
-    CLFrame< T > *finalFrameReadout_ ;
+    clData::CLFrame< T > *finalFrameReadout_ ;
 
     //empty
-    std::unordered_map< const CLAbstractRenderer * ,
-                        CLFrame< T >* > frames_ ;
+    std::unordered_map< const Renderer::CLAbstractRenderer * ,
+                        clData::CLFrame< T >* > frames_ ;
 
-    QQueue< CLFrame< T >* > loadedFrames_ ;
+    QQueue< clData::CLFrame< T >* > loadedFrames_ ;
 
 };
+
+
+}}
 
 #endif // CLCOMPOSITORACCUMULATE_H

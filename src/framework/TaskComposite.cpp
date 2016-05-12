@@ -2,8 +2,9 @@
 #include "ProfilingExterns.h"
 
 #include "Logger.h"
-TaskComposite::TaskComposite( CLAbstractCompositor *compositor ,
-                              CLAbstractRenderer *renderer)
+clpar::Task::TaskComposite::TaskComposite(
+        Compositor::CLAbstractCompositor *compositor ,
+        Renderer::CLAbstractRenderer *renderer )
     : renderer_( renderer )
 {
     compositor_ = compositor ;
@@ -11,7 +12,7 @@ TaskComposite::TaskComposite( CLAbstractCompositor *compositor ,
 }
 
 
-void TaskComposite::run()
+void clpar::Task::TaskComposite::run()
 {
     TOC( compositingProfile.threadSpawning_TIMER ) ;
 

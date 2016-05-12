@@ -7,6 +7,11 @@
 #include <QObject>
 #include "Profiles.hh"
 
+
+
+namespace clpar {
+namespace Task {
+
 /**
  * @brief The TaskComposite class
  */
@@ -21,8 +26,8 @@ public:
      * @param frameIndex
      * @param compositedFramesCount
      */
-    TaskComposite( CLAbstractCompositor *compositor ,
-                   CLAbstractRenderer *cLRenderer );
+    TaskComposite( Compositor::CLAbstractCompositor *compositor ,
+                   Renderer::CLAbstractRenderer *cLRenderer );
 
 signals:
     /**
@@ -35,8 +40,12 @@ protected:
     void run();
 
 private:
-    CLAbstractCompositor *compositor_ ;
-    CLAbstractRenderer *renderer_  ;
+    Compositor::CLAbstractCompositor *compositor_ ;
+    Renderer::CLAbstractRenderer *renderer_  ;
 };
+
+
+}
+}
 
 #endif // TASKCOMPOSITE_H

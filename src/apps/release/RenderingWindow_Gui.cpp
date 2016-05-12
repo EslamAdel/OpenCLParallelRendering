@@ -8,7 +8,7 @@
 #include "Logger.h"
 
 RenderingWindow_Gui::RenderingWindow_Gui(
-        ParallelRendering *parallelRenderer ,
+        clpar::ParallelRendering *parallelRenderer ,
         QWidget *parent )
     : QMainWindow( parent ),
       ui( new Ui::RenderingWindow_Gui )
@@ -105,25 +105,29 @@ void RenderingWindow_Gui::intializeConnections_()
              this , SLOT( captureView_SLOT( )));
 
     // trasnfer function
-//    connect( ui->scaleSlider , SIGNAL( valueChanged(int)) ,
-//             this , SLOT(newTransferFunctionScale_SLOT(int)) );
+    //    connect( ui->scaleSlider , SIGNAL( valueChanged(int)) ,
+    //             this , SLOT(newTransferFunctionScale_SLOT(int)) );
 
 
-//    connect( ui->offsetSlider , SIGNAL( valueChanged(int)) ,
-//             this , SLOT(newTransferFunctionOffset_SLOT(int)) );
+    //    connect( ui->offsetSlider , SIGNAL( valueChanged(int)) ,
+    //             this , SLOT(newTransferFunctionOffset_SLOT(int)) );
 
-//    connect(ui->transferFunctionCheckBox ,SIGNAL(stateChanged(int)),
-//            parallelRenderer_,SLOT(tranferFunctionFlag_SLOT(int)));
+    //    connect(ui->transferFunctionCheckBox ,SIGNAL(stateChanged(int)),
+    //            parallelRenderer_,SLOT(tranferFunctionFlag_SLOT(int)));
 
-//    connect(ui->transferFunctionCheckBox ,SIGNAL(stateChanged(int)),
-//            this , SLOT(tFunctionSLiderControl_SLOT(int)));
+    //    connect(ui->transferFunctionCheckBox ,SIGNAL(stateChanged(int)),
+    //            this , SLOT(tFunctionSLiderControl_SLOT(int)));
 
     //parallelRenderer_
     connect( parallelRenderer_ ,
-             SIGNAL( frameReady_SIGNAL( QPixmap * ,
-                                        const CLAbstractRenderer* )),
-             this , SLOT( frameReady_SLOT( QPixmap * ,
-                                           const CLAbstractRenderer* )));
+             SIGNAL( frameReady_SIGNAL(
+                         QPixmap * ,
+                         const clpar::Renderer::CLAbstractRenderer* )),
+             this ,
+             SLOT( frameReady_SLOT(
+                       QPixmap * ,
+                       const clpar::Renderer::CLAbstractRenderer* )));
+
 
     connect( parallelRenderer_ , SIGNAL( finalFrameReady_SIGNAL( QPixmap* )) ,
              this , SLOT( finalFrameReady_SLOT( QPixmap* )));
@@ -183,8 +187,8 @@ void RenderingWindow_Gui::displayFrame_( QPixmap *frame , uint id )
 
 }
 
-void RenderingWindow_Gui::frameReady_SLOT( QPixmap *frame ,
-                                           const CLAbstractRenderer *renderer )
+void RenderingWindow_Gui::frameReady_SLOT( QPixmap *frame,
+                                           const clpar::Renderer::CLAbstractRenderer *renderer )
 {
     uint index = renderer->getFrameIndex();
 
@@ -380,19 +384,23 @@ void RenderingWindow_Gui::switchRenderingKernel_SLOT()
 {
     if( ui->xrayButton->isChecked( ))
         parallelRenderer_->
-                activateRenderingKernel_SLOT( RenderingMode::RENDERING_MODE_Xray );
+                activateRenderingKernel_SLOT(
+                    clpar::clKernel::RenderingMode::RENDERING_MODE_Xray );
 
     else if( ui->maxIntensityProjectionButton->isChecked( ))
         parallelRenderer_->
-                activateRenderingKernel_SLOT( RenderingMode::RENDERING_MODE_MaxIntensity );
+                activateRenderingKernel_SLOT(
+                    clpar::clKernel::RenderingMode::RENDERING_MODE_MaxIntensity );
 
     else if(ui->minIntensityProjectionButton->isChecked( ))
         parallelRenderer_->
-                activateRenderingKernel_SLOT( RenderingMode::RENDERING_MODE_MinIntensity );
+                activateRenderingKernel_SLOT(
+                    clpar::clKernel::RenderingMode::RENDERING_MODE_MinIntensity );
 
     else if(ui->isoSurfaceButton->isChecked())
         parallelRenderer_->
-                activateRenderingKernel_SLOT( RenderingMode::RENDERING_MODE_IsoSurface );
+                activateRenderingKernel_SLOT(
+                    clpar::clKernel::RenderingMode::RENDERING_MODE_IsoSurface );
 }
 
 
@@ -412,8 +420,8 @@ void RenderingWindow_Gui::captureView_SLOT()
     const uint height = parallelRenderer_->getFrameHeight();
 
     QString newDir = dir + QString( "/" ) + date +
-                     QString( "[%1x%2]" ).arg( QString::number( width ) ,
-                                               QString::number( height ));
+            QString( "[%1x%2]" ).arg( QString::number( width ) ,
+                                      QString::number( height ));
     QDir createDir;
     createDir.mkdir( newDir );
     LOG_DEBUG("New Dir:%s" , newDir.toStdString().c_str() );
@@ -421,7 +429,7 @@ void RenderingWindow_Gui::captureView_SLOT()
 
     LOG_DEBUG("Saving resultant frame");
     QPixmap pic( parallelRenderer_->getCLCompositor().getFinalFrame().
-                 value< CLFrame< float > *>()->
+                 value< clpar::clData::CLFrame< float > *>()->
                  getFramePixmap().
                  scaledToHeight( width ).scaledToWidth( height ));
     pic.save( newDir + "/result.jpg");
@@ -432,9 +440,9 @@ void RenderingWindow_Gui::captureView_SLOT()
     {
 
         LOG_DEBUG("Saving frame<%d>", gpuIndex );
-        CLFrame< float > *sourceFrame =
+        clpar::clData::CLFrame< float > *sourceFrame =
                 parallelRenderer_->getCLRenderer( gpuIndex ).
-                getCLFrame().value< CLFrame< float > *>() ;
+                getCLFrame().value< clpar::clData::CLFrame< float > *>() ;
 
         QPixmap framePixmap( sourceFrame->
                              getFramePixmap().

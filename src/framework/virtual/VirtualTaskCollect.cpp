@@ -1,16 +1,16 @@
 #include "VirtualTaskCollect.h"
 #include "Logger.h"
 
-VirtualTaskCollect::VirtualTaskCollect(
-        CLAbstractRenderer *renderer,
-        CLAbstractCompositor *compositor )
+clpar::Task::VirtualTaskCollect::VirtualTaskCollect(
+        Renderer::CLAbstractRenderer *renderer,
+        Compositor::CLAbstractCompositor *compositor )
     : renderer_( renderer ) ,
       compositor_( compositor )
 {
     setAutoDelete( false );
 }
 
-void VirtualTaskCollect::run()
+void clpar::Task::VirtualTaskCollect::run()
 {
 
     LOG_DEBUG("collecting frame %d", renderer_->getGPUIndex() );

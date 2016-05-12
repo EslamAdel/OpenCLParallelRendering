@@ -1,6 +1,6 @@
 #ifndef CLRENDERER_IPP
 #define CLRENDERER_IPP
 
-template class CLRenderer< uchar , float > ;
+template class clpar::Renderer::CLRenderer< uchar , float > ;
 
 #endif // CLRENDERER_IPP

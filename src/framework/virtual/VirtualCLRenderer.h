@@ -4,6 +4,8 @@
 #include "CLRenderer.h"
 
 
+namespace clpar {
+namespace Renderer {
 
 template< class V ,  class F >
 class VirtualCLRenderer : public CLRenderer< V , F >
@@ -21,6 +23,9 @@ private:
     const uint64_t gpuIndex_VIRTUAL_ ;
 };
 
+
+}
+}
 
 
 #endif // VirtualCLRenderer_H

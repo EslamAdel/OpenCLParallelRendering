@@ -1,15 +1,16 @@
 #include "TaskCollect.h"
 #include "Logger.h"
 
-TaskCollect::TaskCollect( CLAbstractRenderer *renderer ,
-                          CLAbstractCompositor *compositor )
+clpar::Task::TaskCollect::TaskCollect(
+        Renderer::CLAbstractRenderer *renderer ,
+        Compositor::CLAbstractCompositor *compositor )
     : renderer_( renderer ) ,
       compositor_( compositor )
 {
     setAutoDelete( false );
 }
 
-void TaskCollect::run()
+void clpar::Task::TaskCollect::run()
 {
 
     TOC( COLLECTING_PROFILE(renderer_).threadSpawning_TIMER );

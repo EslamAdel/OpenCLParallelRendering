@@ -4,9 +4,13 @@
 #include "CLAbstractRenderer.h"
 #include "Volume.h"
 #include "Transformation.h"
-#include <CLVolume.h>
-#include "CLTransferFunction.h"
+#include "clData.h"
 #include <QMap>
+
+
+namespace clpar {
+namespace Renderer {
+
 
 template < class V , class F >
 class CLRenderer : public CLAbstractRenderer
@@ -61,7 +65,7 @@ public:
      * @brief getCLFrame
      * @return
      */
-    const CLFrameVariant &getCLFrame( ) const override;
+    const clData::CLFrameVariant &getCLFrame( ) const override;
 
 protected:
 
@@ -119,7 +123,7 @@ private:
     /**
      * @brief clVolume_
      */
-    CLVolume< V >* clVolume_;
+    clData::CLVolume< V >* clVolume_;
 
     /**
      * @brief inverseMatrix_
@@ -151,7 +155,7 @@ private:
     /**
      * @brief clFrame_
      */
-    CLImage2D< F > *clFrame_ ;
+    clData::CLImage2D< F > *clFrame_ ;
 
     /**
      * @brief inverseMatrix_
@@ -160,5 +164,8 @@ private:
 };
 
 
+
+}
+}
 
 #endif // CLRenderer_H

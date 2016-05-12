@@ -47,7 +47,7 @@ int main(int argc, char *argv[])
         }
     }
 
-    ParallelRendering parallelRenderer( volume , frameWidth , frameHeight );
+    clpar::ParallelRendering parallelRenderer( volume , frameWidth , frameHeight );
 
     for( const uint rendererIndex : deployGPUs )
         parallelRenderer.addCLRenderer( rendererIndex );

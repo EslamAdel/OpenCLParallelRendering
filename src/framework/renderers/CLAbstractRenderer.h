@@ -6,12 +6,16 @@
 #include <QMutexLocker>
 #include <oclHWDL.h>
 
-#include "CLFrameVariants.hh"
-#include "CLVolumeVariants.hh"
+#include "clData.h"
 #include "CLRenderingKernel.h"
 #include "CLXRayRenderingKernel.h"
 #include "CLMaxIntensityProjectionRenderingKernel.h"
 #include "CLMinIntensityProjectionRenderingKernel.h"
+
+
+namespace clpar { namespace Renderer{
+
+
 
 class CLAbstractRenderer : public QObject
 {
@@ -85,7 +89,7 @@ public:
      * @brief getCLFrame
      * @return
      */
-    virtual const CLFrameVariant &getCLFrame( ) const = 0;
+    virtual const clData::CLFrameVariant &getCLFrame( ) const = 0;
 
     /**
      * @brief getCurrentCenter
@@ -104,7 +108,7 @@ public:
      * @brief switchRenderingKernel
      * @param type
      */
-    void switchRenderingKernel( const RenderingMode type ) ;
+    void switchRenderingKernel( const clKernel::RenderingMode type ) ;
 
 
     /**
@@ -145,7 +149,7 @@ signals:
      * @param thisPtr
      * Pass this pointer as Identifier to this node.
      */
-    void finishedRendering( CLAbstractRenderer *thisPtr );
+    void finishedRendering( clpar::Renderer::CLAbstractRenderer *thisPtr );
 
 
 public slots:
@@ -171,7 +175,7 @@ private:
      * @brief allocateKernels_
      * @return
      */
-    CLRenderingKernels allocateKernels_( ) const;
+    clKernel::CLRenderingKernels allocateKernels_( ) const;
 protected:
 
     /**
@@ -220,7 +224,7 @@ protected:
     /**
      * @brief frameVariant_
      */
-    mutable CLFrameVariant frameVariant_ ;
+    mutable clData::CLFrameVariant frameVariant_ ;
 
 
     /**
@@ -231,17 +235,20 @@ protected:
     /**
      * @brief renderingKernels_
      */
-    CLRenderingKernels renderingKernels_ ;
+    clKernel::CLRenderingKernels renderingKernels_ ;
 
     /**
      * @brief activeRenderingKernel_
      */
-    CLRenderingKernel* activeRenderingKernel_;
+    clKernel::CLRenderingKernel* activeRenderingKernel_;
 
     /**
      * @brief activeRenderingMode_
      */
-    RenderingMode activeRenderingMode_ ;
+    clKernel::RenderingMode activeRenderingMode_ ;
 };
+
+
+}}
 
 #endif // CLABSTRACTRENDERER_H

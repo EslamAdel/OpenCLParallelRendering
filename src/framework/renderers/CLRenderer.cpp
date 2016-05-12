@@ -12,10 +12,11 @@
 #define LOCAL_SIZE_Y    16
 
 template< class V , class F >
-CLRenderer< V , F >::CLRenderer( const uint64_t gpuIndex ,
-                                 const uint frameWidth, const uint frameHeight,
-                                 const Transformation &transformation ,
-                                 const std::string kernelDirectory)
+clpar::Renderer::CLRenderer< V , F >::CLRenderer(
+        const uint64_t gpuIndex ,
+        const uint frameWidth, const uint frameHeight,
+        const Transformation &transformation ,
+        const std::string kernelDirectory)
     : CLAbstractRenderer( gpuIndex , frameWidth , frameHeight , kernelDirectory ) ,
       transformation_( transformation )
 {
@@ -27,26 +28,26 @@ CLRenderer< V , F >::CLRenderer( const uint64_t gpuIndex ,
 }
 
 template< class V , class F >
-CLRenderer< V , F >::~CLRenderer()
+clpar::Renderer::CLRenderer< V , F >::~CLRenderer()
 {
     freeBuffers_();
 }
 
 
 template< class V , class F >
-void CLRenderer< V , F >::createPixelBuffer_()
+void clpar::Renderer::CLRenderer< V , F >::createPixelBuffer_()
 {
     gridSize_[0] = SystemUtilities::roundUp( LOCAL_SIZE_X, frameWidth_ );
     gridSize_[1] = SystemUtilities::roundUp( LOCAL_SIZE_Y, frameHeight_ );
 
     Dimensions2D dimensions( gridSize_[0] , gridSize_[1]);
-    clFrame_ = new CLImage2D< F >( dimensions , CL_INTENSITY , CL_FLOAT );
+    clFrame_ = new clData::CLImage2D< F >( dimensions , CL_INTENSITY , CL_FLOAT );
     clFrame_->createDeviceData( context_ );
 }
 
 
 template< class V , class F >
-void CLRenderer< V , F >::applyTransformation( )
+void clpar::Renderer::CLRenderer< V , F >::applyTransformation( )
 {
     this->paint_( );
 
@@ -54,14 +55,14 @@ void CLRenderer< V , F >::applyTransformation( )
 }
 
 template< class V , class F >
-const Coordinates3D &CLRenderer< V , F >::getCurrentCenter() const
+const Coordinates3D &clpar::Renderer::CLRenderer< V , F >::getCurrentCenter() const
 {
     return currentCenter_ ;
 }
 
 
 template< class V , class F >
-void CLRenderer< V , F >::loadVolume( const VolumeVariant &volume )
+void clpar::Renderer::CLRenderer< V , F >::loadVolume( const VolumeVariant &volume )
 {
     volume_ =  volume.value< Volume< V > *>() ;
     currentCenter_ = volume_->getUnitCubeCenter();
@@ -74,7 +75,7 @@ void CLRenderer< V , F >::loadVolume( const VolumeVariant &volume )
     cl_int clErrorCode = CL_SUCCESS;
 
     // Create an OpenCL volume
-    clVolume_ = new CLVolume< V >( volume_ , VOLUME_CL_UNSIGNED_INT8 );
+    clVolume_ = new clData::CLVolume< V >( volume_ , clData::VOLUME_CL_UNSIGNED_INT8 );
 
     clVolume_->createDeviceVolume( context_ );
 
@@ -85,27 +86,28 @@ void CLRenderer< V , F >::loadVolume( const VolumeVariant &volume )
 }
 
 template< class V , class F >
-void CLRenderer< V , F >::setFrameIndex( const uint frameIndex )
+void clpar::Renderer::CLRenderer< V , F >::setFrameIndex( const uint frameIndex )
 {
     frameIndex_ = frameIndex;
 }
 
 template< class V , class F >
-uint CLRenderer< V , F >::getFrameIndex() const
+uint clpar::Renderer::CLRenderer< V , F >::getFrameIndex() const
 {
     return frameIndex_;
 }
 
 template< class V , class F >
-const CLFrameVariant &CLRenderer< V , F >::getCLFrame() const
+const clpar::clData::CLFrameVariant
+&clpar::Renderer::CLRenderer< V , F >::getCLFrame() const
 {
-    this->frameVariant_.setValue(( CLImage2D< F > *) clFrame_ );
+    this->frameVariant_.setValue(( clData::CLImage2D< F > *) clFrame_ );
     return this->frameVariant_ ;
 }
 
 
 template< class V , class F >
-void CLRenderer< V , F >::renderFrame()
+void clpar::Renderer::CLRenderer< V , F >::renderFrame()
 {
     QMutexLocker lock( &this->switchKernelMutex_ );
 
@@ -138,15 +140,15 @@ void CLRenderer< V , F >::renderFrame()
 
     // Enqueue the kernel for execution
     clErrorCode |= clEnqueueNDRangeKernel(
-                       commandQueue_,
-                       activeRenderingKernel_->getKernelObject() ,
-                       2,
-                       NULL,
-                       gridSize_,
-                       localSize,
-                       0,
-                       0,
-                       0 );
+                commandQueue_,
+                activeRenderingKernel_->getKernelObject() ,
+                2,
+                NULL,
+                gridSize_,
+                localSize,
+                0,
+                0,
+                0 );
 
 
 
@@ -159,7 +161,7 @@ void CLRenderer< V , F >::renderFrame()
 }
 
 template< class V , class F >
-void CLRenderer< V , F >::initializeKernels_()
+void clpar::Renderer::CLRenderer< V , F >::initializeKernels_()
 {
     LOG_DEBUG( "Initializing an OpenCL Kernels ... " );
 
@@ -191,9 +193,9 @@ void CLRenderer< V , F >::initializeKernels_()
     }
 
 
-    for( const RenderingMode mode : renderingKernels_.keys())
+    for( const clKernel::RenderingMode mode : renderingKernels_.keys())
     {
-        CLRenderingKernel* renderingKernel = renderingKernels_[ mode ];
+        clKernel::CLRenderingKernel* renderingKernel = renderingKernels_[ mode ];
 
         renderingKernel->setFrameBuffer( clFrame_->getDeviceData() );
         renderingKernel->setFrameWidth( clFrame_->getFrameDimensions().x );
@@ -211,7 +213,7 @@ void CLRenderer< V , F >::initializeKernels_()
 }
 
 template< class V , class F >
-void CLRenderer< V , F >::freeBuffers_()
+void clpar::Renderer::CLRenderer< V , F >::freeBuffers_()
 {
 
     if( linearVolumeSampler_ )
@@ -237,7 +239,7 @@ void CLRenderer< V , F >::freeBuffers_()
 }
 
 template< class V , class F >
-void CLRenderer< V , F >::paint_()
+void clpar::Renderer::CLRenderer< V , F >::paint_()
 {
     TIC( RENDERING_PROFILE( gpuIndex_ ).mvMatrix_TIMER );
     // Use the GLM to create the Model View Matrix.
@@ -317,19 +319,19 @@ void CLRenderer< V , F >::paint_()
     // in row-major order. With an input vector xIn,
     // the transformed vector xOut is:
     center.x = modelViewMatrix[0] * volume_->getUnitCubeCenter().x +
-               modelViewMatrix[1] * volume_->getUnitCubeCenter().y +
-               modelViewMatrix[2] * volume_->getUnitCubeCenter().z +
-               modelViewMatrix[12];
+            modelViewMatrix[1] * volume_->getUnitCubeCenter().y +
+            modelViewMatrix[2] * volume_->getUnitCubeCenter().z +
+            modelViewMatrix[12];
 
     center.y = modelViewMatrix[4] * volume_->getUnitCubeCenter().x +
-               modelViewMatrix[5] * volume_->getUnitCubeCenter().y +
-               modelViewMatrix[6] * volume_->getUnitCubeCenter().z +
-               modelViewMatrix[13];
+            modelViewMatrix[5] * volume_->getUnitCubeCenter().y +
+            modelViewMatrix[6] * volume_->getUnitCubeCenter().z +
+            modelViewMatrix[13];
 
     center.z = modelViewMatrix[8]  * volume_->getUnitCubeCenter().x +
-               modelViewMatrix[9]  * volume_->getUnitCubeCenter().y +
-               modelViewMatrix[10] * volume_->getUnitCubeCenter().z +
-               modelViewMatrix[14];
+            modelViewMatrix[9]  * volume_->getUnitCubeCenter().y +
+            modelViewMatrix[10] * volume_->getUnitCubeCenter().z +
+            modelViewMatrix[14];
 
 
     //Set he current center after transformation

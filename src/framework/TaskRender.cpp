@@ -1,13 +1,13 @@
 #include "TaskRender.h"
 
-TaskRender::TaskRender( CLAbstractRenderer &cLRenderer )
+clpar::Task::TaskRender::TaskRender( Renderer::CLAbstractRenderer &cLRenderer )
     : cLRenderer_( cLRenderer )
 {
     setAutoDelete( false );
 
 }
 
-void TaskRender::run()
+void clpar::Task::TaskRender::run()
 {
 
     TOC( renderingProfiles[ &cLRenderer_ ]->threadSpawning_TIMER );

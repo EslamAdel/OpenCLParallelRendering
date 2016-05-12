@@ -11,10 +11,10 @@
 #include <QtAlgorithms>
 
 template< class T >
-CLCompositor< T >::CLCompositor( const uint64_t gpuIndex,
-                                 const uint frameWidth ,
-                                 const uint frameHeight ,
-                                 const std::string kernelDirectory )
+clpar::Compositor::CLCompositor< T >::CLCompositor( const uint64_t gpuIndex,
+                                                    const uint frameWidth ,
+                                                    const uint frameHeight ,
+                                                    const std::string kernelDirectory )
     : CLAbstractCompositor( gpuIndex  ,frameWidth , frameHeight, kernelDirectory )
 {
     framesCount_ = 0 ;
@@ -27,13 +27,14 @@ CLCompositor< T >::CLCompositor( const uint64_t gpuIndex,
 }
 
 template< class T >
-CLCompositor< T >::~CLCompositor()
+clpar::Compositor::CLCompositor< T >::~CLCompositor()
 {
 
 }
 
 template< class T >
-void CLCompositor< T >::allocateFrame( CLAbstractRenderer *renderer )
+void clpar::Compositor::CLCompositor< T >::allocateFrame(
+        Renderer::CLAbstractRenderer *renderer )
 {
     if( renderers_.contains( renderer ))
         return ;
@@ -48,17 +49,18 @@ void CLCompositor< T >::allocateFrame( CLAbstractRenderer *renderer )
     depthIndex_->resize( renderers_.size( ));
 
 
-    updateKernelsArguments();
+    updateKernelsArguments_();
 
 }
 
 template< class T >
-void CLCompositor< T >::collectFrame( CLAbstractRenderer *renderer ,
-                                      const cl_bool block )
+void clpar::Compositor::CLCompositor< T >::collectFrame(
+        Renderer::CLAbstractRenderer *renderer ,
+        const cl_bool block )
 {
 
-    CLImage2D< T > *sourceFrame =
-            renderer->getCLFrame().value< CLImage2D< T > *>( );
+    clData::CLImage2D< T > *sourceFrame =
+            renderer->getCLFrame().value< clData::CLImage2D< T > *>( );
 
 #ifdef BENCHMARKING
     imagesArray_->readOtherDeviceData( renderer->getCommandQueue() ,
@@ -83,7 +85,7 @@ void CLCompositor< T >::collectFrame( CLAbstractRenderer *renderer ,
 }
 
 template< class T >
-void CLCompositor< T >::composite( )
+void clpar::Compositor::CLCompositor< T >::composite( )
 {
     QMutexLocker lock( &criticalMutex_ );
 
@@ -93,11 +95,11 @@ void CLCompositor< T >::composite( )
     TIC( compositingProfile.compositing_TIMER );
 
     qStableSort( renderers_.begin() , renderers_.end() ,
-                 CLAbstractRenderer::lessThan );
+                 Renderer::CLAbstractRenderer::lessThan );
 
     QVector< uint > depthIndex ;
 
-    for( const CLAbstractRenderer *renderer : renderers_ )
+    for( const Renderer::CLAbstractRenderer *renderer : renderers_ )
         depthIndex << renderer->getFrameIndex();
 
 
@@ -137,7 +139,7 @@ void CLCompositor< T >::composite( )
 }
 
 template< class T >
-void CLCompositor< T >::loadFinalFrame()
+void clpar::Compositor::CLCompositor< T >::loadFinalFrame()
 {
     finalFrameReadout_->readOtherDeviceData( commandQueue_ ,
                                              *finalFrame_ ,
@@ -146,37 +148,39 @@ void CLCompositor< T >::loadFinalFrame()
 }
 
 template< class T >
-const CLFrameVariant &CLCompositor<T>::getFinalFrame() const
+const clpar::clData::CLFrameVariant
+&clpar::Compositor::CLCompositor<T>::getFinalFrame() const
 {
-    this->finalFrameVariant_.setValue(( CLImage2D< T > *) finalFrameReadout_ );
+    this->finalFrameVariant_.
+            setValue(( clData::CLImage2D< T > *) finalFrameReadout_ );
     return this->finalFrameVariant_ ;
 }
 
 template< class T >
-uint CLCompositor< T >::framesCount() const
+uint clpar::Compositor::CLCompositor< T >::framesCount() const
 {
     return framesCount_ ;
 }
 
 template< class T >
-void CLCompositor< T >::initializeBuffers_()
+void clpar::Compositor::CLCompositor< T >::initializeBuffers_()
 {
     LOG_DEBUG("Initializing Buffers ...");
 
-    finalFrame_ = new CLImage2D< T >( frameDimensions_ , CL_INTENSITY ,
-                                      CL_FLOAT );
-    finalFrameReadout_ = new CLImage2D< T >( frameDimensions_ , CL_INTENSITY ,
+    finalFrame_ = new clData::CLImage2D< T >( frameDimensions_ , CL_INTENSITY ,
+                                      CL_FLOAT  );
+    finalFrameReadout_ = new clData::CLImage2D< T >( frameDimensions_ , CL_INTENSITY ,
                                              CL_FLOAT );
 
     finalFrame_->createDeviceData( context_ );
 
-    imagesArray_ = new CLImage2DArray< T >( frameDimensions_.x ,
+    imagesArray_ = new clData::CLImage2DArray< T >( frameDimensions_.x ,
                                             frameDimensions_.y ,
                                             0 ,
                                             CL_INTENSITY ,
                                             CL_FLOAT );
 
-    depthIndex_ = new CLBuffer< uint >( 1 );
+    depthIndex_ = new clData::CLBuffer< uint >( 1 );
 
     depthIndex_->createDeviceData( context_ );
 
@@ -184,14 +188,15 @@ void CLCompositor< T >::initializeBuffers_()
 }
 
 template< class T >
-void CLCompositor< T >::initializeKernel_()
+void clpar::Compositor::CLCompositor< T >::initializeKernel_()
 {
     LOG_DEBUG( "Initializing OpenCL Kernels ... " );
 
     activeCompositingKernel_ =
-            compositingKernels_[ RenderingMode::RENDERING_MODE_Xray ];
+            compositingKernels_[ clKernel::RenderingMode::RENDERING_MODE_Xray ];
 
-    for( CLCompositingKernel* compositingKernel : compositingKernels_.values( ))
+    for( clKernel::CLCompositingKernel* compositingKernel :
+         compositingKernels_.values( ))
     {
         // Assuming that every thing is going in the right direction.
         cl_int clErrorCode = CL_SUCCESS;
@@ -206,10 +211,11 @@ void CLCompositor< T >::initializeKernel_()
 
 
 template< class T >
-void CLCompositor< T >::updateKernelsArguments()
+void clpar::Compositor::CLCompositor< T >::updateKernelsArguments_()
 {
 
-    for( CLCompositingKernel* compositingKernel : compositingKernels_.values( ))
+    for( clKernel::CLCompositingKernel* compositingKernel :
+         compositingKernels_.values( ))
     {
         // Assuming that every thing is going in the right direction.
         cl_int clErrorCode = CL_SUCCESS;

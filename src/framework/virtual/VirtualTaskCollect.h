@@ -6,28 +6,36 @@
 #include "VirtualCLRenderer.h"
 #include "VirtualCLCompositor.h"
 
+
+namespace clpar {
+namespace Task {
+
 class VirtualTaskCollect : public QObject , public QRunnable
 {
     Q_OBJECT
 
 public:
 
-    VirtualTaskCollect( CLAbstractRenderer *renderer ,
-                        CLAbstractCompositor *compositor );
+    VirtualTaskCollect( Renderer::CLAbstractRenderer *renderer ,
+                        Compositor::CLAbstractCompositor *compositor );
 
 
 signals:
 
     void frameLoadedToDevice_SIGNAL(
-            CLAbstractRenderer *renderer );
+            Renderer::CLAbstractRenderer *renderer );
 
 protected:
     void run();
 
 private:
-    CLAbstractRenderer *renderer_;
-    CLAbstractCompositor *compositor_;
+    Renderer::CLAbstractRenderer *renderer_;
+    Compositor::CLAbstractCompositor *compositor_;
 
 };
+
+
+}
+}
 
 #endif // VIRTUALTASKCOLLECT_H

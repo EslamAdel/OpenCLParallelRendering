@@ -9,7 +9,7 @@
 #include "oclHWDL.h"
 #include "CLRenderer.h"
 #include "Logger.h"
-#include "CLFrameVariants.hh"
+#include "clData.h"
 #include "ProfilingExterns.h"
 #include "CLXRayCompositingKernel.h"
 #include "CLMaxIntensityProjectionCompositingKernel.h"
@@ -17,6 +17,12 @@
 
 #define LOCAL_SIZE_X    16
 #define LOCAL_SIZE_Y    16
+
+
+namespace clpar {
+namespace Compositor {
+
+
 
 class CLAbstractCompositor : public QObject
 {
@@ -41,14 +47,14 @@ public:
      * @brief allocateFrame
      * @param renderer
      */
-    virtual void allocateFrame( CLAbstractRenderer *renderer ) = 0 ;
+    virtual void allocateFrame( Renderer::CLAbstractRenderer *renderer ) = 0 ;
 
     /**
      * @brief collectFrame
      * @param renderer
      * @param block
      */
-    virtual void collectFrame( CLAbstractRenderer *renderer ,
+    virtual void collectFrame( Renderer::CLAbstractRenderer *renderer ,
                                const cl_bool block ) = 0;
 
     /**
@@ -65,7 +71,7 @@ public:
      * @brief getFinalFrame
      * @return
      */
-    virtual const CLFrameVariant &getFinalFrame() const = 0 ;
+    virtual const clData::CLFrameVariant &getFinalFrame() const = 0 ;
 
     /**
      * @brief getGPUIndex
@@ -83,7 +89,7 @@ public:
      * @brief switchCompositingKernel
      * @param mode
      */
-    void switchCompositingKernel( const RenderingMode mode ) ;
+    void switchCompositingKernel( const clKernel::RenderingMode mode ) ;
 
 private:
     /**
@@ -100,7 +106,7 @@ private:
      * @brief allocateKernels_
      * @return
      */
-    CLCompositingKernels allocateKernels_( ) const;
+    clKernel::CLCompositingKernels allocateKernels_( ) const;
 
 protected:
     /**
@@ -164,12 +170,12 @@ protected:
     /**
      * @brief renderers_
      */
-    QVector< const CLAbstractRenderer *> renderers_ ;
+    QVector< const Renderer::CLAbstractRenderer *> renderers_ ;
 
     /**
      * @brief finalFrameVariant_
      */
-    mutable CLFrameVariant finalFrameVariant_ ;
+    mutable clData::CLFrameVariant finalFrameVariant_ ;
 
     /**
      * @brief readOutReady_
@@ -184,12 +190,15 @@ protected:
     /**
      * @brief renderingKernels_
      */
-    CLCompositingKernels compositingKernels_ ;
+    clKernel::CLCompositingKernels compositingKernels_ ;
 
     /**
      * @brief activeRenderingKernel_
      */
-    CLCompositingKernel* activeCompositingKernel_;
+    clKernel::CLCompositingKernel* activeCompositingKernel_;
 };
+
+}
+}
 
 #endif // CLABSTRACTCOMPOSITOR_H

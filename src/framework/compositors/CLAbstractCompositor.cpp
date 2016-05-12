@@ -1,7 +1,7 @@
 #include "CLAbstractCompositor.h"
 
 
-CLAbstractCompositor::CLAbstractCompositor( const uint64_t gpuIndex,
+clpar::Compositor::CLAbstractCompositor::CLAbstractCompositor( const uint64_t gpuIndex,
                                             const uint frameWidth,
                                             const uint frameHeight,
                                             const std::string kernelDirectory,
@@ -16,17 +16,18 @@ CLAbstractCompositor::CLAbstractCompositor( const uint64_t gpuIndex,
     compositingKernels_ = allocateKernels_();
 }
 
-uint64_t CLAbstractCompositor::getGPUIndex() const
+uint64_t clpar::Compositor::CLAbstractCompositor::getGPUIndex() const
 {
     return gpuIndex_ ;
 }
 
-bool CLAbstractCompositor::readOutReady() const
+bool clpar::Compositor::CLAbstractCompositor::readOutReady() const
 {
     return readOutReady_ ;
 }
 
-void CLAbstractCompositor::switchCompositingKernel( const RenderingMode mode )
+void clpar::Compositor::CLAbstractCompositor::switchCompositingKernel(
+        const clKernel::RenderingMode mode )
 {
     QMutexLocker lock( &switchKernelMutex_ );
 
@@ -35,7 +36,7 @@ void CLAbstractCompositor::switchCompositingKernel( const RenderingMode mode )
         activeCompositingKernel_ = compositingKernels_[ mode ];
 }
 
-void CLAbstractCompositor::selectGPU_()
+void clpar::Compositor::CLAbstractCompositor::selectGPU_()
 {
     // Scan the hardware
     oclHWDL::Hardware* clHardware = new oclHWDL::Hardware( );
@@ -56,7 +57,7 @@ void CLAbstractCompositor::selectGPU_()
     context_ = clContext->getContext( );
 }
 
-void CLAbstractCompositor::initializeContext_()
+void clpar::Compositor::CLAbstractCompositor::initializeContext_()
 {
     LOG_DEBUG( "Initializing an OpenCL context ... " );
 
@@ -67,29 +68,30 @@ void CLAbstractCompositor::initializeContext_()
 }
 
 
-CLCompositingKernels CLAbstractCompositor::allocateKernels_( ) const
+clpar::clKernel::CLCompositingKernels
+clpar::Compositor::CLAbstractCompositor::allocateKernels_( ) const
 {
 
-    CLCompositingKernels kernels ;
+    clKernel::CLCompositingKernels kernels ;
 
 
-    kernels[ RenderingMode::RENDERING_MODE_Xray ] =
-            new CLXRayCompositingKernel( context_ ,
+    kernels[ clKernel::RenderingMode::RENDERING_MODE_Xray ] =
+            new clKernel::CLXRayCompositingKernel( context_ ,
                                          "xray_compositing_patch" ,
                                          "xray_compositing.cl" ,
                                          kernelDirectory_ );
 
 
-    kernels[ RenderingMode::RENDERING_MODE_MinIntensity ] =
-            new CLMinIntensityProjectionCompositingKernel(
+    kernels[ clKernel::RenderingMode::RENDERING_MODE_MinIntensity ] =
+            new clKernel::CLMinIntensityProjectionCompositingKernel(
                 context_ ,
                 "minIntensityProjection_compositing" ,
                 "minIntensityProjection_compositing.cl",
                 kernelDirectory_ );
 
 
-    kernels[ RenderingMode::RENDERING_MODE_MaxIntensity ] =
-            new CLMaxIntensityProjectionCompositingKernel(
+    kernels[ clKernel::RenderingMode::RENDERING_MODE_MaxIntensity ] =
+            new clKernel::CLMaxIntensityProjectionCompositingKernel(
                 context_ ,
                 "maxIntensityProjection_compositing" ,
                 "maxIntensityProjection_compositing.cl" ,
@@ -99,7 +101,7 @@ CLCompositingKernels CLAbstractCompositor::allocateKernels_( ) const
     return kernels;
 }
 
-void CLAbstractCompositor::createCommandQueue_()
+void clpar::Compositor::CLAbstractCompositor::createCommandQueue_()
 {
     cl_int clErrorCode = CL_SUCCESS;
     commandQueue_ = clCreateCommandQueue( context_ ,

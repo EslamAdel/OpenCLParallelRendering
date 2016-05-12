@@ -146,14 +146,17 @@ extern CompositingProfile compositingProfile;
 extern FrameworkProfile frameworkProfile;
 extern uint testFrames ;
 
-RenderingProfile &getRenderingProfile( const RenderingProfiles &profiles ,
-                                       const uint gpuIndex );
+RenderingProfile &getRenderingProfile(
+        const RenderingProfiles &profiles ,
+        const uint gpuIndex );
 
-RenderingProfile &getRenderingProfile( const RenderingProfiles &profiles ,
-                                       const CLAbstractRenderer *renderer  );
+RenderingProfile &getRenderingProfile(
+        const RenderingProfiles &profiles ,
+        const clpar::Renderer::CLAbstractRenderer *renderer  );
 
-CollectingProfile &getCollectingProfile( const CollectingProfiles &profile ,
-                                         const CLAbstractRenderer* renderer );
+CollectingProfile &getCollectingProfile(
+        const CollectingProfiles &profile ,
+        const clpar::Renderer::CLAbstractRenderer* renderer );
 
 
 

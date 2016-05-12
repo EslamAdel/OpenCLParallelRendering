@@ -1,11 +1,12 @@
 #include "CLAbstractRenderer.h"
 #include "Logger.h"
 
-CLAbstractRenderer::CLAbstractRenderer( const uint64_t gpuIndex ,
-                                        const uint frameWidth ,
-                                        const uint frameHeight ,
-                                        const std::string kernelDirectory ,
-                                        QObject *parent )
+clpar::Renderer::CLAbstractRenderer::CLAbstractRenderer(
+        const uint64_t gpuIndex ,
+        const uint frameWidth ,
+        const uint frameHeight ,
+        const std::string kernelDirectory ,
+        QObject *parent )
     : gpuIndex_( gpuIndex ) ,
       frameWidth_( frameWidth ) ,
       frameHeight_( frameHeight ) ,
@@ -21,42 +22,42 @@ CLAbstractRenderer::CLAbstractRenderer( const uint64_t gpuIndex ,
     initializeContext_( );
     renderingKernels_ = allocateKernels_();
     activeRenderingKernel_ =
-            renderingKernels_[ RenderingMode::RENDERING_MODE_Xray ];
+            renderingKernels_[ clKernel::RenderingMode::RENDERING_MODE_Xray ];
 
 }
 
-uint64_t CLAbstractRenderer::getGPUIndex() const
+uint64_t clpar::Renderer::CLAbstractRenderer::getGPUIndex() const
 {
     return gpuIndex_ ;
 }
 
-cl_platform_id CLAbstractRenderer::getPlatformId() const
+cl_platform_id clpar::Renderer::CLAbstractRenderer::getPlatformId() const
 {
     return platform_ ;
 }
 
-cl_device_id CLAbstractRenderer::getDeviceId() const
+cl_device_id clpar::Renderer::CLAbstractRenderer::getDeviceId() const
 {
     return device_ ;
 }
 
-cl_context CLAbstractRenderer::getContext() const
+cl_context clpar::Renderer::CLAbstractRenderer::getContext() const
 {
     return context_ ;
 }
 
-cl_command_queue CLAbstractRenderer::getCommandQueue() const
+cl_command_queue clpar::Renderer::CLAbstractRenderer::getCommandQueue() const
 {
     return commandQueue_ ;
 }
 
-bool CLAbstractRenderer::lessThan( const CLAbstractRenderer *lhs ,
-                                   const CLAbstractRenderer *rhs )
+bool clpar::Renderer::CLAbstractRenderer::lessThan( const CLAbstractRenderer *lhs ,
+                                                    const CLAbstractRenderer *rhs )
 {
     return lhs->getCurrentCenter().z < rhs->getCurrentCenter().z ;
 }
 
-void CLAbstractRenderer::initializeContext_()
+void clpar::Renderer::CLAbstractRenderer::initializeContext_()
 {
     LOG_DEBUG( "Initializing an OpenCL context ... " );
 
@@ -66,7 +67,7 @@ void CLAbstractRenderer::initializeContext_()
     LOG_DEBUG( "[DONE] Initializing an OpenCL context ... " );
 }
 
-void CLAbstractRenderer::selectGPU_()
+void clpar::Renderer::CLAbstractRenderer::selectGPU_()
 {
     // Scan the hardware
     oclHWDL::Hardware* clHardware = new oclHWDL::Hardware();
@@ -87,7 +88,7 @@ void CLAbstractRenderer::selectGPU_()
     context_ = clContext->getContext();
 }
 
-void CLAbstractRenderer::createCommandQueue_()
+void clpar::Renderer::CLAbstractRenderer::createCommandQueue_()
 {
     cl_int clErrorCode;
     commandQueue_ = clCreateCommandQueue( context_,
@@ -98,7 +99,8 @@ void CLAbstractRenderer::createCommandQueue_()
 }
 
 
-void CLAbstractRenderer::switchRenderingKernel( const RenderingMode type )
+void clpar::Renderer::CLAbstractRenderer::switchRenderingKernel(
+        const clKernel::RenderingMode type )
 {
     QMutexLocker lock( &switchKernelMutex_ );
 
@@ -110,24 +112,27 @@ void CLAbstractRenderer::switchRenderingKernel( const RenderingMode type )
     activeRenderingKernel_ = renderingKernels_[ type ];
 }
 
-CLRenderingKernels CLAbstractRenderer::allocateKernels_() const
+clpar::clKernel::CLRenderingKernels
+clpar::Renderer::CLAbstractRenderer::allocateKernels_() const
 {
 
-    CLRenderingKernels kernels;
+    clKernel::CLRenderingKernels kernels;
 
     /// Add all the rendering kernel here, and set the selected to be the
     /// activeRenderingKernel_
-    kernels[ RenderingMode::RENDERING_MODE_Xray ] =
-            new CLXRayRenderingKernel( context_ ,
-                                       kernelDirectory_ );
+    kernels[ clKernel::RenderingMode::RENDERING_MODE_Xray ] =
+            new clKernel::CLXRayRenderingKernel( context_ ,
+                                                 kernelDirectory_ );
 
-    kernels[ RenderingMode::RENDERING_MODE_MaxIntensity ] =
-            new CLMaxIntensityProjectionRenderingKernel( context_ ,
-                                                         kernelDirectory_ );
+    kernels[ clKernel::RenderingMode::RENDERING_MODE_MaxIntensity ] =
+            new clKernel::CLMaxIntensityProjectionRenderingKernel(
+                context_ ,
+                kernelDirectory_ );
 
-    kernels[ RenderingMode::RENDERING_MODE_MinIntensity ] =
-            new CLMinIntensityProjectionRenderingKernel( context_ ,
-                                                         kernelDirectory_ );
+    kernels[ clKernel::RenderingMode::RENDERING_MODE_MinIntensity ] =
+            new clKernel::CLMinIntensityProjectionRenderingKernel(
+                context_ ,
+                kernelDirectory_ );
 
 
     return kernels ;

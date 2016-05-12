@@ -9,6 +9,7 @@ include_directories( ${PROJECT_BINARY_DIR} )
 
 ### Adding the source files to the CMake source tree
 SET( OCL_MGPUVS_SOURCE_FILES
+    framework/clpar.h
     framework/renderers/CLAbstractRenderer.cpp
     framework/compositors/CLAbstractCompositor.cpp
     framework/compositors/CLCompositorAccumulate.cpp
@@ -32,20 +33,20 @@ SET( OCL_MGPUVS_SOURCE_FILES
     geometry/Vector2.cpp
     geometry/Vector3.cpp
     geometry/Vector4.cpp
-    opencl/CLFrame.cpp
-    opencl/CLImage2D.cpp
-    opencl/CLImage2DArray.cpp
-    opencl/CLRenderingKernel.cpp
-    opencl/CLCompositingKernel.cpp
-    opencl/CLTransferFunction.cpp
-    opencl/CLVolume.cpp
-    opencl/CLXRayCompositingKernel.cpp
-    opencl/CLXRayRenderingKernel.cpp
-    opencl/CLMaxIntensityProjectionRenderingKernel.cpp
-    opencl/CLMinIntensityProjectionRenderingKernel.cpp
-    opencl/CLMinIntensityProjectionCompositingKernel.cpp
-    opencl/CLMaxIntensityProjectionCompositingKernel.cpp
-    opencl/CLBuffer.cpp
+    opencl/cldata/CLFrame.cpp
+    opencl/cldata/CLImage2D.cpp
+    opencl/cldata/CLImage2DArray.cpp
+    opencl/clkernels/CLRenderingKernel.cpp
+    opencl/clkernels/CLCompositingKernel.cpp
+    opencl/cldata/CLTransferFunction.cpp
+    opencl/cldata/CLVolume.cpp
+    opencl/clkernels/CLXRayCompositingKernel.cpp
+    opencl/clkernels/CLXRayRenderingKernel.cpp
+    opencl/clkernels/CLMaxIntensityProjectionRenderingKernel.cpp
+    opencl/clkernels/CLMinIntensityProjectionRenderingKernel.cpp
+    opencl/clkernels/CLMinIntensityProjectionCompositingKernel.cpp
+    opencl/clkernels/CLMaxIntensityProjectionCompositingKernel.cpp
+    opencl/cldata/CLBuffer.cpp
     profiling/ProfilingExterns.cpp
     system/oclUtils.cpp
     system/Utilities.cpp
@@ -91,26 +92,28 @@ SET( OCL_MGPUVS_HEADER_FILES
     geometry/Vector2.ipp
     geometry/Vector3.ipp
     geometry/Vector4.ipp
-    opencl/CLFrame.h
-    opencl/CLFrame.ipp
-    opencl/CLImage2D.h
-    opencl/CLImage2D.ipp
-    opencl/CLImage2DArray.h
-    opencl/CLImage2DArray.ipp
-    opencl/CLTransferFunction.h
-    opencl/CLVolume.h
-    opencl/CLVolume.ipp
-    opencl/CLXRayCompositingKernel.h
-    opencl/CLRenderingKernel.h
-    opencl/CLCompositingKernel.h
-    opencl/CLXRayRenderingKernel.h
-    opencl/CLMaxIntensityProjectionRenderingKernel.h
-    opencl/CLMinIntensityProjectionRenderingKernel.h
-    opencl/CLMinIntensityProjectionCompositingKernel.h
-    opencl/CLMaxIntensityProjectionCompositingKernel.h
-    opencl/CLBuffer.h
-    opencl/CLFrameVariants.hh
-    opencl/CLVolumeVariants.hh
+    opencl/cldata/clData.h
+    opencl/cldata/CLFrame.h
+    opencl/cldata/CLFrame.ipp
+    opencl/cldata/CLImage2D.h
+    opencl/cldata/CLImage2D.ipp
+    opencl/cldata/CLImage2DArray.h
+    opencl/cldata/CLImage2DArray.ipp
+    opencl/cldata/CLTransferFunction.h
+    opencl/cldata/CLVolume.h
+    opencl/cldata/CLVolume.ipp
+    opencl/clkernels/clKernel.h
+    opencl/clkernels/CLXRayCompositingKernel.h
+    opencl/clkernels/CLRenderingKernel.h
+    opencl/clkernels/CLCompositingKernel.h
+    opencl/clkernels/CLXRayRenderingKernel.h
+    opencl/clkernels/CLMaxIntensityProjectionRenderingKernel.h
+    opencl/clkernels/CLMinIntensityProjectionRenderingKernel.h
+    opencl/clkernels/CLMinIntensityProjectionCompositingKernel.h
+    opencl/clkernels/CLMaxIntensityProjectionCompositingKernel.h
+    opencl/cldata/CLBuffer.h
+    opencl/cldata/CLFrameVariants.hh
+    opencl/cldata/CLVolumeVariants.hh
     profiling/Profiles.hh
     profiling/ProfilingExterns.h
     system/Logger.h
@@ -144,6 +147,8 @@ include_directories( data )
 include_directories( geometry )
 include_directories( kernels )
 include_directories( opencl )
+include_directories( opencl/cldata )
+include_directories( opencl/clkernels )
 include_directories( rendering )
 include_directories( system )
 include_directories( profiling )

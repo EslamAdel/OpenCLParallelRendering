@@ -4,24 +4,32 @@
 RenderingProfile &getRenderingProfile( const RenderingProfiles &profiles ,
                                        const uint gpuIndex )
 {
-    for( auto it : profiles )
-        if( it.first->getGPUIndex() == gpuIndex  )
-            return *it.second;
+    RenderingProfiles::const_iterator it = profiles.begin();
+
+    while( it != profiles.end( ))
+    {
+        if( it.key()->getGPUIndex() == gpuIndex  )
+            return *it.value();
+        it++ ;
+    }
+
 
 }
 
-CollectingProfile &getCollectingProfile( const CollectingProfiles &profiles ,
-                                         const CLAbstractRenderer *renderer)
+CollectingProfile &getCollectingProfile(
+        const CollectingProfiles &profiles ,
+        const clpar::Renderer::CLAbstractRenderer *renderer)
 {
-    return *profiles.at( renderer );
+    return *profiles.value( renderer );
 }
 
 
 
-RenderingProfile &getRenderingProfile( const RenderingProfiles &profiles,
-                                       const CLAbstractRenderer *renderer)
+RenderingProfile &getRenderingProfile(
+        const RenderingProfiles &profiles,
+        const clpar::Renderer::CLAbstractRenderer *renderer)
 {
-    return *profiles.at( renderer ) ;
+    return *profiles.value( renderer ) ;
 }
 
 

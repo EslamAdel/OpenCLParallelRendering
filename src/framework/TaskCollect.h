@@ -8,7 +8,8 @@
 #include "Profiles.hh"
 #include "ProfilingExterns.h"
 
-
+namespace clpar {
+namespace Task {
 
 /**
  * @brief The TaskCollect class
@@ -30,8 +31,8 @@ public:
      * @param frameIndex
      * The index of the rendered frame.
      */
-    TaskCollect( CLAbstractRenderer *renderer ,
-                 CLAbstractCompositor *compositor );
+    TaskCollect( Renderer::CLAbstractRenderer *renderer ,
+                 Compositor::CLAbstractCompositor *compositor );
 
 signals:
     /**
@@ -42,15 +43,18 @@ signals:
      * CLRenderer and the CLCompositor and the frameIndex_ .
      * Considering each CLRenderer is mapped to a CLCompositor.
      */
-    void frameLoadedToDevice_SIGNAL( CLAbstractRenderer *renderer );
+    void frameLoadedToDevice_SIGNAL( clpar::Renderer::CLAbstractRenderer *renderer );
 
 protected:
     void run();
 
 private:
-    CLAbstractRenderer *renderer_;
-    CLAbstractCompositor *compositor_;
+    Renderer::CLAbstractRenderer *renderer_;
+    Compositor::CLAbstractCompositor *compositor_;
 
 };
+
+}
+}
 
 #endif // TASKCOLLECT_H

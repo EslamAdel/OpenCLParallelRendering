@@ -2,10 +2,11 @@
 
 
 template< class V , class F >
-VirtualCLRenderer< V , F >::VirtualCLRenderer( const uint64_t gpuIndex,
-                                      const uint frameWidth ,
-                                      const uint frameHeight ,
-                                      const Transformation &transformation )
+clpar::Renderer::VirtualCLRenderer< V , F >::VirtualCLRenderer(
+        const uint64_t gpuIndex,
+        const uint frameWidth ,
+        const uint frameHeight ,
+        const Transformation &transformation )
     : CLRenderer< V , F >( 0 , frameWidth , frameHeight , transformation  ) ,
       gpuIndex_VIRTUAL_( gpuIndex )
 {
@@ -13,7 +14,7 @@ VirtualCLRenderer< V , F >::VirtualCLRenderer( const uint64_t gpuIndex,
 }
 
 template< class V , class F >
-uint64_t VirtualCLRenderer< V , F >::getGPUIndex() const
+uint64_t clpar::Renderer::VirtualCLRenderer< V , F >::getGPUIndex() const
 {
     return gpuIndex_VIRTUAL_ ;
 }

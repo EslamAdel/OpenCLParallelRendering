@@ -3,7 +3,8 @@
 
 #include <oclHWDL.h>
 #include "CLRenderer.h"
-#include <unordered_map>
+#include <QMap>
+
 
 typedef oclHWDL::Timer64 Timer64 ;
 
@@ -16,7 +17,7 @@ struct GeneralProfile
 struct RenderingProfile : public GeneralProfile
 {
     RenderingProfile() : mvMatrix_TIMER("Transformation Matrix Calculation on Host") ,
-                         rendering_TIMER("Rendering Frame on Device") {}
+        rendering_TIMER("Rendering Frame on Device") {}
     Timer64 mvMatrix_TIMER ;
     Timer64 rendering_TIMER ;
 };
@@ -31,8 +32,8 @@ struct CollectingProfile : public GeneralProfile
 struct CompositingProfile : public GeneralProfile
 {
     CompositingProfile() : accumulatingFrame_TIMER("Accumulating Frame on Compositor") ,
-                           compositing_TIMER("Total Compositing Time on Compositor") ,
-                           loadFinalFromDevice_TIMER("Loading Final Buffer from Compositor"){}
+        compositing_TIMER("Total Compositing Time on Compositor") ,
+        loadFinalFromDevice_TIMER("Loading Final Buffer from Compositor"){}
     Timer64 threadSpawning_TIMER;
     Timer64 accumulatingFrame_TIMER;
     Timer64 compositing_TIMER ;
@@ -43,20 +44,17 @@ struct CompositingProfile : public GeneralProfile
 struct FrameworkProfile
 {
     FrameworkProfile() : convertToPixmap_TIMER("Converting to Pixmap on Host") ,
-                         renderingLoop_TIMER("Rendering Loop") {}
+        renderingLoop_TIMER("Rendering Loop") {}
     Timer64 convertToPixmap_TIMER;
     Timer64 renderingLoop_TIMER;
 };
 
 
-typedef std::unordered_map< const CLAbstractRenderer* ,
-                            RenderingProfile* > RenderingProfiles;
+typedef QMap< const clpar::Renderer::CLAbstractRenderer* , RenderingProfile* > RenderingProfiles;
 
-typedef std::unordered_map< const CLAbstractRenderer* ,
-                            CollectingProfile* > CollectingProfiles;
+typedef QMap< const clpar::Renderer::CLAbstractRenderer* , CollectingProfile* > CollectingProfiles;
 
-typedef std::unordered_map< const CLAbstractRenderer* ,
-                            CompositingProfile* > CompositingProfiles;
+typedef QMap< const clpar::Renderer::CLAbstractRenderer* , CompositingProfile* > CompositingProfiles;
 
 
 

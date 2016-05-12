@@ -7,6 +7,10 @@
 #include "CLRenderer.h"
 #include <CLImage2D.h>
 
+
+
+namespace clpar { namespace Task {
+
 class TaskMakePixmap : public QObject , public QRunnable
 {
     Q_OBJECT
@@ -15,20 +19,24 @@ class TaskMakePixmap : public QObject , public QRunnable
 public:
     TaskMakePixmap( );
 
-    void setFrame( CLImage2D< float > *frame );
-    void setRenderer( CLAbstractRenderer *renderer );
+    void setFrame( clData::CLImage2D< float > *frame );
+    void setRenderer( Renderer::CLAbstractRenderer *renderer );
 
 
 protected:
     void run() ;
 
 signals:
-    void pixmapReady_SIGNAL(  QPixmap *pixmap , const CLAbstractRenderer* clRenderer);
+    void pixmapReady_SIGNAL(  QPixmap *pixmap ,
+                              const clpar::Renderer::CLAbstractRenderer* clRenderer);
 
 private:
-    CLImage2D< float > *frame_ ;
-    CLAbstractRenderer *clRenderer_ ;
+    clData::CLImage2D< float > *frame_ ;
+    Renderer::CLAbstractRenderer *clRenderer_ ;
 
 };
+
+
+}}
 
 #endif // TASKMAKEPIXMAP_H
