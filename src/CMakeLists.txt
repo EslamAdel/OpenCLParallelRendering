@@ -9,7 +9,7 @@ include_directories( ${PROJECT_BINARY_DIR} )
 
 ### Adding the source files to the CMake source tree
 SET( OCL_MGPUVS_SOURCE_FILES
-    framework/clpar.h
+    framework/clparen.h
     framework/renderers/CLAbstractRenderer.cpp
     framework/compositors/CLAbstractCompositor.cpp
     framework/compositors/CLCompositorAccumulate.cpp
