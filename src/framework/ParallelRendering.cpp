@@ -31,8 +31,8 @@ DEFINE_PROFILES
 
 
 clparen::ParallelRendering::ParallelRendering( Volume< uchar > *volume ,
-                                             const uint frameWidth ,
-                                             const uint frameHeight )
+                                               const uint frameWidth ,
+                                               const uint frameHeight )
     : baseVolume_( volume ),
       frameWidth_( frameWidth ),
       frameHeight_( frameHeight ),
