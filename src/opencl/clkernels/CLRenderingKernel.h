@@ -9,7 +9,7 @@
 
 
 
-namespace clpar {
+namespace clparen {
 namespace clKernel {
 
 enum RenderingMode

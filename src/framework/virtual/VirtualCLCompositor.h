@@ -5,7 +5,7 @@
 #include "VirtualCLRenderer.h"
 
 
-namespace clpar {
+namespace clparen {
 namespace Compositor {
 
 

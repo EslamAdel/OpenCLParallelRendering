@@ -152,11 +152,11 @@ RenderingProfile &getRenderingProfile(
 
 RenderingProfile &getRenderingProfile(
         const RenderingProfiles &profiles ,
-        const clpar::Renderer::CLAbstractRenderer *renderer  );
+        const clparen::Renderer::CLAbstractRenderer *renderer  );
 
 CollectingProfile &getCollectingProfile(
         const CollectingProfiles &profile ,
-        const clpar::Renderer::CLAbstractRenderer* renderer );
+        const clparen::Renderer::CLAbstractRenderer* renderer );
 
 
 

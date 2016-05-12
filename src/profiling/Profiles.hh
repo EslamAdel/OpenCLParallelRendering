@@ -50,11 +50,11 @@ struct FrameworkProfile
 };
 
 
-typedef QMap< const clpar::Renderer::CLAbstractRenderer* , RenderingProfile* > RenderingProfiles;
+typedef QMap< const clparen::Renderer::CLAbstractRenderer* , RenderingProfile* > RenderingProfiles;
 
-typedef QMap< const clpar::Renderer::CLAbstractRenderer* , CollectingProfile* > CollectingProfiles;
+typedef QMap< const clparen::Renderer::CLAbstractRenderer* , CollectingProfile* > CollectingProfiles;
 
-typedef QMap< const clpar::Renderer::CLAbstractRenderer* , CompositingProfile* > CompositingProfiles;
+typedef QMap< const clparen::Renderer::CLAbstractRenderer* , CompositingProfile* > CompositingProfiles;
 
 
 

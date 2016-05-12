@@ -1,7 +1,7 @@
 #include "CLRenderingKernel.h"
 #include <Logger.h>
 
-clpar::clKernel::CLRenderingKernel::CLRenderingKernel(
+clparen::clKernel::CLRenderingKernel::CLRenderingKernel(
         cl_context clContext,
         const std::string kernelDirectory,
         const std::string kernelFile  )
@@ -12,7 +12,7 @@ clpar::clKernel::CLRenderingKernel::CLRenderingKernel(
     buildKernel_( );
 }
 
-void clpar::clKernel::CLRenderingKernel::buildKernel_(
+void clparen::clKernel::CLRenderingKernel::buildKernel_(
         const std::string extraBuildOptions )
 {
     LOG_INFO("Building the kernel");
@@ -30,30 +30,30 @@ void clpar::clKernel::CLRenderingKernel::buildKernel_(
     kernelContext_->buildProgram(buildOptions);
 }
 
-std::string clpar::clKernel::CLRenderingKernel::getKernelDirectory( ) const
+std::string clparen::clKernel::CLRenderingKernel::getKernelDirectory( ) const
 {
     return kernelDirectory_;
 }
 
-std::string clpar::clKernel::CLRenderingKernel::getKernelFile() const
+std::string clparen::clKernel::CLRenderingKernel::getKernelFile() const
 {
     return kernelFile_;
 }
 
 oclHWDL::KernelContext*
-clpar::clKernel::CLRenderingKernel::getKernelContext( ) const
+clparen::clKernel::CLRenderingKernel::getKernelContext( ) const
 {
     return kernelContext_;
 }
 
 cl_kernel
-clpar::clKernel::CLRenderingKernel::getKernelObject( ) const
+clparen::clKernel::CLRenderingKernel::getKernelObject( ) const
 {
     return kernelObject_;
 }
 
 
-void clpar::clKernel::CLRenderingKernel::setFrameBuffer( cl_mem frameBuffer )
+void clparen::clKernel::CLRenderingKernel::setFrameBuffer( cl_mem frameBuffer )
 {
     cl_int error = clSetKernelArg( kernelObject_, KERNEL_ARG_FrameBuffer,
                                    sizeof( cl_mem ),
@@ -67,7 +67,7 @@ void clpar::clKernel::CLRenderingKernel::setFrameBuffer( cl_mem frameBuffer )
 
 }
 
-void clpar::clKernel::CLRenderingKernel::setFrameWidth( uint width )
+void clparen::clKernel::CLRenderingKernel::setFrameWidth( uint width )
 {
     cl_int error = clSetKernelArg( kernelObject_, KERNEL_ARG_FrameWidth ,
                                    sizeof( uint ),
@@ -79,7 +79,7 @@ void clpar::clKernel::CLRenderingKernel::setFrameWidth( uint width )
     }
 }
 
-void clpar::clKernel::CLRenderingKernel::setFrameHeight( uint height )
+void clparen::clKernel::CLRenderingKernel::setFrameHeight( uint height )
 {
     cl_int error = clSetKernelArg( kernelObject_, KERNEL_ARG_FrameHeight,
                                    sizeof( uint ),
@@ -91,7 +91,7 @@ void clpar::clKernel::CLRenderingKernel::setFrameHeight( uint height )
     }
 }
 
-void clpar::clKernel::CLRenderingKernel::setVolumeData( cl_mem data )
+void clparen::clKernel::CLRenderingKernel::setVolumeData( cl_mem data )
 {
     cl_int error = clSetKernelArg( kernelObject_, KERNEL_ARG_Volume ,
                                    sizeof( cl_mem ),
@@ -103,7 +103,7 @@ void clpar::clKernel::CLRenderingKernel::setVolumeData( cl_mem data )
     }
 }
 
-void clpar::clKernel::CLRenderingKernel::setVolumeSampler( cl_sampler sampler )
+void clparen::clKernel::CLRenderingKernel::setVolumeSampler( cl_sampler sampler )
 {
     cl_int error = clSetKernelArg( kernelObject_, KERNEL_ARG_VolumeSampler ,
                                    sizeof( cl_sampler ),
@@ -116,7 +116,7 @@ void clpar::clKernel::CLRenderingKernel::setVolumeSampler( cl_sampler sampler )
 }
 
 
-void clpar::clKernel::CLRenderingKernel::setInverseViewMatrix( cl_mem matrix )
+void clparen::clKernel::CLRenderingKernel::setInverseViewMatrix( cl_mem matrix )
 {
     cl_int error = clSetKernelArg( kernelObject_, KERNEL_ARG_InverseMatrix ,
                                    sizeof( cl_mem ),
@@ -129,7 +129,7 @@ void clpar::clKernel::CLRenderingKernel::setInverseViewMatrix( cl_mem matrix )
 }
 
 
-void clpar::clKernel::CLRenderingKernel::releaseKernel()
+void clparen::clKernel::CLRenderingKernel::releaseKernel()
 {
     if( kernelContext_->getProgram( ))
         clReleaseProgram( kernelContext_->getProgram() );
@@ -139,7 +139,7 @@ void clpar::clKernel::CLRenderingKernel::releaseKernel()
 
 }
 
-clpar::clKernel::CLRenderingKernel::~CLRenderingKernel( )
+clparen::clKernel::CLRenderingKernel::~CLRenderingKernel( )
 {
     releaseKernel( );
 }

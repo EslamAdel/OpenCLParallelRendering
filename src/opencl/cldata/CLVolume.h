@@ -5,7 +5,7 @@
 #include <Volume.h>
 
 
-namespace clpar {
+namespace clparen {
 namespace clData {
 
 enum VOLUME_PRECISION

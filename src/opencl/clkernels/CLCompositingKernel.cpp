@@ -1,6 +1,6 @@
 #include "CLCompositingKernel.h"
 
-clpar::clKernel::CLCompositingKernel::CLCompositingKernel(
+clparen::clKernel::CLCompositingKernel::CLCompositingKernel(
         const cl_context clContext ,
         const std::string kernelName ,
         const std::string kernelFile ,
@@ -14,7 +14,7 @@ clpar::clKernel::CLCompositingKernel::CLCompositingKernel(
     retrieveKernelObject_();
 }
 
-void clpar::clKernel::CLCompositingKernel::setFinalFrame(const cl_mem collageFrame)
+void clparen::clKernel::CLCompositingKernel::setFinalFrame(const cl_mem collageFrame)
 {
 
     cl_int error = CL_SUCCESS;
@@ -30,7 +30,7 @@ void clpar::clKernel::CLCompositingKernel::setFinalFrame(const cl_mem collageFra
 }
 
 
-void clpar::clKernel::CLCompositingKernel::setFrame( const cl_mem frameImage2D )
+void clparen::clKernel::CLCompositingKernel::setFrame( const cl_mem frameImage2D )
 {
 
     cl_int error = CL_SUCCESS;
@@ -46,7 +46,7 @@ void clpar::clKernel::CLCompositingKernel::setFrame( const cl_mem frameImage2D )
     }
 }
 
-void clpar::clKernel::CLCompositingKernel::setDepthIndex( const cl_mem depthIndex )
+void clparen::clKernel::CLCompositingKernel::setDepthIndex( const cl_mem depthIndex )
 {
     cl_int error = CL_SUCCESS;
 
@@ -62,19 +62,19 @@ void clpar::clKernel::CLCompositingKernel::setDepthIndex( const cl_mem depthInde
 }
 
 
-void clpar::clKernel::CLCompositingKernel::releaseKernel()
+void clparen::clKernel::CLCompositingKernel::releaseKernel()
 {
     if( kernelContext_->getProgram( ))
         clReleaseProgram( kernelContext_->getProgram() );
 }
 
-cl_kernel clpar::clKernel::CLCompositingKernel::getKernelObject() const
+cl_kernel clparen::clKernel::CLCompositingKernel::getKernelObject() const
 {
     return kernelObject_;
 }
 
 
-void clpar::clKernel::CLCompositingKernel::buildKernel_(const std::string extraBuildOptions )
+void clparen::clKernel::CLCompositingKernel::buildKernel_(const std::string extraBuildOptions )
 {
 
     LOG_INFO("Building the kernel");
@@ -92,7 +92,7 @@ void clpar::clKernel::CLCompositingKernel::buildKernel_(const std::string extraB
     kernelContext_->buildProgram(buildOptions);
 }
 
-void clpar::clKernel::CLCompositingKernel::retrieveKernelObject_( )
+void clparen::clKernel::CLCompositingKernel::retrieveKernelObject_( )
 {
     kernelObject_ = kernelContext_->getKernelObject( kernelName_ );
 }

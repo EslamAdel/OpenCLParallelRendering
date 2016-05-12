@@ -6,7 +6,7 @@
 #include <QDataStream>
 
 
-namespace clpar {
+namespace clparen {
 namespace clData {
 
 

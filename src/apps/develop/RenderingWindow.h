@@ -22,7 +22,7 @@ class RenderingWindow : public QMainWindow
 
 public:
 
-    RenderingWindow( clpar::ParallelRendering *parallelRenderer ,
+    RenderingWindow( clparen::ParallelRendering *parallelRenderer ,
                      QWidget *parent = 0 ) ;
 
 
@@ -44,7 +44,7 @@ private:
 
 public slots:
     void frameReady_SLOT( QPixmap *frame,
-                          const clpar::Renderer::CLAbstractRenderer *renderer );
+                          const clparen::Renderer::CLAbstractRenderer *renderer );
 
     void finalFrameReady_SLOT( QPixmap *finalFrame ) ;
 
@@ -78,7 +78,7 @@ private:
     Ui::RenderingWindow *ui;
 
 
-    clpar::ParallelRendering *parallelRenderer_ ;
+    clparen::ParallelRendering *parallelRenderer_ ;
 
 
     QVector< QLabel*  > frameContainers_;

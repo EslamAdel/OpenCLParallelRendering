@@ -19,7 +19,7 @@
 #define LOCAL_SIZE_Y    16
 
 
-namespace clpar {
+namespace clparen {
 namespace Compositor {
 
 

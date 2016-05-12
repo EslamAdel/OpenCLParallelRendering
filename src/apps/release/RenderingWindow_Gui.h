@@ -34,7 +34,7 @@ class RenderingWindow_Gui : public QMainWindow
 public:
 
 
-    RenderingWindow_Gui( clpar::ParallelRendering *parallelRenderer ,
+    RenderingWindow_Gui( clparen::ParallelRendering *parallelRenderer ,
                          QWidget *parent = 0 ) ;
 
 
@@ -56,7 +56,7 @@ private:
 
 public slots:
     void frameReady_SLOT( QPixmap *frame,
-                          const clpar::Renderer::CLAbstractRenderer *renderer );
+                          const clparen::Renderer::CLAbstractRenderer *renderer );
     void finalFrameReady_SLOT( QPixmap *finalFrame ) ;
 
 private slots:
@@ -111,7 +111,7 @@ private:
     Ui::RenderingWindow_Gui *ui;
 
 
-    clpar::ParallelRendering *parallelRenderer_ ;
+    clparen::ParallelRendering *parallelRenderer_ ;
 
 
     bool frameworkReady_ ;

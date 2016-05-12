@@ -13,7 +13,7 @@
 #include "CLMinIntensityProjectionRenderingKernel.h"
 
 
-namespace clpar { namespace Renderer{
+namespace clparen { namespace Renderer{
 
 
 
@@ -149,7 +149,7 @@ signals:
      * @param thisPtr
      * Pass this pointer as Identifier to this node.
      */
-    void finishedRendering( clpar::Renderer::CLAbstractRenderer *thisPtr );
+    void finishedRendering( clparen::Renderer::CLAbstractRenderer *thisPtr );
 
 
 public slots:

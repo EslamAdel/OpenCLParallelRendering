@@ -7,7 +7,7 @@
 #include "VirtualCLCompositor.h"
 
 
-namespace clpar {
+namespace clparen {
 namespace Task {
 
 class VirtualTaskCollect : public QObject , public QRunnable

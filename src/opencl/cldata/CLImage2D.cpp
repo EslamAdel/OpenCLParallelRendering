@@ -2,7 +2,7 @@
 #include "Logger.h"
 
 template< class T >
-clpar::clData::CLImage2D< T >::CLImage2D( const Dimensions2D dimensions ,
+clparen::clData::CLImage2D< T >::CLImage2D( const Dimensions2D dimensions ,
                                           const cl_channel_order channelOrder ,
                                           const cl_channel_type channelType )
     : CLFrame< T >( dimensions )
@@ -22,13 +22,13 @@ clpar::clData::CLImage2D< T >::CLImage2D( const Dimensions2D dimensions ,
 }
 
 template< class T >
-clpar::clData::CLImage2D< T >::CLImage2D( )
+clparen::clData::CLImage2D< T >::CLImage2D( )
 {
 
 }
 
 template< class T >
-void clpar::clData::CLImage2D< T >::createDeviceData( cl_context context ,
+void clparen::clData::CLImage2D< T >::createDeviceData( cl_context context ,
                                                       const cl_mem_flags flags )
 {
     LOG_DEBUG( "Creating an OpenCL image: %dx%d ",
@@ -60,7 +60,7 @@ void clpar::clData::CLImage2D< T >::createDeviceData( cl_context context ,
 
 
 template< class T >
-void clpar::clData::CLImage2D< T >::writeDeviceData( cl_command_queue cmdQueue,
+void clparen::clData::CLImage2D< T >::writeDeviceData( cl_command_queue cmdQueue,
                                                      const cl_bool blocking )
 {
     const size_t origin[3] = { 0 , 0 , 0 };
@@ -83,7 +83,7 @@ void clpar::clData::CLImage2D< T >::writeDeviceData( cl_command_queue cmdQueue,
 }
 
 template< class T >
-void clpar::clData::CLImage2D< T >::readDeviceData( cl_command_queue cmdQueue ,
+void clparen::clData::CLImage2D< T >::readDeviceData( cl_command_queue cmdQueue ,
                                                     const cl_bool blocking )
 {
     const size_t origin[3] = { 0 , 0 , 0 };
@@ -106,7 +106,7 @@ void clpar::clData::CLImage2D< T >::readDeviceData( cl_command_queue cmdQueue ,
 }
 
 template< class T >
-void clpar::clData::CLImage2D< T >::readOtherDeviceData(
+void clparen::clData::CLImage2D< T >::readOtherDeviceData(
         cl_command_queue sourceCmdQueue ,
         const CLFrame<T> &sourceFrame ,
         const cl_bool blocking )

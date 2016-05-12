@@ -8,7 +8,7 @@
 #include "VirtualCLRenderer.h"
 
 
-namespace clpar
+namespace clparen
 {
 
 class VirtualParallelRendering : public ParallelRendering

@@ -1,7 +1,7 @@
 #include "CLMaxIntensityProjectionCompositingKernel.h"
 
 
-clpar::clKernel::CLMaxIntensityProjectionCompositingKernel::
+clparen::clKernel::CLMaxIntensityProjectionCompositingKernel::
 CLMaxIntensityProjectionCompositingKernel( const cl_context clContext ,
                                            const std::string kernelName ,
                                            const std::string kernelFile ,

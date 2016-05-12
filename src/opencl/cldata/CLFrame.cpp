@@ -8,7 +8,7 @@
 
 
 template< class T >
-clpar::clData::CLFrame< T >::CLFrame( const Dimensions2D dimensions  )
+clparen::clData::CLFrame< T >::CLFrame( const Dimensions2D dimensions  )
     : dimensions_( dimensions ),
       pixmapSynchronized_( false ) ,
       inDevice_( false )
@@ -30,7 +30,7 @@ clpar::clData::CLFrame< T >::CLFrame( const Dimensions2D dimensions  )
 }
 
 template< class T >
-clpar::clData::CLFrame< T >::CLFrame( )
+clparen::clData::CLFrame< T >::CLFrame( )
     : hostData_( nullptr ) ,
       pixmapData_( nullptr )
 {
@@ -38,7 +38,7 @@ clpar::clData::CLFrame< T >::CLFrame( )
 }
 
 template< class T >
-clpar::clData::CLFrame< T >::~CLFrame()
+clparen::clData::CLFrame< T >::~CLFrame()
 {
     releaseDeviceData_();
 
@@ -48,7 +48,7 @@ clpar::clData::CLFrame< T >::~CLFrame()
 }
 
 template< class T >
-void clpar::clData::CLFrame< T >::createDeviceData( cl_context context ,
+void clparen::clData::CLFrame< T >::createDeviceData( cl_context context ,
                                                     const cl_mem_flags flags )
 {
     LOG_DEBUG( "Creating an OpenCL image " );
@@ -74,7 +74,7 @@ void clpar::clData::CLFrame< T >::createDeviceData( cl_context context ,
 }
 
 template< class T >
-void clpar::clData::CLFrame< T >::writeDeviceData( cl_command_queue cmdQueue ,
+void clparen::clData::CLFrame< T >::writeDeviceData( cl_command_queue cmdQueue ,
                                                    const cl_bool blocking )
 {
     if( !inDevice_ )
@@ -95,7 +95,7 @@ void clpar::clData::CLFrame< T >::writeDeviceData( cl_command_queue cmdQueue ,
 }
 
 template< class T >
-void clpar::clData::CLFrame< T >::readDeviceData( cl_command_queue cmdQueue ,
+void clparen::clData::CLFrame< T >::readDeviceData( cl_command_queue cmdQueue ,
                                                   const cl_bool blocking )
 {
     static cl_int error = CL_SUCCESS;
@@ -114,7 +114,7 @@ void clpar::clData::CLFrame< T >::readDeviceData( cl_command_queue cmdQueue ,
 }
 
 template< class T >
-void clpar::clData::CLFrame< T >::readOtherDeviceData(
+void clparen::clData::CLFrame< T >::readOtherDeviceData(
         cl_command_queue sourceCmdQueue ,
         const CLFrame<T> &sourceFrame ,
         const cl_bool blocking )
@@ -139,7 +139,7 @@ void clpar::clData::CLFrame< T >::readOtherDeviceData(
 }
 
 template< class T >
-void clpar::clData::CLFrame< T >::copyDeviceData(
+void clparen::clData::CLFrame< T >::copyDeviceData(
         cl_command_queue cmdQueue ,
         const CLFrame< T > &frame ,
         const cl_bool blocking )
@@ -170,13 +170,13 @@ void clpar::clData::CLFrame< T >::copyDeviceData(
 
 
 template< class T >
-T *clpar::clData::CLFrame<T>::getHostData() const
+T *clparen::clData::CLFrame<T>::getHostData() const
 {
     return hostData_;
 }
 
 template< class T >
-QPixmap &clpar::clData::CLFrame<T>::getFramePixmap()
+QPixmap &clparen::clData::CLFrame<T>::getFramePixmap()
 {
     if( pixmapSynchronized_ ) return frame_ ;
 
@@ -221,7 +221,7 @@ QPixmap &clpar::clData::CLFrame<T>::getFramePixmap()
 }
 
 template< class T >
-void clpar::clData::CLFrame< T >::copyHostData( const T *data )
+void clparen::clData::CLFrame< T >::copyHostData( const T *data )
 {
     std::copy( &data[ 0 ] , &data[ dimensions_.imageSize() - 1 ] ,
             hostData_ );
@@ -229,7 +229,7 @@ void clpar::clData::CLFrame< T >::copyHostData( const T *data )
 }
 
 template< class T >
-void clpar::clData::CLFrame< T >::copyHostData( const CLFrame< T > &sourceFrame )
+void clparen::clData::CLFrame< T >::copyHostData( const CLFrame< T > &sourceFrame )
 {
     const T *hostData_SOURCE = sourceFrame.getHostData();
     const uint64_t frameSize = sourceFrame.getFrameDimensions().imageSize() ;
@@ -242,7 +242,7 @@ void clpar::clData::CLFrame< T >::copyHostData( const CLFrame< T > &sourceFrame 
 }
 
 template< class T >
-void clpar::clData::CLFrame< T >::setHostData( T *data , bool deepCopy )
+void clparen::clData::CLFrame< T >::setHostData( T *data , bool deepCopy )
 {
     if( data == hostData_ )
         return ;
@@ -258,43 +258,43 @@ void clpar::clData::CLFrame< T >::setHostData( T *data , bool deepCopy )
 
 
 template< class T >
-cl_mem clpar::clData::CLFrame< T >::getDeviceData() const
+cl_mem clparen::clData::CLFrame< T >::getDeviceData() const
 {
     return deviceData_ ;
 }
 
 template< class T >
-const Dimensions2D &clpar::clData::CLFrame< T >::getFrameDimensions() const
+const Dimensions2D &clparen::clData::CLFrame< T >::getFrameDimensions() const
 {
     return dimensions_;
 }
 
 template< class T >
-const cl_context clpar::clData::CLFrame< T >::getContext() const
+const cl_context clparen::clData::CLFrame< T >::getContext() const
 {
     return context_ ;
 }
 
 template< class T >
-bool clpar::clData::CLFrame< T >::isInDevice() const
+bool clparen::clData::CLFrame< T >::isInDevice() const
 {
     return inDevice_ ;
 }
 
 template< class T >
-bool clpar::clData::CLFrame< T >::inSameContext( const CLFrame< T > &frame ) const
+bool clparen::clData::CLFrame< T >::inSameContext( const CLFrame< T > &frame ) const
 {
     return frame.isInDevice() && ( frame.getContext() == context_ ) ;
 }
 
 template< class T >
-bool clpar::clData::CLFrame< T >::dimensionsDefined( ) const
+bool clparen::clData::CLFrame< T >::dimensionsDefined( ) const
 {
     return dimensionsDefined_;
 }
 
 template< class T >
-void clpar::clData::CLFrame< T >::releaseDeviceData_()
+void clparen::clData::CLFrame< T >::releaseDeviceData_()
 {
     if( deviceData_ )
         clReleaseMemObject( deviceData_ );
@@ -303,7 +303,7 @@ void clpar::clData::CLFrame< T >::releaseDeviceData_()
 
 
 template< class T >
-void clpar::clData::CLFrame< T >::convertColorToRGBA_( uint Color ,
+void clparen::clData::CLFrame< T >::convertColorToRGBA_( uint Color ,
                                                        uint8_t &r ,
                                                        uint8_t &g ,
                                                        uint8_t &b ,
