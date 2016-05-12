@@ -2,7 +2,7 @@
 #include "Logger.h"
 
 template< class T >
-clpar::Compositor::VirtualCLCompositor< T >::VirtualCLCompositor(
+clparen::Compositor::VirtualCLCompositor< T >::VirtualCLCompositor(
         const uint64_t gpuIndex ,
         const uint frameWidth ,
         const uint frameHeight )

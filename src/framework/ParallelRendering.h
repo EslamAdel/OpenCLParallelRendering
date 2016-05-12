@@ -28,7 +28,7 @@
 
 
 
-namespace clpar {
+namespace clparen {
 
 
 
@@ -156,7 +156,7 @@ signals:
      * For each rendered frame done, emit a signal.
      */
     void frameReady_SIGNAL( QPixmap *pixmap ,
-                            const clpar::Renderer::CLAbstractRenderer * node );
+                            const clparen::Renderer::CLAbstractRenderer * node );
 
     /**
      * @brief finalFrameReady_SIGNAL
@@ -186,7 +186,7 @@ public slots :
      * buffers from the rendering GPU to the compositing GPU.
      * @param finishedNode
      */
-    void finishedRendering_SLOT( clpar::Renderer::CLAbstractRenderer *renderer );
+    void finishedRendering_SLOT( clparen::Renderer::CLAbstractRenderer *renderer );
 
     /**
      * @brief compositingFinished_SLOT
@@ -202,7 +202,7 @@ public slots :
      * so this slot initiates a compositing task.
      * @param finishedNode
      */
-    void frameLoadedToDevice_SLOT( clpar::Renderer::CLAbstractRenderer *renderer );
+    void frameLoadedToDevice_SLOT( clparen::Renderer::CLAbstractRenderer *renderer );
 
 
     /**
@@ -217,7 +217,7 @@ public slots :
      * otherwise, it belongs to CLRenderer referenced by the pointer.
      */
     void pixmapReady_SLOT( QPixmap *pixmap ,
-                           const clpar::Renderer::CLAbstractRenderer * renderer );
+                           const clparen::Renderer::CLAbstractRenderer * renderer );
 
     /**
      * @brief updateRotationX_SLOT
@@ -289,7 +289,7 @@ public slots :
     /**
      * @brief activateRenderingKernel_SLOT
      */
-    void activateRenderingKernel_SLOT( clpar::clKernel::RenderingMode type );
+    void activateRenderingKernel_SLOT( clparen::clKernel::RenderingMode type );
 
 
 

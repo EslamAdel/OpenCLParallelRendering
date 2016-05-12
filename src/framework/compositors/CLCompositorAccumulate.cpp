@@ -1,7 +1,7 @@
 #include "CLCompositorAccumulate.h"
 
 template< class T >
-clpar::Compositor::CLCompositorAccumulate< T >::CLCompositorAccumulate(
+clparen::Compositor::CLCompositorAccumulate< T >::CLCompositorAccumulate(
         const uint64_t gpuIndex,
         const uint frameWidth ,
         const uint frameHeight ,
@@ -16,7 +16,7 @@ clpar::Compositor::CLCompositorAccumulate< T >::CLCompositorAccumulate(
 }
 
 template< class T >
-void clpar::Compositor::CLCompositorAccumulate< T >::allocateFrame(
+void clparen::Compositor::CLCompositorAccumulate< T >::allocateFrame(
         Renderer::CLAbstractRenderer *renderer )
 {
 
@@ -41,7 +41,7 @@ void clpar::Compositor::CLCompositorAccumulate< T >::allocateFrame(
 }
 
 template< class T >
-void clpar::Compositor::CLCompositorAccumulate< T >::collectFrame(
+void clparen::Compositor::CLCompositorAccumulate< T >::collectFrame(
         Renderer::CLAbstractRenderer *renderer ,
         const cl_bool block )
 {
@@ -64,7 +64,7 @@ void clpar::Compositor::CLCompositorAccumulate< T >::collectFrame(
 }
 
 template< class T >
-void clpar::Compositor::CLCompositorAccumulate< T >::composite( )
+void clparen::Compositor::CLCompositorAccumulate< T >::composite( )
 {
     if( ++compositedFramesCount_ == framesCount_ )
         readOutReady_ = true ;
@@ -117,7 +117,7 @@ void clpar::Compositor::CLCompositorAccumulate< T >::composite( )
 }
 
 template< class T >
-void clpar::Compositor::CLCompositorAccumulate< T >::loadFinalFrame()
+void clparen::Compositor::CLCompositorAccumulate< T >::loadFinalFrame()
 {
     TOC( compositingProfile.compositing_TIMER );
     //    LOG_DEBUG("Reading CollageFrame[%d]" , collageBufferFrameIndex_ );
@@ -131,27 +131,27 @@ void clpar::Compositor::CLCompositorAccumulate< T >::loadFinalFrame()
 }
 
 template< class T >
-const clpar::clData::CLFrameVariant &
-clpar::Compositor::CLCompositorAccumulate< T >::getFinalFrame() const
+const clparen::clData::CLFrameVariant &
+clparen::Compositor::CLCompositorAccumulate< T >::getFinalFrame() const
 {
     this->finalFrameVariant_ = QVariant::fromValue( finalFrameReadout_  );
     return this->finalFrameVariant_ ;
 }
 
 template< class T >
-uint clpar::Compositor::CLCompositorAccumulate< T >::framesCount() const
+uint clparen::Compositor::CLCompositorAccumulate< T >::framesCount() const
 {
     return framesCount_ ;
 }
 
 template< class T >
-uint8_t clpar::Compositor::CLCompositorAccumulate< T >::getCompositedFramesCount() const
+uint8_t clparen::Compositor::CLCompositorAccumulate< T >::getCompositedFramesCount() const
 {
     return compositedFramesCount_ ;
 }
 
 template< class T >
-void clpar::Compositor::CLCompositorAccumulate< T >::initializeBuffers_()
+void clparen::Compositor::CLCompositorAccumulate< T >::initializeBuffers_()
 {
     LOG_DEBUG("Initializing Buffers ...");
 
@@ -161,7 +161,7 @@ void clpar::Compositor::CLCompositorAccumulate< T >::initializeBuffers_()
 }
 
 template< class T >
-void clpar::Compositor::CLCompositorAccumulate< T >::initializeKernel_()
+void clparen::Compositor::CLCompositorAccumulate< T >::initializeKernel_()
 {
     LOG_DEBUG( "Initializing an OpenCL Kernel ... " );
 

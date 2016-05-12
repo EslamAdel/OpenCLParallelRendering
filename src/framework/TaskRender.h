@@ -6,7 +6,7 @@
 #include "ProfilingExterns.h"
 
 
-namespace clpar {
+namespace clparen {
 namespace Task {
 
 /**

@@ -3,7 +3,7 @@
 
 #include "CLImage2D.h"
 
-namespace clpar {
+namespace clparen {
 namespace clData {
 
 

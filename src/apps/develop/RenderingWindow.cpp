@@ -8,7 +8,7 @@
 #include <QPicture>
 
 
-RenderingWindow::RenderingWindow( clpar::ParallelRendering *parallelRenderer ,
+RenderingWindow::RenderingWindow( clparen::ParallelRendering *parallelRenderer ,
                                   QWidget *parent )
     : QMainWindow( parent ),
       ui( new Ui::RenderingWindow )
@@ -56,11 +56,11 @@ void RenderingWindow::intializeConnections_()
     connect( parallelRenderer_ ,
              SIGNAL( frameReady_SIGNAL(
                          QPixmap * ,
-                         const clpar::Renderer::CLAbstractRenderer* )),
+                         const clparen::Renderer::CLAbstractRenderer* )),
              this ,
              SLOT( frameReady_SLOT(
                        QPixmap * ,
-                       const clpar::Renderer::CLAbstractRenderer* )));
+                       const clparen::Renderer::CLAbstractRenderer* )));
 
     connect( parallelRenderer_ , SIGNAL( finalFrameReady_SIGNAL( QPixmap* )) ,
              this , SLOT( finalFrameReady_SLOT( QPixmap* )));
@@ -124,7 +124,7 @@ void RenderingWindow::displayFrame_( QPixmap *frame , uint id )
 
 void RenderingWindow::frameReady_SLOT(
         QPixmap *frame,
-        const clpar::Renderer::CLAbstractRenderer *renderer )
+        const clparen::Renderer::CLAbstractRenderer *renderer )
 {
 
     uint index = renderer->getFrameIndex();

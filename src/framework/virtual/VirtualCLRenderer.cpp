@@ -2,7 +2,7 @@
 
 
 template< class V , class F >
-clpar::Renderer::VirtualCLRenderer< V , F >::VirtualCLRenderer(
+clparen::Renderer::VirtualCLRenderer< V , F >::VirtualCLRenderer(
         const uint64_t gpuIndex,
         const uint frameWidth ,
         const uint frameHeight ,
@@ -14,7 +14,7 @@ clpar::Renderer::VirtualCLRenderer< V , F >::VirtualCLRenderer(
 }
 
 template< class V , class F >
-uint64_t clpar::Renderer::VirtualCLRenderer< V , F >::getGPUIndex() const
+uint64_t clparen::Renderer::VirtualCLRenderer< V , F >::getGPUIndex() const
 {
     return gpuIndex_VIRTUAL_ ;
 }

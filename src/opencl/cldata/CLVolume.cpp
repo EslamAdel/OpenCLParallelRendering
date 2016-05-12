@@ -4,7 +4,7 @@
 #include <oclHWDL.h>
 
 template< class T >
-clpar::clData::CLVolume< T >::CLVolume( const Volume< T >* volume,
+clparen::clData::CLVolume< T >::CLVolume( const Volume< T >* volume,
                          const VOLUME_PRECISION precision )
     : volume_( volume )
     , precision_( precision )
@@ -39,7 +39,7 @@ clpar::clData::CLVolume< T >::CLVolume( const Volume< T >* volume,
 }
 
 template< class T >
-cl_mem clpar::clData::CLVolume< T >::createDeviceVolume( cl_context context )
+cl_mem clparen::clData::CLVolume< T >::createDeviceVolume( cl_context context )
 {
     LOG_DEBUG( "Creating an OpenCL volume : %dx%dx%d ",
                volume_->getDimensions().x ,
@@ -151,7 +151,7 @@ cl_mem clpar::clData::CLVolume< T >::createDeviceVolume( cl_context context )
 
 
 template< class T >
-cl_mem clpar::clData::CLVolume< T >::getDeviceData() const
+cl_mem clparen::clData::CLVolume< T >::getDeviceData() const
 {
     return deviceData_ ;
 }

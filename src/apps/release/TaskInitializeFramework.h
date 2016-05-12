@@ -8,14 +8,14 @@
 class TaskInitializeFramework : public QRunnable
 {
 public:
-    TaskInitializeFramework( clpar::ParallelRendering *parallelRendering ,
+    TaskInitializeFramework( clparen::ParallelRendering *parallelRendering ,
                              const QSet< uint > &renderers ,
                              const uint compositor );
 protected:
     void run( );
 
 private:
-    clpar::ParallelRendering *parallelRenderer_ ;
+    clparen::ParallelRendering *parallelRenderer_ ;
     const QSet< uint > &renderers_ ;
     const uint compositorIndex_ ;
 

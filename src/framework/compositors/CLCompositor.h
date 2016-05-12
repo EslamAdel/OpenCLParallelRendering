@@ -7,7 +7,7 @@
 #include <QMutex>
 #include <QMutexLocker>
 
-namespace clpar {
+namespace clparen {
 namespace Compositor {
 
 template< class T >

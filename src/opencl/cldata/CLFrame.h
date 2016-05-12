@@ -10,7 +10,7 @@
 namespace SystemUtilities {}
 using namespace SystemUtilities;
 
-namespace clpar {
+namespace clparen {
 namespace clData {
 
 template< class T >

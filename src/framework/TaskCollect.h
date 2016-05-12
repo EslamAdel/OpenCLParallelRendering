@@ -8,7 +8,7 @@
 #include "Profiles.hh"
 #include "ProfilingExterns.h"
 
-namespace clpar {
+namespace clparen {
 namespace Task {
 
 /**
@@ -43,7 +43,7 @@ signals:
      * CLRenderer and the CLCompositor and the frameIndex_ .
      * Considering each CLRenderer is mapped to a CLCompositor.
      */
-    void frameLoadedToDevice_SIGNAL( clpar::Renderer::CLAbstractRenderer *renderer );
+    void frameLoadedToDevice_SIGNAL( clparen::Renderer::CLAbstractRenderer *renderer );
 
 protected:
     void run();

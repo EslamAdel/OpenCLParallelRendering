@@ -8,7 +8,7 @@
 #include "Logger.h"
 
 RenderingWindow_Gui::RenderingWindow_Gui(
-        clpar::ParallelRendering *parallelRenderer ,
+        clparen::ParallelRendering *parallelRenderer ,
         QWidget *parent )
     : QMainWindow( parent ),
       ui( new Ui::RenderingWindow_Gui )
@@ -122,11 +122,11 @@ void RenderingWindow_Gui::intializeConnections_()
     connect( parallelRenderer_ ,
              SIGNAL( frameReady_SIGNAL(
                          QPixmap * ,
-                         const clpar::Renderer::CLAbstractRenderer* )),
+                         const clparen::Renderer::CLAbstractRenderer* )),
              this ,
              SLOT( frameReady_SLOT(
                        QPixmap * ,
-                       const clpar::Renderer::CLAbstractRenderer* )));
+                       const clparen::Renderer::CLAbstractRenderer* )));
 
 
     connect( parallelRenderer_ , SIGNAL( finalFrameReady_SIGNAL( QPixmap* )) ,
@@ -194,7 +194,7 @@ void RenderingWindow_Gui::displayFrame_( QPixmap *frame , uint id )
 }
 
 void RenderingWindow_Gui::frameReady_SLOT( QPixmap *frame,
-                                           const clpar::Renderer::CLAbstractRenderer *renderer )
+                                           const clparen::Renderer::CLAbstractRenderer *renderer )
 {
     uint index = renderer->getFrameIndex();
 
@@ -391,28 +391,29 @@ void RenderingWindow_Gui::switchRenderingKernel_SLOT()
     if( ui->xrayButton->isChecked( ))
         parallelRenderer_->
                 activateRenderingKernel_SLOT(
-                    clpar::clKernel::RenderingMode::RENDERING_MODE_Xray );
+                    clparen::clKernel::RenderingMode::RENDERING_MODE_Xray );
 
     else if( ui->maxIntensityProjectionButton->isChecked( ))
         parallelRenderer_->
                 activateRenderingKernel_SLOT(
-                    clpar::clKernel::RenderingMode::RENDERING_MODE_MaxIntensity );
+                    clparen::clKernel::RenderingMode::RENDERING_MODE_MaxIntensity );
 
     else if(ui->minIntensityProjectionButton->isChecked( ))
         parallelRenderer_->
                 activateRenderingKernel_SLOT(
-                    clpar::clKernel::RenderingMode::RENDERING_MODE_MinIntensity );
+                    clparen::clKernel::RenderingMode::RENDERING_MODE_MinIntensity );
 
     else if(ui->averageIntensityProjectionButton->isChecked( ))
         parallelRenderer_->
                 activateRenderingKernel_SLOT(
-                    clpar::clKernel::RenderingMode::RENDERING_MODE_AverageIntensity );
+                    clparen::clKernel::RenderingMode::RENDERING_MODE_AverageIntensity );
     /*
     else if(ui->isoSurfaceButton->isChecked())
         parallelRenderer_->
                 activateRenderingKernel_SLOT(
-                    clpar::clKernel::RenderingMode::RENDERING_MODE_IsoSurface );
+                    clparen::clKernel::RenderingMode::RENDERING_MODE_IsoSurface );
      */
+
 }
 
 
@@ -441,7 +442,7 @@ void RenderingWindow_Gui::captureView_SLOT()
 
     LOG_DEBUG("Saving resultant frame");
     QPixmap pic( parallelRenderer_->getCLCompositor().getFinalFrame().
-                 value< clpar::clData::CLFrame< float > *>()->
+                 value< clparen::clData::CLFrame< float > *>()->
                  getFramePixmap().
                  scaledToHeight( width ).scaledToWidth( height ));
     pic.save( newDir + "/result.jpg");
@@ -452,9 +453,9 @@ void RenderingWindow_Gui::captureView_SLOT()
     {
 
         LOG_DEBUG("Saving frame<%d>", gpuIndex );
-        clpar::clData::CLFrame< float > *sourceFrame =
+        clparen::clData::CLFrame< float > *sourceFrame =
                 parallelRenderer_->getCLRenderer( gpuIndex ).
-                getCLFrame().value< clpar::clData::CLFrame< float > *>() ;
+                getCLFrame().value< clparen::clData::CLFrame< float > *>() ;
 
         QPixmap framePixmap( sourceFrame->
                              getFramePixmap().

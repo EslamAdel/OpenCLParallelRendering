@@ -3,8 +3,8 @@
 
 #include <Headers.hh>
 
-template class clpar::clData::CLFrame< uint >;
-template class clpar::clData::CLFrame< float >;
+template class clparen::clData::CLFrame< uint >;
+template class clparen::clData::CLFrame< float >;
 
 
 #endif // RENDERING_CLIMAGE_IPP

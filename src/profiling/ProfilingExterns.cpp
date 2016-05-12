@@ -18,7 +18,7 @@ RenderingProfile &getRenderingProfile( const RenderingProfiles &profiles ,
 
 CollectingProfile &getCollectingProfile(
         const CollectingProfiles &profiles ,
-        const clpar::Renderer::CLAbstractRenderer *renderer)
+        const clparen::Renderer::CLAbstractRenderer *renderer)
 {
     return *profiles.value( renderer );
 }
@@ -27,7 +27,7 @@ CollectingProfile &getCollectingProfile(
 
 RenderingProfile &getRenderingProfile(
         const RenderingProfiles &profiles,
-        const clpar::Renderer::CLAbstractRenderer *renderer)
+        const clparen::Renderer::CLAbstractRenderer *renderer)
 {
     return *profiles.value( renderer ) ;
 }

@@ -1,7 +1,7 @@
 #include "CLAverageIntensityProjectionCompositingKernel.h"
 
 
-clpar::clKernel::CLAverageIntensityProjectionCompositingKernel::
+clparen::clKernel::CLAverageIntensityProjectionCompositingKernel::
 CLAverageIntensityProjectionCompositingKernel( const cl_context clContext ,
                                            const std::string kernelName ,
                                            const std::string kernelFile ,

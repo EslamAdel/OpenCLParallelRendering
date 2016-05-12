@@ -8,7 +8,7 @@
 #include <QQueue>
 
 
-namespace clpar { namespace Compositor {
+namespace clparen { namespace Compositor {
 
 
 

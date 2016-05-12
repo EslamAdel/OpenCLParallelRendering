@@ -2,7 +2,7 @@
 #include <oclUtils.h>
 #include <Logger.h>
 
-clpar::clKernel::CLMaxIntensityProjectionRenderingKernel::
+clparen::clKernel::CLMaxIntensityProjectionRenderingKernel::
 CLMaxIntensityProjectionRenderingKernel( cl_context clContext ,
                                          const std::string kernelDirectory ,
                                          const std::string kernelFile ,
@@ -14,20 +14,20 @@ CLMaxIntensityProjectionRenderingKernel( cl_context clContext ,
 }
 
 void
-clpar::clKernel::CLMaxIntensityProjectionRenderingKernel::retrieveKernelObject_( )
+clparen::clKernel::CLMaxIntensityProjectionRenderingKernel::retrieveKernelObject_( )
 {
     kernelObject_ = kernelContext_->getKernelObject( kernelName_ );
 }
 
-clpar::clKernel::RenderingMode
-clpar::clKernel::CLMaxIntensityProjectionRenderingKernel::
+clparen::clKernel::RenderingMode
+clparen::clKernel::CLMaxIntensityProjectionRenderingKernel::
 getRenderingKernelType( ) const
 {
     return RenderingMode::RENDERING_MODE_MinIntensity;
 }
 
 
-void clpar::clKernel::CLMaxIntensityProjectionRenderingKernel::
+void clparen::clKernel::CLMaxIntensityProjectionRenderingKernel::
 setImageBrightnessFactor( float brightness )
 {
     cl_int error = clSetKernelArg( kernelObject_, KERNEL_ARG_Brightness ,
@@ -40,7 +40,7 @@ setImageBrightnessFactor( float brightness )
     }
 }
 
-void clpar::clKernel::CLMaxIntensityProjectionRenderingKernel::
+void clparen::clKernel::CLMaxIntensityProjectionRenderingKernel::
 setVolumeDensityFactor( float density )
 {
     cl_int error = clSetKernelArg( kernelObject_, KERNEL_ARG_Density ,

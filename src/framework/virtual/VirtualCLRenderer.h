@@ -4,7 +4,7 @@
 #include "CLRenderer.h"
 
 
-namespace clpar {
+namespace clparen {
 namespace Renderer {
 
 template< class V ,  class F >

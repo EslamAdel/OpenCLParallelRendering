@@ -3,7 +3,7 @@
 #include <typeinfo>
 
 template< class T >
-clpar::clData::CLImage2DArray< T >::CLImage2DArray( const uint width ,
+clparen::clData::CLImage2DArray< T >::CLImage2DArray( const uint width ,
                                      const uint height ,
                                      const uint arraySize ,
                                      const cl_channel_order channelOrder ,
@@ -37,7 +37,7 @@ clpar::clData::CLImage2DArray< T >::CLImage2DArray( const uint width ,
 }
 
 template< class T >
-clpar::clData::CLImage2DArray< T >::~CLImage2DArray()
+clparen::clData::CLImage2DArray< T >::~CLImage2DArray()
 {
     if( inDevice_ )
         releaseDeviceData_();
@@ -52,7 +52,7 @@ clpar::clData::CLImage2DArray< T >::~CLImage2DArray()
 
 
 template< class T >
-void clpar::clData::CLImage2DArray< T >::createDeviceData( cl_context context )
+void clparen::clData::CLImage2DArray< T >::createDeviceData( cl_context context )
 {
 
     if( arraySize_ <= 1 )
@@ -81,7 +81,7 @@ void clpar::clData::CLImage2DArray< T >::createDeviceData( cl_context context )
 }
 
 template< class T >
-void clpar::clData::CLImage2DArray< T >::setFrameData(
+void clparen::clData::CLImage2DArray< T >::setFrameData(
         const uint index , const T *data )
 {
     if( index >= arraySize_ )
@@ -97,7 +97,7 @@ void clpar::clData::CLImage2DArray< T >::setFrameData(
 
 
 template< class T >
-void clpar::clData::CLImage2DArray< T >::loadFrameDataToDevice( const uint index ,
+void clparen::clData::CLImage2DArray< T >::loadFrameDataToDevice( const uint index ,
                                                  cl_command_queue  commandQueue ,
                                                  cl_bool blocking )
 {
@@ -129,20 +129,20 @@ void clpar::clData::CLImage2DArray< T >::loadFrameDataToDevice( const uint index
 }
 
 template< class T >
-cl_mem clpar::clData::CLImage2DArray< T >::getDeviceData() const
+cl_mem clparen::clData::CLImage2DArray< T >::getDeviceData() const
 {
     return deviceData_ ;
 }
 
 template< class T>
-float clpar::clData::CLImage2DArray< T >::getFrameDepth()
+float clparen::clData::CLImage2DArray< T >::getFrameDepth()
 {
     return frameDepth_;
 }
 
 
 template< class T >
-void clpar::clData::CLImage2DArray< T >::resize( const uint newArraySize ,
+void clparen::clData::CLImage2DArray< T >::resize( const uint newArraySize ,
                                   cl_context context )
 {
     if( arraySize_ == newArraySize )
@@ -168,13 +168,13 @@ void clpar::clData::CLImage2DArray< T >::resize( const uint newArraySize ,
 }
 
 template< class T >
-size_t clpar::clData::CLImage2DArray< T >::size( ) const
+size_t clparen::clData::CLImage2DArray< T >::size( ) const
 {
     return arraySize_ ;
 }
 
 template< class T >
-void clpar::clData::CLImage2DArray< T >::readOtherDeviceData( cl_command_queue cmdQueue ,
+void clparen::clData::CLImage2DArray< T >::readOtherDeviceData( cl_command_queue cmdQueue ,
                                                const uint index,
                                                const CLImage2D< T > &source ,
                                                cl_bool blocking )
@@ -202,13 +202,13 @@ void clpar::clData::CLImage2DArray< T >::readOtherDeviceData( cl_command_queue c
 }
 
 template< class T >
-bool clpar::clData::CLImage2DArray< T >::inDevice() const
+bool clparen::clData::CLImage2DArray< T >::inDevice() const
 {
     return inDevice_ ;
 }
 
 template< class T >
-void clpar::clData::CLImage2DArray< T >::releaseDeviceData_()
+void clparen::clData::CLImage2DArray< T >::releaseDeviceData_()
 {
     if( deviceData_ != NULL )
         clReleaseMemObject( deviceData_ );

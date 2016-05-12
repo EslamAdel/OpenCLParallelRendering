@@ -3,7 +3,7 @@
 #include <Logger.h>
 
 
-clpar::clKernel::CLXRayRenderingKernel::CLXRayRenderingKernel(
+clparen::clKernel::CLXRayRenderingKernel::CLXRayRenderingKernel(
         cl_context clContext,
         const std::string kernelDirectory,
         const std::string kernelFile,
@@ -15,19 +15,19 @@ clpar::clKernel::CLXRayRenderingKernel::CLXRayRenderingKernel(
     retrieveKernelObject_();
 }
 
-void clpar::clKernel::CLXRayRenderingKernel::retrieveKernelObject_( )
+void clparen::clKernel::CLXRayRenderingKernel::retrieveKernelObject_( )
 {
     kernelObject_ = kernelContext_->getKernelObject( kernelName_ );
 }
 
-clpar::clKernel::RenderingMode
-clpar::clKernel::CLXRayRenderingKernel::getRenderingKernelType( ) const
+clparen::clKernel::RenderingMode
+clparen::clKernel::CLXRayRenderingKernel::getRenderingKernelType( ) const
 {
     return RenderingMode::RENDERING_MODE_Xray ;
 }
 
 
-void clpar::clKernel::CLXRayRenderingKernel::
+void clparen::clKernel::CLXRayRenderingKernel::
 setImageBrightnessFactor( float brightness )
 {
     cl_int error = clSetKernelArg( kernelObject_, KERNEL_ARG_Brightness ,
@@ -40,7 +40,7 @@ setImageBrightnessFactor( float brightness )
     }
 }
 
-void clpar::clKernel::CLXRayRenderingKernel::
+void clparen::clKernel::CLXRayRenderingKernel::
 setVolumeDensityFactor( float density )
 {
     cl_int error = clSetKernelArg( kernelObject_, KERNEL_ARG_Density ,

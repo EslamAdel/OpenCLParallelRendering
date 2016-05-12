@@ -8,7 +8,7 @@
 #include <QMap>
 
 
-namespace clpar {
+namespace clparen {
 namespace Renderer {
 
 

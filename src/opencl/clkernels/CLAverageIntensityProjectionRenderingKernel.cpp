@@ -2,7 +2,7 @@
 #include <oclUtils.h>
 #include <Logger.h>
 
-clpar::clKernel::CLAverageIntensityProjectionRenderingKernel::
+clparen::clKernel::CLAverageIntensityProjectionRenderingKernel::
 CLAverageIntensityProjectionRenderingKernel( cl_context clContext ,
                                          const std::string kernelDirectory ,
                                          const std::string kernelFile ,
@@ -14,20 +14,20 @@ CLAverageIntensityProjectionRenderingKernel( cl_context clContext ,
 }
 
 void
-clpar::clKernel::CLAverageIntensityProjectionRenderingKernel::retrieveKernelObject_( )
+clparen::clKernel::CLAverageIntensityProjectionRenderingKernel::retrieveKernelObject_( )
 {
     kernelObject_ = kernelContext_->getKernelObject( kernelName_ );
 }
 
-clpar::clKernel::RenderingMode
-clpar::clKernel::CLAverageIntensityProjectionRenderingKernel::
+clparen::clKernel::RenderingMode
+clparen::clKernel::CLAverageIntensityProjectionRenderingKernel::
 getRenderingKernelType( ) const
 {
     return RenderingMode::RENDERING_MODE_MinIntensity;
 }
 
 
-void clpar::clKernel::CLAverageIntensityProjectionRenderingKernel::
+void clparen::clKernel::CLAverageIntensityProjectionRenderingKernel::
 setImageBrightnessFactor( float brightness )
 {
     cl_int error = clSetKernelArg( kernelObject_, KERNEL_ARG_Brightness ,
@@ -40,7 +40,7 @@ setImageBrightnessFactor( float brightness )
     }
 }
 
-void clpar::clKernel::CLAverageIntensityProjectionRenderingKernel::
+void clparen::clKernel::CLAverageIntensityProjectionRenderingKernel::
 setVolumeDensityFactor( float density )
 {
     cl_int error = clSetKernelArg( kernelObject_, KERNEL_ARG_Density ,

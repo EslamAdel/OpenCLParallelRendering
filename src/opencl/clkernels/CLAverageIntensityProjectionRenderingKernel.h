@@ -4,7 +4,7 @@
 #include <CLRenderingKernel.h>
 
 
-namespace  clpar  {
+namespace  clparen  {
 namespace clKernel {
 
 

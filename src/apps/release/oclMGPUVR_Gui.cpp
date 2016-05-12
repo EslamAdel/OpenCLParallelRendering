@@ -42,7 +42,7 @@ int main(int argc, char *argv[])
 
 
 
-    clpar::ParallelRendering parallelRenderer( volume , frameWidth , frameHeight );
+    clparen::ParallelRendering parallelRenderer( volume , frameWidth , frameHeight );
 
 
 

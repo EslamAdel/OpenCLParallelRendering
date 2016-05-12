@@ -2,7 +2,7 @@
 #include "Logger.h"
 
 
-clpar::clData::CLTransferFunction::CLTransferFunction(
+clparen::clData::CLTransferFunction::CLTransferFunction(
         const uint length ,
         const float *transferFunctionData )
     : length_( length ) ,
@@ -13,7 +13,7 @@ clpar::clData::CLTransferFunction::CLTransferFunction(
     this->imageDescriptor_.image_height = 1 ;
 }
 
-void clpar::clData::CLTransferFunction::createDeviceData( cl_context context )
+void clparen::clData::CLTransferFunction::createDeviceData( cl_context context )
 {
     const cl_mem_flags flags = CL_MEM_READ_ONLY | CL_MEM_HOST_WRITE_ONLY ;
 
@@ -21,7 +21,7 @@ void clpar::clData::CLTransferFunction::createDeviceData( cl_context context )
 }
 
 
-void clpar::clData::CLTransferFunction::writeDeviceData(
+void clparen::clData::CLTransferFunction::writeDeviceData(
         cl_command_queue cmdQueue ,
         const cl_bool blocking )
 {

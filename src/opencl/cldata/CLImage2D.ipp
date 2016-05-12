@@ -4,7 +4,7 @@
 #include <Headers.hh>
 
 
-template class clpar::clData::CLImage2D< uint >;
-template class clpar::clData::CLImage2D< float >;
+template class clparen::clData::CLImage2D< uint >;
+template class clparen::clData::CLImage2D< float >;
 
 #endif // CLIMAGE2D_IPP

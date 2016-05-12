@@ -9,7 +9,7 @@
 
 
 
-namespace clpar { namespace Task {
+namespace clparen { namespace Task {
 
 class TaskMakePixmap : public QObject , public QRunnable
 {
@@ -28,7 +28,7 @@ protected:
 
 signals:
     void pixmapReady_SIGNAL(  QPixmap *pixmap ,
-                              const clpar::Renderer::CLAbstractRenderer* clRenderer);
+                              const clparen::Renderer::CLAbstractRenderer* clRenderer);
 
 private:
     clData::CLImage2D< float > *frame_ ;

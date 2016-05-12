@@ -1,7 +1,7 @@
 #include "VirtualTaskCollect.h"
 #include "Logger.h"
 
-clpar::Task::VirtualTaskCollect::VirtualTaskCollect(
+clparen::Task::VirtualTaskCollect::VirtualTaskCollect(
         Renderer::CLAbstractRenderer *renderer,
         Compositor::CLAbstractCompositor *compositor )
     : renderer_( renderer ) ,
@@ -10,7 +10,7 @@ clpar::Task::VirtualTaskCollect::VirtualTaskCollect(
     setAutoDelete( false );
 }
 
-void clpar::Task::VirtualTaskCollect::run()
+void clparen::Task::VirtualTaskCollect::run()
 {
 
     LOG_DEBUG("collecting frame %d", renderer_->getGPUIndex() );
