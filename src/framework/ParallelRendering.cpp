@@ -211,8 +211,8 @@ void clpar::ParallelRendering::addCLCompositor( const uint64_t gpuIndex )
             // Map signals from collecting tasks and compositing tasks to the
             // correspondint slots.
             connect( collectingTask ,
-                     SIGNAL( frameLoadedToDevice_SIGNAL( CLAbstractRenderer* )) ,
-                     this , SLOT( frameLoadedToDevice_SLOT( CLAbstractRenderer* )));
+                     SIGNAL( frameLoadedToDevice_SIGNAL(                clpar::Renderer::CLAbstractRenderer* )) ,
+                     this , SLOT( frameLoadedToDevice_SLOT( clpar::Renderer::CLAbstractRenderer* )));
 
             connect( compositingTask , SIGNAL( compositingFinished_SIGNAL( )) ,
                      this , SLOT( compositingFinished_SLOT( )));
