@@ -11,6 +11,7 @@
 #include "CLXRayRenderingKernel.h"
 #include "CLMaxIntensityProjectionRenderingKernel.h"
 #include "CLMinIntensityProjectionRenderingKernel.h"
+#include "CLAverageIntensityProjectionRenderingKernel.h"
 
 
 namespace clpar { namespace Renderer{

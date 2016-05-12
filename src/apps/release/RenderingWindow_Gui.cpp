@@ -144,8 +144,14 @@ void RenderingWindow_Gui::intializeConnections_()
              SIGNAL( toggled( bool )) ,
              this , SLOT( switchRenderingKernel_SLOT( )));
 
+    connect( ui->averageIntensityProjectionButton ,
+             SIGNAL( toggled( bool )) ,
+             this , SLOT( switchRenderingKernel_SLOT( )));
+
+    /*
     connect( ui->isoSurfaceButton , SIGNAL( toggled( bool )),
              this , SLOT( switchRenderingKernel_SLOT( )));
+     */
 }
 
 
@@ -397,10 +403,16 @@ void RenderingWindow_Gui::switchRenderingKernel_SLOT()
                 activateRenderingKernel_SLOT(
                     clpar::clKernel::RenderingMode::RENDERING_MODE_MinIntensity );
 
+    else if(ui->averageIntensityProjectionButton->isChecked( ))
+        parallelRenderer_->
+                activateRenderingKernel_SLOT(
+                    clpar::clKernel::RenderingMode::RENDERING_MODE_AverageIntensity );
+    /*
     else if(ui->isoSurfaceButton->isChecked())
         parallelRenderer_->
                 activateRenderingKernel_SLOT(
                     clpar::clKernel::RenderingMode::RENDERING_MODE_IsoSurface );
+     */
 }
 
 

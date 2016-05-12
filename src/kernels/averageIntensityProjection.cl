@@ -68,7 +68,7 @@ uint rgbaFloatToInt( float4 rgba )
 }
 
 /**
- * @brief minIntensityProjection
+ * @brief averageIntensityProjection
  * @param frameBuffer
  * @param width
  * @param height
@@ -78,7 +78,9 @@ uint rgbaFloatToInt( float4 rgba )
  * @param volume
  * @param volumeSampler
  */
-__kernel void minIntensityProjection(  __write_only image2d_t frameBuffer,
+
+
+__kernel void averageIntensityProjection(  __write_only image2d_t frameBuffer,
 
                     uint width, uint height,
 
@@ -90,8 +92,7 @@ __kernel void minIntensityProjection(  __write_only image2d_t frameBuffer,
 
                     float density,
 
-                    float brightness
-                    )
+                    float brightness )
 {
     const uint x = get_global_id( 0 );
     const uint y = get_global_id( 1 );
@@ -150,7 +151,8 @@ __kernel void minIntensityProjection(  __write_only image2d_t frameBuffer,
         tNear = 0.f;
 
     // March along the ray accumulating the densities
-    float4 intensityBuffer = ( float4 )( 1.f, 1.f, 1.f, 1.f );
+    float4 intensityBuffer = ( float4 )( 0.f, 0.f, 0.f, 0.f );
+    float4 averageIntensityBuffer = ( float4 )( 0.f, 0.f, 0.f, 0.f );
     float t = tFar;
 
     for( uint i = 0 ; i < MAX_STEPS ; i++ )
@@ -166,10 +168,8 @@ __kernel void minIntensityProjection(  __write_only image2d_t frameBuffer,
         // positions along the ray.
         const float4 intensity = read_imagef( volume, volumeSampler, position );
 
-        // update intensity buffer to  minimum value
-        if(intensityBuffer.x > intensity.x)
-            intensityBuffer = intensity;
-
+        // sum all the intensities
+        intensityBuffer += intensity;
 /**
         float4 col;
         if(enableTranferFunction != 0)
@@ -193,15 +193,16 @@ __kernel void minIntensityProjection(  __write_only image2d_t frameBuffer,
         if( t < tNear )
             break;
     }
-
+    // get the average value accross the ray
+    averageIntensityBuffer = intensityBuffer / MAX_STEPS;
     // Adjust the brightness of the pixel
-    intensityBuffer *= brightness;
+    averageIntensityBuffer *= brightness;
 
     // Write the pixel color if it fits only within the image space.
     if(( x < width ) && ( y < height ))
     {
         // Get a 1D index of the pixel in the _frameBuffer_
         const int2 location = (int2)( x , y );
-        write_imagef( frameBuffer , location , intensityBuffer );
+        write_imagef( frameBuffer , location , averageIntensityBuffer );
     }
 }

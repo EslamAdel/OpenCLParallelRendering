@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1031</width>
+    <width>1084</width>
     <height>694</height>
    </rect>
   </property>
@@ -2480,9 +2480,25 @@ border-radius: 4px;
      <rect>
       <x>820</x>
       <y>10</y>
-      <width>211</width>
+      <width>251</width>
       <height>191</height>
      </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QRadioButton::indicator::checked {
+   color:#fff; 
+}
+
+QRadioButton::indicator::unchecked {
+   color :green ; 
+}
+
+QGroupBox::title{
+padding:0 3px;
+color:#fff;
+font:bold;
+}
+</string>
     </property>
     <property name="title">
      <string>Active Kernel</string>
@@ -2500,17 +2516,17 @@ border-radius: 4px;
       <string>Min Intensity Projection</string>
      </property>
     </widget>
-    <widget class="QRadioButton" name="isoSurfaceButton">
+    <widget class="QRadioButton" name="averageIntensityProjectionButton">
      <property name="geometry">
       <rect>
        <x>0</x>
        <y>120</y>
-       <width>206</width>
+       <width>241</width>
        <height>22</height>
       </rect>
      </property>
      <property name="text">
-      <string>Iso-Surface</string>
+      <string>Average Intensity Projection</string>
      </property>
     </widget>
     <widget class="QRadioButton" name="xrayButton">
@@ -2546,7 +2562,7 @@ border-radius: 4px;
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1031</width>
+     <width>1084</width>
      <height>25</height>
     </rect>
    </property>

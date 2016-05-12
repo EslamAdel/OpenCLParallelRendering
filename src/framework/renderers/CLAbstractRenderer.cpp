@@ -135,6 +135,12 @@ clpar::Renderer::CLAbstractRenderer::allocateKernels_() const
                 kernelDirectory_ );
 
 
+    kernels[ clKernel::RenderingMode::RENDERING_MODE_AverageIntensity ] =
+            new clKernel::CLAverageIntensityProjectionRenderingKernel(
+                context_ ,
+                kernelDirectory_ );
+
+
     return kernels ;
 }
 

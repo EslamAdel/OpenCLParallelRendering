@@ -167,7 +167,7 @@ __kernel void maxIntensityProjection(  __write_only image2d_t frameBuffer,
         // positions along the ray.
         const float4 intensity = read_imagef( volume, volumeSampler, position );
 
-        // update intensity buuffer to  maximum value
+        // update intensity buffer to  maximum value
         if(intensityBuffer.x < intensity.x)
             intensityBuffer = intensity;
 
