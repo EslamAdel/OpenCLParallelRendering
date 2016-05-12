@@ -3,11 +3,13 @@
 
 #include "CLFrame.h"
 
-namespace clpar {
-namespace clData {
 
 // Forward declaration
 template< class T > class SerializableFrame ;
+
+
+namespace clpar {
+namespace clData {
 
 
 template< class T >
