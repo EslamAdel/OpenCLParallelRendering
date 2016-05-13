@@ -1,7 +1,10 @@
 #include "CLAbstractCompositor.h"
 
+namespace clparen {
+namespace Compositor {
 
-clparen::Compositor::CLAbstractCompositor::CLAbstractCompositor( const uint64_t gpuIndex,
+
+CLAbstractCompositor::CLAbstractCompositor( const uint64_t gpuIndex,
                                             const uint frameWidth,
                                             const uint frameHeight,
                                             const std::string kernelDirectory,
@@ -16,17 +19,17 @@ clparen::Compositor::CLAbstractCompositor::CLAbstractCompositor( const uint64_t 
     compositingKernels_ = allocateKernels_();
 }
 
-uint64_t clparen::Compositor::CLAbstractCompositor::getGPUIndex() const
+uint64_t CLAbstractCompositor::getGPUIndex() const
 {
     return gpuIndex_ ;
 }
 
-bool clparen::Compositor::CLAbstractCompositor::readOutReady() const
+bool CLAbstractCompositor::readOutReady() const
 {
     return readOutReady_ ;
 }
 
-void clparen::Compositor::CLAbstractCompositor::switchCompositingKernel(
+void CLAbstractCompositor::switchCompositingKernel(
         const clKernel::RenderingMode mode )
 {
     QMutexLocker lock( &switchKernelMutex_ );
@@ -36,7 +39,7 @@ void clparen::Compositor::CLAbstractCompositor::switchCompositingKernel(
         activeCompositingKernel_ = compositingKernels_[ mode ];
 }
 
-void clparen::Compositor::CLAbstractCompositor::selectGPU_()
+void CLAbstractCompositor::selectGPU_()
 {
     // Scan the hardware
     oclHWDL::Hardware* clHardware = new oclHWDL::Hardware( );
@@ -57,7 +60,7 @@ void clparen::Compositor::CLAbstractCompositor::selectGPU_()
     context_ = clContext->getContext( );
 }
 
-void clparen::Compositor::CLAbstractCompositor::initializeContext_()
+void CLAbstractCompositor::initializeContext_()
 {
     LOG_DEBUG( "Initializing an OpenCL context ... " );
 
@@ -68,8 +71,8 @@ void clparen::Compositor::CLAbstractCompositor::initializeContext_()
 }
 
 
-clparen::clKernel::CLCompositingKernels
-clparen::Compositor::CLAbstractCompositor::allocateKernels_( ) const
+clKernel::CLCompositingKernels
+CLAbstractCompositor::allocateKernels_( ) const
 {
 
     clKernel::CLCompositingKernels kernels ;
@@ -101,7 +104,7 @@ clparen::Compositor::CLAbstractCompositor::allocateKernels_( ) const
     return kernels;
 }
 
-void clparen::Compositor::CLAbstractCompositor::createCommandQueue_()
+void CLAbstractCompositor::createCommandQueue_()
 {
     cl_int clErrorCode = CL_SUCCESS;
     commandQueue_ = clCreateCommandQueue( context_ ,
@@ -112,3 +115,7 @@ void clparen::Compositor::CLAbstractCompositor::createCommandQueue_()
         oclHWDL::Error::checkCLError( clErrorCode );
 }
 
+
+
+}
+}

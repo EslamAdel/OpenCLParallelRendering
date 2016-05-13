@@ -1,7 +1,13 @@
 #ifndef CLCOMPOSITOR_IPP
 #define CLCOMPOSITOR_IPP
 
-template class clparen::Compositor::CLCompositor< float > ;
+namespace clparen {
+namespace Compositor {
+
+template class CLCompositor< float > ;
+
+}
+}
 
 #endif // CLCOMPOSITOR_IPP
 

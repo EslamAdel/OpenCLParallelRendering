@@ -3,8 +3,14 @@
 
 #include <Headers.hh>
 
-template class clparen::clData::CLBuffer< uint32_t >;
+namespace clparen {
+namespace clData {
 
+
+template class CLBuffer< uint32_t >;
+
+}
+}
 
 #endif // CLBUFFER_IPP
 

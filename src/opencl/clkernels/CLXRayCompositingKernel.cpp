@@ -1,7 +1,10 @@
 #include "CLXRayCompositingKernel.h"
 
+namespace clparen {
+namespace clKernel {
 
-clparen::clKernel::CLXRayCompositingKernel::CLXRayCompositingKernel(
+
+CLXRayCompositingKernel::CLXRayCompositingKernel(
         const cl_context clContext ,
         const std::string kernelName ,
         const std::string kernelFile ,
@@ -9,4 +12,8 @@ clparen::clKernel::CLXRayCompositingKernel::CLXRayCompositingKernel(
     : CLCompositingKernel( clContext , kernelName , kernelFile , kernelDirectory )
 {
 
+}
+
+
+}
 }

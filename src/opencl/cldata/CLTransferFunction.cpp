@@ -1,8 +1,11 @@
 #include "CLTransferFunction.h"
 #include "Logger.h"
 
+namespace clparen {
+namespace clData {
 
-clparen::clData::CLTransferFunction::CLTransferFunction(
+
+CLTransferFunction::CLTransferFunction(
         const uint length ,
         const float *transferFunctionData )
     : length_( length ) ,
@@ -13,7 +16,7 @@ clparen::clData::CLTransferFunction::CLTransferFunction(
     this->imageDescriptor_.image_height = 1 ;
 }
 
-void clparen::clData::CLTransferFunction::createDeviceData( cl_context context )
+void CLTransferFunction::createDeviceData( cl_context context )
 {
     const cl_mem_flags flags = CL_MEM_READ_ONLY | CL_MEM_HOST_WRITE_ONLY ;
 
@@ -21,7 +24,7 @@ void clparen::clData::CLTransferFunction::createDeviceData( cl_context context )
 }
 
 
-void clparen::clData::CLTransferFunction::writeDeviceData(
+void CLTransferFunction::writeDeviceData(
         cl_command_queue cmdQueue ,
         const cl_bool blocking )
 {
@@ -43,4 +46,8 @@ void clparen::clData::CLTransferFunction::writeDeviceData(
         oclHWDL::Error::checkCLError( error );
         LOG_ERROR("OpenCL Error!");
     }
+}
+
+
+}
 }

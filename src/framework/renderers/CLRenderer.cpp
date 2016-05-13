@@ -11,8 +11,14 @@
 #define LOCAL_SIZE_X    16
 #define LOCAL_SIZE_Y    16
 
+
+namespace clparen {
+namespace Renderer {
+
+
+
 template< class V , class F >
-clparen::Renderer::CLRenderer< V , F >::CLRenderer(
+CLRenderer< V , F >::CLRenderer(
         const uint64_t gpuIndex ,
         const uint frameWidth, const uint frameHeight,
         const Transformation &transformation ,
@@ -28,14 +34,14 @@ clparen::Renderer::CLRenderer< V , F >::CLRenderer(
 }
 
 template< class V , class F >
-clparen::Renderer::CLRenderer< V , F >::~CLRenderer()
+CLRenderer< V , F >::~CLRenderer()
 {
     freeBuffers_();
 }
 
 
 template< class V , class F >
-void clparen::Renderer::CLRenderer< V , F >::createPixelBuffer_()
+void CLRenderer< V , F >::createPixelBuffer_()
 {
     gridSize_[0] = SystemUtilities::roundUp( LOCAL_SIZE_X, frameWidth_ );
     gridSize_[1] = SystemUtilities::roundUp( LOCAL_SIZE_Y, frameHeight_ );
@@ -47,7 +53,7 @@ void clparen::Renderer::CLRenderer< V , F >::createPixelBuffer_()
 
 
 template< class V , class F >
-void clparen::Renderer::CLRenderer< V , F >::applyTransformation( )
+void CLRenderer< V , F >::applyTransformation( )
 {
     this->paint_( );
 
@@ -55,14 +61,14 @@ void clparen::Renderer::CLRenderer< V , F >::applyTransformation( )
 }
 
 template< class V , class F >
-const Coordinates3D &clparen::Renderer::CLRenderer< V , F >::getCurrentCenter() const
+const Coordinates3D &CLRenderer< V , F >::getCurrentCenter() const
 {
     return currentCenter_ ;
 }
 
 
 template< class V , class F >
-void clparen::Renderer::CLRenderer< V , F >::loadVolume( const VolumeVariant &volume )
+void CLRenderer< V , F >::loadVolume( const VolumeVariant &volume )
 {
     volume_ =  volume.value< Volume< V > *>() ;
     currentCenter_ = volume_->getUnitCubeCenter();
@@ -86,20 +92,20 @@ void clparen::Renderer::CLRenderer< V , F >::loadVolume( const VolumeVariant &vo
 }
 
 template< class V , class F >
-void clparen::Renderer::CLRenderer< V , F >::setFrameIndex( const uint frameIndex )
+void CLRenderer< V , F >::setFrameIndex( const uint frameIndex )
 {
     frameIndex_ = frameIndex;
 }
 
 template< class V , class F >
-uint clparen::Renderer::CLRenderer< V , F >::getFrameIndex() const
+uint CLRenderer< V , F >::getFrameIndex() const
 {
     return frameIndex_;
 }
 
 template< class V , class F >
 const clparen::clData::CLFrameVariant
-&clparen::Renderer::CLRenderer< V , F >::getCLFrame() const
+&CLRenderer< V , F >::getCLFrame() const
 {
     this->frameVariant_.setValue(( clData::CLImage2D< F > *) clFrame_ );
     return this->frameVariant_ ;
@@ -107,7 +113,7 @@ const clparen::clData::CLFrameVariant
 
 
 template< class V , class F >
-void clparen::Renderer::CLRenderer< V , F >::renderFrame()
+void CLRenderer< V , F >::renderFrame()
 {
     QMutexLocker lock( &this->switchKernelMutex_ );
 
@@ -161,7 +167,7 @@ void clparen::Renderer::CLRenderer< V , F >::renderFrame()
 }
 
 template< class V , class F >
-void clparen::Renderer::CLRenderer< V , F >::initializeKernels_()
+void CLRenderer< V , F >::initializeKernels_()
 {
     LOG_DEBUG( "Initializing an OpenCL Kernels ... " );
 
@@ -213,7 +219,7 @@ void clparen::Renderer::CLRenderer< V , F >::initializeKernels_()
 }
 
 template< class V , class F >
-void clparen::Renderer::CLRenderer< V , F >::freeBuffers_()
+void CLRenderer< V , F >::freeBuffers_()
 {
 
     if( linearVolumeSampler_ )
@@ -239,7 +245,7 @@ void clparen::Renderer::CLRenderer< V , F >::freeBuffers_()
 }
 
 template< class V , class F >
-void clparen::Renderer::CLRenderer< V , F >::paint_()
+void CLRenderer< V , F >::paint_()
 {
     TIC( RENDERING_PROFILE( gpuIndex_ ).mvMatrix_TIMER );
     // Use the GLM to create the Model View Matrix.
@@ -360,6 +366,9 @@ void clparen::Renderer::CLRenderer< V , F >::paint_()
     TOC( RENDERING_PROFILE( gpuIndex_ ).rendering_TIMER );
 }
 
+
+}
+}
 
 
 #include "CLRenderer.ipp"

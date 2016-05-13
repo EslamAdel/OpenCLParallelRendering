@@ -2,7 +2,13 @@
 #include "ProfilingExterns.h"
 
 #include "Logger.h"
-clparen::Task::TaskComposite::TaskComposite(
+
+
+namespace clparen {
+namespace Task {
+
+
+TaskComposite::TaskComposite(
         Compositor::CLAbstractCompositor *compositor ,
         Renderer::CLAbstractRenderer *renderer )
     : renderer_( renderer )
@@ -12,7 +18,7 @@ clparen::Task::TaskComposite::TaskComposite(
 }
 
 
-void clparen::Task::TaskComposite::run()
+void TaskComposite::run()
 {
     TOC( compositingProfile.threadSpawning_TIMER ) ;
 
@@ -27,3 +33,6 @@ void clparen::Task::TaskComposite::run()
     }
 }
 
+
+}
+}

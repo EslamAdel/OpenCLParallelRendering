@@ -1,7 +1,12 @@
 #include "TaskCollect.h"
 #include "Logger.h"
 
-clparen::Task::TaskCollect::TaskCollect(
+
+namespace clparen {
+namespace Task {
+
+
+TaskCollect::TaskCollect(
         Renderer::CLAbstractRenderer *renderer ,
         Compositor::CLAbstractCompositor *compositor )
     : renderer_( renderer ) ,
@@ -10,7 +15,7 @@ clparen::Task::TaskCollect::TaskCollect(
     setAutoDelete( false );
 }
 
-void clparen::Task::TaskCollect::run()
+void TaskCollect::run()
 {
 
     TOC( COLLECTING_PROFILE(renderer_).threadSpawning_TIMER );
@@ -30,3 +35,8 @@ void clparen::Task::TaskCollect::run()
 
 }
 
+
+
+
+}
+}

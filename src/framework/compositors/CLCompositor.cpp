@@ -10,8 +10,13 @@
 
 #include <QtAlgorithms>
 
+
+namespace clparen {
+namespace Compositor {
+
+
 template< class T >
-clparen::Compositor::CLCompositor< T >::CLCompositor( const uint64_t gpuIndex,
+CLCompositor< T >::CLCompositor( const uint64_t gpuIndex,
                                                     const uint frameWidth ,
                                                     const uint frameHeight ,
                                                     const std::string kernelDirectory )
@@ -27,13 +32,13 @@ clparen::Compositor::CLCompositor< T >::CLCompositor( const uint64_t gpuIndex,
 }
 
 template< class T >
-clparen::Compositor::CLCompositor< T >::~CLCompositor()
+CLCompositor< T >::~CLCompositor()
 {
 
 }
 
 template< class T >
-void clparen::Compositor::CLCompositor< T >::allocateFrame(
+void CLCompositor< T >::allocateFrame(
         Renderer::CLAbstractRenderer *renderer )
 {
     if( renderers_.contains( renderer ))
@@ -54,7 +59,7 @@ void clparen::Compositor::CLCompositor< T >::allocateFrame(
 }
 
 template< class T >
-void clparen::Compositor::CLCompositor< T >::collectFrame(
+void CLCompositor< T >::collectFrame(
         Renderer::CLAbstractRenderer *renderer ,
         const cl_bool block )
 {
@@ -85,7 +90,7 @@ void clparen::Compositor::CLCompositor< T >::collectFrame(
 }
 
 template< class T >
-void clparen::Compositor::CLCompositor< T >::composite( )
+void CLCompositor< T >::composite( )
 {
     QMutexLocker lock( &criticalMutex_ );
 
@@ -139,7 +144,7 @@ void clparen::Compositor::CLCompositor< T >::composite( )
 }
 
 template< class T >
-void clparen::Compositor::CLCompositor< T >::loadFinalFrame()
+void CLCompositor< T >::loadFinalFrame()
 {
     finalFrameReadout_->readOtherDeviceData( commandQueue_ ,
                                              *finalFrame_ ,
@@ -148,8 +153,8 @@ void clparen::Compositor::CLCompositor< T >::loadFinalFrame()
 }
 
 template< class T >
-const clparen::clData::CLFrameVariant
-&clparen::Compositor::CLCompositor<T>::getFinalFrame() const
+const clData::CLFrameVariant
+&CLCompositor<T>::getFinalFrame() const
 {
     this->finalFrameVariant_.
             setValue(( clData::CLImage2D< T > *) finalFrameReadout_ );
@@ -157,13 +162,13 @@ const clparen::clData::CLFrameVariant
 }
 
 template< class T >
-uint clparen::Compositor::CLCompositor< T >::framesCount() const
+uint CLCompositor< T >::framesCount() const
 {
     return framesCount_ ;
 }
 
 template< class T >
-void clparen::Compositor::CLCompositor< T >::initializeBuffers_()
+void CLCompositor< T >::initializeBuffers_()
 {
     LOG_DEBUG("Initializing Buffers ...");
 
@@ -188,7 +193,7 @@ void clparen::Compositor::CLCompositor< T >::initializeBuffers_()
 }
 
 template< class T >
-void clparen::Compositor::CLCompositor< T >::initializeKernel_()
+void CLCompositor< T >::initializeKernel_()
 {
     LOG_DEBUG( "Initializing OpenCL Kernels ... " );
 
@@ -211,7 +216,7 @@ void clparen::Compositor::CLCompositor< T >::initializeKernel_()
 
 
 template< class T >
-void clparen::Compositor::CLCompositor< T >::updateKernelsArguments_()
+void CLCompositor< T >::updateKernelsArguments_()
 {
 
     for( clKernel::CLCompositingKernel* compositingKernel :
@@ -228,6 +233,11 @@ void clparen::Compositor::CLCompositor< T >::updateKernelsArguments_()
             compositingKernel->setFrame( imagesArray_->getDeviceData( ));
     }
 
+}
+
+
+
+}
 }
 
 #include "CLCompositor.ipp"

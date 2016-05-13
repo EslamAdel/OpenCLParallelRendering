@@ -1,7 +1,11 @@
 #include "CLAbstractRenderer.h"
 #include "Logger.h"
 
-clparen::Renderer::CLAbstractRenderer::CLAbstractRenderer(
+namespace clparen {
+namespace Renderer {
+
+
+CLAbstractRenderer::CLAbstractRenderer(
         const uint64_t gpuIndex ,
         const uint frameWidth ,
         const uint frameHeight ,
@@ -26,38 +30,38 @@ clparen::Renderer::CLAbstractRenderer::CLAbstractRenderer(
 
 }
 
-uint64_t clparen::Renderer::CLAbstractRenderer::getGPUIndex() const
+uint64_t CLAbstractRenderer::getGPUIndex() const
 {
     return gpuIndex_ ;
 }
 
-cl_platform_id clparen::Renderer::CLAbstractRenderer::getPlatformId() const
+cl_platform_id CLAbstractRenderer::getPlatformId() const
 {
     return platform_ ;
 }
 
-cl_device_id clparen::Renderer::CLAbstractRenderer::getDeviceId() const
+cl_device_id CLAbstractRenderer::getDeviceId() const
 {
     return device_ ;
 }
 
-cl_context clparen::Renderer::CLAbstractRenderer::getContext() const
+cl_context CLAbstractRenderer::getContext() const
 {
     return context_ ;
 }
 
-cl_command_queue clparen::Renderer::CLAbstractRenderer::getCommandQueue() const
+cl_command_queue CLAbstractRenderer::getCommandQueue() const
 {
     return commandQueue_ ;
 }
 
-bool clparen::Renderer::CLAbstractRenderer::lessThan( const CLAbstractRenderer *lhs ,
-                                                    const CLAbstractRenderer *rhs )
+bool CLAbstractRenderer::lessThan( const CLAbstractRenderer *lhs ,
+                                   const CLAbstractRenderer *rhs )
 {
     return lhs->getCurrentCenter().z < rhs->getCurrentCenter().z ;
 }
 
-void clparen::Renderer::CLAbstractRenderer::initializeContext_()
+void CLAbstractRenderer::initializeContext_()
 {
     LOG_DEBUG( "Initializing an OpenCL context ... " );
 
@@ -67,7 +71,7 @@ void clparen::Renderer::CLAbstractRenderer::initializeContext_()
     LOG_DEBUG( "[DONE] Initializing an OpenCL context ... " );
 }
 
-void clparen::Renderer::CLAbstractRenderer::selectGPU_()
+void CLAbstractRenderer::selectGPU_()
 {
     // Scan the hardware
     oclHWDL::Hardware* clHardware = new oclHWDL::Hardware();
@@ -88,7 +92,7 @@ void clparen::Renderer::CLAbstractRenderer::selectGPU_()
     context_ = clContext->getContext();
 }
 
-void clparen::Renderer::CLAbstractRenderer::createCommandQueue_()
+void CLAbstractRenderer::createCommandQueue_()
 {
     cl_int clErrorCode;
     commandQueue_ = clCreateCommandQueue( context_,
@@ -99,7 +103,7 @@ void clparen::Renderer::CLAbstractRenderer::createCommandQueue_()
 }
 
 
-void clparen::Renderer::CLAbstractRenderer::switchRenderingKernel(
+void CLAbstractRenderer::switchRenderingKernel(
         const clKernel::RenderingMode type )
 {
     QMutexLocker lock( &switchKernelMutex_ );
@@ -112,8 +116,8 @@ void clparen::Renderer::CLAbstractRenderer::switchRenderingKernel(
     activeRenderingKernel_ = renderingKernels_[ type ];
 }
 
-clparen::clKernel::CLRenderingKernels
-clparen::Renderer::CLAbstractRenderer::allocateKernels_() const
+clKernel::CLRenderingKernels
+CLAbstractRenderer::allocateKernels_() const
 {
 
     clKernel::CLRenderingKernels kernels;
@@ -144,3 +148,5 @@ clparen::Renderer::CLAbstractRenderer::allocateKernels_() const
     return kernels ;
 }
 
+}
+}

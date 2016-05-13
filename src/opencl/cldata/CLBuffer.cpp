@@ -1,8 +1,13 @@
 #include "CLBuffer.h"
 #include "Logger.h"
 
+
+namespace clparen {
+namespace clData {
+
+
 template< class T >
-clparen::clData::CLBuffer< T >::CLBuffer( const u_int64_t size )
+CLBuffer< T >::CLBuffer( const u_int64_t size )
 {
     deviceData_ = NULL ;
     context_ = NULL ;
@@ -13,7 +18,7 @@ clparen::clData::CLBuffer< T >::CLBuffer( const u_int64_t size )
 }
 
 template< class T >
-void clparen::clData::CLBuffer< T >::createDeviceData( cl_context context )
+void CLBuffer< T >::createDeviceData( cl_context context )
 {
 
     cl_int error = CL_SUCCESS ;
@@ -33,8 +38,8 @@ void clparen::clData::CLBuffer< T >::createDeviceData( cl_context context )
 }
 
 template< class T >
-void clparen::clData::CLBuffer< T >::writeDeviceData( cl_command_queue cmdQueue ,
-                                                    const cl_bool blocking )
+void CLBuffer< T >::writeDeviceData( cl_command_queue cmdQueue ,
+                                     const cl_bool blocking )
 {
 
     cl_int error = CL_SUCCESS ;
@@ -52,7 +57,7 @@ void clparen::clData::CLBuffer< T >::writeDeviceData( cl_command_queue cmdQueue 
 }
 
 template< class T >
-void clparen::clData::CLBuffer< T >::readDeviceData( cl_command_queue cmdQueue ,
+void CLBuffer< T >::readDeviceData( cl_command_queue cmdQueue ,
                                     const cl_bool blocking )
 {
 
@@ -71,7 +76,7 @@ void clparen::clData::CLBuffer< T >::readDeviceData( cl_command_queue cmdQueue ,
 }
 
 template< class T >
-void clparen::clData::CLBuffer< T >::resize( u_int64_t newSize )
+void CLBuffer< T >::resize( u_int64_t newSize )
 {
     if( size_ == newSize )
         return;
@@ -91,13 +96,13 @@ void clparen::clData::CLBuffer< T >::resize( u_int64_t newSize )
 }
 
 template< class T >
-T *clparen::clData::CLBuffer< T >::getHostData() const
+T *CLBuffer< T >::getHostData() const
 {
     return hostData_ ;
 }
 
 template< class T >
-void clparen::clData::CLBuffer< T >::setHostData( const T *data )
+void CLBuffer< T >::setHostData( const T *data )
 {
     std::copy(  data  , data + size_ ,  hostData_ );
 
@@ -107,7 +112,7 @@ void clparen::clData::CLBuffer< T >::setHostData( const T *data )
 }
 
 template< class T >
-void clparen::clData::CLBuffer< T >::setHostData( const QVector<T> &vector )
+void CLBuffer< T >::setHostData( const QVector<T> &vector )
 {
     if( vector.size() != size_ )
         LOG_ERROR("Size Mismatch!");
@@ -116,31 +121,31 @@ void clparen::clData::CLBuffer< T >::setHostData( const QVector<T> &vector )
 }
 
 template< class T >
-cl_mem clparen::clData::CLBuffer< T >::getDeviceData() const
+cl_mem CLBuffer< T >::getDeviceData() const
 {
     return deviceData_ ;
 }
 
 template< class T >
-const size_t clparen::clData::CLBuffer< T >::size() const
+const size_t CLBuffer< T >::size() const
 {
     return size_ ;
 }
 
 template< class T >
-const cl_context clparen::clData::CLBuffer< T >::getContext() const
+const cl_context CLBuffer< T >::getContext() const
 {
     return context_ ;
 }
 
 template< class T >
-bool clparen::clData::CLBuffer< T >::inDevice() const
+bool CLBuffer< T >::inDevice() const
 {
     return inDevice_ ;
 }
 
 template< class T >
-void clparen::clData::CLBuffer< T >::releaseDeviceData_( )
+void CLBuffer< T >::releaseDeviceData_( )
 {
     if( deviceData_ != NULL )
         clReleaseMemObject( deviceData_ );
@@ -150,7 +155,7 @@ void clparen::clData::CLBuffer< T >::releaseDeviceData_( )
 
 template< class T >
 QDataStream &operator>>( QDataStream &stream ,
-                         clparen::clData::CLBuffer< T > &buffer )
+                         CLBuffer< T > &buffer )
 {
 
     LOG_ERROR("Not Implemented yet!");
@@ -159,13 +164,16 @@ QDataStream &operator>>( QDataStream &stream ,
 
 template< class T >
 QDataStream &operator<<( QDataStream &stream ,
-                         clparen::clData::CLBuffer< T > &buffer )
+                         CLBuffer< T > &buffer )
 {
 
 
     LOG_ERROR("Not Implemented yet!");
 
     return stream ;
+}
+
+}
 }
 
 #include "CLBuffer.ipp"

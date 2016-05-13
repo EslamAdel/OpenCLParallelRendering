@@ -28,7 +28,7 @@ protected:
 
 signals:
     void pixmapReady_SIGNAL(  QPixmap *pixmap ,
-                              const clparen::Renderer::CLAbstractRenderer* clRenderer);
+                              const Renderer::CLAbstractRenderer* clRenderer);
 
 private:
     clData::CLImage2D< float > *frame_ ;

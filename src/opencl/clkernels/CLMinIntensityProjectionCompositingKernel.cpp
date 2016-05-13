@@ -1,7 +1,13 @@
 #include "CLMinIntensityProjectionCompositingKernel.h"
 
 
-clparen::clKernel::CLMinIntensityProjectionCompositingKernel::
+
+namespace clparen {
+namespace clKernel {
+
+
+
+CLMinIntensityProjectionCompositingKernel::
 CLMinIntensityProjectionCompositingKernel( const cl_context clContext ,
                                            const std::string kernelName ,
                                            const std::string kernelFile ,
@@ -9,4 +15,8 @@ CLMinIntensityProjectionCompositingKernel( const cl_context clContext ,
     : CLCompositingKernel( clContext , kernelName , kernelFile , kernelDirectory )
 {
 
+}
+
+
+}
 }

@@ -1,10 +1,14 @@
 #include "CLImage2D.h"
 #include "Logger.h"
 
+namespace clparen {
+namespace clData {
+
+
 template< class T >
-clparen::clData::CLImage2D< T >::CLImage2D( const Dimensions2D dimensions ,
-                                          const cl_channel_order channelOrder ,
-                                          const cl_channel_type channelType )
+CLImage2D< T >::CLImage2D( const Dimensions2D dimensions ,
+                           const cl_channel_order channelOrder ,
+                           const cl_channel_type channelType )
     : CLFrame< T >( dimensions )
 {
     imageFormat_.image_channel_order = channelOrder;
@@ -22,14 +26,14 @@ clparen::clData::CLImage2D< T >::CLImage2D( const Dimensions2D dimensions ,
 }
 
 template< class T >
-clparen::clData::CLImage2D< T >::CLImage2D( )
+CLImage2D< T >::CLImage2D( )
 {
 
 }
 
 template< class T >
-void clparen::clData::CLImage2D< T >::createDeviceData( cl_context context ,
-                                                      const cl_mem_flags flags )
+void CLImage2D< T >::createDeviceData( cl_context context ,
+                                       const cl_mem_flags flags )
 {
     LOG_DEBUG( "Creating an OpenCL image: %dx%d ",
                this->dimensions_.x , this->dimensions_.y );
@@ -60,8 +64,8 @@ void clparen::clData::CLImage2D< T >::createDeviceData( cl_context context ,
 
 
 template< class T >
-void clparen::clData::CLImage2D< T >::writeDeviceData( cl_command_queue cmdQueue,
-                                                     const cl_bool blocking )
+void CLImage2D< T >::writeDeviceData( cl_command_queue cmdQueue,
+                                      const cl_bool blocking )
 {
     const size_t origin[3] = { 0 , 0 , 0 };
     const size_t region[3] = { this->dimensions_.x , this->dimensions_.y , 1 };
@@ -83,8 +87,8 @@ void clparen::clData::CLImage2D< T >::writeDeviceData( cl_command_queue cmdQueue
 }
 
 template< class T >
-void clparen::clData::CLImage2D< T >::readDeviceData( cl_command_queue cmdQueue ,
-                                                    const cl_bool blocking )
+void CLImage2D< T >::readDeviceData( cl_command_queue cmdQueue ,
+                                     const cl_bool blocking )
 {
     const size_t origin[3] = { 0 , 0 , 0 };
     const size_t
@@ -106,7 +110,7 @@ void clparen::clData::CLImage2D< T >::readDeviceData( cl_command_queue cmdQueue 
 }
 
 template< class T >
-void clparen::clData::CLImage2D< T >::readOtherDeviceData(
+void CLImage2D< T >::readOtherDeviceData(
         cl_command_queue sourceCmdQueue ,
         const CLFrame<T> &sourceFrame ,
         const cl_bool blocking )
@@ -137,7 +141,8 @@ void clparen::clData::CLImage2D< T >::readOtherDeviceData(
     }
 }
 
+}
+}
 
 #include <CLImage2D.ipp>
-
 

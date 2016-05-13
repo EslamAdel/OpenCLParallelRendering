@@ -186,7 +186,7 @@ public slots :
      * buffers from the rendering GPU to the compositing GPU.
      * @param finishedNode
      */
-    void finishedRendering_SLOT( clparen::Renderer::CLAbstractRenderer *renderer );
+    void finishedRendering_SLOT( Renderer::CLAbstractRenderer *renderer );
 
     /**
      * @brief compositingFinished_SLOT
@@ -202,7 +202,7 @@ public slots :
      * so this slot initiates a compositing task.
      * @param finishedNode
      */
-    void frameLoadedToDevice_SLOT( clparen::Renderer::CLAbstractRenderer *renderer );
+    void frameLoadedToDevice_SLOT( Renderer::CLAbstractRenderer *renderer );
 
 
     /**
@@ -217,7 +217,7 @@ public slots :
      * otherwise, it belongs to CLRenderer referenced by the pointer.
      */
     void pixmapReady_SLOT( QPixmap *pixmap ,
-                           const clparen::Renderer::CLAbstractRenderer * renderer );
+                           const Renderer::CLAbstractRenderer * renderer );
 
     /**
      * @brief updateRotationX_SLOT

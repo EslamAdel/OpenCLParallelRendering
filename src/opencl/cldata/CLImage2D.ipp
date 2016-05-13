@@ -3,8 +3,13 @@
 
 #include <Headers.hh>
 
+namespace clparen {
+namespace clData {
 
-template class clparen::clData::CLImage2D< uint >;
-template class clparen::clData::CLImage2D< float >;
 
+template class CLImage2D< uint >;
+template class CLImage2D< float >;
+
+}
+}
 #endif // CLIMAGE2D_IPP

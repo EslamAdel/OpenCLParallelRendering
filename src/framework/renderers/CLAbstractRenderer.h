@@ -150,7 +150,7 @@ signals:
      * @param thisPtr
      * Pass this pointer as Identifier to this node.
      */
-    void finishedRendering( clparen::Renderer::CLAbstractRenderer *thisPtr );
+    void finishedRendering( Renderer::CLAbstractRenderer *thisPtr );
 
 
 public slots:

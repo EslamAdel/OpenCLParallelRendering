@@ -6,9 +6,12 @@
 // map [0.f , 1.f] => [0 , 255]
 #define F2B( f ) (( f ) >= 1.0 ? 255 : (short)( ( f ) * 256.0 ))
 
+namespace clparen {
+namespace clData {
+
 
 template< class T >
-clparen::clData::CLFrame< T >::CLFrame( const Dimensions2D dimensions  )
+CLFrame< T >::CLFrame( const Dimensions2D dimensions  )
     : dimensions_( dimensions ),
       pixmapSynchronized_( false ) ,
       inDevice_( false )
@@ -30,7 +33,7 @@ clparen::clData::CLFrame< T >::CLFrame( const Dimensions2D dimensions  )
 }
 
 template< class T >
-clparen::clData::CLFrame< T >::CLFrame( )
+CLFrame< T >::CLFrame( )
     : hostData_( nullptr ) ,
       pixmapData_( nullptr )
 {
@@ -38,7 +41,7 @@ clparen::clData::CLFrame< T >::CLFrame( )
 }
 
 template< class T >
-clparen::clData::CLFrame< T >::~CLFrame()
+CLFrame< T >::~CLFrame()
 {
     releaseDeviceData_();
 
@@ -48,8 +51,8 @@ clparen::clData::CLFrame< T >::~CLFrame()
 }
 
 template< class T >
-void clparen::clData::CLFrame< T >::createDeviceData( cl_context context ,
-                                                    const cl_mem_flags flags )
+void CLFrame< T >::createDeviceData( cl_context context ,
+                                     const cl_mem_flags flags )
 {
     LOG_DEBUG( "Creating an OpenCL image " );
 
@@ -74,8 +77,8 @@ void clparen::clData::CLFrame< T >::createDeviceData( cl_context context ,
 }
 
 template< class T >
-void clparen::clData::CLFrame< T >::writeDeviceData( cl_command_queue cmdQueue ,
-                                                   const cl_bool blocking )
+void CLFrame< T >::writeDeviceData( cl_command_queue cmdQueue ,
+                                    const cl_bool blocking )
 {
     if( !inDevice_ )
         LOG_ERROR("No allocation for the buffer in device!");
@@ -95,8 +98,8 @@ void clparen::clData::CLFrame< T >::writeDeviceData( cl_command_queue cmdQueue ,
 }
 
 template< class T >
-void clparen::clData::CLFrame< T >::readDeviceData( cl_command_queue cmdQueue ,
-                                                  const cl_bool blocking )
+void CLFrame< T >::readDeviceData( cl_command_queue cmdQueue ,
+                                   const cl_bool blocking )
 {
     static cl_int error = CL_SUCCESS;
     error = clEnqueueReadBuffer( cmdQueue, deviceData_ , blocking ,
@@ -114,7 +117,7 @@ void clparen::clData::CLFrame< T >::readDeviceData( cl_command_queue cmdQueue ,
 }
 
 template< class T >
-void clparen::clData::CLFrame< T >::readOtherDeviceData(
+void CLFrame< T >::readOtherDeviceData(
         cl_command_queue sourceCmdQueue ,
         const CLFrame<T> &sourceFrame ,
         const cl_bool blocking )
@@ -139,7 +142,7 @@ void clparen::clData::CLFrame< T >::readOtherDeviceData(
 }
 
 template< class T >
-void clparen::clData::CLFrame< T >::copyDeviceData(
+void CLFrame< T >::copyDeviceData(
         cl_command_queue cmdQueue ,
         const CLFrame< T > &frame ,
         const cl_bool blocking )
@@ -170,13 +173,13 @@ void clparen::clData::CLFrame< T >::copyDeviceData(
 
 
 template< class T >
-T *clparen::clData::CLFrame<T>::getHostData() const
+T *CLFrame<T>::getHostData() const
 {
     return hostData_;
 }
 
 template< class T >
-QPixmap &clparen::clData::CLFrame<T>::getFramePixmap()
+QPixmap &CLFrame<T>::getFramePixmap()
 {
     if( pixmapSynchronized_ ) return frame_ ;
 
@@ -221,7 +224,7 @@ QPixmap &clparen::clData::CLFrame<T>::getFramePixmap()
 }
 
 template< class T >
-void clparen::clData::CLFrame< T >::copyHostData( const T *data )
+void CLFrame< T >::copyHostData( const T *data )
 {
     std::copy( &data[ 0 ] , &data[ dimensions_.imageSize() - 1 ] ,
             hostData_ );
@@ -229,7 +232,7 @@ void clparen::clData::CLFrame< T >::copyHostData( const T *data )
 }
 
 template< class T >
-void clparen::clData::CLFrame< T >::copyHostData( const CLFrame< T > &sourceFrame )
+void CLFrame< T >::copyHostData( const CLFrame< T > &sourceFrame )
 {
     const T *hostData_SOURCE = sourceFrame.getHostData();
     const uint64_t frameSize = sourceFrame.getFrameDimensions().imageSize() ;
@@ -242,7 +245,7 @@ void clparen::clData::CLFrame< T >::copyHostData( const CLFrame< T > &sourceFram
 }
 
 template< class T >
-void clparen::clData::CLFrame< T >::setHostData( T *data , bool deepCopy )
+void CLFrame< T >::setHostData( T *data , bool deepCopy )
 {
     if( data == hostData_ )
         return ;
@@ -258,43 +261,43 @@ void clparen::clData::CLFrame< T >::setHostData( T *data , bool deepCopy )
 
 
 template< class T >
-cl_mem clparen::clData::CLFrame< T >::getDeviceData() const
+cl_mem CLFrame< T >::getDeviceData() const
 {
     return deviceData_ ;
 }
 
 template< class T >
-const Dimensions2D &clparen::clData::CLFrame< T >::getFrameDimensions() const
+const Dimensions2D &CLFrame< T >::getFrameDimensions() const
 {
     return dimensions_;
 }
 
 template< class T >
-const cl_context clparen::clData::CLFrame< T >::getContext() const
+const cl_context CLFrame< T >::getContext() const
 {
     return context_ ;
 }
 
 template< class T >
-bool clparen::clData::CLFrame< T >::isInDevice() const
+bool CLFrame< T >::isInDevice() const
 {
     return inDevice_ ;
 }
 
 template< class T >
-bool clparen::clData::CLFrame< T >::inSameContext( const CLFrame< T > &frame ) const
+bool CLFrame< T >::inSameContext( const CLFrame< T > &frame ) const
 {
     return frame.isInDevice() && ( frame.getContext() == context_ ) ;
 }
 
 template< class T >
-bool clparen::clData::CLFrame< T >::dimensionsDefined( ) const
+bool CLFrame< T >::dimensionsDefined( ) const
 {
     return dimensionsDefined_;
 }
 
 template< class T >
-void clparen::clData::CLFrame< T >::releaseDeviceData_()
+void CLFrame< T >::releaseDeviceData_()
 {
     if( deviceData_ )
         clReleaseMemObject( deviceData_ );
@@ -303,11 +306,11 @@ void clparen::clData::CLFrame< T >::releaseDeviceData_()
 
 
 template< class T >
-void clparen::clData::CLFrame< T >::convertColorToRGBA_( uint Color ,
-                                                       uint8_t &r ,
-                                                       uint8_t &g ,
-                                                       uint8_t &b ,
-                                                       uint8_t &a )
+void CLFrame< T >::convertColorToRGBA_( uint Color ,
+                                        uint8_t &r ,
+                                        uint8_t &g ,
+                                        uint8_t &b ,
+                                        uint8_t &a )
 {
 
     b = Color & 0xFF; Color >>= 8;
@@ -315,5 +318,10 @@ void clparen::clData::CLFrame< T >::convertColorToRGBA_( uint Color ,
     r = Color & 0xFF; Color >>= 8;
     a = Color & 0xFF;
 }
+
+
+}
+}
+
 
 #include "CLFrame.ipp"

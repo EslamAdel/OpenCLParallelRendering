@@ -27,12 +27,12 @@ DEFINE_PROFILES
 
 #endif
 
+namespace clparen
+{
 
-
-
-clparen::ParallelRendering::ParallelRendering( Volume< uchar > *volume ,
-                                               const uint frameWidth ,
-                                               const uint frameHeight )
+ParallelRendering::ParallelRendering( Volume< uchar > *volume ,
+                                      const uint frameWidth ,
+                                      const uint frameHeight )
     : baseVolume_( volume ),
       frameWidth_( frameWidth ),
       frameHeight_( frameHeight ),
@@ -65,17 +65,17 @@ clparen::ParallelRendering::ParallelRendering( Volume< uchar > *volume ,
 
 
     /**
-    compositing of frames is not performed concurrently,
-    so only one thread will accumulate each frame then upload the
-    collage buffer to host, then rewind (clear) the collage frame
-    at host for the next round.
-      **/
+        compositing of frames is not performed concurrently,
+        so only one thread will accumulate each frame then upload the
+        collage buffer to host, then rewind (clear) the collage frame
+        at host for the next round.
+          **/
     compositorPool_.setMaxThreadCount( 1 );
 }
 
 
 
-void clparen::ParallelRendering::addCLRenderer( const uint64_t gpuIndex )
+void ParallelRendering::addCLRenderer( const uint64_t gpuIndex )
 {
     // if device already occupied by a rendering node, return.
     if( inUseGPUs_.contains( listGPUs_.at( gpuIndex ))) return;
@@ -129,27 +129,27 @@ void clparen::ParallelRendering::addCLRenderer( const uint64_t gpuIndex )
     // Map the signal emitted from rendering node after rendering is finished
     // to the corresponding slot.
     connect( renderer ,
-             SIGNAL( finishedRendering( clparen::Renderer::CLAbstractRenderer* )),
+             SIGNAL( finishedRendering( Renderer::CLAbstractRenderer* )),
              this ,
-             SLOT( finishedRendering_SLOT( clparen::Renderer::CLAbstractRenderer* )));
+             SLOT( finishedRendering_SLOT( Renderer::CLAbstractRenderer* )));
 
     connect( taskPixmap ,
              SIGNAL(pixmapReady_SIGNAL(
                         QPixmap*,
-                        const clparen::Renderer::CLAbstractRenderer* )) ,
+                        const Renderer::CLAbstractRenderer* )) ,
              this ,
              SLOT(pixmapReady_SLOT(
                       QPixmap*,
-                      const clparen::Renderer::CLAbstractRenderer* )));
+                      const Renderer::CLAbstractRenderer* )));
 }
 
-int clparen::ParallelRendering::getCLRenderersCount() const
+int ParallelRendering::getCLRenderersCount() const
 {
     return inUseGPUs_.size();
 }
 
 
-void clparen::ParallelRendering::addCLCompositor( const uint64_t gpuIndex )
+void ParallelRendering::addCLCompositor( const uint64_t gpuIndex )
 {
     LOG_INFO("Linking Rendering Units with Compositing Unit...");
 
@@ -173,11 +173,11 @@ void clparen::ParallelRendering::addCLCompositor( const uint64_t gpuIndex )
     connect( finalFramePixmapTask_ ,
              SIGNAL( pixmapReady_SIGNAL(
                          QPixmap* ,
-                         const clparen::Renderer::CLAbstractRenderer* )) ,
+                         const Renderer::CLAbstractRenderer* )) ,
              this ,
              SLOT(pixmapReady_SLOT(
                       QPixmap* ,
-                      const clparen::Renderer::CLAbstractRenderer* )));
+                      const Renderer::CLAbstractRenderer* )));
 
     // for each rendering task finished, a collecting task and a
     // compositing task will be assigned!
@@ -212,9 +212,9 @@ void clparen::ParallelRendering::addCLCompositor( const uint64_t gpuIndex )
             // correspondint slots.
             connect( collectingTask ,
                      SIGNAL( frameLoadedToDevice_SIGNAL(
-                                 clparen::Renderer::CLAbstractRenderer* )) ,
+                                 Renderer::CLAbstractRenderer* )) ,
                      this , SLOT( frameLoadedToDevice_SLOT(
-                                      clparen::Renderer::CLAbstractRenderer* )));
+                                      Renderer::CLAbstractRenderer* )));
 
             connect( compositingTask , SIGNAL( compositingFinished_SIGNAL( )) ,
                      this , SLOT( compositingFinished_SLOT( )));
@@ -225,7 +225,7 @@ void clparen::ParallelRendering::addCLCompositor( const uint64_t gpuIndex )
 }
 
 
-void clparen::ParallelRendering::distributeBaseVolume1D()
+void ParallelRendering::distributeBaseVolume1D()
 {
     const int nDevices = inUseGPUs_.size();
 
@@ -253,7 +253,7 @@ void clparen::ParallelRendering::distributeBaseVolume1D()
     emit this->frameworkReady_SIGNAL();
 }
 
-void clparen::ParallelRendering::distributeBaseVolumeWeighted()
+void ParallelRendering::distributeBaseVolumeWeighted()
 {
     QVector< uint > computingPowerScores ;
     for( const oclHWDL::Device *device : inUseGPUs_ )
@@ -282,7 +282,7 @@ void clparen::ParallelRendering::distributeBaseVolumeWeighted()
 
 }
 
-void clparen::ParallelRendering::distributeBaseVolumeMemoryWeighted()
+void ParallelRendering::distributeBaseVolumeMemoryWeighted()
 {
 
     QVector< uint > memoryScores ;
@@ -313,7 +313,7 @@ void clparen::ParallelRendering::distributeBaseVolumeMemoryWeighted()
 
 
 
-void clparen::ParallelRendering::startRendering()
+void ParallelRendering::startRendering()
 {
     activeRenderers_ =  inUseGPUs_.size();
 
@@ -325,7 +325,7 @@ void clparen::ParallelRendering::startRendering()
     LOG_INFO("[DONE] Triggering Rendering Nodes");
 }
 
-void clparen::ParallelRendering::applyTransformation_()
+void ParallelRendering::applyTransformation_()
 {
     readyPixmapsCount_ = 0 ;
 
@@ -348,15 +348,15 @@ void clparen::ParallelRendering::applyTransformation_()
     renderersReady_ = false;
 }
 
-void clparen::ParallelRendering::syncTransformation_()
+void ParallelRendering::syncTransformation_()
 {
     // modified when no active rendering threads
     transformationAsync_ = transformation_ ;
 }
 
 
-const clparen::Renderer::CLAbstractRenderer &
-clparen::ParallelRendering::getCLRenderer( const uint64_t gpuIndex ) const
+const Renderer::CLAbstractRenderer &
+ParallelRendering::getCLRenderer( const uint64_t gpuIndex ) const
 {
     // handle some minor exceptions.
     const oclHWDL::Device *device = listGPUs_.at( gpuIndex );
@@ -368,30 +368,30 @@ clparen::ParallelRendering::getCLRenderer( const uint64_t gpuIndex ) const
 
 }
 
-const clparen::Compositor::CLAbstractCompositor
-&clparen::ParallelRendering::getCLCompositor() const
+const Compositor::CLAbstractCompositor
+&ParallelRendering::getCLCompositor() const
 {
     return  *compositor_  ;
 }
 
 
-uint clparen::ParallelRendering::getMachineGPUsCount() const
+uint ParallelRendering::getMachineGPUsCount() const
 {
     return machineGPUsCount_;
 }
 
-uint clparen::ParallelRendering::getFrameWidth() const
+uint ParallelRendering::getFrameWidth() const
 {
     return frameWidth_;
 }
 
-uint clparen::ParallelRendering::getFrameHeight() const
+uint ParallelRendering::getFrameHeight() const
 {
     return frameHeight_;
 }
 
-void clparen::ParallelRendering::finishedRendering_SLOT(
-        clparen::Renderer::CLAbstractRenderer *renderer )
+void ParallelRendering::finishedRendering_SLOT(
+        Renderer::CLAbstractRenderer *renderer )
 {
     //    LOG_DEBUG("Finished Rendering");
 
@@ -417,7 +417,7 @@ void clparen::ParallelRendering::finishedRendering_SLOT(
 
 }
 
-void clparen::ParallelRendering::compositingFinished_SLOT()
+void ParallelRendering::compositingFinished_SLOT()
 {
 
     TOC( frameworkProfile.renderingLoop_TIMER );
@@ -449,8 +449,8 @@ void clparen::ParallelRendering::compositingFinished_SLOT()
 
 }
 
-void clparen::ParallelRendering::frameLoadedToDevice_SLOT(
-        clparen::Renderer::CLAbstractRenderer *renderer )
+void ParallelRendering::frameLoadedToDevice_SLOT(
+        Renderer::CLAbstractRenderer *renderer )
 {
     TIC( compositingProfile.threadSpawning_TIMER );
 
@@ -465,9 +465,9 @@ void clparen::ParallelRendering::frameLoadedToDevice_SLOT(
 
 }
 
-void clparen::ParallelRendering::pixmapReady_SLOT(
+void ParallelRendering::pixmapReady_SLOT(
         QPixmap *pixmap,
-        const clparen::Renderer::CLAbstractRenderer *renderer )
+        const Renderer::CLAbstractRenderer *renderer )
 {
     if( renderer == nullptr )
         emit this->finalFrameReady_SIGNAL( pixmap );
@@ -475,70 +475,70 @@ void clparen::ParallelRendering::pixmapReady_SLOT(
         emit this->frameReady_SIGNAL( pixmap , renderer );
 }
 
-void clparen::ParallelRendering::updateRotationX_SLOT( int angle )
+void ParallelRendering::updateRotationX_SLOT( int angle )
 {
     transformation_.rotation.x = angle ;
     if( renderersReady_ ) applyTransformation_();
     pendingTransformations_ = true ;
 }
 
-void clparen::ParallelRendering::updateRotationY_SLOT( int angle )
+void ParallelRendering::updateRotationY_SLOT( int angle )
 {
     transformation_.rotation.y = angle ;
     if( renderersReady_ ) applyTransformation_();
     else pendingTransformations_ = true ;
 }
 
-void clparen::ParallelRendering::updateRotationZ_SLOT( int angle )
+void ParallelRendering::updateRotationZ_SLOT( int angle )
 {
     transformation_.rotation.z = angle ;
     if( renderersReady_ ) applyTransformation_();
     else pendingTransformations_ = true ;
 }
 
-void clparen::ParallelRendering::updateTranslationX_SLOT( int distance )
+void ParallelRendering::updateTranslationX_SLOT( int distance )
 {
     transformation_.translation.x = distance;
     if( renderersReady_ ) applyTransformation_();
     else pendingTransformations_ = true ;
 }
 
-void clparen::ParallelRendering::updateTranslationY_SLOT( int distance )
+void ParallelRendering::updateTranslationY_SLOT( int distance )
 {
     transformation_.translation.y = distance;
     if( renderersReady_ ) applyTransformation_();
     else pendingTransformations_ = true ;
 }
 
-void clparen::ParallelRendering::updateTranslationZ_SLOT( int distance )
+void ParallelRendering::updateTranslationZ_SLOT( int distance )
 {
     transformation_.translation.z = distance;
     if( renderersReady_ ) applyTransformation_();
     else pendingTransformations_ = true ;
 }
 
-void clparen::ParallelRendering::updateScaleX_SLOT( int distance )
+void ParallelRendering::updateScaleX_SLOT( int distance )
 {
     transformation_.scale.x = distance;
     if( renderersReady_ ) applyTransformation_();
     else pendingTransformations_ = true ;
 }
 
-void clparen::ParallelRendering::updateScaleY_SLOT( int distance )
+void ParallelRendering::updateScaleY_SLOT( int distance )
 {
     transformation_.scale.y = distance;
     if( renderersReady_ ) applyTransformation_();
     else pendingTransformations_ = true ;
 }
 
-void clparen::ParallelRendering::updateScaleZ_SLOT( int distance )
+void ParallelRendering::updateScaleZ_SLOT( int distance )
 {
     transformation_.scale.z = distance;
     if( renderersReady_ ) applyTransformation_();
     else pendingTransformations_ = true ;
 }
 
-void clparen::ParallelRendering::updateScaleXYZ_SLOT( int distance )
+void ParallelRendering::updateScaleXYZ_SLOT( int distance )
 {
     transformation_.scale.x = distance;
     transformation_.scale.y = distance;
@@ -547,22 +547,22 @@ void clparen::ParallelRendering::updateScaleXYZ_SLOT( int distance )
     else pendingTransformations_ = true ;
 }
 
-void clparen::ParallelRendering::updateImageBrightness_SLOT( float brightness )
+void ParallelRendering::updateImageBrightness_SLOT( float brightness )
 {
     transformation_.brightness = brightness;
     if( renderersReady_ ) applyTransformation_();
     else pendingTransformations_ = true ;
 }
 
-void clparen::ParallelRendering::updateVolumeDensity_SLOT( float density )
+void ParallelRendering::updateVolumeDensity_SLOT( float density )
 {
     transformation_.volumeDensity = density;
     if( renderersReady_ ) applyTransformation_();
     else pendingTransformations_ = true ;
 }
 
-void clparen::ParallelRendering::activateRenderingKernel_SLOT(
-        clparen::clKernel::RenderingMode type )
+void ParallelRendering::activateRenderingKernel_SLOT(
+        clKernel::RenderingMode type )
 {
     for( Renderer::CLAbstractRenderer *renderer : renderers_.values())
         renderer->switchRenderingKernel( type );
@@ -575,7 +575,7 @@ void clparen::ParallelRendering::activateRenderingKernel_SLOT(
     else pendingTransformations_ = true ;
 }
 
-void clparen::ParallelRendering::benchmark_( )
+void ParallelRendering::benchmark_( )
 {
 
     for( Renderer::CLAbstractRenderer *renderer : renderers_ )
@@ -600,4 +600,8 @@ void clparen::ParallelRendering::benchmark_( )
 
 
     EXIT_PROFILING();
+}
+
+
+
 }

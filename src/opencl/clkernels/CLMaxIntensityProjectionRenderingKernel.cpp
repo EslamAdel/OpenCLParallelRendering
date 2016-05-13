@@ -2,7 +2,12 @@
 #include <oclUtils.h>
 #include <Logger.h>
 
-clparen::clKernel::CLMaxIntensityProjectionRenderingKernel::
+
+namespace clparen {
+namespace clKernel {
+
+
+CLMaxIntensityProjectionRenderingKernel::
 CLMaxIntensityProjectionRenderingKernel( cl_context clContext ,
                                          const std::string kernelDirectory ,
                                          const std::string kernelFile ,
@@ -14,20 +19,20 @@ CLMaxIntensityProjectionRenderingKernel( cl_context clContext ,
 }
 
 void
-clparen::clKernel::CLMaxIntensityProjectionRenderingKernel::retrieveKernelObject_( )
+CLMaxIntensityProjectionRenderingKernel::retrieveKernelObject_( )
 {
     kernelObject_ = kernelContext_->getKernelObject( kernelName_ );
 }
 
-clparen::clKernel::RenderingMode
-clparen::clKernel::CLMaxIntensityProjectionRenderingKernel::
+RenderingMode
+CLMaxIntensityProjectionRenderingKernel::
 getRenderingKernelType( ) const
 {
     return RenderingMode::RENDERING_MODE_MinIntensity;
 }
 
 
-void clparen::clKernel::CLMaxIntensityProjectionRenderingKernel::
+void CLMaxIntensityProjectionRenderingKernel::
 setImageBrightnessFactor( float brightness )
 {
     cl_int error = clSetKernelArg( kernelObject_, KERNEL_ARG_Brightness ,
@@ -40,7 +45,7 @@ setImageBrightnessFactor( float brightness )
     }
 }
 
-void clparen::clKernel::CLMaxIntensityProjectionRenderingKernel::
+void CLMaxIntensityProjectionRenderingKernel::
 setVolumeDensityFactor( float density )
 {
     cl_int error = clSetKernelArg( kernelObject_, KERNEL_ARG_Density ,
@@ -51,4 +56,8 @@ setVolumeDensityFactor( float density )
         oclHWDL::Error::checkCLError( error );
         LOG_ERROR("Exiting Due to OpenCL Error!");
     }
+}
+
+
+}
 }

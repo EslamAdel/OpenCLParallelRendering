@@ -1,6 +1,11 @@
 #include "CLCompositingKernel.h"
 
-clparen::clKernel::CLCompositingKernel::CLCompositingKernel(
+
+namespace clparen {
+namespace clKernel {
+
+
+CLCompositingKernel::CLCompositingKernel(
         const cl_context clContext ,
         const std::string kernelName ,
         const std::string kernelFile ,
@@ -14,7 +19,7 @@ clparen::clKernel::CLCompositingKernel::CLCompositingKernel(
     retrieveKernelObject_();
 }
 
-void clparen::clKernel::CLCompositingKernel::setFinalFrame(const cl_mem collageFrame)
+void CLCompositingKernel::setFinalFrame(const cl_mem collageFrame)
 {
 
     cl_int error = CL_SUCCESS;
@@ -30,7 +35,7 @@ void clparen::clKernel::CLCompositingKernel::setFinalFrame(const cl_mem collageF
 }
 
 
-void clparen::clKernel::CLCompositingKernel::setFrame( const cl_mem frameImage2D )
+void CLCompositingKernel::setFrame( const cl_mem frameImage2D )
 {
 
     cl_int error = CL_SUCCESS;
@@ -46,7 +51,7 @@ void clparen::clKernel::CLCompositingKernel::setFrame( const cl_mem frameImage2D
     }
 }
 
-void clparen::clKernel::CLCompositingKernel::setDepthIndex( const cl_mem depthIndex )
+void CLCompositingKernel::setDepthIndex( const cl_mem depthIndex )
 {
     cl_int error = CL_SUCCESS;
 
@@ -62,19 +67,19 @@ void clparen::clKernel::CLCompositingKernel::setDepthIndex( const cl_mem depthIn
 }
 
 
-void clparen::clKernel::CLCompositingKernel::releaseKernel()
+void CLCompositingKernel::releaseKernel()
 {
     if( kernelContext_->getProgram( ))
         clReleaseProgram( kernelContext_->getProgram() );
 }
 
-cl_kernel clparen::clKernel::CLCompositingKernel::getKernelObject() const
+cl_kernel CLCompositingKernel::getKernelObject() const
 {
     return kernelObject_;
 }
 
 
-void clparen::clKernel::CLCompositingKernel::buildKernel_(const std::string extraBuildOptions )
+void CLCompositingKernel::buildKernel_(const std::string extraBuildOptions )
 {
 
     LOG_INFO("Building the kernel");
@@ -92,8 +97,11 @@ void clparen::clKernel::CLCompositingKernel::buildKernel_(const std::string extr
     kernelContext_->buildProgram(buildOptions);
 }
 
-void clparen::clKernel::CLCompositingKernel::retrieveKernelObject_( )
+void CLCompositingKernel::retrieveKernelObject_( )
 {
     kernelObject_ = kernelContext_->getKernelObject( kernelName_ );
 }
 
+
+}
+}
