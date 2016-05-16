@@ -263,7 +263,7 @@ protected:
     /**
      * @brief GPUExecution_
      */
-    cl_event GPUExecution_;
+    cl_event clGPUExecution_;
 
     /**
      * @brief renderingTime_
