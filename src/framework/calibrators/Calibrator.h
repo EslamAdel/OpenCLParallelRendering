@@ -14,7 +14,8 @@ public:
                const uint frameWidth,
                const uint frameHeight,
                const Transformation &transformation,
-               const int iterations);
+               const std::string kernelDirectory,
+               const uint iterations);
 public slots:
 
     /**
@@ -35,7 +36,7 @@ private:
     /**
      * @brief iterations_
      */
-    const int iterations_;
+    const uint iterations_;
 
     /**
      * @brief accumulator_

@@ -3,7 +3,8 @@
 namespace clparen {
 namespace Task {
 
-TaskCalibrate::TaskCalibrate()
+TaskCalibrate::TaskCalibrate(const uint width , const uint height , const uint iterations) :
+    frameWidth_(width),frameHeight_(height),iterations_(iterations)
 {
     //Initialize Transformations
     initializeTransformations_();
@@ -40,8 +41,21 @@ void TaskCalibrate::initializeTransformations_()
     transformations_.scale.z = 1.0;
 }
 
-void TaskCalibrate::addCalibrator_()
+void TaskCalibrate::deployGPUs_()
 {
+    oclHWDL::Hardware clHardware;
+    listGPUs_ = clHardware.getListGPUs();
+    for(uint64_t idx = 0 ; idx < listGPUs_.size() ; idx++)
+    {
+        const uint64_t index = idx ;
+        calibrator_ = new   calibrator::Calibrator<uchar ,float >(idx ,
+                                                                  frameWidth_,
+                                                                  frameHeight_,
+                                                                  transformations_,
+                                                                  "/usr/local/share",
+                                                                  iterations_);
+//        calibrators_.append(cal);
+    }
 
 }
 

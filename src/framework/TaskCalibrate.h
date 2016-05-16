@@ -15,7 +15,9 @@ class TaskCalibrate : public QThread
 {
     Q_OBJECT
 public:
-    TaskCalibrate();
+    TaskCalibrate(const uint width,
+                  const uint height,
+                  const uint iterations);
 
 public slots:
 
@@ -49,12 +51,17 @@ private:
     /**
      * @brief addCalibrator
      */
-    void addCalibrator_();
+    void deployGPUs_();
 
 private:
     FrameRates frameRates_;
-    QList<calibrator::Calibrator<uchar,float> > calibrators_;
+    QList<calibrator::Calibrator<uchar,float>* > calibrators_;
     Transformation transformations_;
+    oclHWDL::Devices listGPUs_;
+    const uint frameWidth_;
+    const uint frameHeight_;
+    const uint iterations_;
+    calibrator::Calibrator<uchar , float > * calibrator_ ;
 
 };
 

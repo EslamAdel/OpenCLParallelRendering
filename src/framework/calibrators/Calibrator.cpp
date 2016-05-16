@@ -9,9 +9,10 @@ Calibrator<V , F >::Calibrator(const uint64_t gpuIndex,
                                const uint frameWidth,
                                const uint frameHeight,
                                const Transformation &transformation,
-                               const int iterations)
+                               const std::string kernelDirectory,
+                               const uint iterations)
     : Renderer::CLRenderer< V , F >( gpuIndex, frameWidth, frameHeight,
-                                     transformation),
+                                     transformation , kernelDirectory),
       iterations_(iterations)
 {
     connect(this,SIGNAL(finishedRendering(Renderer::CLAbstractRenderer*)),
