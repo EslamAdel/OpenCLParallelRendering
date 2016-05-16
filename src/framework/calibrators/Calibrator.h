@@ -5,6 +5,7 @@
 #include "CLRenderer.h"
 #include "AbstractCalibrator.h"
 
+
 namespace clparen {
 namespace Calibrator{
 
@@ -16,39 +17,34 @@ public:
     Calibrator( const uint64_t gpuIndex,
                 const uint frameWidth,
                 const uint frameHeight,
-                const Transformation &transformation,
+                const Transformation transformation,
                 const std::string kernelDirectory,
                 const uint iterations ,
                 QObject *parent = 0 );
 
-public slots:
-    virtual void finishRendering_SLOT( Renderer::CLAbstractRenderer* ) override ;
+    /**
+     * @brief startCalibration
+     */
+    double startCalibration();
 
-public:
+    /**
+     * @brief loadVolume
+     * @param volume
+     */
+    void loadVolume(  const VolumeVariant &volume );
+
+
+private:
     /**
      * @brief rendererEngine_
      */
     Renderer::CLRenderer< V , F > rendererEngine_ ;
 
-private:
     /**
      * @brief iterations_
      */
     const uint iterations_;
 
-    /**
-     * @brief framesCounter_
-     */
-    uint framesCounter_ ;
-    /**
-     * @brief accumulator_
-     */
-    QVector< double > accumulator_;
-
-    /**
-     * @brief frameRate_
-     */
-    double frameRate_;
 };
 
 }

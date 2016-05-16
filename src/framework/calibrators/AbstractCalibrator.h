@@ -14,12 +14,8 @@ class AbstractCalibrator : public QObject
 public:
     AbstractCalibrator( QObject *parent = 0 );
 
-public slots:
-    virtual void finishRendering_SLOT( Renderer::CLAbstractRenderer* ) = 0 ;
-
 signals:
-    void finishCalibration_SIGNAL( double frameRate , uint64_t gpuIdx );
-
+    void finishedCalibration_SIGNAL( double meanTime , uint64_t gpuIdx );
 
 
 };

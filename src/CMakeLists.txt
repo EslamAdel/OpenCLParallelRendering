@@ -15,12 +15,12 @@ SET( OCL_MGPUVS_SOURCE_FILES
     framework/compositors/CLCompositorAccumulate.cpp
     framework/calibrators/AbstractCalibrator.cpp
     framework/calibrators/Calibrator.cpp
+    framework/calibrators/TaskCalibrate.cpp
     framework/ParallelRendering.cpp
     framework/renderers/CLRenderer.cpp
     framework/TaskRender.cpp
     framework/TaskCollect.cpp
     framework/TaskComposite.cpp
-    framework/TaskCalibrate.cpp
     framework/compositors/CLCompositor.cpp
     framework/TaskMakePixmap.cpp
     framework/virtual/VirtualParallelRendering.cpp
@@ -72,8 +72,8 @@ SET( OCL_MGPUVS_HEADER_FILES
     framework/calibrators/AbstractCalibrator.h
     framework/calibrators/Calibrator.h
     framework/calibrators/Calibrator.ipp
+    framework/calibrators/TaskCalibrate.h
     framework/ParallelRendering.h
-    framework/TaskCalibrate.h
     framework/TaskCollect.h
     framework/TaskComposite.h
     framework/TaskMakePixmap.h

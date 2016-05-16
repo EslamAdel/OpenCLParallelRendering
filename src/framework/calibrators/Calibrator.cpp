@@ -1,46 +1,54 @@
 #include "Calibrator.h"
+#include <Timer.h>
 
 namespace clparen {
 namespace Calibrator{
 
 template< class V , class F >
-Calibrator<V , F >::Calibrator(const uint64_t gpuIndex,
-                               const uint frameWidth,
-                               const uint frameHeight,
-                               const Transformation &transformation,
-                               const std::string kernelDirectory,
-                               const uint iterations ,
-                               QObject *parent )
+Calibrator<V , F >::Calibrator( const uint64_t gpuIndex,
+                                const uint frameWidth,
+                                const uint frameHeight,
+                                const Transformation transformation,
+                                const std::string kernelDirectory,
+                                const uint iterations ,
+                                QObject *parent )
     : AbstractCalibrator( parent ) ,
       rendererEngine_( gpuIndex, frameWidth, frameHeight,
                        transformation , kernelDirectory ),
-      iterations_(iterations)
+      iterations_( iterations )
 {
-    connect( &rendererEngine_ ,
-             SIGNAL( finishedRendering( Renderer::CLAbstractRenderer* )),
-             this ,
-             SLOT( finishRendering_SLOT(Renderer::CLAbstractRenderer*)));
-    framesCounter_ = 0 ;
+
 }
 
-template <class V , class F >
-void Calibrator< V ,F >::finishRendering_SLOT( Renderer::CLAbstractRenderer * )
+
+template< class V , class F >
+double Calibrator< V , F >::startCalibration()
 {
-    accumulator_.append( rendererEngine_.getRenderingTime( ));
-    if( ++framesCounter_ == iterations_)
+
+    Timer64 timer;
+
+    for( uint i = 0 ; i < iterations_ ; i++ )
     {
-        double meanTime = std::accumulate( accumulator_.begin(),
-                                           accumulator_.end(),
-                                           0.0) / accumulator_.size( );
-        frameRate_ = 10e9/meanTime;
-
-        emit finishCalibration_SIGNAL( frameRate_ ,
-                                       rendererEngine_.getGPUIndex( ));
-        framesCounter_ = 0 ;
-    }
-    else
+        timer.start();
         rendererEngine_.applyTransformation( );
+        timer.stop();
+    }
+
+    double mean = timer.getMean();
+
+    emit finishedCalibration_SIGNAL( mean ,
+                                     rendererEngine_.getGPUIndex( ));
+
+    return mean ;
 }
+
+template< class V , class F >
+void Calibrator< V , F >::loadVolume(  const VolumeVariant &volume )
+{
+    rendererEngine_.loadVolume( volume );
+}
+
+
 
 }
 }

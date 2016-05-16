@@ -70,17 +70,17 @@ double CLAbstractRenderer::getRenderingTime()
 void CLAbstractRenderer::calculateExecutionTime_()
 {
     cl_ulong start , end;
-    clGetEventProfilingInfo(GPUExecution_,
-                            CL_PROFILING_COMMAND_END,
-                            sizeof(cl_ulong),
-                            &end,
-                            NULL);
+    clGetEventProfilingInfo( clGPUExecution_,
+                             CL_PROFILING_COMMAND_END,
+                             sizeof(cl_ulong),
+                             &end,
+                             NULL );
 
-    clGetEventProfilingInfo(GPUExecution_,
-                            CL_PROFILING_COMMAND_START,
-                            sizeof(cl_ulong),
-                            &start,
-                            NULL);
+    clGetEventProfilingInfo( clGPUExecution_,
+                             CL_PROFILING_COMMAND_START,
+                             sizeof(cl_ulong),
+                             &start,
+                             NULL );
 
     renderingTime_ = (end - start);
 
