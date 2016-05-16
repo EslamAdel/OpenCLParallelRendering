@@ -65,10 +65,6 @@ void TaskCalibrate::deployGPUs_()
                                                "/usr/local/share",
                                                iterations_ );
 
-        connect( calibrator ,
-                 SIGNAL(finishCalibration_SIGNAL( double , uint64_t )) ,
-                 this, SLOT(finishCalibration_SLOT( double , uint64_t )));
-
         calibrators_[ idx ] = calibrator;
     }
 
@@ -86,6 +82,7 @@ void TaskCalibrate::generateDummyVolume_()
 
     int seed = time(NULL);
     srand( seed );
+
 
     for( uint64_t i = 0 ; i < volumeSize ; i++ )
         data[ i ] = rand() % 255 ;

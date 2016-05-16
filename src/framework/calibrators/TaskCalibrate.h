@@ -14,7 +14,7 @@ namespace Calibrator {
 namespace Task {
 
 //typedef QMap<uint64_t,double> FrameRates;
-class TaskCalibrate : public QObject , QRunnable
+class TaskCalibrate : public QObject , public QRunnable
 {
     Q_OBJECT
 public:
