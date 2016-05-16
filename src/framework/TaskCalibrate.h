@@ -55,13 +55,13 @@ private:
 
 private:
     FrameRates frameRates_;
-    QList<calibrator::Calibrator<uchar,float>* > calibrators_;
+    QList<Calibrator::Calibrator<uchar,float>* > calibrators_;
     Transformation transformations_;
     oclHWDL::Devices listGPUs_;
     const uint frameWidth_;
     const uint frameHeight_;
     const uint iterations_;
-    calibrator::Calibrator<uchar , float > * calibrator_ ;
+    Calibrator::Calibrator<uchar , float > * calibrator_ ;
 
 };
 

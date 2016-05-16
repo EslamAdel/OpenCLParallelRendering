@@ -14,7 +14,8 @@
 #include "CLAverageIntensityProjectionRenderingKernel.h"
 
 
-namespace clparen { namespace Renderer{
+namespace clparen {
+namespace Renderer{
 
 
 

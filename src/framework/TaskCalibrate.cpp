@@ -48,13 +48,13 @@ void TaskCalibrate::deployGPUs_()
     for(uint64_t idx = 0 ; idx < listGPUs_.size() ; idx++)
     {
         const uint64_t index = idx ;
-        calibrator_ = new   calibrator::Calibrator<uchar ,float >(idx ,
-                                                                  frameWidth_,
-                                                                  frameHeight_,
-                                                                  transformations_,
-                                                                  "/usr/local/share",
-                                                                  iterations_);
-//        calibrators_.append(cal);
+        calibrator_ = new Calibrator::Calibrator<uchar ,float >(idx ,
+                                                                frameWidth_,
+                                                                frameHeight_,
+                                                                transformations_,
+                                                                "/usr/local/share",
+                                                                iterations_);
+        //        calibrators_.append(cal);
     }
 
 }
