@@ -1,0 +1,8 @@
+#!/bin/sh
+if [ -n "$LD_LIBRARY_PATH" ]; then
+  LD_LIBRARY_PATH=@MyQtLibsDir@:$LD_LIBRARY_PATH
+else
+  LD_LIBRARY_PATH=@MyQtLibsDir@
+fi
+export LD_LIBRARY_PATH
+exec @APP_EXECUTABLE@ "$@"
