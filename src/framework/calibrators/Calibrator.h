@@ -24,12 +24,13 @@ public:
 public slots:
     virtual void finishRendering_SLOT( Renderer::CLAbstractRenderer* ) override ;
 
-private:
+public:
     /**
      * @brief rendererEngine_
      */
     Renderer::CLRenderer< V , F > rendererEngine_ ;
 
+private:
     /**
      * @brief iterations_
      */

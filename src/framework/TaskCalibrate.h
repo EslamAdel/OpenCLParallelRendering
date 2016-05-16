@@ -6,18 +6,20 @@
 #include <QList>
 #include "Calibrator.h"
 #include "Transformation.h"
+#include "Volume.h"
 
 namespace clparen {
 namespace Task {
 
-typedef QMap<uint64_t,double> FrameRates;
+//typedef QMap<uint64_t,double> FrameRates;
 class TaskCalibrate : public QThread
 {
     Q_OBJECT
 public:
     TaskCalibrate(const uint width,
                   const uint height,
-                  const uint iterations);
+                  const uint iterations,
+                  const uint volumeScale);
 
 public slots:
 
@@ -33,7 +35,7 @@ signals:
      * @brief taskCalibrattionFinsished
      * @param FrameRates
      */
-    void taskCalibrattionFinsished(double FrameRates );
+    void taskCalibrattionFinsished( QVector< double > FrameRates );
 
 protected:
 
@@ -53,15 +55,19 @@ private:
      */
     void deployGPUs_();
 
+    void makeDummyVolume_();
+
 private:
-    FrameRates frameRates_;
+//    FrameRates frameRates_;
+    QVector< double > frameRates_;
     QList<Calibrator::Calibrator<uchar,float>* > calibrators_;
     Transformation transformations_;
     oclHWDL::Devices listGPUs_;
     const uint frameWidth_;
     const uint frameHeight_;
     const uint iterations_;
-    Calibrator::Calibrator<uchar , float > * calibrator_ ;
+    Volume8 * volume_;
+    const uint volumeScale_;
 
 };
 
