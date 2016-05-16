@@ -61,6 +61,31 @@ bool CLAbstractRenderer::lessThan( const CLAbstractRenderer *lhs ,
     return lhs->getCurrentCenter().z < rhs->getCurrentCenter().z ;
 }
 
+double CLAbstractRenderer::getRenderingTime()
+{
+    calculateExecutionTime_();
+    return renderingTime_;
+}
+
+void CLAbstractRenderer::calculateExecutionTime_()
+{
+    cl_ulong start , end;
+    clGetEventProfilingInfo(GPUExecution_,
+                            CL_PROFILING_COMMAND_END,
+                            sizeof(cl_ulong),
+                            &end,
+                            NULL);
+
+    clGetEventProfilingInfo(GPUExecution_,
+                            CL_PROFILING_COMMAND_START,
+                            sizeof(cl_ulong),
+                            &start,
+                            NULL);
+
+    renderingTime_ = (end - start);
+
+}
+
 void CLAbstractRenderer::initializeContext_()
 {
     LOG_DEBUG( "Initializing an OpenCL context ... " );
@@ -97,7 +122,8 @@ void CLAbstractRenderer::createCommandQueue_()
     cl_int clErrorCode;
     commandQueue_ = clCreateCommandQueue( context_,
                                           device_,
-                                          0, &clErrorCode );
+                                          CL_QUEUE_PROFILING_ENABLE,
+                                          &clErrorCode );
 
     oclHWDL::Error::checkCLError(clErrorCode);
 }

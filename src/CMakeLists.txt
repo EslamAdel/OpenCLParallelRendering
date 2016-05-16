@@ -13,11 +13,14 @@ SET( OCL_MGPUVS_SOURCE_FILES
     framework/renderers/CLAbstractRenderer.cpp
     framework/compositors/CLAbstractCompositor.cpp
     framework/compositors/CLCompositorAccumulate.cpp
+    framework/calibrators/AbstractCalibrator.cpp
+    framework/calibrators/Calibrator.cpp
     framework/ParallelRendering.cpp
     framework/renderers/CLRenderer.cpp
     framework/TaskRender.cpp
     framework/TaskCollect.cpp
     framework/TaskComposite.cpp
+    framework/TaskCalibrate.cpp
     framework/compositors/CLCompositor.cpp
     framework/TaskMakePixmap.cpp
     framework/virtual/VirtualParallelRendering.cpp
@@ -66,7 +69,11 @@ SET( OCL_MGPUVS_HEADER_FILES
     framework/compositors/CLCompositor.ipp
     framework/renderers/CLRenderer.h
     framework/renderers/CLRenderer.ipp
+    framework/calibrators/AbstractCalibrator.h
+    framework/calibrators/Calibrator.h
+    framework/calibrators/Calibrator.ipp
     framework/ParallelRendering.h
+    framework/TaskCalibrate.h
     framework/TaskCollect.h
     framework/TaskComposite.h
     framework/TaskMakePixmap.h
@@ -150,6 +157,7 @@ include_directories( framework )
 include_directories( framework/virtual )
 include_directories( framework/compositors )
 include_directories( framework/renderers )
+include_directories( framework/calibrators )
 include_directories( auxillary )
 include_directories( common )
 include_directories( data )
@@ -161,7 +169,7 @@ include_directories( opencl/clkernels )
 include_directories( rendering )
 include_directories( system )
 include_directories( profiling )
- 
+
 
 ### Add all the kernel files to a list in order to be able to copy them to the
 ### directories where the executables of the 'apps' will be generated.

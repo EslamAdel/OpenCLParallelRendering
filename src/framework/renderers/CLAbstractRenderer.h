@@ -14,7 +14,8 @@
 #include "CLAverageIntensityProjectionRenderingKernel.h"
 
 
-namespace clparen { namespace Renderer{
+namespace clparen {
+namespace Renderer{
 
 
 
@@ -121,6 +122,12 @@ public:
     static bool lessThan( const CLAbstractRenderer* lhs ,
                           const CLAbstractRenderer* rhs );
 
+    /**
+     * @brief getRenderingTime
+     * @return
+     */
+    double getRenderingTime();
+
 protected:
 
     /**
@@ -142,6 +149,11 @@ protected:
      * @brief freeBuffers_
      */
     virtual void freeBuffers_( ) = 0 ;
+
+    /**
+     * @brief calculateExecutionTime_
+     */
+    void calculateExecutionTime_();
 
 signals:
     /**
@@ -247,6 +259,17 @@ protected:
      * @brief activeRenderingMode_
      */
     clKernel::RenderingMode activeRenderingMode_ ;
+
+    /**
+     * @brief GPUExecution_
+     */
+    cl_event GPUExecution_;
+
+    /**
+     * @brief renderingTime_
+     */
+    double renderingTime_ ;
+
 };
 
 
