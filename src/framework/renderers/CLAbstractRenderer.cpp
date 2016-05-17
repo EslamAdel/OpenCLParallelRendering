@@ -69,20 +69,35 @@ double CLAbstractRenderer::getRenderingTime()
 
 void CLAbstractRenderer::calculateExecutionTime_()
 {
+    // Assuming that every thing is going in the right direction.
+    cl_int clErrorCode = CL_SUCCESS;
+
     cl_ulong start , end;
+
+    clErrorCode =
+    clWaitForEvents( 1 , &clGPUExecution_ );
+
+    clErrorCode |=
     clGetEventProfilingInfo( clGPUExecution_,
                              CL_PROFILING_COMMAND_END,
                              sizeof(cl_ulong),
                              &end,
                              NULL );
 
+    clErrorCode |=
     clGetEventProfilingInfo( clGPUExecution_,
                              CL_PROFILING_COMMAND_START,
                              sizeof(cl_ulong),
                              &start,
                              NULL );
 
-    renderingTime_ = (end - start);
+    if( clErrorCode != CL_SUCCESS )
+    {
+        oclHWDL::Error::checkCLError( clErrorCode );
+        LOG_ERROR("Exiting Due to OpenCL Error!");
+    }
+
+    renderingTime_ = static_cast< double >( end -  start );
 
 }
 
@@ -113,7 +128,7 @@ void CLAbstractRenderer::selectGPU_()
 
     // Create the OpenCL context
     oclHWDL::Context* clContext =
-            new oclHWDL::Context(selectedGPU, oclHWDL::BASIC_CL_CONTEXT);
+            new oclHWDL::Context( selectedGPU, oclHWDL::BASIC_CL_CONTEXT );
     context_ = clContext->getContext();
 }
 
