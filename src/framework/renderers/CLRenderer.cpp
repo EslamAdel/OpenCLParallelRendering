@@ -154,7 +154,7 @@ void CLRenderer< V , F >::renderFrame()
                 localSize,
                 0,
                 0,
-                0 );
+                &clGPUExecution_ );
 
 
 

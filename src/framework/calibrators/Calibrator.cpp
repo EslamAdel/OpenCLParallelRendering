@@ -32,12 +32,10 @@ double Calibrator< V , F >::startCalibration()
         timer.start();
         rendererEngine_.applyTransformation( );
         timer.stop();
+        std::cout << "Time Event " << rendererEngine_.getRenderingTime() << std::endl;
     }
 
     double mean = timer.getMean();
-
-    emit finishedCalibration_SIGNAL( mean ,
-                                     rendererEngine_.getGPUIndex( ));
 
     return mean ;
 }
