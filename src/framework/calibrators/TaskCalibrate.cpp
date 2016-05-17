@@ -11,12 +11,7 @@ TaskCalibrate::TaskCalibrate( const Dimensions2D frameDimensions,
       volumeDimensions_( volumeDimensions ) ,
       iterations_( iterations )
 {
-    //Initialize Transformations
-    initializeTransformations_();
-    //Deploy all GPUs
-    deployGPUs_();
-    //Generate dummy volume
-    generateDummyVolume_();
+
 }
 
 void TaskCalibrate::initializeTransformations_()
@@ -40,6 +35,14 @@ void TaskCalibrate::initializeTransformations_()
 
 void TaskCalibrate::run()
 {
+    //Initialize Transformations
+    initializeTransformations_();
+    //Deploy all GPUs
+    deployGPUs_();
+    //Generate dummy volume
+    generateDummyVolume_();
+
+
     for( const uint64_t gpuIndex : calibrators_.keys( ))
         renderingTimes_[ gpuIndex ] =
                 calibrators_[ gpuIndex ]->startCalibration();
