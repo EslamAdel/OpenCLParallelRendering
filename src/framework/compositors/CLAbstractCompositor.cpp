@@ -8,11 +8,11 @@ CLAbstractCompositor::CLAbstractCompositor( const uint64_t gpuIndex,
                                             const uint frameWidth,
                                             const uint frameHeight,
                                             const std::string kernelDirectory,
-                                            QObject *parent)
+                                            QObject *parent )
     : gpuIndex_( gpuIndex ) ,
       kernelDirectory_( kernelDirectory ),
       frameDimensions_( frameWidth , frameHeight ),
-      QObject(parent)
+      QObject( parent )
 {
     readOutReady_ = false ;
     initializeContext_( );

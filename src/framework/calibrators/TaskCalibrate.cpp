@@ -100,7 +100,7 @@ void TaskCalibrate::generateDummyVolume_()
     VolumeVariant volume = VolumeVariant::fromValue( volume_.data( ));
 
     for( Calibrator< uchar , float > *calibrator : calibrators_ )
-        calibrator->loadVolume(volume);
+        calibrator->loadVolume( volume );
 
 }
 
