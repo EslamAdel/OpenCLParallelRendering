@@ -43,9 +43,22 @@ void TaskCalibrate::run()
     generateDummyVolume_();
 
 
+    QMap< uint64_t , QFuture< double > > futureMap ;
+
+
+    // Calibrate all GPUs concurrently.
+    for( const uint64_t gpuIndex : calibrators_.keys( ))
+        futureMap[ gpuIndex ] =
+                QtConcurrent::run(
+                    calibrators_[ gpuIndex ] ,
+                    &Calibrator< uchar , float >::startCalibration );
+
+
+    // Sync here. QFuture::result() blocks until function execution finishs.
     for( const uint64_t gpuIndex : calibrators_.keys( ))
         renderingTimes_[ gpuIndex ] =
-                calibrators_[ gpuIndex ]->startCalibration();
+                futureMap[ gpuIndex ].result();
+
 
     emit calibrationFinsished_SIGNAL( renderingTimes_ );
 

@@ -8,6 +8,8 @@
 #include "Transformation.h"
 #include "Volume.h"
 #include <QScopedPointer>
+#include <QtConcurrent/QtConcurrent>
+#include <QFuture>
 
 namespace clparen {
 namespace Calibrator {
