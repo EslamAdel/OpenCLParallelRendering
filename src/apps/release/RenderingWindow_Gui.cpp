@@ -100,6 +100,10 @@ void RenderingWindow_Gui::intializeConnections_()
     connect( ui->densitySlider , SIGNAL( valueChanged( int )),
              this , SLOT( newDensity_SLOT( int )));
 
+    connect( ui->isoValueSlider , SIGNAL( valueChanged( float )),
+             this , SLOT( newIsoSurfaceValue_SLOT( float )));
+
+
     //capture button
     connect( ui->captureButton , SIGNAL( released( )) ,
              this , SLOT( captureView_SLOT( )));
@@ -147,6 +151,11 @@ void RenderingWindow_Gui::intializeConnections_()
     connect( ui->averageIntensityProjectionButton ,
              SIGNAL( toggled( bool )) ,
              this , SLOT( switchRenderingKernel_SLOT( )));
+
+    connect( ui->isoSurfaceButton ,
+             SIGNAL( toggled( bool )) ,
+             this , SLOT( switchRenderingKernel_SLOT( )));
+
 
     /*
     connect( ui->isoSurfaceButton , SIGNAL( toggled( bool )),
@@ -301,6 +310,13 @@ void RenderingWindow_Gui::newDensity_SLOT(int value)
     parallelRenderer_->updateVolumeDensity_SLOT( density );
 }
 
+void RenderingWindow_Gui::newIsoValue_SLOT(float value)
+{
+    ui->isoValue->setText( QString::number( value ));
+    parallelRenderer_->updateIsoValue_SLOT( value );
+
+}
+
 
 
 //void RenderingWindow_Gui::newTransferFunctionScale_SLOT(int value)
@@ -407,12 +423,12 @@ void RenderingWindow_Gui::switchRenderingKernel_SLOT()
         parallelRenderer_->
                 activateRenderingKernel_SLOT(
                     clparen::clKernel::RenderingMode::RENDERING_MODE_AverageIntensity );
-    /*
-    else if(ui->isoSurfaceButton->isChecked())
+
+    else if(ui->isoSurfaceButton->isChecked( ))
         parallelRenderer_->
                 activateRenderingKernel_SLOT(
                     clparen::clKernel::RenderingMode::RENDERING_MODE_IsoSurface );
-     */
+
 
 }
 

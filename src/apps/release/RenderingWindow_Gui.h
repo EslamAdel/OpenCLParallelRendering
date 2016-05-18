@@ -61,19 +61,13 @@ public slots:
 
 private slots:
 
-
     void newXRotation_SLOT( int value );
-
-
 
     void newYRotation_SLOT( int value );
 
-
     void newZRotation_SLOT( int value );
 
-
     void newXTranslation_SLOT( int value );
-
 
     void newYTranslation_SLOT( int value );
 
@@ -89,8 +83,9 @@ private slots:
 
     void newBrightness_SLOT( int value );
 
-
     void newDensity_SLOT( int value );
+
+    void newIsoValue_SLOT( float value );
 
     void captureView_SLOT() ;
 
@@ -101,7 +96,6 @@ private slots:
 //    void tFunctionSLiderControl_SLOT(int state);
 
     void initializeFramework_SLOT( );
-
 
     void frameworkReady_SLOT( );
 

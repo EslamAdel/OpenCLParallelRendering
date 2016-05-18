@@ -185,6 +185,11 @@ CLAbstractRenderer::allocateKernels_() const
                 context_ ,
                 kernelDirectory_ );
 
+    kernels[ clKernel::RenderingMode::RENDERING_MODE_IsoSurface ] =
+            new clKernel::CLIsoSurfaceRenderingKernel(
+                context_ ,
+                kernelDirectory_ );
+
 
     return kernels ;
 }

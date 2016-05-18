@@ -12,6 +12,7 @@
 #include "CLMaxIntensityProjectionRenderingKernel.h"
 #include "CLMinIntensityProjectionRenderingKernel.h"
 #include "CLAverageIntensityProjectionRenderingKernel.h"
+#include "CLIsoSurfaceRenderingKernel.h"
 
 
 namespace clparen {

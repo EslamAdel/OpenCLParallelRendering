@@ -561,6 +561,11 @@ void ParallelRendering::updateVolumeDensity_SLOT( float density )
     else pendingTransformations_ = true ;
 }
 
+void ParallelRendering::updateIsoValue_SLOT(float value)
+{
+
+}
+
 void ParallelRendering::activateRenderingKernel_SLOT(
         clKernel::RenderingMode type )
 {
