@@ -34,7 +34,15 @@ public:
     void loadVolume(  const VolumeVariant &volume );
 
 
+    /**
+     * @brief getGPUName
+     * @return
+     */
+    std::string getGPUName() const ;
+
 private:
+    Transformation transformation_ ;
+
     /**
      * @brief rendererEngine_
      */

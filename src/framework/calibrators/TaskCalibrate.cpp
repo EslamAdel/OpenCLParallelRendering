@@ -12,6 +12,18 @@ TaskCalibrate::TaskCalibrate( const Dimensions2D frameDimensions,
       iterations_( iterations )
 {
 
+    volume_.reset();
+
+}
+
+TaskCalibrate::TaskCalibrate( const Dimensions2D frameDimensions,
+                              Volume< uchar > *volume ,
+                              const uint iterations )
+    : frameDimensions_( frameDimensions ) ,
+      iterations_( iterations )
+{
+
+    volume_.reset( volume  );
 }
 
 void TaskCalibrate::initializeTransformations_()
@@ -39,8 +51,8 @@ void TaskCalibrate::run()
     initializeTransformations_();
     //Deploy all GPUs
     deployGPUs_();
-    //Generate dummy volume
-    generateDummyVolume_();
+    //Load volume to GPUs
+    loadVolume_();
 
 
     QMap< uint64_t , QFuture< double > > futureMap ;
@@ -60,6 +72,12 @@ void TaskCalibrate::run()
                 futureMap[ gpuIndex ].result();
 
 
+    for( const uint64_t gpuIndex : calibrators_.keys( ))
+    {
+        const std::string name = calibrators_[ gpuIndex ]->getGPUName() ;
+        LOG_DEBUG("GPU#%d[%s]:%f",gpuIndex , name.c_str() ,
+                  renderingTimes_[ gpuIndex ]) ;
+    }
     emit calibrationFinsished_SIGNAL( renderingTimes_ );
 
 }
@@ -86,30 +104,33 @@ void TaskCalibrate::deployGPUs_()
 
 }
 
-void TaskCalibrate::generateDummyVolume_()
+void TaskCalibrate::loadVolume_()
 {
-    Coordinates3D volumeCoordinates( 0.5 , 0.5 , 0.5 );
-    Coordinates3D unitCubeCenter( 0.5 , 0.5 , 0.5 );
-    Coordinates3D unitCubeScaleFactors( 1.f , 1.f , 1.f );
+    if( volume_.isNull())
+    {
+        // Generate dummy volume
+        Coordinates3D volumeCoordinates( 0.5 , 0.5 , 0.5 );
+        Coordinates3D unitCubeCenter( 0.5 , 0.5 , 0.5 );
+        Coordinates3D unitCubeScaleFactors( 1.f , 1.f , 1.f );
 
-    const uint64_t volumeSize = volumeDimensions_.volumeSize() ;
+        const uint64_t volumeSize = volumeDimensions_.volumeSize() ;
 
-    uchar* data =  new uchar[ volumeSize ];
+        uchar* data =  new uchar[ volumeSize ];
 
-    int seed = time(NULL);
-    srand( seed );
-
-
-    for( uint64_t i = 0 ; i < volumeSize ; i++ )
-        data[ i ] = rand() % 255 ;
+        int seed = time(NULL);
+        srand( seed );
 
 
-    volume_.reset( new Volume8( volumeCoordinates,
-                                volumeDimensions_ ,
-                                unitCubeCenter ,
-                                unitCubeScaleFactors ,
-                                data ));
+        for( uint64_t i = 0 ; i < volumeSize ; i++ )
+            data[ i ] = rand() % 255 ;
 
+
+        volume_.reset( new Volume8( volumeCoordinates,
+                                    volumeDimensions_ ,
+                                    unitCubeCenter ,
+                                    unitCubeScaleFactors ,
+                                    data ));
+    }
     VolumeVariant volume = VolumeVariant::fromValue( volume_.data( ));
 
     for( Calibrator< uchar , float > *calibrator : calibrators_ )

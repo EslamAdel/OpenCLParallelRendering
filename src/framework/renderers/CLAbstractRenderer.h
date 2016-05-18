@@ -57,6 +57,12 @@ public:
     virtual uint64_t getGPUIndex( ) const ;
 
     /**
+     * @brief getGPUName
+     * @return
+     */
+    std::string getGPUName( ) const ;
+
+    /**
      * @brief getPlatformId
      * @return
      */
@@ -200,6 +206,11 @@ protected:
      * Selected GPU, where the volume rendering kernel will be executed.
      */
     const uint64_t gpuIndex_;
+
+    /**
+     * @brief name_
+     */
+    std::string name_ ;
 
     /**
      * @brief platform_

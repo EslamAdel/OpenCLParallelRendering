@@ -569,7 +569,7 @@ T *Volume<T>::getValue( const Voxel3DIndex xyz ) const
 template< class T >
 T* Volume< T >::getData() const
 {
-    return data_;
+    return ( data_ == nullptr )? mmapAddr_ : data_ ;
 }
 
 template< class T >

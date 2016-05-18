@@ -173,3 +173,50 @@ qt5_use_modules( ${OCL_MGPUVR_VIRTUAL_EXECUTABLE} Core Widgets OpenGL Gui )
 install( TARGETS ${OCL_MGPUVR_VIRTUAL_EXECUTABLE} DESTINATION bin )
 
 
+
+## -------------------------- Calibrate SETTING--------------------------------##
+
+message("Calibrate Executable Setting...")
+
+### Calibrate Application name
+set( OCL_MGPUVR_CALIBRATE_EXECUTABLE "oclMGPUVR_Calibrate" )
+
+set( OCL_MGPUVR_CALIBRATE_HEADER_FILES CommandLineParser.h )
+set( OCL_MGPUVR_CALIBRATE_SOURCE_FILES
+                                oclMGPUVR_Calibrate.cpp
+                                CommandLineParser.cpp )
+
+
+### Generate the executable
+add_executable( ${OCL_MGPUVR_CALIBRATE_EXECUTABLE}
+    ${OCL_MGPUVR_CALIBRATE_SOURCE_FILES}
+)
+
+
+### Link the application against the oclMGPUVR library
+target_link_libraries( ${OCL_MGPUVR_CALIBRATE_EXECUTABLE} ${OCL_MGPUVS_LIBRARY} )
+
+
+# Generate the run script.
+# Add the shell script to run the application.
+set( OCL_MGPUVR_CALIBRATE_RUNSCRIPT ${OCL_MGPUVR_CALIBRATE_EXECUTABLE}.sh )
+
+set( APP_EXECUTABLE ${OCL_MGPUVR_CALIBRATE_EXECUTABLE} )
+configure_file( ${APPLICATION_RUNSCRIPT_RAW} ${OCL_MGPUVR_CALIBRATE_RUNSCRIPT} @ONLY)
+
+# now copy the temporary into the final destination, setting the permissions
+file( COPY ${CMAKE_CURRENT_BINARY_DIR}/${OCL_MGPUVR_CALIBRATE_RUNSCRIPT}
+    DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
+    FILE_PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ
+    GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
+
+install( FILES ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${OCL_MGPUVR_CALIBRATE_RUNSCRIPT} DESTINATION bin
+    PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ
+    GROUP_EXECUTE WORLD_READ WORLD_EXECUTE )
+
+### Make sure to use the required Qt modules
+qt5_use_modules( ${OCL_MGPUVR_CALIBRATE_EXECUTABLE} Core )
+
+
+# Install the executable (generate with 'make install' in the bin directory)
+install( TARGETS ${OCL_MGPUVR_CALIBRATE_EXECUTABLE} DESTINATION bin )

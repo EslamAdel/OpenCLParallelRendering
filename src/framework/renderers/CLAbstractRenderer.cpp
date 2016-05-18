@@ -30,9 +30,16 @@ CLAbstractRenderer::CLAbstractRenderer(
 
 }
 
+
+
 uint64_t CLAbstractRenderer::getGPUIndex() const
 {
     return gpuIndex_ ;
+}
+
+std::string CLAbstractRenderer::getGPUName() const
+{
+    return name_ ;
 }
 
 cl_platform_id CLAbstractRenderer::getPlatformId() const
@@ -97,7 +104,7 @@ void CLAbstractRenderer::calculateExecutionTime_()
         LOG_ERROR("Exiting Due to OpenCL Error!");
     }
 
-    renderingTime_ = static_cast< double >( end -  start );
+    renderingTime_ = static_cast< double >( end -  start ) / 1e6 ;
 
 }
 
@@ -122,6 +129,7 @@ void CLAbstractRenderer::selectGPU_()
     // Select the GPU that will be used for running the kernel
     oclHWDL::Device* selectedGPU = listGPUs.at( gpuIndex_ );
     device_ = selectedGPU->getId();
+    name_ = selectedGPU->getName();
 
     // Get the platform that corresponds to the GPU
     platform_ = selectedGPU->getPlatform()->getPlatformId();

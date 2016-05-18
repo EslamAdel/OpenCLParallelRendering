@@ -60,7 +60,7 @@ cl_mem CLVolume< T >::createDeviceVolume( cl_context context )
             LOG_DEBUG( "CL_UNORM_INT8" );
             imageFormat_.image_channel_data_type = CL_UNORM_INT8;
 
-            if( typeid( volume_ ) == typeid( uint8_t ))
+            if( typeid( T ) == typeid( uint8_t ))
             {
                 // No need to copy the data into another array with a
                 // different format.

@@ -4,5 +4,13 @@
 
 #include "ParallelRendering.h"
 
+#include "Calibrator.h"
+
+#include "CLCompositor.h"
+
+#include "CLRenderer.h"
+
+
+
 
 #endif // FRAMEWORK_H

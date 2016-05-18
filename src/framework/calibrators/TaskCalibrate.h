@@ -24,6 +24,10 @@ public:
                    const Dimensions3D volumeDimensions ,
                    const uint iterations );
 
+    TaskCalibrate( const Dimensions2D frameDimensions ,
+                   Volume< uchar > *volume  ,
+                   const uint iterations );
+
 signals:
 
     /**
@@ -53,7 +57,7 @@ private:
     /**
      * @brief makeDummyVolume_
      */
-    void generateDummyVolume_( );
+    void loadVolume_( );
 
 private:
     /**
