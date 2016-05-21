@@ -1,9 +1,9 @@
 #ifndef VOLUME_H
 #define VOLUME_H
 
-#include <Headers.hh>
-#include <Typedefs.hh>
-#include <Image.h>
+#include "Headers.h"
+#include "Typedefs.hh"
+#include "Image.h"
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
@@ -29,6 +29,7 @@ public: // Constructors
      * @param prefix
      */
     Volume( const std::string prefix,
+            const bool memoryMapVolume = true ,
             const bool drawBoundingBox = false );
 
     /**
@@ -278,6 +279,13 @@ public: // Public functions
     QVector< BrickParameters< T > >
     weightedBricking1D( const QVector< uint > &scores );
 
+    /**
+     * @brief weightedBrickingWithCopy1D
+     * @param scores
+     * @return
+     */
+    QVector< Volume< T > *>
+    weightedBrickingWithCopy1D( const QVector<uint> &scores );
 
 protected: // Protected functions
 
@@ -287,7 +295,7 @@ protected: // Protected functions
      * including its type and dimensions.
      * @param prefix
      */
-    virtual void loadHeaderData_( const std::string prefix );
+    void loadHeaderData_( const std::string prefix );
 
     /**
      * @brief loadVolumeData_
@@ -295,19 +303,19 @@ protected: // Protected functions
      * memory.
      * @param prefix
      */
-    virtual void loadVolumeData_( const std::string prefix );
+    void loadVolumeData_( const std::string prefix );
 
     /**
      * @brief mapVolumeData
      * @param prefix
      */
-    void mapVolumeData(const std::string prefix);
+    void mapVolumeData_( const std::string prefix );
 
     /**
      * @brief addBoundingBox_
      * Adds the bounding box to the data
      */
-    virtual void addBoundingBox_();
+    void addBoundingBox_();
 
     /**
      * @brief zeroPad_

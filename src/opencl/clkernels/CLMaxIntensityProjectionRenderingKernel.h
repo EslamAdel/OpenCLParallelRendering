@@ -1,7 +1,7 @@
 #ifndef CLMaxIntensityProjectionRENDERINGKERNEL_H
 #define CLMaxIntensityProjectionRENDERINGKERNEL_H
 
-#include <CLRenderingKernel.h>
+#include "CLRenderingKernel.h"
 
 
 namespace  clparen  {

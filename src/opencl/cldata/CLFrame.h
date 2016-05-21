@@ -1,8 +1,8 @@
 #ifndef CLIMAGE_H
 #define CLIMAGE_H
-#include <Headers.h>
 #include <QPixmap>
-#include <Typedefs.hh>
+#include "Headers.h"
+#include "Typedefs.hh"
 #include <oclHWDL/ErrorHandler.h>
 #include "Utilities.h"
 

@@ -96,7 +96,6 @@ void TaskCalibrate::deployGPUs_()
                                                frameDimensions_.x ,
                                                frameDimensions_.y ,
                                                transformations_,
-                                               "/usr/local/share",
                                                iterations_ );
 
         calibrators_[ idx ] = calibrator;

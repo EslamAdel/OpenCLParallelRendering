@@ -18,7 +18,6 @@ public:
                 const uint frameWidth,
                 const uint frameHeight,
                 const Transformation transformation,
-                const std::string kernelDirectory,
                 const uint iterations ,
                 QObject *parent = 0 );
 

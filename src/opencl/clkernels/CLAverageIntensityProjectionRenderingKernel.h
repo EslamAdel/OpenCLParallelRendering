@@ -1,7 +1,7 @@
 #ifndef CLAverageIntensityProjectionRENDERINGKERNEL_H
 #define CLAverageIntensityProjectionRENDERINGKERNEL_H
 
-#include <CLRenderingKernel.h>
+#include "CLRenderingKernel.h"
 
 
 namespace  clparen  {

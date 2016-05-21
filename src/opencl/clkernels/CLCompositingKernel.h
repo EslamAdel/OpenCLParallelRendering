@@ -1,7 +1,7 @@
 #ifndef CLCOMPOSITINGKERNEL_H
 #define CLCOMPOSITINGKERNEL_H
 
-#include "Headers.hh"
+#include "Headers.h"
 #include <oclHWDL/oclHWDL.h>
 #include "Logger.h"
 #include "CLRenderingKernel.h"

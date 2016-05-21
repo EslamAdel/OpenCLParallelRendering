@@ -1,12 +1,18 @@
 #ifndef CLRENDERINGKERNEL_H
 #define CLRENDERINGKERNEL_H
 
-#include <Headers.hh>
+#include "Headers.h"
 #include <oclHWDL/oclHWDL.h>
 #include <QMap>
 
-
-
+#include <QCoreApplication>
+#include <QDir>
+#define DEFAULT_KERNELS_DIRECTORY \
+    QString( qApp->applicationDirPath() + \
+    QDir::separator() + \
+    ".." + \
+    QDir::separator() + \
+    "share" ).toStdString()
 
 
 namespace clparen {
@@ -51,9 +57,13 @@ public:
      * @param kernelDirectory
      * @param kernelFile
      */
-    CLRenderingKernel( cl_context clContext ,
-                       const std::string kernelDirectory,
-                       const std::string kernelFile );
+    CLRenderingKernel(
+            cl_context clContext ,
+            const std::string kernelFile ,
+            const std::string kernelDirectory = DEFAULT_KERNELS_DIRECTORY );
+
+
+
     ~CLRenderingKernel( );
 
 public:
@@ -62,7 +72,7 @@ public:
       * @brief getKernelDirectory
       * @return
       */
-     std::string getKernelDirectory( ) const;
+    std::string getKernelDirectory( ) const;
 
     /**
      * @brief getKernelFile
@@ -180,12 +190,12 @@ protected:
     /**
       * @brief kernelObject_
       */
-     cl_kernel kernelObject_;
+    cl_kernel kernelObject_;
 
-     /**
+    /**
       * @brief kernelType_
       */
-     RenderingMode kernelType_;
+    RenderingMode kernelType_;
 
 };
 

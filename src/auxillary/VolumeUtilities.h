@@ -1,7 +1,7 @@
 #ifndef VOLUMEUTILITIES_H
 #define VOLUMEUTILITIES_H
 
-#include <Typedefs.hh>
+#include "Typedefs.hh"
 
 namespace VolumeUtilities
 {

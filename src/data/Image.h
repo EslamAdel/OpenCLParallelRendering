@@ -1,8 +1,7 @@
 #ifndef IMAGE_H
 #define IMAGE_H
-
-#include <Headers.hh>
-#include <Typedefs.hh>
+#include "Headers.h"
+#include "Typedefs.hh"
 #include <QImage>
 
 template< class T >

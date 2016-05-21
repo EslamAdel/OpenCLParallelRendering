@@ -32,10 +32,11 @@ public:
      * @param kernelDirectory
      * @param parent
      */
-    explicit CLAbstractRenderer( const uint64_t gpuIndex ,
-                                 const uint frameWidth , const uint frameHeight ,
-                                 const std::string kernelDirectory  ,
-                                 QObject *parent = 0 );
+    explicit CLAbstractRenderer(
+            const uint64_t gpuIndex ,
+            const uint frameWidth , const uint frameHeight ,
+            const std::string kernelDirectory  = DEFAULT_KERNELS_DIRECTORY ,
+            QObject *parent = 0 );
 
 
     /**

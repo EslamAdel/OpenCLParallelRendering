@@ -22,9 +22,10 @@ public:
      * @param frameHeight
      * @param kernelDirectory
      */
-    CLCompositor( const uint64_t gpuIndex ,
-                  const uint frameWidth , const uint frameHeight,
-                  const std::string kernelDirectory = "." ) ;
+    CLCompositor(
+            const uint64_t gpuIndex ,
+            const uint frameWidth , const uint frameHeight,
+            const std::string kernelDirectory = DEFAULT_KERNELS_DIRECTORY ) ;
 
     ~CLCompositor( );
 

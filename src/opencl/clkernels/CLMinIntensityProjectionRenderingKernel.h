@@ -1,7 +1,7 @@
 #ifndef CLMinIntensityProjectionRENDERINGKERNEL_H
 #define CLMinIntensityProjectionRENDERINGKERNEL_H
 
-#include <CLRenderingKernel.h>
+#include "CLRenderingKernel.h"
 
 namespace  clparen {
 namespace clKernel {

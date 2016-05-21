@@ -2,13 +2,18 @@
 #include "Logger.h"
 
 template< class T >
-Volume< T >::Volume( const std::string prefix, const bool drawBoundingBox )
+Volume< T >::Volume( const std::string prefix,
+                     const bool memoryMapVolume,
+                     const bool drawBoundingBox )
     : drawBoundingBox_( drawBoundingBox ),
       data_( nullptr ),
       mmapAddr_( nullptr )
 {
     //Map Volume instead of Loading in Memory
-    mapVolumeData( prefix );
+    if( memoryMapVolume )
+        mapVolumeData_( prefix );
+    else
+        loadVolumeData_( prefix );
 
     coordinates_ = Coordinates3D( dimensions_.x / 2.f,
                                   dimensions_.y / 2.f,
@@ -42,13 +47,13 @@ Volume< T >::Volume( const Coordinates3D brickCoordinates,
     unitCubeScaleFactors_ = brickUnitCubeScaleFactors ;
     data_ = brickData ;
 
-//    LOG_DEBUG("Coor(%f,%f,%f),D(%d,%d,%d),unitCenter(%f,%f,%f),"
-//              "unitScale(%f,%f,%f)",
-//              coordinates_.x , coordinates_.y , coordinates_.z ,
-//              dimensions_.x , dimensions_.y , dimensions_.z ,
-//              unitCubeCenter_.x , unitCubeCenter_.y , unitCubeCenter_.z ,
-//              unitCubeScaleFactors_.x , unitCubeScaleFactors_.y ,
-//              unitCubeScaleFactors_.z );
+    //    LOG_DEBUG("Coor(%f,%f,%f),D(%d,%d,%d),unitCenter(%f,%f,%f),"
+    //              "unitScale(%f,%f,%f)",
+    //              coordinates_.x , coordinates_.y , coordinates_.z ,
+    //              dimensions_.x , dimensions_.y , dimensions_.z ,
+    //              unitCubeCenter_.x , unitCubeCenter_.y , unitCubeCenter_.z ,
+    //              unitCubeScaleFactors_.x , unitCubeScaleFactors_.y ,
+    //              unitCubeScaleFactors_.z );
     //    addBoundingBox_();
 }
 
@@ -67,13 +72,13 @@ Volume< T >::Volume( const BrickParameters< T > brickParameters ,
     unitCubeCenter_ = brickParameters.unitCubeCenter_ ;
     unitCubeScaleFactors_ = brickParameters.unitCubeScaleFactors_ ;
 
-//    LOG_DEBUG("Coor(%f,%f,%f),D(%d,%d,%d),unitCenter(%f,%f,%f),"
-//              "unitScale(%f,%f,%f)",
-//              coordinates_.x , coordinates_.y , coordinates_.z ,
-//              dimensions_.x , dimensions_.y , dimensions_.z ,
-//              unitCubeCenter_.x , unitCubeCenter_.y , unitCubeCenter_.z ,
-//              unitCubeScaleFactors_.x , unitCubeScaleFactors_.y ,
-//              unitCubeScaleFactors_.z );
+    //    LOG_DEBUG("Coor(%f,%f,%f),D(%d,%d,%d),unitCenter(%f,%f,%f),"
+    //              "unitScale(%f,%f,%f)",
+    //              coordinates_.x , coordinates_.y , coordinates_.z ,
+    //              dimensions_.x , dimensions_.y , dimensions_.z ,
+    //              unitCubeCenter_.x , unitCubeCenter_.y , unitCubeCenter_.z ,
+    //              unitCubeScaleFactors_.x , unitCubeScaleFactors_.y ,
+    //              unitCubeScaleFactors_.z );
 
     for( uint64_t i = 0; i < brickParameters.dimensions_.x; i++ )
     {
@@ -171,7 +176,7 @@ void Volume< T >::loadVolumeData_( const std::string prefix )
 }
 
 template< class T >
-void Volume< T >::mapVolumeData( const std::string prefix )
+void Volume< T >::mapVolumeData_( const std::string prefix )
 {
     int fd;
 
@@ -247,35 +252,35 @@ Volume< T >* Volume<T>::getBrick( const u_int64_t xi, const u_int64_t xf,
             getBrickParameters( xi , xf , yi , yf , zi , zf );
 
 
-//    T *brickData = new T[ brickParameters.dimensions_.volumeSize() ];
+    //    T *brickData = new T[ brickParameters.dimensions_.volumeSize() ];
 
-//    uint64_t sum = 0;
-//    for( uint64_t i = 0; i < brickParameters.dimensions_.x; i++ )
-//    {
-//        for( uint64_t j = 0; j < brickParameters.dimensions_.y; j++ )
-//        {
-//            for( uint64_t k = 0; k < brickParameters.dimensions_.z; k++ )
-//            {
-//                // The 1D index of the extracted brick
-//                const uint64_t brickIndex =
-//                        VolumeUtilities::get1DIndex(
-//                            i, j, k, brickParameters.dimensions_ );
+    //    uint64_t sum = 0;
+    //    for( uint64_t i = 0; i < brickParameters.dimensions_.x; i++ )
+    //    {
+    //        for( uint64_t j = 0; j < brickParameters.dimensions_.y; j++ )
+    //        {
+    //            for( uint64_t k = 0; k < brickParameters.dimensions_.z; k++ )
+    //            {
+    //                // The 1D index of the extracted brick
+    //                const uint64_t brickIndex =
+    //                        VolumeUtilities::get1DIndex(
+    //                            i, j, k, brickParameters.dimensions_ );
 
-//                // The 1D index of the original 'big' volume
-//                const uint64_t volumeIndex =
-//                        get1DIndex( brickParameters.origin_.x + i,
-//                                    brickParameters.origin_.y + j,
-//                                    brickParameters.origin_.z + k );
+    //                // The 1D index of the original 'big' volume
+    //                const uint64_t volumeIndex =
+    //                        get1DIndex( brickParameters.origin_.x + i,
+    //                                    brickParameters.origin_.y + j,
+    //                                    brickParameters.origin_.z + k );
 
-//                //Get brick data from the big volume
-//                brickData[ brickIndex ] =
-//                        brickParameters.baseData_[ volumeIndex ] ;
+    //                //Get brick data from the big volume
+    //                brickData[ brickIndex ] =
+    //                        brickParameters.baseData_[ volumeIndex ] ;
 
-//                sum += brickData[ brickIndex ];
-//            }
-//        }
-//    }
-//    LOG_DEBUG("sum=%d",sum);
+    //                sum += brickData[ brickIndex ];
+    //            }
+    //        }
+    //    }
+    //    LOG_DEBUG("sum=%d",sum);
 
 
     return new Volume< T >( brickParameters );
@@ -497,6 +502,54 @@ Volume< T >::heuristicBricking( const uint partitions ) const
     }
 }
 
+
+template< class T >
+QVector< Volume< T >* >
+Volume< T >::weightedBrickingWithCopy1D( const QVector< uint > &scores )
+{
+    uint totalScore = 0 ;
+    for( const uint score : scores )
+        totalScore += score ;
+
+    QVector< float > xDimensionFractions ;
+    for( const uint score : scores )
+        xDimensionFractions.append( (float)score / (float)totalScore );
+
+    QVector< u_int64_t > newXDimensions;
+    for( const float xFraction : xDimensionFractions )
+        newXDimensions.append(  xFraction * dimensions_.x );
+
+    QVector< Volume< T > *> bricks;
+    u_int64_t xInitial = 0;
+    u_int64_t xFinal = 0 ;
+
+    for( uint i = 0 ; i < newXDimensions.size() - 1 ; i++ )
+    {
+        xInitial = xFinal ;
+        xFinal += newXDimensions[ i ];
+
+        Volume< T > *brick = getBrick( xInitial ,
+                                       xFinal ,
+                                       0 ,
+                                       dimensions_.y ,
+                                       0 ,
+                                       dimensions_.z );
+        bricks.push_back( brick );
+
+    }
+
+    Volume< T > *brick = getBrick( xFinal ,
+                                   dimensions_.x ,
+                                   0 ,
+                                   dimensions_.y ,
+                                   0 ,
+                                   dimensions_.z );
+
+    bricks.push_back( brick );
+
+    return bricks;
+}
+
 template< class T >
 QVector< BrickParameters< T > >
 Volume< T >::weightedBricking1D( const QVector< uint > &scores )
@@ -553,7 +606,7 @@ T* Volume< T >::getValue( const uint64_t x,
 {
     const uint64_t index = get1DIndex( x, y, z );
     T* value = new T[ 1 ];
-    *value = data_ != NULL ? data_[ index ] : mmapAddr_[index];
+    *value = ( data_ != nullptr )? data_[index] : mmapAddr_[index];
     return value;
 }
 
@@ -562,7 +615,7 @@ T *Volume<T>::getValue( const Voxel3DIndex xyz ) const
 {
     const u_int64_t index = get1DIndex( xyz.x, xyz.y, xyz.z );
     T* value = new T[ 1 ];
-    *value = data_ != NULL ? data_[index] : mmapAddr_[index];
+    *value = ( data_ != nullptr )? data_[index] : mmapAddr_[index];
     return value;
 }
 
@@ -589,17 +642,17 @@ void Volume< T >::addBoundingBox_()
             for ( u_int64_t k = 0; k < dimensions_.x; k++ )
             {
                 if ((( i < 4 )                 && ( j < 4 ))                  ||
-                    (( j < 4 )                 && ( k < 4 ))                  ||
-                    (( k < 4 )                 && ( i < 4 ))                  ||
-                    (( i < 4 )                 && ( j > dimensions_.y - 5 ))  ||
-                    (( j < 4 )                 && ( k > dimensions_.x - 5 ))  ||
-                    (( k < 4 )                 && ( i > dimensions_.z - 5 ))  ||
-                    (( i > dimensions_.z - 5 ) && ( j > dimensions_.y - 5 ))  ||
-                    (( j > dimensions_.y - 5 ) && ( k > dimensions_.x - 5 ))  ||
-                    (( k > dimensions_.x - 5 ) && ( i > dimensions_.z - 5 ))  ||
-                    (( i > dimensions_.z - 5 ) && ( j < 4 ))                  ||
-                    (( j > dimensions_.y - 5 ) && ( k < 4 ))                  ||
-                    (( k > dimensions_.x - 5 ) && ( i < 4 )))
+                        (( j < 4 )                 && ( k < 4 ))                  ||
+                        (( k < 4 )                 && ( i < 4 ))                  ||
+                        (( i < 4 )                 && ( j > dimensions_.y - 5 ))  ||
+                        (( j < 4 )                 && ( k > dimensions_.x - 5 ))  ||
+                        (( k < 4 )                 && ( i > dimensions_.z - 5 ))  ||
+                        (( i > dimensions_.z - 5 ) && ( j > dimensions_.y - 5 ))  ||
+                        (( j > dimensions_.y - 5 ) && ( k > dimensions_.x - 5 ))  ||
+                        (( k > dimensions_.x - 5 ) && ( i > dimensions_.z - 5 ))  ||
+                        (( i > dimensions_.z - 5 ) && ( j < 4 ))                  ||
+                        (( j > dimensions_.y - 5 ) && ( k < 4 ))                  ||
+                        (( k > dimensions_.x - 5 ) && ( i < 4 )))
                 {
                     *ptr = 255;
                 }
@@ -628,7 +681,7 @@ Image<T>* Volume< T >::getSliceX( const u_int64_t x ) const
         for( u_int64_t j = 0; j < dimensions_.z; j++ )
         {
             sliceData[sliceIndex] = data_ != nullptr ? data_[get1DIndex(x, i, j)]
-                                             : mmapAddr_[get1DIndex(x, i, j)];
+                    : mmapAddr_[get1DIndex(x, i, j)];
             sliceIndex++;
         }
     }
@@ -649,7 +702,7 @@ Image<T>* Volume< T >::getSliceY( const u_int64_t y ) const
         for( u_int64_t j = 0; j < dimensions_.z; j++ )
         {
             sliceData[sliceIndex] = data_ != nullptr ? data_[get1DIndex(i, y ,j)]
-                                             : mmapAddr_[get1DIndex(i, y , j)];
+                    : mmapAddr_[get1DIndex(i, y , j)];
             sliceIndex++;
         }
     }
@@ -670,7 +723,7 @@ Image<T>* Volume< T >::getSliceZ( const u_int64_t z ) const
         for( u_int64_t j = 0; j < dimensions_.y; j++ )
         {
             sliceData[sliceIndex] = data_ != nullptr ? data_[get1DIndex(i, j ,z)]
-                                             : mmapAddr_[get1DIndex(i, j ,z)];
+                    : mmapAddr_[get1DIndex(i, j ,z)];
             sliceIndex++;
         }
     }
@@ -699,7 +752,7 @@ Image< T >* Volume< T >::getProjectionX( ) const
             {
                 sliceDataFloat[pixelIndex] +=
                         data_ != nullptr ? data_[get1DIndex(sliceIdx, i, j)]
-                                 : mmapAddr_[get1DIndex(sliceIdx, i, j)];
+                        : mmapAddr_[get1DIndex(sliceIdx, i, j)];
                 pixelIndex++;
             }
         }
@@ -740,7 +793,7 @@ Image<T> * Volume< T >::getProjectionY() const
             {
                 sliceDataFloat[pixelIndex] +=
                         data_ != nullptr ? data_[get1DIndex(i, sliceIdx , j)]
-                                 : mmapAddr_[get1DIndex(i, sliceIdx , j)];
+                        : mmapAddr_[get1DIndex(i, sliceIdx , j)];
 
                 pixelIndex++;
             }
@@ -782,7 +835,7 @@ Image<T>* Volume<T>::getProjectionZ() const
             {
                 sliceDataFloat[pixelIndex] +=
                         data_ != nullptr ? data_[get1DIndex(i, j ,sliceIdx )]
-                                 : mmapAddr_[get1DIndex(i, j ,sliceIdx)];
+                        : mmapAddr_[get1DIndex(i, j ,sliceIdx)];
                 pixelIndex++;
             }
         }

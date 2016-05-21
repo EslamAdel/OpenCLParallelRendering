@@ -9,13 +9,12 @@ Calibrator<V , F >::Calibrator( const uint64_t gpuIndex,
                                 const uint frameWidth,
                                 const uint frameHeight,
                                 const Transformation transformation,
-                                const std::string kernelDirectory,
                                 const uint iterations ,
                                 QObject *parent )
     : AbstractCalibrator( parent ) ,
       transformation_( transformation ) ,
       rendererEngine_( gpuIndex, frameWidth, frameHeight,
-                       transformation_ , kernelDirectory ),
+                       transformation_ ),
       iterations_( iterations )
 {
 
@@ -47,7 +46,7 @@ double Calibrator< V , F >::startCalibration()
     for( const double time : renderingTimes )
         mean += time / size ;
 
-    return mean  ;
+    return mean ;
 }
 
 template< class V , class F >

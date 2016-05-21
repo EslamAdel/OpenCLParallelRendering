@@ -24,10 +24,11 @@ public:
      * @param transformation
      * @param kernelDirectory
      */
-    CLRenderer( const uint64_t gpuIndex,
-                const uint frameWidth , const uint frameHeight ,
-                const Transformation &transformation ,
-                const std::string kernelDirectory = "." );
+    CLRenderer(
+            const uint64_t gpuIndex,
+            const uint frameWidth , const uint frameHeight ,
+            const Transformation &transformation ,
+            const std::string kernelDirectory = DEFAULT_KERNELS_DIRECTORY );
 
 
     ~CLRenderer();

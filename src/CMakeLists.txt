@@ -2,13 +2,8 @@
 # Copyright (C) 2015 Marwan Abdellah <abdellah.marwan@gmail.com>
 ################################################################################
 
-### Add the binary directory to the include and set off the mocs.
-include_directories( ${PROJECT_BINARY_DIR} )
-
-
-
 ### Adding the source files to the CMake source tree
-SET( OCL_MGPUVS_SOURCE_FILES
+SET( CLPAREN_SOURCE_FILES
     framework/renderers/CLAbstractRenderer.cpp
     framework/compositors/CLAbstractCompositor.cpp
     framework/compositors/CLCompositorAccumulate.cpp
@@ -59,7 +54,7 @@ SET( OCL_MGPUVS_SOURCE_FILES
 )
 
 ### Adding the header files to the CMake source tree
-SET( OCL_MGPUVS_HEADER_FILES
+SET( CLPAREN_HEADER_FILES
     framework/clparen.h
     framework/renderers/CLAbstractRenderer.h
     framework/compositors/CLAbstractCompositor.h
@@ -137,7 +132,7 @@ SET( OCL_MGPUVS_HEADER_FILES
 
 
 ### Adding the kernels to the CMake source tree
-set( OCL_MGPUVS_KERNELS
+set( CLPAREN_KERNELS
     kernels/volumeRender.cl
     kernels/xray.cl
     kernels/xray_compositing.cl
@@ -147,7 +142,6 @@ set( OCL_MGPUVS_KERNELS
     kernels/minIntensityProjection_compositing.cl
     kernels/averageIntensityProjection.cl
     kernels/averageIntensityProjection_compositing.cl
-
 )
 
 
@@ -175,67 +169,50 @@ include_directories( profiling )
 ### directories where the executables of the 'apps' will be generated.
 ### This will facilitate testing the implementation without installing any
 ### artifacts.
-foreach( kernel_file ${OCL_MGPUVS_KERNELS} )
-    list( APPEND OCL_MGPUVS_KERNEL_FILES
+foreach( kernel_file ${CLPAREN_KERNELS} )
+    list( APPEND CLPAREN_KERNEL_FILES
          "${CMAKE_CURRENT_SOURCE_DIR}/${kernel_file}" )
     message(${CMAKE_CURRENT_SOURCE_DIR}/${kernel_file})
 endforeach( )
 
-
+install( FILES ${CLPAREN_KERNELS} DESTINATION share )
 
 ### ---------------------- RELEASE LIBRARY SETTING ---------------------------###
 
-
 # Create a library with the main compoments of the framework and link the apps
 # against it later to reduce the compilation time
-set( OCL_MGPUVS_LIBRARY "oclMGPUVS" )
+set( CLPAREN_LIBRARY "clparen" )
 
-add_library( ${OCL_MGPUVS_LIBRARY} SHARED
-    ${OCL_MGPUVS_SOURCE_FILES}
-    ${OCL_MGPUVS_HEADER_FILES}
-    ${OCL_MGPUVS_KERNELS} )
+add_library( ${CLPAREN_LIBRARY} SHARED
+    ${CLPAREN_SOURCE_FILES}
+    ${CLPAREN_HEADER_FILES}
+    ${CLPAREN_KERNELS}  )
 
 
-set_property( TARGET ${OCL_MGPUVS_LIBRARY} PROPERTY IMPORTED_LOCATION
-    ${CMAKE_BINARY_DIRECTORY}/lib${OCL_MGPUVS_LIBRARY}.so )
-
-install( TARGETS ${OCL_MGPUVS_LIBRARY} DESTINATION lib )
-install( FILES ${OCL_MGPUVS_HEADER_FILES} DESTINATION include/${OCL_MGPUVS_LIBRARY} )
-
+install( TARGETS ${CLPAREN_LIBRARY} DESTINATION lib )
+install( FILES ${CLPAREN_HEADER_FILES} DESTINATION include/${CLPAREN_LIBRARY} )
 
 ### ---------------------- BENCHMARK LIBRARY SETTING ---------------------------###
 
-
-
 # Create same library, but with activation of BENCHMARKING Definition.
-set( OCL_MGPUVS_LIBRARY_BENCHMARK "oclMGPUVS_benchmark" )
+set( CLPAREN_LIBRARY_BENCHMARK "clparen_benchmark" )
 
 
 # same library with BENCHMARKING defined.
-add_library( ${OCL_MGPUVS_LIBRARY_BENCHMARK} SHARED
-    ${OCL_MGPUVS_SOURCE_FILES}
-    ${OCL_MGPUVS_HEADER_FILES}
-    ${OCL_MGPUVS_KERNELS} )
+add_library( ${CLPAREN_LIBRARY_BENCHMARK} SHARED
+    ${CLPAREN_SOURCE_FILES}
+    ${CLPAREN_HEADER_FILES}
+    ${CLPAREN_KERNELS} )
 
 
-target_compile_definitions( ${OCL_MGPUVS_LIBRARY_BENCHMARK} INTERFACE BENCHMARKING)
+target_compile_definitions( ${CLPAREN_LIBRARY_BENCHMARK} INTERFACE BENCHMARKING)
 
-set_target_properties(  ${OCL_MGPUVS_LIBRARY_BENCHMARK}
+set_target_properties(  ${CLPAREN_LIBRARY_BENCHMARK}
                         PROPERTIES COMPILE_DEFINITIONS "BENCHMARKING" )
-# BENCHMARKING defined
-set_property( TARGET ${OCL_MGPUVS_LIBRARY_BENCHMARK} PROPERTY IMPORTED_LOCATION
-    ${CMAKE_BINARY_DIRECTORY}/lib${OCL_MGPUVS_LIBRARY}.so )
 
-
-install( TARGETS ${OCL_MGPUVS_LIBRARY_BENCHMARK} DESTINATION lib )
-
+install( TARGETS ${CLPAREN_LIBRARY_BENCHMARK} DESTINATION lib )
 
 ### ------------------------------------------------------------------------------###
 
-
-install( FILES ${OCL_MGPUVS_KERNELS} DESTINATION share )
-
 # Add the applications
 add_subdirectory( apps )
-
-

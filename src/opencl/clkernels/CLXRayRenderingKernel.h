@@ -1,7 +1,7 @@
 #ifndef CLXRAYRENDERINGKERNEL_H
 #define CLXRAYRENDERINGKERNEL_H
 
-#include <CLRenderingKernel.h>
+#include "CLRenderingKernel.h"
 
 namespace clparen {
 namespace clKernel {

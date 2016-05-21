@@ -1,7 +1,6 @@
 #ifndef TRANSFERFUNCTION_H
 #define TRANSFERFUNCTION_H
-
-#include <Headers.hh>
+#include "Headers.h"
 
 struct RGBA
 {

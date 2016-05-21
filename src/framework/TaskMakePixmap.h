@@ -3,9 +3,9 @@
 
 #include <QObject>
 #include <QRunnable>
-#include <CLFrame.h>
+#include "CLFrame.h"
 #include "CLRenderer.h"
-#include <CLImage2D.h>
+#include "CLImage2D.h"
 
 
 

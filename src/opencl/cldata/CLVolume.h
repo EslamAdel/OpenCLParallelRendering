@@ -2,7 +2,7 @@
 #define RENDERING_CLVOLUME_H
 
 #include <Headers.h>
-#include <Volume.h>
+#include "Volume.h"
 
 
 namespace clparen {

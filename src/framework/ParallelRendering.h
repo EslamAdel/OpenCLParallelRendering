@@ -2,7 +2,7 @@
 #define PARALLELRENDERING_H
 
 #include "ProfilingExterns.h"
-#include <Headers.hh>
+#include "Headers.hh"
 #include <unordered_map>
 
 #include <QObject>

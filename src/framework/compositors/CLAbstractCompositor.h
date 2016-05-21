@@ -1,7 +1,7 @@
 #ifndef CLABSTRACTCOMPOSITOR_H
 #define CLABSTRACTCOMPOSITOR_H
 
-#include <Headers.hh>
+#include "Headers.hh"
 #include <QVector>
 #include <QMutex>
 #include <QMutexLocker>
@@ -38,10 +38,11 @@ public:
      * @param kernelDirectory
      * @param parent
      */
-    CLAbstractCompositor( const uint64_t gpuIndex ,
-                          const uint frameWidth , const uint frameHeight ,
-                          const std::string kernelDirectory  ,
-                          QObject *parent = 0  );
+    CLAbstractCompositor(
+            const uint64_t gpuIndex ,
+            const uint frameWidth , const uint frameHeight ,
+            const std::string kernelDirectory = DEFAULT_KERNELS_DIRECTORY ,
+            QObject *parent = 0  );
 
     /**
      * @brief allocateFrame

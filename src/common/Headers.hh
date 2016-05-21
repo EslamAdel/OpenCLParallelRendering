@@ -14,7 +14,7 @@
 #include <assert.h>
 #include <typeinfo>
 
-#include <half.hpp>
+#include "half.hpp"
 using half_float::half;
 
 #endif // HEADERS_HH

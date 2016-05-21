@@ -1,7 +1,7 @@
 #ifndef BRICKPARAMETERS_H
 #define BRICKPARAMETERS_H
 
-#include <Typedefs.hh>
+#include "Typedefs.hh"
 
 // forward declaration
 template< class T > class Volume;
