@@ -1,29 +1,29 @@
-#ifndef CLMaxIntensityProjectionRENDERINGKERNEL_H
-#define CLMaxIntensityProjectionRENDERINGKERNEL_H
+#ifndef CLIsoSurfaceRENDERINGKERNEL_H
+#define CLIsoSurfaceRENDERINGKERNEL_H
 
-#include "CLRenderingKernel.h"
+#include <CLRenderingKernel.h>
 
 
 namespace clparen  {
 namespace clKernel {
 
 
-class CLMaxIntensityProjectionRenderingKernel : public CLRenderingKernel
+class CLIsoSurfaceRenderingKernel : public CLRenderingKernel
 {
 private:
     enum XRayKernelArgument
     {
         KERNEL_ARG_Density = KERNEL_ARG_DerivedKernelsOffset  ,
-        KERNEL_ARG_Brightness
-
+        KERNEL_ARG_Brightness,
+        KERNEL_ARG_IsoValue
     };
 
 public:
-    CLMaxIntensityProjectionRenderingKernel(
+    CLIsoSurfaceRenderingKernel(
             cl_context sharedContext = NULL,
             const std::string kernelDirectory = ".",
-            const std::string kernelFile = "maxIntensityProjection.cl" ,
-            const std::string kernelName = "maxIntensityProjection" );
+            const std::string kernelFile = "isoSurface.cl" ,
+            const std::string kernelName = "isoSurface" );
 
 public:
 
@@ -42,6 +42,13 @@ public:
      */
     virtual void setImageBrightnessFactor( float brightness ) final;
 
+    /**
+     * @brief setVolumeIsoValue
+     * @param isovalue
+     */
+    virtual void setVolumeIsoValue( float isovalue ) final;
+
+
 
 protected:
 
@@ -56,6 +63,8 @@ private:
      * @brief kernelName_
      */
     const std::string kernelName_;
+
+
 };
 
 
@@ -63,4 +72,4 @@ private:
 }
 }
 
-#endif // CLMaxIntensityProjectionRENDERINGKERNEL_H
+#endif // CLISOSURFACERENDERINGKERNEL_H

@@ -289,6 +289,14 @@ public slots :
     /**
      * @brief activateRenderingKernel_SLOT
      */
+    /**
+     * @brief updateIsoValue_SLOT
+     */
+    void updateIsoValue_SLOT( float isoValue );
+    /**
+     * @brief activateRenderingKernel_SLOT
+     * @param type
+     */
     void activateRenderingKernel_SLOT( clparen::clKernel::RenderingMode type );
 
 

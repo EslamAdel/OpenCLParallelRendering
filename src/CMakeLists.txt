@@ -42,10 +42,12 @@ SET( CLPAREN_SOURCE_FILES
     opencl/clkernels/CLMaxIntensityProjectionRenderingKernel.cpp
     opencl/clkernels/CLMinIntensityProjectionRenderingKernel.cpp
     opencl/clkernels/CLAverageIntensityProjectionRenderingKernel.cpp
+    opencl/clkernels/CLIsoSurfaceRenderingKernel.cpp
     opencl/clkernels/CLMinIntensityProjectionCompositingKernel.cpp
     opencl/clkernels/CLMaxIntensityProjectionCompositingKernel.cpp
     opencl/clkernels/CLAverageIntensityProjectionCompositingKernel.cpp
     opencl/clkernels/CLAverageIntensityProjectionCompositingKernel.cpp
+    opencl/clkernels/CLIsoSurfaceCompositingKernel.cpp
     opencl/cldata/CLBuffer.cpp
     profiling/ProfilingExterns.cpp
     system/oclUtils.cpp
@@ -115,10 +117,12 @@ SET( CLPAREN_HEADER_FILES
     opencl/clkernels/CLMaxIntensityProjectionRenderingKernel.h
     opencl/clkernels/CLMinIntensityProjectionRenderingKernel.h
     opencl/clkernels/CLAverageIntensityProjectionRenderingKernel.h
+    opencl/clkernels/CLIsoSurfaceRenderingKernel.h
     opencl/clkernels/CLMinIntensityProjectionCompositingKernel.h
     opencl/clkernels/CLMaxIntensityProjectionCompositingKernel.h
     opencl/clkernels/CLAverageIntensityProjectionCompositingKernel.h
     opencl/clkernels/CLAverageIntensityProjectionCompositingKernel.h
+    opencl/clkernels/CLIsoSurfaceCompositingKernel.h
     opencl/cldata/CLBuffer.h
     opencl/cldata/CLFrameVariants.hh
     opencl/cldata/CLVolumeVariants.hh
@@ -142,6 +146,8 @@ set( CLPAREN_KERNELS
     kernels/minIntensityProjection_compositing.cl
     kernels/averageIntensityProjection.cl
     kernels/averageIntensityProjection_compositing.cl
+    kernels/isoSurface.cl
+    kernels/isoSurface_compositing.cl
 )
 
 

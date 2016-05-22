@@ -68,17 +68,18 @@ uint rgbaFloatToInt( float4 rgba )
 }
 
 /**
- * @brief minIntensityProjection
+ * @brief isoSurface
  * @param frameBuffer
  * @param width
  * @param height
- * @param density
- * @param brightness
  * @param invViewMatrix
  * @param volume
  * @param volumeSampler
+ * @param density
+ * @param brightness
+ * @param isovalue
  */
-__kernel void minIntensityProjection(  __write_only image2d_t frameBuffer,
+__kernel void isoSurface( __write_only image2d_t frameBuffer,
 
                     uint width, uint height,
 
@@ -90,7 +91,9 @@ __kernel void minIntensityProjection(  __write_only image2d_t frameBuffer,
 
                     float density,
 
-                    float brightness
+                    float brightness,
+
+                    float isoValue
                     )
 {
     const uint x = get_global_id( 0 );
@@ -150,7 +153,7 @@ __kernel void minIntensityProjection(  __write_only image2d_t frameBuffer,
         tNear = 0.f;
 
     // March along the ray accumulating the densities
-    float4 intensityBuffer = ( float4 )( 1.f, 1.f, 1.f, 1.f );
+    float4 intensityBuffer = ( float4 )( 0.f, 0.f, 0.f, 0.f );
     float t = tFar;
 
     for( uint i = 0 ; i < MAX_STEPS ; i++ )
@@ -166,33 +169,23 @@ __kernel void minIntensityProjection(  __write_only image2d_t frameBuffer,
         // positions along the ray.
         const float4 intensity = read_imagef( volume, volumeSampler, position );
 
-        // update intensity buffer to  minimum value
-        if(intensityBuffer.x > intensity.x && intensity.x != 0 )
-            intensityBuffer = intensity;
-
-/**
-        float4 col;
-        if(enableTranferFunction != 0)
-        {
-        // lookup in transfer function texture
-            float2 transfer_pos = (float2)(( intensity.x - transferOffset ) *
-                                         transferScale , 0.5f );
-            col = read_imagef(transferFunc, transferFuncSampler, transfer_pos);
-         }
-         else
-            col = intensity;
-**/
         // Accumulate the result by mixing what is currently in the
         // _intensityBuffer_ with the new intensity value that was sampled from
         // the volume, with the corrsponding alpha components
-
-
+        //float alpha = intensity.w * density ;
+        //intensityBuffer = mix( intensityBuffer, intensity ,
+        //( float4 )( alpha, alpha, alpha, alpha ));
+        if(intensity.x > isoValue)
+        {
+            intensityBuffer = intensity;
+         }
 
         // Get the parametric value of the next sample along the ray
         t -= T_STEP;
         if( t < tNear )
             break;
     }
+
 
     // Adjust the brightness of the pixel
     intensityBuffer *= brightness;

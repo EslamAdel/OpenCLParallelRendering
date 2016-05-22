@@ -47,7 +47,11 @@ struct Transformation
      * @brief transferFunctionOffset
      */
     float transferFunctionOffset ;
-
+    /**
+       for iso surface kernel
+     * @brief isoValue
+     */
+    float isoValue;
 };
 
 #endif // TRANSFORMATION_H

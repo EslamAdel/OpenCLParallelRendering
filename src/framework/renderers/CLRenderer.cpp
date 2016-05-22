@@ -144,6 +144,15 @@ void CLRenderer< V , F >::renderFrame()
     activeRenderingKernel_->
             setImageBrightnessFactor( transformation_.brightness );
 
+    activeRenderingKernel_->setVolumeIsoValue( transformation_.isoValue );
+
+    /*
+    if(activeRenderingKernel_->
+            getRenderingKernelType() == clparen::clKernel::RENDERING_MODE_IsoSurface)
+    {
+        activeRenderingKernel_->
+        }
+*/
     // Enqueue the kernel for execution
     clErrorCode |= clEnqueueNDRangeKernel(
                 commandQueue_,

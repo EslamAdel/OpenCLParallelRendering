@@ -144,8 +144,13 @@ public:
      * @brief setImageBrightnessFactor
      * @param brightness
      */
-    virtual void setImageBrightnessFactor( float brightness ) = 0;
 
+    virtual void setImageBrightnessFactor( float brightness ) = 0;
+    /**
+     * @brief setVolumeIsoValue
+     * @param isovalue
+     */
+    virtual void setVolumeIsoValue( float isovalue ) ;
 
     /**
      * @brief releaseKernel
