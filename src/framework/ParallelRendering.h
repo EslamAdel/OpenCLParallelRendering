@@ -292,7 +292,7 @@ public slots :
     /**
      * @brief updateIsoValue_SLOT
      */
-    void updateIsoValue_SLOT( float value );
+    void updateIsoValue_SLOT( float isoValue );
     /**
      * @brief activateRenderingKernel_SLOT
      * @param type

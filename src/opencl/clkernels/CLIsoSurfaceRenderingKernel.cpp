@@ -52,3 +52,18 @@ setVolumeDensityFactor( float density )
         LOG_ERROR("Exiting Due to OpenCL Error!");
     }
 }
+
+void clparen::clKernel::CLIsoSurfaceRenderingKernel::
+setVolumeIsoValue( float isovalue )
+{
+    cl_int error = clSetKernelArg( kernelObject_, KERNEL_ARG_IsoValue ,
+                                   sizeof( float ),
+                                   &isovalue );
+    if( error != CL_SUCCESS )
+    {
+        oclHWDL::Error::checkCLError( error );
+        LOG_ERROR("Exiting Due to OpenCL Error! [Arg:%d]",
+                  KERNEL_ARG_IsoValue );
+    }
+
+}

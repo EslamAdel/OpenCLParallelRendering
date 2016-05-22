@@ -72,11 +72,12 @@ uint rgbaFloatToInt( float4 rgba )
  * @param frameBuffer
  * @param width
  * @param height
- * @param density
- * @param brightness
  * @param invViewMatrix
  * @param volume
  * @param volumeSampler
+ * @param density
+ * @param brightness
+ * @param isovalue
  */
 __kernel void isoSurface( __write_only image2d_t frameBuffer,
 
@@ -90,7 +91,10 @@ __kernel void isoSurface( __write_only image2d_t frameBuffer,
 
                     float density,
 
-                    float brightness )
+                    float brightness,
+
+                    float isoValue
+                    )
 {
     const uint x = get_global_id( 0 );
     const uint y = get_global_id( 1 );
@@ -171,11 +175,9 @@ __kernel void isoSurface( __write_only image2d_t frameBuffer,
         //float alpha = intensity.w * density ;
         //intensityBuffer = mix( intensityBuffer, intensity ,
         //( float4 )( alpha, alpha, alpha, alpha ));
-        if(intensity.x > density)
+        if(intensity.x > isoValue)
         {
-
             intensityBuffer = intensity;
-            break;
          }
 
         // Get the parametric value of the next sample along the ray

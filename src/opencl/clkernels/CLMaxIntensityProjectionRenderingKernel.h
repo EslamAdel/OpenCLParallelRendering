@@ -4,7 +4,7 @@
 #include <CLRenderingKernel.h>
 
 
-namespace  clparen  {
+namespace clparen  {
 namespace clKernel {
 
 
@@ -15,6 +15,7 @@ private:
     {
         KERNEL_ARG_Density = KERNEL_ARG_DerivedKernelsOffset  ,
         KERNEL_ARG_Brightness
+
     };
 
 public:
@@ -40,7 +41,6 @@ public:
      * @param brightness
      */
     virtual void setImageBrightnessFactor( float brightness ) final;
-
 
 
 protected:

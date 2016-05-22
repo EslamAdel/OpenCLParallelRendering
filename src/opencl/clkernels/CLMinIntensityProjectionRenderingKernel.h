@@ -52,7 +52,6 @@ public:
     virtual void setImageBrightnessFactor( float brightness ) final;
 
 
-
 protected:
 
     /**

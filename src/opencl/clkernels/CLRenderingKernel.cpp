@@ -133,6 +133,12 @@ void CLRenderingKernel::setInverseViewMatrix( cl_mem matrix )
     }
 }
 
+void CLRenderingKernel::setVolumeIsoValue( float isovalue )
+{
+
+}
+
+
 
 void CLRenderingKernel::releaseKernel()
 {

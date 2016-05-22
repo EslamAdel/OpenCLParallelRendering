@@ -561,9 +561,11 @@ void ParallelRendering::updateVolumeDensity_SLOT( float density )
     else pendingTransformations_ = true ;
 }
 
-void ParallelRendering::updateIsoValue_SLOT(float value)
+void ParallelRendering::updateIsoValue_SLOT(float isoValue)
 {
-
+    transformation_.isoValue = isoValue;
+    if( renderersReady_ ) applyTransformation_();
+    else pendingTransformations_ = true ;
 }
 
 void ParallelRendering::activateRenderingKernel_SLOT(

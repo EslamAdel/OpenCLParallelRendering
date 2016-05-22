@@ -166,8 +166,9 @@ CLAbstractRenderer::allocateKernels_() const
     /// Add all the rendering kernel here, and set the selected to be the
     /// activeRenderingKernel_
     kernels[ clKernel::RenderingMode::RENDERING_MODE_Xray ] =
-            new clKernel::CLXRayRenderingKernel( context_ ,
-                                                 kernelDirectory_ );
+            new clKernel::CLXRayRenderingKernel(
+                context_ ,
+                kernelDirectory_ );
 
     kernels[ clKernel::RenderingMode::RENDERING_MODE_MaxIntensity ] =
             new clKernel::CLMaxIntensityProjectionRenderingKernel(

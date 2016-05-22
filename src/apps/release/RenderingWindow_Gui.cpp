@@ -46,7 +46,7 @@ RenderingWindow_Gui::RenderingWindow_Gui(
     ui->compositingDevice->setMaxGPUs( 1 );
     ui->offsetSlider->setEnabled(false);
     ui->scaleSlider->setEnabled(false);
-
+    ui->isoValueSlider->setEnabled(false);
 
 
     //disable transformations and transfer function when framework is not ready.
@@ -100,8 +100,8 @@ void RenderingWindow_Gui::intializeConnections_()
     connect( ui->densitySlider , SIGNAL( valueChanged( int )),
              this , SLOT( newDensity_SLOT( int )));
 
-    connect( ui->isoValueSlider , SIGNAL( valueChanged( float )),
-             this , SLOT( newIsoSurfaceValue_SLOT( float )));
+    connect( ui->isoValueSlider , SIGNAL( valueChanged( int )),
+             this , SLOT( newIsoValue_SLOT( int )));
 
 
     //capture button
@@ -156,11 +156,6 @@ void RenderingWindow_Gui::intializeConnections_()
              SIGNAL( toggled( bool )) ,
              this , SLOT( switchRenderingKernel_SLOT( )));
 
-
-    /*
-    connect( ui->isoSurfaceButton , SIGNAL( toggled( bool )),
-             this , SLOT( switchRenderingKernel_SLOT( )));
-     */
 }
 
 
@@ -292,28 +287,26 @@ void RenderingWindow_Gui::newXYZScaling_SLOT(int value)
 }
 
 
-
 void RenderingWindow_Gui::newBrightness_SLOT(int value)
 {
     ui->brightnessValue->setText( QString::number( value ));
 
     float brightness =  float( value ) / 100.0;
     parallelRenderer_->updateImageBrightness_SLOT( brightness );
-
 }
 
 void RenderingWindow_Gui::newDensity_SLOT(int value)
 {
     ui->densityValue->setText( QString::number( value ));
-
     float density = float( value ) / 100.0;
     parallelRenderer_->updateVolumeDensity_SLOT( density );
 }
 
-void RenderingWindow_Gui::newIsoValue_SLOT(float value)
+void RenderingWindow_Gui::newIsoValue_SLOT(int value)
 {
-    ui->isoValue->setText( QString::number( value ));
-    parallelRenderer_->updateIsoValue_SLOT( value );
+    float isoValue = value / 10.0;
+    ui->isoValue->setText( QString::number( isoValue ));
+    parallelRenderer_->updateIsoValue_SLOT( isoValue );
 
 }
 
@@ -430,6 +423,7 @@ void RenderingWindow_Gui::switchRenderingKernel_SLOT()
                     clparen::clKernel::RenderingMode::RENDERING_MODE_IsoSurface );
 
 
+    ui->isoValueSlider->setEnabled( ui->isoSurfaceButton->isChecked( ));
 }
 
 

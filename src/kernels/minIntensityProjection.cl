@@ -167,7 +167,7 @@ __kernel void minIntensityProjection(  __write_only image2d_t frameBuffer,
         const float4 intensity = read_imagef( volume, volumeSampler, position );
 
         // update intensity buffer to  minimum value
-        if(intensityBuffer.x > intensity.x)
+        if(intensityBuffer.x > intensity.x && intensity.x != 0 )
             intensityBuffer = intensity;
 
 /**

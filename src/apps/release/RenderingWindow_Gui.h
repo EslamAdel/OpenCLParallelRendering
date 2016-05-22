@@ -85,7 +85,7 @@ private slots:
 
     void newDensity_SLOT( int value );
 
-    void newIsoValue_SLOT( float value );
+    void newIsoValue_SLOT( int value );
 
     void captureView_SLOT() ;
 

@@ -4,7 +4,7 @@
 #include <CLRenderingKernel.h>
 
 
-namespace  clparen  {
+namespace clparen  {
 namespace clKernel {
 
 
@@ -14,7 +14,8 @@ private:
     enum XRayKernelArgument
     {
         KERNEL_ARG_Density = KERNEL_ARG_DerivedKernelsOffset  ,
-        KERNEL_ARG_Brightness
+        KERNEL_ARG_Brightness,
+        KERNEL_ARG_IsoValue
     };
 
 public:
@@ -41,6 +42,12 @@ public:
      */
     virtual void setImageBrightnessFactor( float brightness ) final;
 
+    /**
+     * @brief setVolumeIsoValue
+     * @param isovalue
+     */
+    virtual void setVolumeIsoValue( float isovalue ) final;
+
 
 
 protected:
@@ -56,6 +63,8 @@ private:
      * @brief kernelName_
      */
     const std::string kernelName_;
+
+
 };
 
 
