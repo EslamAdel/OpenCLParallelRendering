@@ -1,6 +1,7 @@
 #ifndef VOLUME_H
 #define VOLUME_H
 
+
 #include "Headers.h"
 #include "Typedefs.hh"
 #include "Image.h"
@@ -131,6 +132,20 @@ public: // Public functions
      * @return A pointer to the data of the volume.
      */
     virtual T* getData() const;
+
+
+    /**
+     * @brief operator []
+     * @param index
+     * @return
+     */
+    T &operator[]( const uint64_t index );
+
+    /**
+     * @brief copyData
+     * @param data
+     */
+    void copyData( const T *data );
 
     /**
      * @brief getMampAddr
@@ -367,6 +382,7 @@ protected: // Protected (private) member variables
      * @brief drawBoundingBox_
      */
     const bool drawBoundingBox_;
+
 };
 
 /**

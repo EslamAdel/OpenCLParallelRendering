@@ -113,12 +113,13 @@ void clparen::VirtualParallelRendering::distributeBaseVolume1D()
 
     int i = 0;
 
-    for( auto renderer  : renderers_ )
+    for( Renderer::CLAbstractRenderer* renderer  : renderers_ )
     {
         LOG_DEBUG( "Loading subVolume to device" );
 
-        auto subVolume = bricks[ i++ ];
-        renderer->loadVolume( VolumeVariant::fromValue( subVolume ));
+        Volume8 *subVolume = bricks[ i++ ];
+        VolumeVariant volumeVariant = VolumeVariant::fromValue( subVolume );
+        renderer->loadVolume( volumeVariant );
 
         LOG_DEBUG( "[DONE] Loading subVolume to GPU <%d>",
                    renderer->getGPUIndex( ));

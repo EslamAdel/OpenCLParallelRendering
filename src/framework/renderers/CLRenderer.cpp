@@ -68,7 +68,7 @@ const Coordinates3D &CLRenderer< V , F >::getCurrentCenter() const
 
 
 template< class V , class F >
-void CLRenderer< V , F >::loadVolume( const VolumeVariant &volume )
+void CLRenderer< V , F >::loadVolume( VolumeVariant &volume )
 {
     volume_ =  volume.value< Volume< V > *>() ;
     currentCenter_ = volume_->getUnitCubeCenter();
@@ -375,6 +375,19 @@ void CLRenderer< V , F >::paint_()
     TOC( RENDERING_PROFILE( gpuIndex_ ).rendering_TIMER );
 }
 
+
+template< class V , class F >
+const clData::CLVolume< V > *CLRenderer< V , F >::getCLVolume() const
+{
+    return clVolume_;
+}
+
+template< class V , class F >
+void CLRenderer< V , F >::reloadVolume( const cl_bool blocking )
+{
+    clVolume_->writeDeviceData( this->commandQueue_ , blocking );
+
+}
 
 }
 }

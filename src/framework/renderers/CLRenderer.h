@@ -37,7 +37,7 @@ public:
      * @brief loadVolume
      * @param volume
      */
-    void loadVolume( const VolumeVariant &volume ) override ;
+    void loadVolume( VolumeVariant &volume ) override ;
 
     /**
      * @brief applyTransformation
@@ -67,6 +67,17 @@ public:
      * @return
      */
     const clData::CLFrameVariant &getCLFrame( ) const override;
+
+    /**
+     * @brief getCLVolume
+     * @return
+     */
+    const clData::CLVolume< V > *getCLVolume() const;
+
+    /**
+     * @brief reloadVolume
+     */
+    void reloadVolume( const cl_bool blocking );
 
 protected:
 
@@ -119,7 +130,7 @@ private:
     /**
      * @brief volume_
      */
-    const Volume< V >* volume_;
+    Volume< V >* volume_;
 
     /**
      * @brief clVolume_

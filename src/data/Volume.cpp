@@ -626,6 +626,22 @@ T* Volume< T >::getData() const
 }
 
 template< class T >
+T &Volume< T >::operator[]( const uint64_t index )
+{
+    return ( data_ == nullptr )? mmapAddr_[ index ] : data_[ index ];
+}
+
+template< class T >
+void Volume< T >::copyData( const T *data )
+{
+
+    std::copy( &data[ 0 ] , &data[ dimensions_.volumeSize() - 1 ] ,
+            ( data_ == nullptr )? mmapAddr_ : data_ );
+
+
+}
+
+template< class T >
 T* Volume< T >::getMampAddr() const
 {
     return mmapAddr_;

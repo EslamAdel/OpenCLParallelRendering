@@ -1,7 +1,7 @@
 #ifndef CLIsoSurfaceRENDERINGKERNEL_H
 #define CLIsoSurfaceRENDERINGKERNEL_H
 
-#include <CLRenderingKernel.h>
+#include "CLRenderingKernel.h"
 
 
 namespace clparen  {

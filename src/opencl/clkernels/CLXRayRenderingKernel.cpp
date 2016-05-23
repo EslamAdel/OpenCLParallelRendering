@@ -1,6 +1,6 @@
 #include "CLXRayRenderingKernel.h"
 #include <oclUtils.h>
-#include <Logger.h>
+#include "Logger.h"
 
 namespace clparen {
 namespace clKernel {

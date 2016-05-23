@@ -50,7 +50,7 @@ public:
      * @brief loadVolume
      * @param volume
      */
-    virtual void loadVolume( const VolumeVariant &volume ) = 0 ;
+    virtual void loadVolume( VolumeVariant &volume ) = 0 ;
 
     /**
      * @brief getGPUIndex

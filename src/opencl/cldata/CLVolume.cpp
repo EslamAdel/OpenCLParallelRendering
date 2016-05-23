@@ -8,7 +8,7 @@ namespace clData {
 
 
 template< class T >
-CLVolume< T >::CLVolume( const Volume< T >* volume,
+CLVolume< T >::CLVolume( Volume< T >* volume,
                          const VOLUME_PRECISION precision )
     : volume_( volume )
     , precision_( precision )
@@ -55,92 +55,92 @@ cl_mem CLVolume< T >::createDeviceVolume( cl_context context )
 
     switch ( precision_ )
     {
-        case( VOLUME_CL_UNSIGNED_INT8 ):
+    case( VOLUME_CL_UNSIGNED_INT8 ):
+    {
+        LOG_DEBUG( "CL_UNORM_INT8" );
+        imageFormat_.image_channel_data_type = CL_UNORM_INT8;
+
+        if( typeid( T ) == typeid( uint8_t ))
         {
-            LOG_DEBUG( "CL_UNORM_INT8" );
-            imageFormat_.image_channel_data_type = CL_UNORM_INT8;
+            // No need to copy the data into another array with a
+            // different format.
+            deviceData_ =
+                    clCreateImage( context,
+                                   flags_ ,
+                                   &imageFormat_ ,
+                                   &imageDescriptor_ ,
+                                   ( void* ) volume_->getData() ,
+                                   &error );
+        }
+        else
+        {
+            // Conversion is needed !
+            const size_t volumeSize
+                    = volume_->getDimensions().volumeSize( );
 
-            if( typeid( T ) == typeid( uint8_t ))
+            uint8_t *volumeData = new uint8_t[ volumeSize ];
+
+            for( uint64_t i = 0 ; i <  volumeSize ;  i++ )
             {
-                // No need to copy the data into another array with a
-                // different format.
-                deviceData_ =
-                        clCreateImage( context,
-                                       flags_ ,
-                                       &imageFormat_ ,
-                                       &imageDescriptor_ ,
-                                       ( void* ) volume_->getData() ,
-                                       &error );
-            }
-            else
-            {
-                // Conversion is needed !
-                const size_t volumeSize
-                        = volume_->getDimensions().volumeSize( );
-
-                uint8_t *volumeData = new uint8_t[ volumeSize ];
-
-                for( uint64_t i = 0 ; i <  volumeSize ;  i++ )
-                {
-                    volumeData[ i ] =
-                            static_cast< uint8_t >( volume_->getData()[ i ] );
-                }
-
-                deviceData_ =
-                        clCreateImage( context,
-                                       flags_ ,
-                                       &imageFormat_ ,
-                                       &imageDescriptor_ ,
-                                       ( void* ) volumeData ,
-                                       &error );
-
-                // Free the converted data
-                delete [] volumeData;
+                volumeData[ i ] =
+                        static_cast< uint8_t >( volume_->getData()[ i ] );
             }
 
-        }   break;
+            deviceData_ =
+                    clCreateImage( context,
+                                   flags_ ,
+                                   &imageFormat_ ,
+                                   &imageDescriptor_ ,
+                                   ( void* ) volumeData ,
+                                   &error );
 
-            imageFormat_.image_channel_data_type = CL_UNORM_INT16;
+            // Free the converted data
+            delete [] volumeData;
+        }
 
-        case( VOLUME_CL_UNSIGNED_INT16 ):
-            if( typeid( volume_ ) == typeid( uint16_t ))
-            {
+    }   break;
 
-            }
-            else
-            {
+        imageFormat_.image_channel_data_type = CL_UNORM_INT16;
 
-            }
-            break;
+    case( VOLUME_CL_UNSIGNED_INT16 ):
+        if( typeid( volume_ ) == typeid( uint16_t ))
+        {
 
-        case( VOLUME_CL_HALF_FLOAT ):
+        }
+        else
+        {
 
-            imageFormat_.image_channel_data_type = CL_HALF_FLOAT;
-            if( typeid( volume_ ) == typeid( half ))
-            {
+        }
+        break;
 
-            }
-            else
-            {
+    case( VOLUME_CL_HALF_FLOAT ):
 
-            }
-            break;
+        imageFormat_.image_channel_data_type = CL_HALF_FLOAT;
+        if( typeid( volume_ ) == typeid( half ))
+        {
 
-            imageFormat_.image_channel_data_type = CL_FLOAT;
+        }
+        else
+        {
 
-        case( VOLUME_CL_FLOAT ):
-            if( typeid( volume_ ) == typeid( float ))
-            {
+        }
+        break;
 
-            }
-            else
-            {
+        imageFormat_.image_channel_data_type = CL_FLOAT;
 
-            }
+    case( VOLUME_CL_FLOAT ):
+        if( typeid( volume_ ) == typeid( float ))
+        {
 
-            break;
-        default:
-            break;
+        }
+        else
+        {
+
+        }
+
+        break;
+    default:
+        break;
     }
 
     if( error != CL_SUCCESS )
@@ -153,11 +153,47 @@ cl_mem CLVolume< T >::createDeviceVolume( cl_context context )
     return deviceData_;
 }
 
-
 template< class T >
 cl_mem CLVolume< T >::getDeviceData() const
 {
     return deviceData_ ;
+}
+
+template< class T >
+void CLVolume< T >::writeDeviceData( cl_command_queue cmdQueue ,
+                                     const cl_bool blocking )
+{
+    QMutexLocker lock( &hostDataMutex_ );
+
+    const size_t origin[3] = { 0 , 0 , 0 };
+    const size_t region[3] = { volume_->getDimensions().x ,
+                               volume_->getDimensions().y ,
+                               volume_->getDimensions().z };
+
+    // Initially, assume that everything is fine
+    cl_int error = CL_SUCCESS;
+    error = clEnqueueWriteImage( cmdQueue, deviceData_ , blocking ,
+                                 origin , region ,
+                                 volume_->getDimensions().x * sizeof( T )  ,
+                                 volume_->getDimensions().x *
+                                 volume_->getDimensions().y * sizeof( T ) ,
+                                 ( const void * ) volume_->getData() ,
+                                 0 , 0 , 0 );
+
+    if( error != CL_SUCCESS )
+    {
+        oclHWDL::Error::checkCLError( error );
+        LOG_ERROR("OpenCL Error!");
+    }
+}
+
+template< class T >
+void CLVolume< T >::copyHostData( const T *data )
+{
+    QMutexLocker lock( &hostDataMutex_ );
+
+    volume_->copyData( data );
+
 }
 
 }

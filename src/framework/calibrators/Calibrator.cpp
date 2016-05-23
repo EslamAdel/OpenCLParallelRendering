@@ -50,7 +50,7 @@ double Calibrator< V , F >::startCalibration()
 }
 
 template< class V , class F >
-void Calibrator< V , F >::loadVolume(  const VolumeVariant &volume )
+void Calibrator< V , F >::loadVolume( VolumeVariant &volume )
 {
     rendererEngine_.loadVolume( volume );
 }

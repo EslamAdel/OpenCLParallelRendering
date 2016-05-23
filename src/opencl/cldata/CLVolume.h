@@ -3,7 +3,8 @@
 
 #include <Headers.h>
 #include "Volume.h"
-
+#include <QMutex>
+#include <QMutexLocker>
 
 namespace clparen {
 namespace clData {
@@ -30,7 +31,7 @@ public:
      * @param volume
      * @param precision
      */
-    CLVolume( const Volume< T >* volume, const VOLUME_PRECISION precision );
+    CLVolume( Volume< T >* volume, const VOLUME_PRECISION precision );
 
 public:
 
@@ -42,14 +43,32 @@ public:
     cl_mem createDeviceVolume( cl_context context );
 
 
+    /**
+     * @brief getDeviceData
+     * @return
+     */
     cl_mem getDeviceData( ) const ;
+
+    /**
+     * @brief writeDeviceData
+     * @param cmdQueue
+     * @param blocking
+     */
+    void writeDeviceData( cl_command_queue cmdQueue ,
+                          const cl_bool blocking ) ;
+
+    /**
+     * @brief copyHostData
+     * @param data
+     */
+    void copyHostData( const T *data );
 
 private:
 
     /**
      * @brief volume_
      */
-    const Volume< T >* volume_;
+    Volume< T >* volume_;
 
     /**
      * @brief precision_
@@ -75,6 +94,11 @@ private:
      * @brief deviceData_
      */
     cl_mem deviceData_ ;
+
+    /**
+     * @brief hostDataMutex_
+     */
+    QMutex hostDataMutex_ ;
 };
 
 

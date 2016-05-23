@@ -30,7 +30,7 @@ public:
      * @brief loadVolume
      * @param volume
      */
-    void loadVolume(  const VolumeVariant &volume );
+    void loadVolume( VolumeVariant &volume );
 
 
     /**

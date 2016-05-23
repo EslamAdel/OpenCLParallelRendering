@@ -48,6 +48,7 @@ void minIntensityProjection_compositing( __write_only image2d_t finalFrame ,
 
     float4 minColor = (float4)( 1.f , 1.f , 1.f , 1.f );
 
+
     for( int i = 0 ; i < framesCount ; i++ )
     {
         const uint currentDepth = depthIndex[ i ];
@@ -60,6 +61,9 @@ void minIntensityProjection_compositing( __write_only image2d_t finalFrame ,
         if the specified relation is true.
         © 2016 Pearson Education, Informit. All rights reserved.
         **/
+        if( sample.x == 0 )
+            continue ;
+
         const int4 cmp = isless( sample , minColor ) ;
         if(  cmp.x )
             minColor = sample ;
@@ -67,6 +71,9 @@ void minIntensityProjection_compositing( __write_only image2d_t finalFrame ,
     }
 
     const int2 locate = (int2)( x , y );
+    const int4 cmp = isequal( minColor , (float4)(1.f , 1.f , 1.f , 1.f));
+    if( cmp.x )
+        minColor = (float4)( 0.f , 0.f , 0.f , 0.f);
 
     write_imagef( finalFrame , locate , minColor ) ;
 }
