@@ -26,6 +26,9 @@ CLRenderer< V , F >::CLRenderer(
     : CLAbstractRenderer( gpuIndex , frameWidth , frameHeight , kernelDirectory ) ,
       transformation_( transformation )
 {
+
+    clVolume_ = nullptr ;
+
     LOG_INFO( "Creating Context on Node with GPU <%d>", gpuIndex );
     linearFiltering_ = true;
 
@@ -237,7 +240,7 @@ void CLRenderer< V , F >::freeBuffers_()
     if( nearestVolumeSampler_ )
         clReleaseSampler( nearestVolumeSampler_ );
 
-    if( clVolume_->getDeviceData( ))
+    if( clVolume_ && clVolume_->getDeviceData( ))
         clReleaseMemObject( clVolume_->getDeviceData( ));
 
     if( clFrame_->getDeviceData() )
@@ -387,6 +390,13 @@ void CLRenderer< V , F >::reloadVolume( const cl_bool blocking )
 {
     clVolume_->writeDeviceData( this->commandQueue_ , blocking );
 
+}
+
+template< class V , class F >
+void CLRenderer< V , F >::copyHostData(
+        const BrickParameters< V > &brickParameters )
+{
+    clVolume_->copyHostData( brickParameters );
 }
 
 }

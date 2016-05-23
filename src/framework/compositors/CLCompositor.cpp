@@ -162,6 +162,12 @@ const clData::CLFrameVariant
 }
 
 template< class T >
+const clData::CLImage2D< T > &CLCompositor< T >::getFinalFrame( bool )
+{
+    return *finalFrameReadout_;
+}
+
+template< class T >
 uint CLCompositor< T >::framesCount() const
 {
     return framesCount_ ;

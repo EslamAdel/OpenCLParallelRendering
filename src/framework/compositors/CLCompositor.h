@@ -60,6 +60,13 @@ public:
     const clData::CLFrameVariant &getFinalFrame( ) const override;
 
     /**
+     * @brief getFinalFrame
+     * @param clImage2D
+     * @return
+     */
+    const clData::CLImage2D< T > &getFinalFrame( bool clImage2D );
+
+    /**
      * @brief framesCount
      * @return
      */

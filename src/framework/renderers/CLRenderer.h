@@ -79,6 +79,14 @@ public:
      */
     void reloadVolume( const cl_bool blocking );
 
+
+    /**
+     * @brief copyHostData
+     * @param brickParameters
+     */
+    void copyHostData( const BrickParameters< V > &brickParameters );
+
+
 protected:
 
     /**
