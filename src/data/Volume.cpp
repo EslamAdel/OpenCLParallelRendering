@@ -80,31 +80,7 @@ Volume< T >::Volume( const BrickParameters< T > brickParameters ,
     //              unitCubeScaleFactors_.x , unitCubeScaleFactors_.y ,
     //              unitCubeScaleFactors_.z );
 
-    for( uint64_t i = 0; i < brickParameters.dimensions_.x; i++ )
-    {
-        for( uint64_t j = 0; j < brickParameters.dimensions_.y; j++ )
-        {
-            for( uint64_t k = 0; k < brickParameters.dimensions_.z; k++ )
-            {
-                // The 1D index of the extracted brick
-                const uint64_t brickIndex =
-                        VolumeUtilities::get1DIndex(
-                            i, j, k, brickParameters.dimensions_ );
-
-                // The 1D index of the original 'big' volume
-                const uint64_t volumeIndex =
-                        VolumeUtilities::get1DIndex(
-                            brickParameters.origin_.x + i,
-                            brickParameters.origin_.y + j,
-                            brickParameters.origin_.z + k ,
-                            brickParameters.baseDimensions_ );
-
-                //Get brick data from the big volume
-                data_[ brickIndex ] =
-                        brickParameters.baseData_[ volumeIndex ] ;
-            }
-        }
-    }
+    copyData( brickParameters );
 
 }
 
@@ -505,7 +481,7 @@ Volume< T >::heuristicBricking( const uint partitions ) const
 
 template< class T >
 QVector< Volume< T >* >
-Volume< T >::weightedBrickingWithCopy1D( const QVector< uint > &scores )
+Volume< T >::weightedBrickingWithCopy1D( const QVector< uint > &scores ) const
 {
     uint totalScore = 0 ;
     for( const uint score : scores )
@@ -551,8 +527,15 @@ Volume< T >::weightedBrickingWithCopy1D( const QVector< uint > &scores )
 }
 
 template< class T >
+Volume< T > *Volume< T >::fromBrickParameters(
+        const BrickParameters<T> &brickParamters )
+{
+    return new Volume< T >( brickParamters );
+}
+
+template< class T >
 QVector< BrickParameters< T > >
-Volume< T >::weightedBricking1D( const QVector< uint > &scores )
+Volume< T >::weightedBricking1D( const QVector< uint > &scores ) const
 {
     uint totalScore = 0 ;
     for( const uint score : scores )
@@ -639,6 +622,41 @@ void Volume< T >::copyData( const T *data )
             ( data_ == nullptr )? mmapAddr_ : data_ );
 
 
+}
+
+template< class T >
+void Volume< T >::copyData( const BrickParameters< T > &brickParameters )
+{
+    if( brickParameters.dimensions_ != dimensions_ )
+    {
+        LOG_ERROR("Dimensions mismatch!");
+    }
+
+    for( uint64_t i = 0; i < brickParameters.dimensions_.x; i++ )
+    {
+        for( uint64_t j = 0; j < brickParameters.dimensions_.y; j++ )
+        {
+            for( uint64_t k = 0; k < brickParameters.dimensions_.z; k++ )
+            {
+                // The 1D index of the extracted brick
+                const uint64_t brickIndex =
+                        VolumeUtilities::get1DIndex(
+                            i, j, k, brickParameters.dimensions_ );
+
+                // The 1D index of the original 'big' volume
+                const uint64_t volumeIndex =
+                        VolumeUtilities::get1DIndex(
+                            brickParameters.origin_.x + i,
+                            brickParameters.origin_.y + j,
+                            brickParameters.origin_.z + k ,
+                            brickParameters.baseDimensions_ );
+
+                //Get brick data from the big volume
+                data_[ brickIndex ] =
+                        brickParameters.baseData_[ volumeIndex ] ;
+            }
+        }
+    }
 }
 
 template< class T >

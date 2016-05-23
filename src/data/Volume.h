@@ -148,6 +148,12 @@ public: // Public functions
     void copyData( const T *data );
 
     /**
+     * @brief copyData
+     * @param data
+     */
+    void copyData( const BrickParameters< T > &brickParameters );
+
+    /**
      * @brief getMampAddr
      * @return
      */
@@ -292,7 +298,7 @@ public: // Public functions
      * @return
      */
     QVector< BrickParameters< T > >
-    weightedBricking1D( const QVector< uint > &scores );
+    weightedBricking1D( const QVector< uint > &scores ) const ;
 
     /**
      * @brief weightedBrickingWithCopy1D
@@ -300,7 +306,15 @@ public: // Public functions
      * @return
      */
     QVector< Volume< T > *>
-    weightedBrickingWithCopy1D( const QVector<uint> &scores );
+    weightedBrickingWithCopy1D( const QVector<uint> &scores ) const ;
+
+    /**
+     * @brief fromBrickParameters
+     * @param brickParamters
+     * @return
+     */
+    static Volume< T >* fromBrickParameters(
+            const BrickParameters< T > &brickParamters );
 
 protected: // Protected functions
 

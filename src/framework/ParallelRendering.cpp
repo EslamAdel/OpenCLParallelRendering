@@ -144,7 +144,7 @@ void ParallelRendering::addCLRenderer( const uint64_t gpuIndex )
 
 int ParallelRendering::getCLRenderersCount() const
 {
-    return inUseGPUs_.size();
+    return renderers_.size();
 }
 
 
