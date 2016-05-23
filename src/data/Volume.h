@@ -157,8 +157,15 @@ public: // Public functions
      * @brief getMampAddr
      * @return
      */
-    virtual T* getMampAddr() const;
+    virtual T* getMmapAddr() const;
 
+    /**
+     * @brief loadFile
+     * @param prefix
+     * @param memoryMapVolume
+     */
+    void loadFile( const std::string prefix,
+                   const bool memoryMapVolume = true );
     /**
      * @brief get1DIndex
      * Computes the 1D index of a voxel in a 3D volume given by the XYZ

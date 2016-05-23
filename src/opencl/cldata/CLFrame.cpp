@@ -45,9 +45,11 @@ CLFrame< T >::~CLFrame()
 {
     releaseDeviceData_();
 
-    delete hostData_ ;
+    if( hostData_ )
+        delete [] hostData_ ;
 
-    delete pixmapData_ ;
+    if( pixmapData_ )
+        delete [] pixmapData_ ;
 }
 
 template< class T >
@@ -253,7 +255,7 @@ void CLFrame< T >::setHostData( T *data , bool deepCopy )
         copyHostData( data );
     else
     {
-        if( hostData_ != nullptr ) delete hostData_ ;
+        if( hostData_ != nullptr ) delete [] hostData_ ;
         hostData_ = data ;
         pixmapSynchronized_ = false ;
     }

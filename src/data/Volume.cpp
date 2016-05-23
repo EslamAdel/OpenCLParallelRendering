@@ -132,6 +132,9 @@ void Volume< T >::loadVolumeData_( const std::string prefix )
 {
     loadHeaderData_( prefix );
 
+    if( data_ )
+        delete [] data_ ;
+
     // Allocate the volume
     data_ = new T[ dimensions_.volumeSize() ];
 
@@ -168,6 +171,15 @@ void Volume< T >::mapVolumeData_( const std::string prefix )
     {
         LOG_ERROR( "Could not open the volume file [%s]", filePath.c_str( ));
     }
+
+
+    if( mmapAddr_ != nullptr )
+    {
+        if (munmap( mmapAddr_, sizeInBytes_) == -1)
+            LOG_WARNING("Error un-mmapping the file. Memory Leakage is possible.");
+
+    }
+
 
     //Map the volume to virtual addresses
     mmapAddr_= ( T* ) mmap( NULL , sizeInBytes_ , PROT_READ ,
@@ -660,9 +672,16 @@ void Volume< T >::copyData( const BrickParameters< T > &brickParameters )
 }
 
 template< class T >
-T* Volume< T >::getMampAddr() const
+T* Volume< T >::getMmapAddr() const
 {
     return mmapAddr_;
+}
+
+template< class T >
+void Volume< T >::loadFile( const std::string prefix ,
+                            const bool memoryMapVolume )
+{
+
 }
 
 template< class T >
@@ -893,7 +912,15 @@ Image<T>* Volume<T>::getProjectionZ() const
 template< class T >
 Volume< T >::~Volume()
 {
-    delete [] data_;
+    if( data_ != nullptr )
+        delete [] data_ ;
+
+    if( mmapAddr_ != nullptr )
+    {
+        if (munmap( mmapAddr_, sizeInBytes_) == -1)
+            LOG_WARNING("Error un-mmapping the file. Memory Leakage is possible.");
+
+    }
 }
 
 

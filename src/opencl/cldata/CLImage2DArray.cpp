@@ -48,7 +48,7 @@ CLImage2DArray< T >::~CLImage2DArray()
 
     for( T* data : framesData_ )
     {
-        delete data ;
+        delete [] data ;
     }
     framesData_.clear();
 

@@ -18,6 +18,13 @@ CLBuffer< T >::CLBuffer( const u_int64_t size )
 }
 
 template< class T >
+CLBuffer< T >::~CLBuffer()
+{
+    if( hostData_ )
+        delete [] hostData_ ;
+}
+
+template< class T >
 void CLBuffer< T >::createDeviceData( cl_context context )
 {
 
