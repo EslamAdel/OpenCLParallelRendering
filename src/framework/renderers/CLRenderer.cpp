@@ -377,7 +377,7 @@ void CLRenderer< V , F >::paint_()
 
 
 template< class V , class F >
-const clData::CLVolume< V > *CLRenderer< V , F >::getCLVolume() const
+clData::CLVolume< V > *CLRenderer< V , F >::getCLVolume()
 {
     return clVolume_;
 }

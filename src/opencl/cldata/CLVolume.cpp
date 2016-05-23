@@ -196,6 +196,15 @@ void CLVolume< T >::copyHostData( const T *data )
 
 }
 
+template< class T >
+void CLVolume< T >::copyHostData(
+        const BrickParameters< T > &brickParameters )
+{
+    QMutexLocker lock( &hostDataMutex_ );
+
+    volume_->copyData( brickParameters );
+}
+
 }
 }
 

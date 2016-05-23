@@ -72,7 +72,7 @@ public:
      * @brief getCLVolume
      * @return
      */
-    const clData::CLVolume< V > *getCLVolume() const;
+    clData::CLVolume< V > *getCLVolume();
 
     /**
      * @brief reloadVolume

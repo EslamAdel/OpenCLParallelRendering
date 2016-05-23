@@ -63,6 +63,11 @@ public:
      */
     void copyHostData( const T *data );
 
+    /**
+     * @brief copyHostData
+     * @param brickParameters
+     */
+    void copyHostData( const BrickParameters< T > &brickParameters );
 private:
 
     /**
