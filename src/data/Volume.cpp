@@ -80,6 +80,7 @@ Volume< T >::Volume( const BrickParameters< T > brickParameters ,
 
 }
 
+
 template< class T >
 uint64_t Volume< T >::getSizeX() const
 {
@@ -734,6 +735,20 @@ void Volume< T >::zeroPad_()
 }
 
 template< class T >
+void Volume< T >::releaseData_()
+{
+    if( data_ != nullptr )
+        delete [] data_ ;
+
+    if( mmapAddr_ != nullptr )
+    {
+        if (munmap( mmapAddr_, sizeInBytes_) == -1)
+            LOG_WARNING("Error un-mmapping the file. Memory Leakage is possible.");
+
+    }
+}
+
+template< class T >
 Image<T>* Volume< T >::getSliceX( const u_int64_t x ) const
 {
 
@@ -924,15 +939,24 @@ Image<T>* Volume<T>::getProjectionZ() const
 template< class T >
 Volume< T >::~Volume()
 {
-    if( data_ != nullptr )
-        delete [] data_ ;
 
-    if( mmapAddr_ != nullptr )
-    {
-        if (munmap( mmapAddr_, sizeInBytes_) == -1)
-            LOG_WARNING("Error un-mmapping the file. Memory Leakage is possible.");
+    releaseData_();
+}
 
-    }
+template< class T >
+Volume< T > &Volume< T >::operator=( const Volume<T> &volume )
+{
+    releaseData_();
+
+    dimensions_           = volume.dimensions_ ;
+    coordinates_          = volume.coordinates_ ;
+    unitCubeCenter_       = volume.unitCubeCenter_ ;
+    unitCubeScaleFactors_ = volume.unitCubeScaleFactors_;
+    sizeInBytes_          = volume.sizeInBytes_ ;
+    data_                 = volume.data_ ;
+    mmapAddr_             = volume.mmapAddr_ ;
+
+    return *this;
 }
 
 

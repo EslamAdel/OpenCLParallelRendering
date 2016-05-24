@@ -59,9 +59,12 @@ public: // Constructors
     Volume( const BrickParameters< T > brickParameters ,
             const bool drawBoundingBox = false );
 
+
     ~Volume();
 
 public: // Public functions
+
+    Volume< T > &operator=( const Volume< T > &volume );
 
     /**
      * @brief getDimensions
@@ -361,6 +364,11 @@ protected: // Protected functions
      * dimensions.
      */
     virtual void zeroPad_();
+
+    /**
+     * @brief releaseData_
+     */
+    void releaseData_();
 
 protected: // Protected (private) member variables
 

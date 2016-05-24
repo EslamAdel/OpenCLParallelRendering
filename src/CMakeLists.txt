@@ -90,6 +90,7 @@ SET( CLPAREN_HEADER_FILES
     data/ImageVariant.hh
     data/TransferFunction.h
     data/Volume.h
+    data/Volume.ipp
     data/VolumeVariant.hh
     data/BrickParameters.h
     data/BrickParameters.ipp
