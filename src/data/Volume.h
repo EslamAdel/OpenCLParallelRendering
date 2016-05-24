@@ -25,6 +25,8 @@ class Volume
 public: // Constructors
 
 
+    Volume( const bool drawBoundingBox = false );
+
     /**
      * @brief Volume
      * @param prefix
@@ -403,6 +405,7 @@ protected: // Protected (private) member variables
      * @brief drawBoundingBox_
      */
     const bool drawBoundingBox_;
+
 
 };
 

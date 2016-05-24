@@ -2,6 +2,15 @@
 #include "Logger.h"
 
 template< class T >
+Volume< T >::Volume( const bool drawBoundingBox  )
+    : data_( nullptr ),
+      mmapAddr_( nullptr ),
+      drawBoundingBox_( drawBoundingBox )
+{
+
+}
+
+template< class T >
 Volume< T >::Volume( const std::string prefix,
                      const bool memoryMapVolume,
                      const bool drawBoundingBox )
@@ -9,21 +18,8 @@ Volume< T >::Volume( const std::string prefix,
       data_( nullptr ),
       mmapAddr_( nullptr )
 {
-    //Map Volume instead of Loading in Memory
-    if( memoryMapVolume )
-        mapVolumeData_( prefix );
-    else
-        loadVolumeData_( prefix );
 
-    coordinates_ = Coordinates3D( dimensions_.x / 2.f,
-                                  dimensions_.y / 2.f,
-                                  dimensions_.z / 2.f);
-
-    unitCubeCenter_ = Coordinates3D( coordinates_.x / dimensions_.x,
-                                     coordinates_.y / dimensions_.y,
-                                     coordinates_.z / dimensions_.z );
-
-    unitCubeScaleFactors_ = Coordinates3D( 1.f , 1.f , 1.f );
+    loadFile( prefix , memoryMapVolume );
 
     LOG_DEBUG("Volume Created: %dx%dx%d",
               dimensions_.x , dimensions_.y , dimensions_.z );
@@ -177,7 +173,6 @@ void Volume< T >::mapVolumeData_( const std::string prefix )
     {
         if (munmap( mmapAddr_, sizeInBytes_) == -1)
             LOG_WARNING("Error un-mmapping the file. Memory Leakage is possible.");
-
     }
 
 
@@ -681,6 +676,23 @@ template< class T >
 void Volume< T >::loadFile( const std::string prefix ,
                             const bool memoryMapVolume )
 {
+
+    //Map Volume instead of Loading in Memory
+    if( memoryMapVolume )
+        mapVolumeData_( prefix );
+    else
+        loadVolumeData_( prefix );
+
+
+    coordinates_ = Coordinates3D( dimensions_.x / 2.f,
+                                  dimensions_.y / 2.f,
+                                  dimensions_.z / 2.f);
+
+    unitCubeCenter_ = Coordinates3D( coordinates_.x / dimensions_.x,
+                                     coordinates_.y / dimensions_.y,
+                                     coordinates_.z / dimensions_.z );
+
+    unitCubeScaleFactors_ = Coordinates3D( 1.f , 1.f , 1.f );
 
 }
 
