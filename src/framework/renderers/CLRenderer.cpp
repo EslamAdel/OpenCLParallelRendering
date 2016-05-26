@@ -46,8 +46,8 @@ CLRenderer< V , F >::~CLRenderer()
 template< class V , class F >
 void CLRenderer< V , F >::createPixelBuffer_()
 {
-    gridSize_[0] = SystemUtilities::roundUp( LOCAL_SIZE_X, frameDimensions_.x );
-    gridSize_[1] = SystemUtilities::roundUp( LOCAL_SIZE_Y, frameDimensions_.y );
+    gridSize_[0] = SystemUtilities::roundUp( LOCAL_SIZE_X, sortFirstDimensions_.x );
+    gridSize_[1] = SystemUtilities::roundUp( LOCAL_SIZE_Y, sortFirstDimensions_.y );
 
     clFrame_ = new clData::CLImage2D< F >( sortFirstDimensions_ ,
                                            CL_INTENSITY , CL_FLOAT );
