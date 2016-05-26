@@ -7,7 +7,7 @@
 #include <vector>
 #include <QLabel>
 
-#include "ParallelRendering.h"
+#include "SortLastRenderer.h"
 #include "CLRenderer.h"
 #include "ProfilingExterns.h"
 #include <QThreadPool>
@@ -34,7 +34,7 @@ class RenderingWindow_Gui : public QMainWindow
 public:
 
 
-    RenderingWindow_Gui( clparen::Parallel::ParallelRendering *parallelRenderer ,
+    RenderingWindow_Gui( clparen::Parallel::CLAbstractParallelRenderer *parallelRenderer ,
                          QWidget *parent = 0 ) ;
 
 
@@ -105,7 +105,7 @@ private:
     Ui::RenderingWindow_Gui *ui;
 
 
-    clparen::Parallel::ParallelRendering *parallelRenderer_ ;
+    clparen::Parallel::CLAbstractParallelRenderer *parallelRenderer_ ;
 
 
     bool frameworkReady_ ;

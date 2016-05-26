@@ -9,7 +9,8 @@
 
 
 
-namespace clparen { namespace Task {
+namespace clparen {
+namespace Task {
 
 class TaskMakePixmap : public QObject , public QRunnable
 {

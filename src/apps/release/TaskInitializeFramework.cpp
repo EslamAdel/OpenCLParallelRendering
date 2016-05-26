@@ -3,7 +3,7 @@
 
 
 TaskInitializeFramework::TaskInitializeFramework(
-        clparen::Parallel::ParallelRendering *parallelRendering,
+        clparen::Parallel::CLAbstractParallelRenderer *parallelRendering,
         const QSet<uint> &renderers,
         const uint compositor)
     : parallelRenderer_( parallelRendering ) ,

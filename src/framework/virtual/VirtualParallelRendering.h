@@ -1,7 +1,7 @@
 #ifndef VIRTUALPARALLELRENDERING_H
 #define VIRTUALPARALLELRENDERING_H
 
-#include "ParallelRendering.h"
+#include "SortLastRenderer.h"
 #include "VirtualCLRenderer.h"
 #include "VirtualCLCompositor.h"
 #include "VirtualTaskCollect.h"
@@ -13,7 +13,7 @@ namespace clparen
 namespace Parallel
 {
 
-class VirtualParallelRendering : public ParallelRendering
+class VirtualParallelRendering : public SortLastRenderer< uchar , float >
 {
     Q_OBJECT
 

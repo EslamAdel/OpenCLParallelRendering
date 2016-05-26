@@ -1,36 +1,26 @@
-#ifndef PARALLELRENDERING_H
-#define PARALLELRENDERING_H
+#ifndef CLABSTRACTPARALLELRENDERER_H
+#define CLABSTRACTPARALLELRENDERER_H
 
+#include <QObject>
 #include "ProfilingExterns.h"
 #include "Headers.hh"
-#include <unordered_map>
-
 #include <QObject>
 #include <QList>
 #include <QSet>
 #include <QMap>
 #include <QThreadPool>
-
 #include <oclHWDL.h>
+#include "CLVolumeVariants.hh"
+#include "Transformation.h"
 
 #include "TaskRender.h"
 #include "TaskCollect.h"
 #include "TaskComposite.h"
 #include "TaskMakePixmap.h"
 
-#include "CLRenderer.h"
-#include "CLCompositorAccumulate.h"
-#include "CLAbstractCompositor.h"
-
-#include "CLVolumeVariants.hh"
-#include "Transformation.h"
-
-
-
 
 namespace clparen {
 namespace Parallel {
-
 
 typedef QMap< const oclHWDL::Device*, Renderer::CLAbstractRenderer*> CLRenderers;
 
@@ -43,28 +33,13 @@ typedef QMap< const Renderer::CLAbstractRenderer* , Task::TaskCollect*> Collecti
 typedef QMap< const Renderer::CLAbstractRenderer* , Task::TaskMakePixmap*> MakePixmapTasks;
 
 
-/**
- * @brief The ParallelRendering class
- */
-class ParallelRendering : public QObject
+class CLAbstractParallelRenderer : public QObject
 {
     Q_OBJECT
-
 public:
-
-    /**
-     * @brief ParallelRendering
-     *
-     * @param volume
-     * @param frameWidth
-     * @param frameHeight
-     *  frameWidth and frameHeight will be set for all rendered frames
-     *  and collage frame as well.
-     */
-    ParallelRendering( Volume< uchar >* volume ,
-                       const uint frameWidth = 512 ,
-                       const uint frameHeight = 512 );
-
+    explicit CLAbstractParallelRenderer( const uint frameWidth = 512 ,
+                                         const uint frameHeight = 512  ,
+                                         QObject *parent = 0 );
 
 
     /**
@@ -73,8 +48,7 @@ public:
      *
      * @param gpuIndex
      */
-    virtual void addCLRenderer( const uint64_t gpuIndex );
-
+    virtual void addCLRenderer( const uint64_t gpuIndex ) = 0;
 
     /**
      * @brief getCLRenderersCount
@@ -88,32 +62,16 @@ public:
      * Create and attach CLCompositor to the GPU indexed by gpuIndex.
      * @param gpuIndex
      */
-    virtual void addCLCompositor( const uint64_t gpuIndex );
+    virtual void addCLCompositor( const uint64_t gpuIndex ) = 0;
 
 
-    /**
-     * @brief distributeBaseVolume1D
-     * Distribute the baseVolume_ over the CLRenderers_ evenly based on
-     * the X-axis.
-     */
-    virtual void distributeBaseVolume1D( );
-
-    /**
-     * @brief distributeBaseVolumeWeighted
-     */
-    virtual void distributeBaseVolumeWeighted();
-
-    /**
-     * @brief distributeBaseVolumeMemoryWeighted
-     */
-    virtual void distributeBaseVolumeMemoryWeighted();
+    virtual void distributeBaseVolume1D() = 0;
 
     /**
      * @brief startRendering
      * Spark the rendering loop.
      */
     virtual void startRendering( );
-
 
 
     /**
@@ -146,7 +104,6 @@ public:
      * @return
      */
     uint getFrameHeight() const ;
-
 
 signals:
 
@@ -190,14 +147,14 @@ public slots :
      * buffers from the rendering GPU to the compositing GPU.
      * @param finishedNode
      */
-    void finishedRendering_SLOT( Renderer::CLAbstractRenderer *renderer );
+    virtual void finishedRendering_SLOT( Renderer::CLAbstractRenderer *renderer ) = 0;
 
     /**
      * @brief compositingFinished_SLOT
      * When a CLCompositor finishs compositing, the signal emitted will be
      * mapped to this slot, where proper routines will be performed.
      */
-    void compositingFinished_SLOT( );
+    virtual void compositingFinished_SLOT( ) = 0 ;
 
     /**
      * @brief frameLoadedToDevice_SLOT
@@ -206,7 +163,7 @@ public slots :
      * so this slot initiates a compositing task.
      * @param finishedNode
      */
-    void frameLoadedToDevice_SLOT( Renderer::CLAbstractRenderer *renderer );
+    virtual void frameLoadedToDevice_SLOT( Renderer::CLAbstractRenderer *renderer ) = 0;
 
 
     /**
@@ -220,8 +177,8 @@ public slots :
      * if it is nullptr then it belongs to the CompositorNode,
      * otherwise, it belongs to CLRenderer referenced by the pointer.
      */
-    void pixmapReady_SLOT( QPixmap *pixmap ,
-                           const Renderer::CLAbstractRenderer * renderer );
+    virtual void pixmapReady_SLOT( QPixmap *pixmap ,
+                           const Renderer::CLAbstractRenderer * renderer ) = 0;
 
     /**
      * @brief updateRotationX_SLOT
@@ -310,7 +267,7 @@ protected:
      * @brief applyTransformation
      * Start rendering and apply the desired transformation.
      */
-    virtual void applyTransformation_();
+    virtual void applyTransformation_() ;
 
     /**
      * @brief syncTransformation
@@ -323,6 +280,11 @@ protected:
      * @brief benchmark_
      */
     void benchmark_() ;
+
+signals:
+
+public slots:
+
 
 protected :
     //oclHWDl utilities
@@ -341,7 +303,6 @@ protected :
      */
     oclHWDL::Devices                listGPUs_;
 
-private:
     /**
      * @brief renderers_
      */
@@ -352,8 +313,6 @@ private:
      */
     Compositor::CLAbstractCompositor *compositor_;
 
-
-protected:
 
     //threadpools
     /**
@@ -376,15 +335,29 @@ protected:
      */
     QThreadPool pixmapMakerPool_;
 
-    //QRunnables to be executed concurrently.
+    /**
+     * @brief renderingTasks_
+     */
     RenderingTasks  renderingTasks_ ;
+    /**
+     * @brief collectingTasks_
+     */
     CollectingTasks collectingTasks_ ;
-    CompositingTasks compositingTasks_ ;
-    Task::TaskMakePixmap *finalFramePixmapTask_;
-    MakePixmapTasks makePixmapTasks_ ;
 
-    //Volume Data
-    Volume<uchar> *baseVolume_;
+    /**
+     * @brief compositingTasks_
+     */
+    CompositingTasks compositingTasks_ ;
+
+    /**
+     * @brief finalFramePixmapTask_
+     */
+    Task::TaskMakePixmap *finalFramePixmapTask_;
+
+    /**
+     * @brief makePixmapTasks_
+     */
+    MakePixmapTasks makePixmapTasks_ ;
 
     //Transformations
     Transformation transformation_ ;
@@ -407,8 +380,10 @@ protected:
     uint machineGPUsCount_;
     const uint frameWidth_ ;
     const uint frameHeight_ ;
+
 };
 
 }
 }
-#endif // PARALLELRENDERING_H
+
+#endif // CLABSTRACTPARALLELRENDERER_H

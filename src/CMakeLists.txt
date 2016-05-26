@@ -10,7 +10,8 @@ SET( CLPAREN_SOURCE_FILES
     framework/calibrators/AbstractCalibrator.cpp
     framework/calibrators/Calibrator.cpp
     framework/calibrators/TaskCalibrate.cpp
-    framework/parallel/ParallelRendering.cpp
+    framework/parallel/CLAbstractParallelRenderer.cpp
+    framework/parallel/SortLastRenderer.cpp
     framework/renderers/CLRenderer.cpp
     framework/renderers/TaskRender.cpp
     framework/parallel/TaskCollect.cpp
@@ -70,7 +71,9 @@ SET( CLPAREN_HEADER_FILES
     framework/calibrators/Calibrator.h
     framework/calibrators/Calibrator.ipp
     framework/calibrators/TaskCalibrate.h
-    framework/parallel/ParallelRendering.h
+    framework/parallel/CLAbstractParallelRenderer.h
+    framework/parallel/SortLastRenderer.h
+    framework/parallel/SortLastRenderer.ipp
     framework/parallel/TaskCollect.h
     framework/compositors/TaskComposite.h
     framework/parallel/TaskMakePixmap.h

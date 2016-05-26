@@ -2,7 +2,7 @@
 #include <iostream>
 #include "Logger.h"
 #include "ProfilingExterns.h"
-#include "ParallelRendering.h"
+#include "SortLastRenderer.h"
 #include "RenderingWindow_Gui.h"
 #include "CommandLineParser.h"
 
@@ -42,7 +42,7 @@ int main(int argc, char *argv[])
 
 
 
-    clparen::Parallel::ParallelRendering
+    clparen::Parallel::SortLastRenderer< uchar , float >
             parallelRenderer( volume , frameWidth , frameHeight );
 
 

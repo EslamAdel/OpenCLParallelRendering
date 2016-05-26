@@ -49,7 +49,7 @@ int main(int argc, char *argv[])
     //        LOG_INFO("Deploy GPU<%d>", index );
     //    LOG_INFO("compositor: GPU<%d>", compositorGPUIndex );
 
-    clparen::Parallel::ParallelRendering
+    clparen::Parallel::SortLastRenderer< uchar , float >
             parallelRenderer( volume , frameWidth , frameHeight );
 
 

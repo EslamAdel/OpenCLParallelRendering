@@ -9,7 +9,7 @@
 
 
 RenderingWindow::RenderingWindow(
-        clparen::Parallel::ParallelRendering *parallelRenderer ,
+        clparen::Parallel::CLAbstractParallelRenderer *parallelRenderer ,
         QWidget *parent )
     : QMainWindow( parent ),
       ui( new Ui::RenderingWindow )

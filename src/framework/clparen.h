@@ -2,7 +2,7 @@
 #define FRAMEWORK_H
 
 #include "Typedefs.hh"
-#include "ParallelRendering.h"
+#include "SortLastRenderer.h"
 #include "Calibrator.h"
 #include "CLCompositor.h"
 #include "CLRenderer.h"

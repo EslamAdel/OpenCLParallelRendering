@@ -47,7 +47,7 @@ int main(int argc, char *argv[])
         }
     }
 
-    clparen::Parallel::ParallelRendering
+    clparen::Parallel::SortLastRenderer< uchar , float >
             parallelRenderer( volume , frameWidth , frameHeight );
 
     for( const uint rendererIndex : deployGPUs )

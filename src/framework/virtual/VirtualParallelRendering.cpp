@@ -11,7 +11,7 @@ VirtualParallelRendering::VirtualParallelRendering( Volume<uchar> *volume,
                                                     const uint frameWidth,
                                                     const uint frameHeight ,
                                                     const uint virtualGPUsCount)
-    : ParallelRendering( volume , frameWidth , frameHeight ) ,
+    : SortLastRenderer< uchar , float >( volume , frameWidth , frameHeight ) ,
       virtualGPUsCount_( virtualGPUsCount )
 {
     LOG_DEBUG("Virtual Parallel Framework Created");
