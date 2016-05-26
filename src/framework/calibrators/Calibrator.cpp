@@ -13,8 +13,8 @@ Calibrator<V , F >::Calibrator( const uint64_t gpuIndex,
                                 QObject *parent )
     : AbstractCalibrator( parent ) ,
       transformation_( transformation ) ,
-      rendererEngine_( gpuIndex, frameWidth, frameHeight,
-                       transformation_ ),
+      rendererEngine_( gpuIndex, transformation_ ,
+                       Dimensions2D( frameWidth, frameHeight )),
       iterations_( iterations )
 {
 

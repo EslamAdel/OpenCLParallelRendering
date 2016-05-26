@@ -8,8 +8,9 @@
 #include <QPicture>
 
 
-RenderingWindow::RenderingWindow( clparen::ParallelRendering *parallelRenderer ,
-                                  QWidget *parent )
+RenderingWindow::RenderingWindow(
+        clparen::Parallel::ParallelRendering *parallelRenderer ,
+        QWidget *parent )
     : QMainWindow( parent ),
       ui( new Ui::RenderingWindow )
 {

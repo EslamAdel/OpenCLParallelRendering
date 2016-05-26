@@ -20,10 +20,13 @@ namespace Renderer {
 template< class V , class F >
 CLRenderer< V , F >::CLRenderer(
         const uint64_t gpuIndex ,
-        const uint frameWidth, const uint frameHeight,
         const Transformation &transformation ,
+        const Dimensions2D frameDimensions ,
+        const Dimensions2D sortFirstOffset ,
+        const Dimensions2D sortFirstDimensions ,
         const std::string kernelDirectory)
-    : CLAbstractRenderer( gpuIndex , frameWidth , frameHeight , kernelDirectory ) ,
+    : CLAbstractRenderer( gpuIndex , frameDimensions , sortFirstOffset ,
+                          sortFirstDimensions , kernelDirectory ) ,
       transformation_( transformation )
 {
 
@@ -46,11 +49,11 @@ CLRenderer< V , F >::~CLRenderer()
 template< class V , class F >
 void CLRenderer< V , F >::createPixelBuffer_()
 {
-    gridSize_[0] = SystemUtilities::roundUp( LOCAL_SIZE_X, frameWidth_ );
-    gridSize_[1] = SystemUtilities::roundUp( LOCAL_SIZE_Y, frameHeight_ );
+    gridSize_[0] = SystemUtilities::roundUp( LOCAL_SIZE_X, frameDimensions_.x );
+    gridSize_[1] = SystemUtilities::roundUp( LOCAL_SIZE_Y, frameDimensions_.y );
 
-    Dimensions2D dimensions( gridSize_[0] , gridSize_[1]);
-    clFrame_ = new clData::CLImage2D< F >( dimensions , CL_INTENSITY , CL_FLOAT );
+    clFrame_ = new clData::CLImage2D< F >( sortFirstDimensions_ ,
+                                           CL_INTENSITY , CL_FLOAT );
     clFrame_->createDeviceData( context_ );
 }
 
@@ -140,6 +143,7 @@ void CLRenderer< V , F >::renderFrame()
     // connected now to the OpenCL context.
     const size_t localSize[ ] = { LOCAL_SIZE_X, LOCAL_SIZE_Y };
 
+    const size_t globalWorkOffet[ ] = { sortFirstOffset_.x , sortFirstOffset_.y };
 
     activeRenderingKernel_->
             setVolumeDensityFactor( transformation_.volumeDensity );
@@ -149,19 +153,13 @@ void CLRenderer< V , F >::renderFrame()
 
     activeRenderingKernel_->setVolumeIsoValue( transformation_.isoValue );
 
-    /*
-    if(activeRenderingKernel_->
-            getRenderingKernelType() == clparen::clKernel::RENDERING_MODE_IsoSurface)
-    {
-        activeRenderingKernel_->
-        }
-*/
+
     // Enqueue the kernel for execution
     clErrorCode |= clEnqueueNDRangeKernel(
                 commandQueue_,
                 activeRenderingKernel_->getKernelObject() ,
                 2,
-                NULL,
+                globalWorkOffet ,
                 gridSize_,
                 localSize,
                 0,
@@ -216,9 +214,10 @@ void CLRenderer< V , F >::initializeKernels_()
         clKernel::CLRenderingKernel* renderingKernel = renderingKernels_[ mode ];
 
         renderingKernel->setFrameBuffer( clFrame_->getDeviceData() );
-        renderingKernel->setFrameWidth( clFrame_->getFrameDimensions().x );
-        renderingKernel->setFrameHeight( clFrame_->getFrameDimensions().y );
-
+        renderingKernel->setFrameWidth( frameDimensions_.x );
+        renderingKernel->setFrameHeight( frameDimensions_.y );
+        renderingKernel->setSortFirstWidth( sortFirstDimensions_.x );
+        renderingKernel->setSortFirstHeight( sortFirstDimensions_.y );
         renderingKernel->setInverseViewMatrix( inverseMatrix_ );
 
         renderingKernel->setVolumeData( clVolume_->getDeviceData( ));

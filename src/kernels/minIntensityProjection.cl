@@ -80,7 +80,9 @@ uint rgbaFloatToInt( float4 rgba )
  */
 __kernel void minIntensityProjection(  __write_only image2d_t frameBuffer,
 
-                    uint width, uint height,
+                    uint frameWidth, uint frameHeight,
+
+                    uint sortFirstWidth , uint sortFirstHeight ,
 
                     __constant  float* invViewMatrix,
 
@@ -90,14 +92,24 @@ __kernel void minIntensityProjection(  __write_only image2d_t frameBuffer,
 
                     float density,
 
-                    float brightness
-                    )
-{
+                    float brightness )
+                    {
+
     const uint x = get_global_id( 0 );
     const uint y = get_global_id( 1 );
 
-    const float u = ( x / ( float ) width ) * 2.f - 1.f;
-    const float v = ( y / ( float ) height ) * 2.f - 1.f;
+    const uint offsetX = get_global_offset( 0 );
+    const uint offsetY = get_global_offset( 1 );
+
+    // If out of boundaries, return.
+    if( x - offsetX - 1 > sortFirstWidth )
+        return ;
+
+    if( y - offsetY - 1 > sortFirstHeight )
+        return ;
+
+    const float u = ( x / ( float ) frameWidth ) * 2.f - 1.f;
+    const float v = ( y / ( float ) frameHeight ) * 2.f - 1.f;
 
     // float T_STEP = 0.f1f;
     const float4 boxMin = ( float4 )( -1.f, -1.f, -1.f, 1.f );
@@ -135,14 +147,11 @@ __kernel void minIntensityProjection(  __write_only image2d_t frameBuffer,
     // If it doesn't hit, then return a black value in the corresponding pixel
     if( !hit )
     {
-        if(( x < width ) && ( y < height ))
-        {
-            // Get the 1D index of the pixel to set its color, and return
-            const float4 nullPixel = ( float4 )( 0.f , 0.f , 0.f , 0.f );
-            const int2 location = (int2)( x , y );
-            write_imagef( frameBuffer , location , nullPixel );
-        }
-        return;
+       // Get the 1D index of the pixel to set its color, and return
+       const float4 nullPixel = ( float4 )( 0.f , 0.f , 0.f , 0.f );
+       const int2 location = (int2)( x , y );
+       write_imagef( frameBuffer , location , nullPixel );
+
     }
 
     // Clamp to near plane if the tNear was negative
@@ -197,11 +206,9 @@ __kernel void minIntensityProjection(  __write_only image2d_t frameBuffer,
     // Adjust the brightness of the pixel
     intensityBuffer *= brightness;
 
-    // Write the pixel color if it fits only within the image space.
-    if(( x < width ) && ( y < height ))
-    {
-        // Get a 1D index of the pixel in the _frameBuffer_
-        const int2 location = (int2)( x , y );
-        write_imagef( frameBuffer , location , intensityBuffer );
-    }
+
+    // Get a 1D index of the pixel in the _frameBuffer_
+    const int2 location = (int2)( x , y );
+    write_imagef( frameBuffer , location , intensityBuffer );
+
 }

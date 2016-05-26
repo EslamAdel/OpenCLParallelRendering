@@ -96,6 +96,30 @@ void CLRenderingKernel::setFrameHeight( uint height )
     }
 }
 
+void CLRenderingKernel::setSortFirstWidth( uint width )
+{
+    cl_int error = clSetKernelArg( kernelObject_, KERNEL_ARG_SortFirstWidth ,
+                                   sizeof( uint ),
+                                   &width );
+    if( error != CL_SUCCESS )
+    {
+        oclHWDL::Error::checkCLError( error );
+        LOG_ERROR("Exiting Due to OpenCL Error!");
+    }
+}
+
+void CLRenderingKernel::setSortFirstHeight( uint height )
+{
+    cl_int error = clSetKernelArg( kernelObject_, KERNEL_ARG_SortFirstHeight,
+                                   sizeof( uint ),
+                                   &height );
+    if( error != CL_SUCCESS )
+    {
+        oclHWDL::Error::checkCLError( error );
+        LOG_ERROR("Exiting Due to OpenCL Error!");
+    }
+}
+
 void CLRenderingKernel::setVolumeData( cl_mem data )
 {
     cl_int error = clSetKernelArg( kernelObject_, KERNEL_ARG_Volume ,

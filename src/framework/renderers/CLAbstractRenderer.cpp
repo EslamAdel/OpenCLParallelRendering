@@ -6,14 +6,17 @@ namespace Renderer {
 
 
 CLAbstractRenderer::CLAbstractRenderer(
-        const uint64_t gpuIndex ,
-        const uint frameWidth ,
-        const uint frameHeight ,
-        const std::string kernelDirectory ,
+        const uint64_t gpuIndex,
+        const Dimensions2D frameDimensions,
+        const Dimensions2D sortFirstOffset,
+        const Dimensions2D sortFirstDimensions,
+        const std::string kernelDirectory,
         QObject *parent )
     : gpuIndex_( gpuIndex ) ,
-      frameWidth_( frameWidth ) ,
-      frameHeight_( frameHeight ) ,
+      frameDimensions_( frameDimensions ) ,
+      sortFirstOffset_( sortFirstOffset ) ,
+      sortFirstDimensions_(( sortFirstDimensions == Dimensions2D( 0 , 0 )) ?
+                               frameDimensions : sortFirstDimensions ) ,
       kernelDirectory_( kernelDirectory ),
       QObject(parent)
 {
@@ -29,7 +32,6 @@ CLAbstractRenderer::CLAbstractRenderer(
             renderingKernels_[ clKernel::RenderingMode::RENDERING_MODE_Xray ];
 
 }
-
 
 
 uint64_t CLAbstractRenderer::getGPUIndex() const
@@ -82,21 +84,21 @@ void CLAbstractRenderer::calculateExecutionTime_()
     cl_ulong start , end;
 
     clErrorCode =
-    clWaitForEvents( 1 , &clGPUExecution_ );
+            clWaitForEvents( 1 , &clGPUExecution_ );
 
     clErrorCode |=
-    clGetEventProfilingInfo( clGPUExecution_,
-                             CL_PROFILING_COMMAND_END,
-                             sizeof(cl_ulong),
-                             &end,
-                             NULL );
+            clGetEventProfilingInfo( clGPUExecution_,
+                                     CL_PROFILING_COMMAND_END,
+                                     sizeof(cl_ulong),
+                                     &end,
+                                     NULL );
 
     clErrorCode |=
-    clGetEventProfilingInfo( clGPUExecution_,
-                             CL_PROFILING_COMMAND_START,
-                             sizeof(cl_ulong),
-                             &start,
-                             NULL );
+            clGetEventProfilingInfo( clGPUExecution_,
+                                     CL_PROFILING_COMMAND_START,
+                                     sizeof(cl_ulong),
+                                     &start,
+                                     NULL );
 
     if( clErrorCode != CL_SUCCESS )
     {
@@ -201,6 +203,21 @@ CLAbstractRenderer::allocateKernels_() const
 
 
     return kernels ;
+}
+
+const Dimensions2D &CLAbstractRenderer::getSortFirstDimensions() const
+{
+    return sortFirstDimensions_;
+}
+
+const Dimensions2D &CLAbstractRenderer::getSortFirstOffset() const
+{
+    return sortFirstOffset_;
+}
+
+const Dimensions2D &CLAbstractRenderer::getFrameDimensions() const
+{
+    return frameDimensions_;
 }
 
 }

@@ -2,9 +2,10 @@
 
 
 
-TaskInitializeFramework::TaskInitializeFramework( clparen::ParallelRendering *parallelRendering,
-                                                  const QSet<uint> &renderers,
-                                                  const uint compositor)
+TaskInitializeFramework::TaskInitializeFramework(
+        clparen::Parallel::ParallelRendering *parallelRendering,
+        const QSet<uint> &renderers,
+        const uint compositor)
     : parallelRenderer_( parallelRendering ) ,
       renderers_( renderers ),
       compositorIndex_( compositor )

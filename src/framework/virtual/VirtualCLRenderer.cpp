@@ -7,7 +7,8 @@ clparen::Renderer::VirtualCLRenderer< V , F >::VirtualCLRenderer(
         const uint frameWidth ,
         const uint frameHeight ,
         const Transformation &transformation )
-    : CLRenderer< V , F >( 0 , frameWidth , frameHeight , transformation  ) ,
+    : CLRenderer< V , F >( 0 ,transformation ,
+                           Dimensions2D( frameWidth , frameHeight )) ,
       gpuIndex_VIRTUAL_( gpuIndex )
 {
 

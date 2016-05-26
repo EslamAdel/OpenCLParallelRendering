@@ -2,33 +2,33 @@
 #define T_STEP 0.01
 
 /**
- * @brief intersectBox
- * A function that checks the intersectin between a ray and a box representing
- * the bounding box of a three-dimensional volume texture .
- * @param rayOrigin The origin of the ray.
- * @param rayDirection The direction of the ray.
- * @param pMin The minimum point of the boundnig box that reflects the left and
- * lower corner.
- * @param pMax The maximum point of the bounding box that reflects the right and
- * upper corner.
- * @param tNear The parametric value of the the near intersection of the ray
- * with the bounding box.
- * @param tFar The parametric value of the the far intersection of the ray
- * with the bounding box.
- * @return True if the ray intersects with the bounding box and false otherwise.
- * @note To understand how does this method work, it is recommended to have a
- * look at the following link
- * http://www.siggraph.org/education/materials/HyperGraph/raytrace/rtinter3.htm
- */
+* @brief intersectBox
+* A function that checks the intersectin between a ray and a box representing
+* the bounding box of a three-dimensional volume texture .
+* @param rayOrigin The origin of the ray.
+* @param rayDirection The direction of the ray.
+* @param pMin The minimum point of the boundnig box that reflects the left and
+* lower corner.
+* @param pMax The maximum point of the bounding box that reflects the right and
+* upper corner.
+* @param tNear The parametric value of the the near intersection of the ray
+* with the bounding box.
+* @param tFar The parametric value of the the far intersection of the ray
+* with the bounding box.
+* @return True if the ray intersects with the bounding box and false otherwise.
+* @note To understand how does this method work, it is recommended to have a
+* look at the following link
+* http://www.siggraph.org/education/materials/HyperGraph/raytrace/rtinter3.htm
+*/
 int intersectBox( const float4 rayOrigin, const float4 rayDirection,
-                  const float4 pMin, const float4 pMax,
-                  float* tNear, float* tFar)
+const float4 pMin, const float4 pMax,
+float* tNear, float* tFar)
 {
-    // Compute the intersection of the ray with all the six planes of the
-    // bounding box.
-    const float4 invR = ( float4 )( 1.f, 1.f, 1.f, 1.f) / rayDirection;
-    const float4 tPMin = invR * ( pMin - rayOrigin );
-    const float4 tPMax = invR * ( pMax - rayOrigin );
+// Compute the intersection of the ray with all the six planes of the
+// bounding box.
+const float4 invR = ( float4 )( 1.f, 1.f, 1.f, 1.f) / rayDirection;
+const float4 tPMin = invR * ( pMin - rayOrigin );
+const float4 tPMax = invR * ( pMax - rayOrigin );
 
     // Re-order the intersections to find smallest and largest on each axis.
     const float4 tMin = min( tPMax, tPMin );
@@ -42,45 +42,47 @@ int intersectBox( const float4 rayOrigin, const float4 rayDirection,
     *tFar = tMaxSmallest;
 
     return tMaxSmallest > tMinLargest;
-}
+    }
 
 /**
- * @brief rgbaFloatToInt
- * Converts a float4 with RGBA components into a 32-bit unsigned integer, at
- * which each byte represents a color component. This step is required to
- * optimize the way the final color array that represents the image is created.
- * It basically converts a 4 x 32-bit float vector into a single 32-bit value.
- * @param rgba The color vector in RGBA fashion.
- * @return A 32-bit integer representing the color.
- * @note Use the swizzeling operator to access the individual color components
- * from the rgba vector and use shift operation to sort them in the unsigned int.
- */
+* @brief rgbaFloatToInt
+* Converts a float4 with RGBA components into a 32-bit unsigned integer, at
+* which each byte represents a color component. This step is required to
+* optimize the way the final color array that represents the image is created.
+* It basically converts a 4 x 32-bit float vector into a single 32-bit value.
+* @param rgba The color vector in RGBA fashion.
+* @return A 32-bit integer representing the color.
+* @note Use the swizzeling operator to access the individual color components
+* from the rgba vector and use shift operation to sort them in the unsigned int.
+*/
 uint rgbaFloatToInt( float4 rgba )
 {
-    rgba.x = clamp( rgba.x, 0.f, 1.f);
-    rgba.y = clamp( rgba.y, 0.f, 1.f);
-    rgba.z = clamp( rgba.z, 0.f, 1.f);
-    rgba.w = clamp( rgba.w, 0.f, 1.f);
-    return (( uint )( rgba.w * 255.f ) << 24 ) |     // Alpha
-           (( uint )( rgba.z * 255.f ) << 16 ) |     // Blue
-           (( uint )( rgba.y * 255.f ) << 8  ) |     // Green
-            ( uint )( rgba.x * 255.f );              // Red
+rgba.x = clamp( rgba.x, 0.f, 1.f);
+rgba.y = clamp( rgba.y, 0.f, 1.f);
+rgba.z = clamp( rgba.z, 0.f, 1.f);
+rgba.w = clamp( rgba.w, 0.f, 1.f);
+return (( uint )( rgba.w * 255.f ) << 24 ) |     // Alpha
+(( uint )( rgba.z * 255.f ) << 16 ) |     // Blue
+(( uint )( rgba.y * 255.f ) << 8  ) |     // Green
+( uint )( rgba.x * 255.f );              // Red
 }
 
 /**
- * @brief xray
- * @param frameBuffer
- * @param width
- * @param height
- * @param density
- * @param brightness
- * @param invViewMatrix
- * @param volume
- * @param volumeSampler
- */
+* @brief xray
+* @param frameBuffer
+* @param width
+* @param height
+* @param density
+* @param brightness
+* @param invViewMatrix
+* @param volume
+* @param volumeSampler
+*/
 __kernel void xray( __write_only image2d_t frameBuffer,
 
-                    uint width, uint height,
+                    uint frameWidth, uint frameHeight,
+
+                    uint sortFirstWidth , uint sortFirstHeight ,
 
                     __constant  float* invViewMatrix,
 
@@ -91,12 +93,23 @@ __kernel void xray( __write_only image2d_t frameBuffer,
                     float density,
 
                     float brightness )
-{
+                    {
+
     const uint x = get_global_id( 0 );
     const uint y = get_global_id( 1 );
 
-    const float u = ( x / ( float ) width ) * 2.f - 1.f;
-    const float v = ( y / ( float ) height ) * 2.f - 1.f;
+    const uint offsetX = get_global_offset( 0 );
+    const uint offsetY = get_global_offset( 1 );
+
+    // If out of boundaries, return.
+    if( x - offsetX - 1 > sortFirstWidth )
+        return ;
+
+    if( y - offsetY - 1 > sortFirstHeight )
+        return ;
+
+    const float u = ( x / ( float ) frameWidth ) * 2.f - 1.f;
+    const float v = ( y / ( float ) frameHeight ) * 2.f - 1.f;
 
     // float T_STEP = 0.f1f;
     const float4 boxMin = ( float4 )( -1.f, -1.f, -1.f, 1.f );
@@ -106,47 +119,45 @@ __kernel void xray( __write_only image2d_t frameBuffer,
     float4 eyeRayDirection;
 
     const float4 eyeRayOrigin =
-                   ( float4 )( invViewMatrix[ 3  ],
-                               invViewMatrix[ 7  ],
-                               invViewMatrix[ 11 ],
-                               1.f );
+    ( float4 )( invViewMatrix[ 3  ],
+    invViewMatrix[ 7  ],
+    invViewMatrix[ 11 ],
+    1.f );
 
     const float4 direction = normalize((( float4 )( u, v, -2.f, 0.f )));
     eyeRayDirection.x = dot( direction, (( float4 )( invViewMatrix[ 0  ],
-                                                     invViewMatrix[ 1  ],
-                                                     invViewMatrix[ 2  ],
-                                                     invViewMatrix[ 3  ] )));
+    invViewMatrix[ 1  ],
+    invViewMatrix[ 2  ],
+    invViewMatrix[ 3  ] )));
     eyeRayDirection.y = dot( direction, (( float4 )( invViewMatrix[ 4  ],
-                                                     invViewMatrix[ 5  ],
-                                                     invViewMatrix[ 6  ],
-                                                     invViewMatrix[ 7  ] )));
+    invViewMatrix[ 5  ],
+    invViewMatrix[ 6  ],
+    invViewMatrix[ 7  ] )));
     eyeRayDirection.z = dot( direction, (( float4 )( invViewMatrix[ 8  ],
-                                                     invViewMatrix[ 9  ],
-                                                     invViewMatrix[ 10 ],
-                                                     invViewMatrix[ 11 ] )));
+    invViewMatrix[ 9  ],
+    invViewMatrix[ 10 ],
+    invViewMatrix[ 11 ] )));
     eyeRayDirection.w = 1.f;
 
     // Find the intersection of the ray with the box
     float tNear, tFar;
     int hit = intersectBox( eyeRayOrigin, eyeRayDirection,
-                            boxMin, boxMax, &tNear, &tFar );
+    boxMin, boxMax, &tNear, &tFar );
 
     // If it doesn't hit, then return a black value in the corresponding pixel
     if( !hit )
     {
-        if(( x < width ) && ( y < height ))
-        {
-            // Get the 1D index of the pixel to set its color, and return
-            const float4 nullPixel = ( float4 )( 0.f , 0.f , 0.f , 0.f );
-            const int2 location = (int2)( x , y );
-            write_imagef( frameBuffer , location , nullPixel );
-        }
+        // Get the 1D index of the pixel to set its color, and return
+        const float4 nullPixel = ( float4 )( 0.f , 0.f , 0.f , 0.f );
+        const int2 location = (int2)( x , y );
+        write_imagef( frameBuffer , location , nullPixel );
+
         return;
     }
 
     // Clamp to near plane if the tNear was negative
     if( tNear < 0.f )
-        tNear = 0.f;
+    tNear = 0.f;
 
     // March along the ray accumulating the densities
     float4 intensityBuffer = ( float4 )( 0.f, 0.f, 0.f, 0.f );
@@ -170,22 +181,20 @@ __kernel void xray( __write_only image2d_t frameBuffer,
         // the volume, with the corrsponding alpha components
         float alpha = intensity.w * density ;
         intensityBuffer = mix( intensityBuffer, intensity ,
-                             ( float4 )( alpha, alpha, alpha, alpha ));
+        ( float4 )( alpha, alpha, alpha, alpha ));
 
         // Get the parametric value of the next sample along the ray
         t -= T_STEP;
         if( t < tNear )
-            break;
-    }
+        break;
+        }
 
     // Adjust the brightness of the pixel
     intensityBuffer *= brightness;
 
-    // Write the pixel color if it fits only within the image space.
-    if(( x < width ) && ( y < height ))
-    {
-        // Get a 1D index of the pixel in the _frameBuffer_
-        const int2 location = (int2)( x , y );
-        write_imagef( frameBuffer , location , intensityBuffer );
-    }
+
+    // Get a 1D index of the pixel in the _frameBuffer_
+    const int2 location = (int2)( x , y );
+    write_imagef( frameBuffer , location , intensityBuffer );
+
 }

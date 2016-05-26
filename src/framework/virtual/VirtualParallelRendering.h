@@ -10,6 +10,8 @@
 
 namespace clparen
 {
+namespace Parallel
+{
 
 class VirtualParallelRendering : public ParallelRendering
 {
@@ -54,11 +56,12 @@ private:
     Compositor::CLAbstractCompositor *compositor_ ;
     const uint virtualGPUsCount_ ;
 
-    std::vector< Task::TaskComposite* > compositingTasks_ ;
+    std::vector< Compositor::Task::TaskComposite* > compositingTasks_ ;
     std::vector< Task::VirtualTaskCollect *> collectingTasks_ ;
-    std::vector< Task::TaskRender * > renderingTasks_ ;
+    std::vector< Renderer::Task::TaskRender * > renderingTasks_ ;
 
 };
 
+}
 }
 #endif // VIRTUALPARALLELRENDERING_H

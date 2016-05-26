@@ -8,7 +8,7 @@
 #include "Logger.h"
 
 RenderingWindow_Gui::RenderingWindow_Gui(
-        clparen::ParallelRendering *parallelRenderer ,
+        clparen::Parallel::ParallelRendering *parallelRenderer ,
         QWidget *parent )
     : QMainWindow( parent ),
       ui( new Ui::RenderingWindow_Gui )

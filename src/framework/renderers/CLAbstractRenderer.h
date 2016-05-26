@@ -35,7 +35,9 @@ public:
      */
     explicit CLAbstractRenderer(
             const uint64_t gpuIndex ,
-            const uint frameWidth , const uint frameHeight ,
+            const Dimensions2D frameDimensions  ,
+            const Dimensions2D sortFirstOffset = Dimensions2D( 0 , 0 ),
+            const Dimensions2D sortFirstDimensions = Dimensions2D( 0 , 0 ),
             const std::string kernelDirectory  = DEFAULT_KERNELS_DIRECTORY ,
             QObject *parent = 0 );
 
@@ -135,6 +137,24 @@ public:
      * @return
      */
     double getRenderingTime();
+
+    /**
+     * @brief getFrameDimensions
+     * @return
+     */
+    const Dimensions2D &getFrameDimensions() const;
+
+    /**
+     * @brief getSortFirstOffset
+     * @return
+     */
+    const Dimensions2D &getSortFirstOffset() const;
+
+    /**
+     * @brief getSortFirstDimensions
+     * @return
+     */
+    const Dimensions2D &getSortFirstDimensions() const;
 
 protected:
 
@@ -240,12 +260,17 @@ protected:
     /**
      * @brief frameWidth_
      */
-    const uint frameWidth_ ;
+    const Dimensions2D frameDimensions_ ;
 
     /**
-     * @brief frameHeight_
+     * @brief sortFirstOffset_
      */
-    const uint frameHeight_ ;
+    const Dimensions2D sortFirstOffset_ ;
+
+    /**
+     * @brief sortFirstDimensions_
+     */
+    const Dimensions2D sortFirstDimensions_;
 
     /**
      * @brief frameVariant_

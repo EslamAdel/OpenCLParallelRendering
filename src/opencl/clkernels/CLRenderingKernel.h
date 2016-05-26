@@ -42,6 +42,8 @@ protected:
         KERNEL_ARG_FrameBuffer = 0 ,
         KERNEL_ARG_FrameWidth ,
         KERNEL_ARG_FrameHeight ,
+        KERNEL_ARG_SortFirstWidth ,
+        KERNEL_ARG_SortFirstHeight ,
         KERNEL_ARG_InverseMatrix ,
         KERNEL_ARG_Volume ,
         KERNEL_ARG_VolumeSampler ,
@@ -116,6 +118,18 @@ public:
      */
     void setFrameHeight( uint height );
 
+    /**
+     * @brief setSortFirstWidth
+     * @param width
+     */
+    void setSortFirstWidth( uint width );
+
+    /**
+     * @brief setSortFirstHeight
+     * @param height
+     */
+
+    void setSortFirstHeight( uint height );
     /**
      * @brief setVolumeData
      * @param data

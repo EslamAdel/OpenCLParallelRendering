@@ -34,7 +34,7 @@ class RenderingWindow_Gui : public QMainWindow
 public:
 
 
-    RenderingWindow_Gui( clparen::ParallelRendering *parallelRenderer ,
+    RenderingWindow_Gui( clparen::Parallel::ParallelRendering *parallelRenderer ,
                          QWidget *parent = 0 ) ;
 
 
@@ -105,7 +105,7 @@ private:
     Ui::RenderingWindow_Gui *ui;
 
 
-    clparen::ParallelRendering *parallelRenderer_ ;
+    clparen::Parallel::ParallelRendering *parallelRenderer_ ;
 
 
     bool frameworkReady_ ;

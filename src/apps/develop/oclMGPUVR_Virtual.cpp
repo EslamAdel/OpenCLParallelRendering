@@ -45,7 +45,8 @@ int main(int argc, char *argv[])
     LOG_DEBUG("Virtual Renderers = %d" , virtualRenderers );
 
 
-    clparen::VirtualParallelRendering parallelRenderer( volume , frameWidth , frameHeight );
+    clparen::Parallel::VirtualParallelRendering
+            parallelRenderer( volume , frameWidth , frameHeight );
 
 
 

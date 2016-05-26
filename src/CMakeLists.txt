@@ -10,18 +10,18 @@ SET( CLPAREN_SOURCE_FILES
     framework/calibrators/AbstractCalibrator.cpp
     framework/calibrators/Calibrator.cpp
     framework/calibrators/TaskCalibrate.cpp
-    framework/ParallelRendering.cpp
+    framework/parallel/ParallelRendering.cpp
     framework/renderers/CLRenderer.cpp
-    framework/TaskRender.cpp
-    framework/TaskCollect.cpp
-    framework/TaskComposite.cpp
+    framework/renderers/TaskRender.cpp
+    framework/parallel/TaskCollect.cpp
+    framework/compositors/TaskComposite.cpp
     framework/compositors/CLCompositor.cpp
-    framework/TaskMakePixmap.cpp
+    framework/parallel/TaskMakePixmap.cpp
     framework/virtual/VirtualParallelRendering.cpp
     framework/virtual/VirtualCLRenderer.cpp
     framework/virtual/VirtualCLCompositor.cpp
     framework/virtual/VirtualTaskCollect.cpp
-    framework/Transformation.cpp
+    data/Transformation.cpp
     auxillary/VolumeUtilities.cpp
     data/Image.cpp
     data/TransferFunction.cpp
@@ -70,18 +70,18 @@ SET( CLPAREN_HEADER_FILES
     framework/calibrators/Calibrator.h
     framework/calibrators/Calibrator.ipp
     framework/calibrators/TaskCalibrate.h
-    framework/ParallelRendering.h
-    framework/TaskCollect.h
-    framework/TaskComposite.h
-    framework/TaskMakePixmap.h
-    framework/TaskRender.h
+    framework/parallel/ParallelRendering.h
+    framework/parallel/TaskCollect.h
+    framework/compositors/TaskComposite.h
+    framework/parallel/TaskMakePixmap.h
+    framework/renderers/TaskRender.h
     framework/virtual/VirtualCLCompositor.h
     framework/virtual/VirtualCLCompositor.ipp
     framework/virtual/VirtualParallelRendering.h
     framework/virtual/VirtualCLRenderer.h
     framework/virtual/VirtualCLRenderer.ipp
     framework/virtual/VirtualTaskCollect.h
-    framework/Transformation.h
+    data/Transformation.h
     auxillary/half.hpp
     auxillary/VolumeUtilities.h
     common/Headers.hh
@@ -155,6 +155,7 @@ set( CLPAREN_KERNELS
 ### Include the directories to the CMake source tree
 
 include_directories( framework )
+include_directories( framework/parallel )
 include_directories( framework/virtual )
 include_directories( framework/compositors )
 include_directories( framework/renderers )

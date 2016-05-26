@@ -22,7 +22,7 @@ class RenderingWindow : public QMainWindow
 
 public:
 
-    RenderingWindow( clparen::ParallelRendering *parallelRenderer ,
+    RenderingWindow( clparen::Parallel::ParallelRendering *parallelRenderer ,
                      QWidget *parent = 0 ) ;
 
 
@@ -78,7 +78,7 @@ private:
     Ui::RenderingWindow *ui;
 
 
-    clparen::ParallelRendering *parallelRenderer_ ;
+    clparen::Parallel::ParallelRendering *parallelRenderer_ ;
 
 
     QVector< QLabel*  > frameContainers_;
