@@ -22,11 +22,8 @@ CLRenderer< V , F >::CLRenderer(
         const uint64_t gpuIndex ,
         const Transformation &transformation ,
         const Dimensions2D frameDimensions ,
-        const Dimensions2D sortFirstOffset ,
-        const Dimensions2D sortFirstDimensions ,
         const std::string kernelDirectory)
-    : CLAbstractRenderer( gpuIndex , frameDimensions , sortFirstOffset ,
-                          sortFirstDimensions , kernelDirectory ) ,
+    : CLAbstractRenderer( gpuIndex , frameDimensions , kernelDirectory ) ,
       transformation_( transformation )
 {
 
@@ -143,7 +140,7 @@ void CLRenderer< V , F >::renderFrame()
     // connected now to the OpenCL context.
     const size_t localSize[ ] = { LOCAL_SIZE_X, LOCAL_SIZE_Y };
 
-    const size_t globalWorkOffet[ ] = { sortFirstOffset_.x , sortFirstOffset_.y };
+    const size_t globalWorkOffset[ ] = { sortFirstOffset_.x , sortFirstOffset_.y };
 
     activeRenderingKernel_->
             setVolumeDensityFactor( transformation_.volumeDensity );
@@ -159,7 +156,7 @@ void CLRenderer< V , F >::renderFrame()
                 commandQueue_,
                 activeRenderingKernel_->getKernelObject() ,
                 2,
-                globalWorkOffet ,
+                globalWorkOffset ,
                 gridSize_,
                 localSize,
                 0,

@@ -20,5 +20,5 @@ void TaskInitializeFramework::run()
 
     parallelRenderer_->addCLCompositor( compositorIndex_ );
 
-    parallelRenderer_->distributeBaseVolume1D();
+    parallelRenderer_->distributeBaseVolume();
 }

@@ -36,8 +36,6 @@ public:
     explicit CLAbstractRenderer(
             const uint64_t gpuIndex ,
             const Dimensions2D frameDimensions  ,
-            const Dimensions2D sortFirstOffset = Dimensions2D( 0 , 0 ),
-            const Dimensions2D sortFirstDimensions = Dimensions2D( 0 , 0 ),
             const std::string kernelDirectory  = DEFAULT_KERNELS_DIRECTORY ,
             QObject *parent = 0 );
 
@@ -156,6 +154,10 @@ public:
      */
     const Dimensions2D &getSortFirstDimensions() const;
 
+
+    void setSortFirstSettings( const Dimensions2D sortFirstOffset ,
+                               const Dimensions2D sortFirstDimensions );
+
 protected:
 
     /**
@@ -265,12 +267,12 @@ protected:
     /**
      * @brief sortFirstOffset_
      */
-    const Dimensions2D sortFirstOffset_ ;
+    Dimensions2D sortFirstOffset_ ;
 
     /**
      * @brief sortFirstDimensions_
      */
-    const Dimensions2D sortFirstDimensions_;
+    Dimensions2D sortFirstDimensions_;
 
     /**
      * @brief frameVariant_

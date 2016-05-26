@@ -28,8 +28,6 @@ public:
             const uint64_t gpuIndex,
             const Transformation &transformation ,
             const Dimensions2D frameDimensions ,
-            const Dimensions2D sortFirstOffset = Dimensions2D( 0 , 0 ),
-            const Dimensions2D sortFirstDimensions = Dimensions2D( 0 , 0 ),
             const std::string kernelDirectory = DEFAULT_KERNELS_DIRECTORY );
 
 
@@ -87,6 +85,7 @@ public:
      * @param brickParameters
      */
     void copyHostData( const BrickParameters< V > &brickParameters );
+
 
 
 protected:

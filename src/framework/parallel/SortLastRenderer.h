@@ -32,8 +32,8 @@ public:
      * @param frameHeight
      */
     SortLastRenderer( Volume< V >* volume ,
-                       const uint frameWidth = 512 ,
-                       const uint frameHeight = 512 );
+                       const uint64_t frameWidth = 512 ,
+                       const uint64_t frameHeight = 512 );
 
 
 
@@ -44,6 +44,23 @@ public:
 
     virtual void addCLCompositor( const uint64_t gpuIndex ) override;
 
+
+
+    void finishedRendering_SLOT( Renderer::CLAbstractRenderer *renderer ) override;
+
+    void compositingFinished_SLOT( ) override;
+
+
+    void frameLoadedToDevice_SLOT( Renderer::CLAbstractRenderer *renderer ) override;
+
+
+    void pixmapReady_SLOT( QPixmap *pixmap ,
+                           const Renderer::CLAbstractRenderer * renderer ) override;
+
+
+    virtual void distributeBaseVolume() override;
+
+    void initializeRenderers() override;
 
     /**
      * @brief distributeBaseVolume1D
@@ -63,19 +80,7 @@ public:
     virtual void distributeBaseVolumeMemoryWeighted();
 
 
-    void finishedRendering_SLOT( Renderer::CLAbstractRenderer *renderer ) override;
-
-    void compositingFinished_SLOT( ) override;
-
-
-    void frameLoadedToDevice_SLOT( Renderer::CLAbstractRenderer *renderer ) override;
-
-
-    void pixmapReady_SLOT( QPixmap *pixmap ,
-                           const Renderer::CLAbstractRenderer * renderer ) override;
-
-
-
+    virtual void finalFrameReady_SLOT( QPixmap *pixmap ) override ;
 protected:
     //Volume Data
     Volume< V > *baseVolume_;

@@ -37,8 +37,8 @@ class CLAbstractParallelRenderer : public QObject
 {
     Q_OBJECT
 public:
-    explicit CLAbstractParallelRenderer( const uint frameWidth = 512 ,
-                                         const uint frameHeight = 512  ,
+    explicit CLAbstractParallelRenderer( const uint64_t frameWidth = 512 ,
+                                         const uint64_t frameHeight = 512  ,
                                          QObject *parent = 0 );
 
 
@@ -65,7 +65,7 @@ public:
     virtual void addCLCompositor( const uint64_t gpuIndex ) = 0;
 
 
-    virtual void distributeBaseVolume1D() = 0;
+    virtual void distributeBaseVolume() = 0;
 
     /**
      * @brief startRendering
@@ -74,6 +74,10 @@ public:
     virtual void startRendering( );
 
 
+    /**
+     * @brief initializeRenderers
+     */
+    virtual void initializeRenderers( ) = 0 ;
     /**
      * @brief getCLRenderer
      * @param gpuIndex
@@ -97,13 +101,13 @@ public:
      * @brief getFrameWidth
      * @return
      */
-    uint getFrameWidth() const ;
+    uint64_t getFrameWidth() const ;
 
     /**
      * @brief getFrameHeight
      * @return
      */
-    uint getFrameHeight() const ;
+    uint64_t getFrameHeight() const ;
 
 signals:
 
@@ -140,6 +144,7 @@ signals:
 
 public slots :
 
+    virtual void finalFrameReady_SLOT( QPixmap *pixmap ) = 0 ;
     /**
      * @brief finishedRendering_SLOT
      * When a CLRenderer finishs rendering, the signal emitted will be
@@ -279,7 +284,7 @@ protected:
     /**
      * @brief benchmark_
      */
-    void benchmark_() ;
+    virtual void benchmark_() ;
 
 signals:
 
@@ -378,8 +383,8 @@ protected :
 
     //facts
     uint machineGPUsCount_;
-    const uint frameWidth_ ;
-    const uint frameHeight_ ;
+    const uint64_t frameWidth_ ;
+    const uint64_t frameHeight_ ;
 
 };
 

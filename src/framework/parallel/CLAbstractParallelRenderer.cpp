@@ -18,9 +18,10 @@ namespace clparen
 namespace Parallel
 {
 
-CLAbstractParallelRenderer::CLAbstractParallelRenderer( const uint frameWidth,
-                                                        const uint frameHeight,
-                                                        QObject *parent )
+CLAbstractParallelRenderer::CLAbstractParallelRenderer(
+        const uint64_t frameWidth,
+        const uint64_t frameHeight,
+        QObject *parent )
     : QObject( parent ) ,
       frameWidth_( frameWidth ) ,
       frameHeight_( frameHeight ),
@@ -129,12 +130,12 @@ uint CLAbstractParallelRenderer::getMachineGPUsCount() const
     return machineGPUsCount_;
 }
 
-uint CLAbstractParallelRenderer::getFrameWidth() const
+uint64_t CLAbstractParallelRenderer::getFrameWidth() const
 {
     return frameWidth_;
 }
 
-uint CLAbstractParallelRenderer::getFrameHeight() const
+uint64_t CLAbstractParallelRenderer::getFrameHeight() const
 {
     return frameHeight_;
 }

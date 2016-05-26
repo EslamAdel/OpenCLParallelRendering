@@ -18,19 +18,12 @@ namespace Parallel
 
 template< class V , class F >
 SortLastRenderer< V , F >::SortLastRenderer( Volume< V > *volume ,
-                                      const uint frameWidth ,
-                                      const uint frameHeight )
+                                      const uint64_t frameWidth ,
+                                      const uint64_t frameHeight )
     : baseVolume_( volume ),
       CLAbstractParallelRenderer( frameWidth , frameHeight )
 {
 
-
-    /**
-        compositing of frames is not performed concurrently,
-        so only one thread will accumulate each frame then upload the
-        collage buffer to host, then rewind (clear) the collage frame
-        at host for the next round.
-          **/
     compositorPool_.setMaxThreadCount( 1 );
 }
 
@@ -270,6 +263,12 @@ void SortLastRenderer< V , F >::distributeBaseVolumeMemoryWeighted()
     emit this->frameworkReady_SIGNAL();
 }
 
+template< class V , class F >
+void SortLastRenderer< V , F >::finalFrameReady_SLOT( QPixmap *pixmap)
+{
+
+}
+
 
 template< class V , class F >
 void SortLastRenderer< V , F >::finishedRendering_SLOT(
@@ -356,6 +355,19 @@ void SortLastRenderer< V , F >::pixmapReady_SLOT(
         emit this->finalFrameReady_SIGNAL( pixmap );
     else
         emit this->frameReady_SIGNAL( pixmap , renderer );
+}
+
+
+template< class V , class F >
+void SortLastRenderer< V , F >::distributeBaseVolume()
+{
+    distributeBaseVolume1D();
+}
+
+template< class V , class F >
+void SortLastRenderer< V , F >::initializeRenderers()
+{
+
 }
 
 

@@ -8,15 +8,12 @@ namespace Renderer {
 CLAbstractRenderer::CLAbstractRenderer(
         const uint64_t gpuIndex,
         const Dimensions2D frameDimensions,
-        const Dimensions2D sortFirstOffset,
-        const Dimensions2D sortFirstDimensions,
         const std::string kernelDirectory,
         QObject *parent )
     : gpuIndex_( gpuIndex ) ,
       frameDimensions_( frameDimensions ) ,
-      sortFirstOffset_( sortFirstOffset ) ,
-      sortFirstDimensions_(( sortFirstDimensions == Dimensions2D( 0 , 0 )) ?
-                               frameDimensions : sortFirstDimensions ) ,
+      sortFirstOffset_( Dimensions2D( 0 , 0 )) ,
+      sortFirstDimensions_( frameDimensions ) ,
       kernelDirectory_( kernelDirectory ),
       QObject(parent)
 {
@@ -208,6 +205,23 @@ CLAbstractRenderer::allocateKernels_() const
 const Dimensions2D &CLAbstractRenderer::getSortFirstDimensions() const
 {
     return sortFirstDimensions_;
+}
+
+void CLAbstractRenderer::setSortFirstSettings(
+        const Dimensions2D sortFirstOffset,
+        const Dimensions2D sortFirstDimensions )
+{
+    sortFirstOffset_ = sortFirstOffset ;
+    sortFirstDimensions_ = sortFirstDimensions ;
+
+    if( sortFirstOffset_.x + sortFirstDimensions_.x > frameDimensions_.x ||
+            sortFirstOffset_.y + sortFirstDimensions_.y > frameDimensions_.y )
+        LOG_ERROR("Rendered region exceeds the frame region.");
+
+    LOG_DEBUG("GPU<%d> offset:[%s],sortFDim:[%s] ",
+              gpuIndex_ ,
+              sortFirstOffset.toString().c_str() ,
+              sortFirstDimensions.toString().c_str());
 }
 
 const Dimensions2D &CLAbstractRenderer::getSortFirstOffset() const

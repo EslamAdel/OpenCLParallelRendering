@@ -14,7 +14,8 @@ template< class T >
 CLFrame< T >::CLFrame( const Dimensions2D dimensions  )
     : dimensions_( dimensions ),
       pixmapSynchronized_( false ) ,
-      inDevice_( false )
+      inDevice_( false ),
+      deviceData_( nullptr )
 {
     hostData_ = new T[ dimensions.imageSize() ];
 

@@ -49,7 +49,7 @@ int main(int argc, char *argv[])
     //        LOG_INFO("Deploy GPU<%d>", index );
     //    LOG_INFO("compositor: GPU<%d>", compositorGPUIndex );
 
-    clparen::Parallel::SortLastRenderer< uchar , float >
+    clparen::Parallel::SortFirstRenderer< uchar , float >
             parallelRenderer( volume , frameWidth , frameHeight );
 
 
@@ -57,10 +57,9 @@ int main(int argc, char *argv[])
     for( const uint rendererIndex : deployGPUs )
         parallelRenderer.addCLRenderer( rendererIndex );
 
-    parallelRenderer.addCLCompositor( compositorGPUIndex );
-
 //    parallelRenderer.distributeBaseVolumeMemoryWeighted();
-    parallelRenderer.distributeBaseVolume1D();
+    parallelRenderer.initializeRenderers();
+    parallelRenderer.distributeBaseVolume();
 
     RenderingWindow rw( &parallelRenderer ) ;
     rw.show();

@@ -63,9 +63,8 @@ void RenderingWindow::intializeConnections_()
                        QPixmap * ,
                        const clparen::Renderer::CLAbstractRenderer* )));
 
-    connect( parallelRenderer_ , SIGNAL( finalFrameReady_SIGNAL( QPixmap* )) ,
-             this , SLOT( finalFrameReady_SLOT( QPixmap* )));
-
+    //    connect( parallelRenderer_ , SIGNAL( finalFrameReady_SIGNAL( QPixmap* )) ,
+    //             this , SLOT( finalFrameReady_SLOT( QPixmap* )));
 
     //sliders
     connect( ui->xRotationSlider , SIGNAL( valueChanged( int )),
@@ -107,7 +106,6 @@ void RenderingWindow::startRendering_( )
     newBrightness_SLOT( ui->brightnessSlider->value( ));
     newDensity_SLOT( ui->densitySlider->value( ));
 
-
     parallelRenderer_->startRendering( );
 
 }
@@ -117,7 +115,7 @@ void RenderingWindow::displayFrame_( QPixmap *frame , uint id )
 
     frameContainers_[ id ]->setPixmap
             (( frame->scaled( frameContainers_[ id ]->width( ),
-                              frameContainers_[ id ]->height( ),
+                              frameContainers_[ id ]->height( ) ,
                               Qt::KeepAspectRatio )));
 
 
@@ -128,7 +126,12 @@ void RenderingWindow::frameReady_SLOT(
         const clparen::Renderer::CLAbstractRenderer *renderer )
 {
 
-    uint index = renderer->getFrameIndex();
+    if(renderer == nullptr )
+    {
+        finalFrameReady_SLOT( frame );
+        return ;
+    }
+    uint index = renderer->getGPUIndex();
 
     if( index < frameContainers_.size() )
         displayFrame_( frame , index );
@@ -145,7 +148,7 @@ void RenderingWindow::finalFrameReady_SLOT( QPixmap *finalFrame )
     ui->frameContainerResult->
             setPixmap( finalFrame->scaled( ui->frameContainerResult->width( ) ,
                                            ui->frameContainerResult->height( ) ,
-                                           Qt::KeepAspectRatio ));
+                                           Qt::KeepAspectRatio));
 }
 
 void RenderingWindow::newXRotation_SLOT(int value)

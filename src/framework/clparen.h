@@ -3,6 +3,7 @@
 
 #include "Typedefs.hh"
 #include "SortLastRenderer.h"
+#include "SortFirstRenderer.h"
 #include "Calibrator.h"
 #include "CLCompositor.h"
 #include "CLRenderer.h"

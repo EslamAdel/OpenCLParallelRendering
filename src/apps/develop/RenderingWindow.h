@@ -4,7 +4,7 @@
 #include <QtWidgets>
 #include <QMainWindow>
 #include <Headers.hh>
-#include "SortLastRenderer.h"
+#include "clparen.h"
 #include "VirtualParallelRendering.h"
 #include "CLRenderer.h"
 #include <vector>
