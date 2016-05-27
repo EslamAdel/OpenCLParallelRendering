@@ -57,7 +57,6 @@ public:
                            const Renderer::CLAbstractRenderer * renderer ) override;
 
 
-    void finalFrameReady_SLOT( QPixmap *pixmap )  override ;
 protected:
     void applyTransformation_() override;
 

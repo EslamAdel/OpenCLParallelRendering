@@ -121,7 +121,7 @@ signals:
      * For each rendered frame done, emit a signal.
      */
     void frameReady_SIGNAL( QPixmap *pixmap ,
-                            const clparen::Renderer::CLAbstractRenderer * node );
+                            const Renderer::CLAbstractRenderer * node );
 
     /**
      * @brief finalFrameReady_SIGNAL
@@ -144,7 +144,6 @@ signals:
 
 public slots :
 
-    virtual void finalFrameReady_SLOT( QPixmap *pixmap ) = 0 ;
     /**
      * @brief finishedRendering_SLOT
      * When a CLRenderer finishs rendering, the signal emitted will be

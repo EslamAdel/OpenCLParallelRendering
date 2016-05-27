@@ -7,10 +7,20 @@ namespace clData {
 
 
 template< class T >
+CLBuffer< T >::CLBuffer()
+{
+    deviceData_ = nullptr ;
+    context_ = nullptr ;
+    inDevice_ = false ;
+    size_ = 0 ;
+    hostData_ = nullptr;
+}
+
+template< class T >
 CLBuffer< T >::CLBuffer( const u_int64_t size )
 {
-    deviceData_ = NULL ;
-    context_ = NULL ;
+    deviceData_ = nullptr ;
+    context_ = nullptr ;
     inDevice_ = false ;
     size_ = size ;
     hostData_ = new T[ size ];
@@ -20,7 +30,7 @@ CLBuffer< T >::CLBuffer( const u_int64_t size )
 template< class T >
 CLBuffer< T >::~CLBuffer()
 {
-    if( hostData_ )
+    if( hostData_ != nullptr  )
         delete [] hostData_ ;
 }
 
@@ -90,12 +100,15 @@ void CLBuffer< T >::resize( u_int64_t newSize )
 
     size_ = newSize ;
 
-    if( void* mem = std::realloc( hostData_ , newSize ))
-        hostData_ = static_cast< T* >( mem );
+    if( hostData_ != nullptr )
+    {
+        delete [] hostData_ ;
+        hostData_ = new T[ size_ ];
+    }
     else
         LOG_ERROR("Bad Alloc!");
 
-    if( deviceData_ != 0 )
+    if( deviceData_ != nullptr )
     {
         releaseDeviceData_();
         createDeviceData( context_ );
@@ -154,10 +167,10 @@ bool CLBuffer< T >::inDevice() const
 template< class T >
 void CLBuffer< T >::releaseDeviceData_( )
 {
-    if( deviceData_ != NULL )
+    if( deviceData_ != nullptr )
         clReleaseMemObject( deviceData_ );
 
-    deviceData_ = NULL ;
+    deviceData_ = nullptr ;
 }
 
 template< class T >

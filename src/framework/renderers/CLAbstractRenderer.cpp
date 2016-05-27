@@ -218,10 +218,12 @@ void CLAbstractRenderer::setSortFirstSettings(
             sortFirstOffset_.y + sortFirstDimensions_.y > frameDimensions_.y )
         LOG_ERROR("Rendered region exceeds the frame region.");
 
-    LOG_DEBUG("GPU<%d> offset:[%s],sortFDim:[%s] ",
-              gpuIndex_ ,
-              sortFirstOffset.toString().c_str() ,
-              sortFirstDimensions.toString().c_str());
+//    LOG_DEBUG("GPU<%d> offset:[%s],sortFDim:[%s] ",
+//              gpuIndex_ ,
+//              sortFirstOffset.toString().c_str() ,
+//              sortFirstDimensions.toString().c_str());
+
+    createPixelBuffer_();
 }
 
 const Dimensions2D &CLAbstractRenderer::getSortFirstOffset() const

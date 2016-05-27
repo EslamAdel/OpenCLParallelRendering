@@ -24,11 +24,11 @@ SortFirstRenderer< V , F >::SortFirstRenderer( Volume< V > *volume,
     connect( this , SIGNAL(finishedCompositing_SIGNAL()) ,
              this , SLOT(compositingFinished_SLOT()));
 
-    connect( this ,
-             SIGNAL(finalFrameReady_SIGNAL(QPixmap*)) ,
-             this,
-             SLOT( finalFrameReady_SLOT(QPixmap*)),
-             Qt::BlockingQueuedConnection );
+    connect( this , SIGNAL(frameReady_SIGNAL( QPixmap*,
+                                              const Renderer::CLAbstractRenderer* )) ,
+             this, SLOT( pixmapReady_SLOT( QPixmap*,
+                                           const Renderer::CLAbstractRenderer*)) ,
+            Qt::BlockingQueuedConnection );
 
 }
 
@@ -159,6 +159,7 @@ void SortFirstRenderer< V , F >::compositingFinished_SLOT( )
     else
         renderersReady_ = true ;
 
+
     //    clone_();
     QtConcurrent::run( this ,  &SortFirstRenderer::clone_ );
 }
@@ -180,21 +181,6 @@ void SortFirstRenderer< V , F >::pixmapReady_SLOT(
     emit this->finalFrameReady_SIGNAL( pixmap );
 }
 
-template< class V , class F >
-void SortFirstRenderer< V , F >::finalFrameReady_SLOT(QPixmap *pixmap)
-{
-    for( const Renderer::CLAbstractRenderer *it : renderers_ )
-    {
-        clData::CLImage2D< float > *frame = it->getCLFrame()
-                .value< clData::CLImage2D< float >*>();
-
-        emit this->frameReady_SIGNAL( &frame->getFramePixmap() ,
-                                      it);
-    }
-
-    emit this->frameReady_SIGNAL( pixmap , nullptr );
-
-}
 
 template< class V , class F >
 void SortFirstRenderer< V , F >::applyTransformation_()
@@ -240,6 +226,9 @@ void SortFirstRenderer< V , F >::assemble_(
     clFrame->readDeviceData( renderer->getCommandQueue() ,
                              CL_TRUE );
 
+    //    LOG_DEBUG("Frame[%d]:%s",renderer->getGPUIndex() ,
+    //              clFrame->getFrameDimensions().toString().c_str());
+
     const Dimensions2D finalFrameSize = finalFrame->getDimensions();
 
     const Dimensions2D &offset = renderer->getSortFirstOffset();
@@ -248,12 +237,21 @@ void SortFirstRenderer< V , F >::assemble_(
     F *frameBuffer = clFrame->getHostData();
 
 
+    //    LOG_DEBUG("GPU<%d>:offset:%s" ,
+    //              renderer->getGPUIndex() ,
+    //              offset.toString().c_str());
+
+    //    LOG_DEBUG("GPU<%d>:size:%s",
+    //              renderer->getGPUIndex(),
+    //              frameSize.toString().c_str());
+
     frameCopyMutex_.lockForRead();
     // Frames Assembly.
     for( uint64_t i = 0 ; i < frameSize.x ; i++ )
+    {
+        const uint64_t x = i + offset.x ;
         for( uint64_t j = 0 ; j < frameSize.y ; j++ )
         {
-            const uint64_t x = i + offset.x ;
             const uint64_t y = j + offset.y ;
 
             // small frame flat index.
@@ -263,6 +261,7 @@ void SortFirstRenderer< V , F >::assemble_(
 
             finalFrameBuffer[ finalFrameIndex ] = frameBuffer[ frameIndex ];
         }
+    }
 
     frameCopyMutex_.unlock();
 
@@ -274,12 +273,9 @@ template< class V , class F >
 void SortFirstRenderer< V , F >::clone_( )
 {
 
-    const F *source = frame_.data()->getData();
-
     frameCopyMutex_.lockForWrite();
-    clFrame_->copyHostData( source );
-
-    emit this->finalFrameReady_SIGNAL( &clFrame_->getFramePixmap( ));
+    clFrame_->copyHostData( *frame_.data( ));
+    emit this->frameReady_SIGNAL( &clFrame_->getFramePixmap( ) , nullptr );
     frameCopyMutex_.unlock();
 
 }

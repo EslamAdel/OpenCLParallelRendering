@@ -5,7 +5,7 @@
 #include "Typedefs.hh"
 #include <oclHWDL/ErrorHandler.h>
 #include "Utilities.h"
-
+#include "Image.h"
 
 namespace SystemUtilities {}
 using namespace SystemUtilities;
@@ -98,7 +98,7 @@ public:
      * @brief getFramePixmap
      * @return
      */
-    virtual QPixmap &getFramePixmap() ;
+    QPixmap &getFramePixmap() ;
 
     /**
      * @brief copyHostData
@@ -111,6 +111,12 @@ public:
      * @param sourceFrame
      */
     virtual void copyHostData( const CLFrame< T > &sourceFrame );
+
+    /**
+     * @brief copyHostData
+     * @param sourceFrame
+     */
+    virtual void copyHostData( const Image< T > &sourceFrame );
 
     /**
      * @brief setHostData

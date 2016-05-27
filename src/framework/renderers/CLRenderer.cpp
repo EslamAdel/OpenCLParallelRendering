@@ -28,9 +28,10 @@ CLRenderer< V , F >::CLRenderer(
 {
 
     clVolume_ = nullptr ;
-
+    clFrame_ = nullptr ;
     LOG_INFO( "Creating Context on Node with GPU <%d>", gpuIndex );
     linearFiltering_ = true;
+
 
     // Creating the pixel buffer that will contain the final image
     createPixelBuffer_( );
@@ -49,8 +50,14 @@ void CLRenderer< V , F >::createPixelBuffer_()
     gridSize_[0] = SystemUtilities::roundUp( LOCAL_SIZE_X, sortFirstDimensions_.x );
     gridSize_[1] = SystemUtilities::roundUp( LOCAL_SIZE_Y, sortFirstDimensions_.y );
 
+    if( clFrame_ != nullptr )
+        delete clFrame_ ;
+
     clFrame_ = new clData::CLImage2D< F >( sortFirstDimensions_ ,
                                            CL_INTENSITY , CL_FLOAT );
+
+//    LOG_DEBUG("Created Frame[%d]:%s",gpuIndex_,sortFirstDimensions_.toString().c_str());
+
     clFrame_->createDeviceData( context_ );
 }
 
@@ -180,7 +187,6 @@ void CLRenderer< V , F >::initializeKernels_()
 
     // Assuming that every thing is going in the right direction.
     cl_int clErrorCode = CL_SUCCESS;
-
 
     linearVolumeSampler_ = clCreateSampler( context_, true,
                                             CL_ADDRESS_CLAMP_TO_EDGE,

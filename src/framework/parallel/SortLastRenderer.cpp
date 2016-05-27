@@ -264,13 +264,6 @@ void SortLastRenderer< V , F >::distributeBaseVolumeMemoryWeighted()
 }
 
 template< class V , class F >
-void SortLastRenderer< V , F >::finalFrameReady_SLOT( QPixmap *pixmap)
-{
-
-}
-
-
-template< class V , class F >
 void SortLastRenderer< V , F >::finishedRendering_SLOT(
         Renderer::CLAbstractRenderer *renderer )
 {

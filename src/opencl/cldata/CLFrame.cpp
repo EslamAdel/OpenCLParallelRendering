@@ -248,6 +248,16 @@ void CLFrame< T >::copyHostData( const CLFrame< T > &sourceFrame )
 }
 
 template< class T >
+void CLFrame< T >::copyHostData( const Image< T > &sourceFrame )
+{
+
+    if( sourceFrame.getDimensions() != dimensions_ )
+        LOG_ERROR("Dimensions mismatch!");
+
+    copyHostData( sourceFrame.getData(  ));
+}
+
+template< class T >
 void CLFrame< T >::setHostData( T *data , bool deepCopy )
 {
     if( data == hostData_ )

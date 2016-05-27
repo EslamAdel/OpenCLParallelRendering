@@ -152,7 +152,7 @@ __kernel void averageIntensityProjection(  __write_only image2d_t frameBuffer,
 
        // Get the 1D index of the pixel to set its color, and return
        const float4 nullPixel = ( float4 )( 0.f , 0.f , 0.f , 0.f );
-       const int2 location = (int2)( x , y );
+       const int2 location = (int2)( x - offsetX , y - offsetY );
        write_imagef( frameBuffer , location , nullPixel );
 
     }
@@ -210,7 +210,7 @@ __kernel void averageIntensityProjection(  __write_only image2d_t frameBuffer,
     averageIntensityBuffer *= brightness;
 
     // Get a 1D index of the pixel in the _frameBuffer_
-    const int2 location = (int2)( x , y );
+    const int2 location = (int2)( x - offsetX , y - offsetY );
     write_imagef( frameBuffer , location , averageIntensityBuffer );
 
 }

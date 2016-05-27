@@ -80,7 +80,6 @@ public:
     virtual void distributeBaseVolumeMemoryWeighted();
 
 
-    virtual void finalFrameReady_SLOT( QPixmap *pixmap ) override ;
 protected:
     //Volume Data
     Volume< V > *baseVolume_;

@@ -94,6 +94,8 @@ void CLImage2D< T >::readDeviceData( cl_command_queue cmdQueue ,
     const size_t
             region[3] = { this->dimensions_.x , this->dimensions_.y , 1 };
 
+//    LOG_DEBUG("ImageDim:%s", this->dimensions_.toString().c_str());
+
     // Initially, assume that everything is fine
     cl_int error = CL_SUCCESS;
     error = clEnqueueReadImage( cmdQueue, this->deviceData_ , blocking ,

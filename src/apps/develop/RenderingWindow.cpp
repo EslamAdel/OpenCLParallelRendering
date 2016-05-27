@@ -54,17 +54,9 @@ RenderingWindow::~RenderingWindow( )
 void RenderingWindow::intializeConnections_()
 {
     //parallelRenderer_
-    connect( parallelRenderer_ ,
-             SIGNAL( frameReady_SIGNAL(
-                         QPixmap * ,
-                         const clparen::Renderer::CLAbstractRenderer* )),
-             this ,
-             SLOT( frameReady_SLOT(
-                       QPixmap * ,
-                       const clparen::Renderer::CLAbstractRenderer* )));
+    connect( parallelRenderer_ , SIGNAL( finalFrameReady_SIGNAL( QPixmap* )) ,
+             this , SLOT( finalFrameReady_SLOT( QPixmap* )));
 
-    //    connect( parallelRenderer_ , SIGNAL( finalFrameReady_SIGNAL( QPixmap* )) ,
-    //             this , SLOT( finalFrameReady_SLOT( QPixmap* )));
 
     //sliders
     connect( ui->xRotationSlider , SIGNAL( valueChanged( int )),
@@ -113,6 +105,12 @@ void RenderingWindow::startRendering_( )
 void RenderingWindow::displayFrame_( QPixmap *frame , uint id )
 {
 
+//    LOG_DEBUG("Frame[%d] size:%d,%d", id , frame->width() , frame->height());
+
+//    QPixmap framePixmap( *frame );
+
+//    framePixmap.save( QString("/projects/clparen/%1.jpg").arg( id ));
+
     frameContainers_[ id ]->setPixmap
             (( frame->scaled( frameContainers_[ id ]->width( ),
                               frameContainers_[ id ]->height( ) ,
@@ -149,6 +147,8 @@ void RenderingWindow::finalFrameReady_SLOT( QPixmap *finalFrame )
             setPixmap( finalFrame->scaled( ui->frameContainerResult->width( ) ,
                                            ui->frameContainerResult->height( ) ,
                                            Qt::KeepAspectRatio));
+
+
 }
 
 void RenderingWindow::newXRotation_SLOT(int value)

@@ -1,6 +1,6 @@
 #include "TaskMakePixmap.h"
 #include "ProfilingExterns.h"
-
+#include "Logger.h"
 
 
 namespace clparen {
@@ -23,11 +23,16 @@ void TaskMakePixmap::setRenderer(
         Renderer::CLAbstractRenderer *renderer )
 {
     clRenderer_ = renderer ;
+    frame_ = renderer->getCLFrame().value< clData::CLImage2D< float > *>();
 }
 
 void TaskMakePixmap::run()
 {
     TIC( frameworkProfile.convertToPixmap_TIMER );
+
+    if( frame_ == nullptr )
+        LOG_ERROR("Null ptr!");
+
     emit this->pixmapReady_SIGNAL( &( frame_->getFramePixmap( )) , clRenderer_ );
     TOC( frameworkProfile.convertToPixmap_TIMER );
 }

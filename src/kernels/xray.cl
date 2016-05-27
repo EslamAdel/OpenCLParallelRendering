@@ -21,14 +21,14 @@
 * http://www.siggraph.org/education/materials/HyperGraph/raytrace/rtinter3.htm
 */
 int intersectBox( const float4 rayOrigin, const float4 rayDirection,
-const float4 pMin, const float4 pMax,
-float* tNear, float* tFar)
+                  const float4 pMin, const float4 pMax,
+                  float* tNear, float* tFar)
 {
-// Compute the intersection of the ray with all the six planes of the
-// bounding box.
-const float4 invR = ( float4 )( 1.f, 1.f, 1.f, 1.f) / rayDirection;
-const float4 tPMin = invR * ( pMin - rayOrigin );
-const float4 tPMax = invR * ( pMax - rayOrigin );
+    // Compute the intersection of the ray with all the six planes of the
+    // bounding box.
+    const float4 invR = ( float4 )( 1.f, 1.f, 1.f, 1.f) / rayDirection;
+    const float4 tPMin = invR * ( pMin - rayOrigin );
+    const float4 tPMax = invR * ( pMax - rayOrigin );
 
     // Re-order the intersections to find smallest and largest on each axis.
     const float4 tMin = min( tPMax, tPMin );
@@ -42,7 +42,7 @@ const float4 tPMax = invR * ( pMax - rayOrigin );
     *tFar = tMaxSmallest;
 
     return tMaxSmallest > tMinLargest;
-    }
+}
 
 /**
 * @brief rgbaFloatToInt
@@ -57,14 +57,14 @@ const float4 tPMax = invR * ( pMax - rayOrigin );
 */
 uint rgbaFloatToInt( float4 rgba )
 {
-rgba.x = clamp( rgba.x, 0.f, 1.f);
-rgba.y = clamp( rgba.y, 0.f, 1.f);
-rgba.z = clamp( rgba.z, 0.f, 1.f);
-rgba.w = clamp( rgba.w, 0.f, 1.f);
-return (( uint )( rgba.w * 255.f ) << 24 ) |     // Alpha
-(( uint )( rgba.z * 255.f ) << 16 ) |     // Blue
-(( uint )( rgba.y * 255.f ) << 8  ) |     // Green
-( uint )( rgba.x * 255.f );              // Red
+    rgba.x = clamp( rgba.x, 0.f, 1.f);
+    rgba.y = clamp( rgba.y, 0.f, 1.f);
+    rgba.z = clamp( rgba.z, 0.f, 1.f);
+    rgba.w = clamp( rgba.w, 0.f, 1.f);
+    return (( uint )( rgba.w * 255.f ) << 24 ) |     // Alpha
+            (( uint )( rgba.z * 255.f ) << 16 ) |     // Blue
+            (( uint )( rgba.y * 255.f ) << 8  ) |     // Green
+            ( uint )( rgba.x * 255.f );              // Red
 }
 
 /**
@@ -93,7 +93,7 @@ __kernel void xray( __write_only image2d_t frameBuffer,
                     float density,
 
                     float brightness )
-                    {
+{
 
     const uint x = get_global_id( 0 );
     const uint y = get_global_id( 1 );
@@ -108,6 +108,8 @@ __kernel void xray( __write_only image2d_t frameBuffer,
     if( y - offsetY - 1 > sortFirstHeight )
         return ;
 
+
+
     const float u = ( x / ( float ) frameWidth ) * 2.f - 1.f;
     const float v = ( y / ( float ) frameHeight ) * 2.f - 1.f;
 
@@ -119,30 +121,30 @@ __kernel void xray( __write_only image2d_t frameBuffer,
     float4 eyeRayDirection;
 
     const float4 eyeRayOrigin =
-    ( float4 )( invViewMatrix[ 3  ],
-    invViewMatrix[ 7  ],
-    invViewMatrix[ 11 ],
-    1.f );
+            ( float4 )( invViewMatrix[ 3  ],
+            invViewMatrix[ 7  ],
+            invViewMatrix[ 11 ],
+            1.f );
 
     const float4 direction = normalize((( float4 )( u, v, -2.f, 0.f )));
     eyeRayDirection.x = dot( direction, (( float4 )( invViewMatrix[ 0  ],
-    invViewMatrix[ 1  ],
-    invViewMatrix[ 2  ],
-    invViewMatrix[ 3  ] )));
+                                         invViewMatrix[ 1  ],
+                             invViewMatrix[ 2  ],
+            invViewMatrix[ 3  ] )));
     eyeRayDirection.y = dot( direction, (( float4 )( invViewMatrix[ 4  ],
-    invViewMatrix[ 5  ],
-    invViewMatrix[ 6  ],
-    invViewMatrix[ 7  ] )));
+                                         invViewMatrix[ 5  ],
+                             invViewMatrix[ 6  ],
+            invViewMatrix[ 7  ] )));
     eyeRayDirection.z = dot( direction, (( float4 )( invViewMatrix[ 8  ],
-    invViewMatrix[ 9  ],
-    invViewMatrix[ 10 ],
-    invViewMatrix[ 11 ] )));
+                                         invViewMatrix[ 9  ],
+                             invViewMatrix[ 10 ],
+            invViewMatrix[ 11 ] )));
     eyeRayDirection.w = 1.f;
 
     // Find the intersection of the ray with the box
     float tNear, tFar;
     int hit = intersectBox( eyeRayOrigin, eyeRayDirection,
-    boxMin, boxMax, &tNear, &tFar );
+                            boxMin, boxMax, &tNear, &tFar );
 
     // If it doesn't hit, then return a black value in the corresponding pixel
     if( !hit )
@@ -157,7 +159,7 @@ __kernel void xray( __write_only image2d_t frameBuffer,
 
     // Clamp to near plane if the tNear was negative
     if( tNear < 0.f )
-    tNear = 0.f;
+        tNear = 0.f;
 
     // March along the ray accumulating the densities
     float4 intensityBuffer = ( float4 )( 0.f, 0.f, 0.f, 0.f );
@@ -181,13 +183,13 @@ __kernel void xray( __write_only image2d_t frameBuffer,
         // the volume, with the corrsponding alpha components
         float alpha = intensity.w * density ;
         intensityBuffer = mix( intensityBuffer, intensity ,
-        ( float4 )( alpha, alpha, alpha, alpha ));
+                               ( float4 )( alpha, alpha, alpha, alpha ));
 
         // Get the parametric value of the next sample along the ray
         t -= T_STEP;
         if( t < tNear )
-        break;
-        }
+            break;
+    }
 
     // Adjust the brightness of the pixel
     intensityBuffer *= brightness;
