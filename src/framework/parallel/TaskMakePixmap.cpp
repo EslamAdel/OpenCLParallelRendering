@@ -14,7 +14,7 @@ TaskMakePixmap::TaskMakePixmap(  )
     setAutoDelete( false );
 }
 
-void TaskMakePixmap::setFrame( clData::CLImage2D< float > *frame )
+void TaskMakePixmap::setFrame( CLData::CLImage2D< float > *frame )
 {
     frame_ = frame ;
 }
@@ -23,7 +23,7 @@ void TaskMakePixmap::setRenderer(
         Renderer::CLAbstractRenderer *renderer )
 {
     clRenderer_ = renderer ;
-    frame_ = renderer->getCLFrame().value< clData::CLImage2D< float > *>();
+    frame_ = renderer->getCLFrame().value< CLData::CLImage2D< float > *>();
 }
 
 void TaskMakePixmap::run()

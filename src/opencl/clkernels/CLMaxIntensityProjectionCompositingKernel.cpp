@@ -1,7 +1,7 @@
 #include "CLMaxIntensityProjectionCompositingKernel.h"
 
 namespace clparen {
-namespace clKernel {
+namespace CLKernel {
 
 
 

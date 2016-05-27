@@ -1,7 +1,7 @@
 #include "CLIsoSurfaceCompositingKernel.h"
 
 
-clparen::clKernel::CLIsoSurfaceCompositingKernel::
+clparen::CLKernel::CLIsoSurfaceCompositingKernel::
 CLIsoSurfaceCompositingKernel( const cl_context clContext ,
                                            const std::string kernelName ,
                                            const std::string kernelFile ,

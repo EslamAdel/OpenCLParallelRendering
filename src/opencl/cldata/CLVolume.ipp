@@ -4,15 +4,15 @@
 #include <Headers.hh>
 
 namespace clparen {
-namespace clData {
+namespace CLData {
 
 template class CLVolume< uint8_t >;
-//template class CLVolume< uint16_t >;
-//template class CLVolume< uint32_t >;
-//template class CLVolume< uint64_t >;
-//template class CLVolume< half >;
-//template class CLVolume< float >;
-//template class CLVolume< double >;
+template class CLVolume< uint16_t >;
+template class CLVolume< uint32_t >;
+template class CLVolume< uint64_t >;
+template class CLVolume< half >;
+template class CLVolume< float >;
+template class CLVolume< double >;
 
 }
 }

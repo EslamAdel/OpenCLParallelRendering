@@ -262,7 +262,7 @@ public slots :
      * @brief activateRenderingKernel_SLOT
      * @param type
      */
-    void activateRenderingKernel_SLOT( clparen::clKernel::RenderingMode type );
+    void activateRenderingKernel_SLOT( clparen::CLKernel::RenderingMode type );
 
 
 

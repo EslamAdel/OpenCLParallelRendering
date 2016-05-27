@@ -5,7 +5,7 @@
 
 
 namespace  clparen  {
-namespace clKernel {
+namespace CLKernel {
 
 
 class CLAverageIntensityProjectionRenderingKernel : public CLRenderingKernel

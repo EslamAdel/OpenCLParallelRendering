@@ -3,7 +3,7 @@
 #include "Logger.h"
 
 namespace clparen {
-namespace clKernel {
+namespace CLKernel {
 
 
 CLXRayRenderingKernel::CLXRayRenderingKernel(

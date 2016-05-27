@@ -1,7 +1,7 @@
 #include "CLXRayCompositingKernel.h"
 
 namespace clparen {
-namespace clKernel {
+namespace CLKernel {
 
 
 CLXRayCompositingKernel::CLXRayCompositingKernel(

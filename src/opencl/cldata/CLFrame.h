@@ -11,7 +11,7 @@ namespace SystemUtilities {}
 using namespace SystemUtilities;
 
 namespace clparen {
-namespace clData {
+namespace CLData {
 
 template< class T >
 class CLFrame

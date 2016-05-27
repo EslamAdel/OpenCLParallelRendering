@@ -26,7 +26,7 @@ CLAbstractRenderer::CLAbstractRenderer(
     initializeContext_( );
     renderingKernels_ = allocateKernels_();
     activeRenderingKernel_ =
-            renderingKernels_[ clKernel::RenderingMode::RENDERING_MODE_Xray ];
+            renderingKernels_[ CLKernel::RenderingMode::RENDERING_MODE_Xray ];
 
 }
 
@@ -152,7 +152,7 @@ void CLAbstractRenderer::createCommandQueue_()
 
 
 void CLAbstractRenderer::switchRenderingKernel(
-        const clKernel::RenderingMode type )
+        const CLKernel::RenderingMode type )
 {
     QMutexLocker lock( &switchKernelMutex_ );
 
@@ -164,37 +164,37 @@ void CLAbstractRenderer::switchRenderingKernel(
     activeRenderingKernel_ = renderingKernels_[ type ];
 }
 
-clKernel::CLRenderingKernels
+CLKernel::CLRenderingKernels
 CLAbstractRenderer::allocateKernels_() const
 {
 
-    clKernel::CLRenderingKernels kernels;
+    CLKernel::CLRenderingKernels kernels;
 
     /// Add all the rendering kernel here, and set the selected to be the
     /// activeRenderingKernel_
-    kernels[ clKernel::RenderingMode::RENDERING_MODE_Xray ] =
-            new clKernel::CLXRayRenderingKernel(
+    kernels[ CLKernel::RenderingMode::RENDERING_MODE_Xray ] =
+            new CLKernel::CLXRayRenderingKernel(
                 context_ ,
                 kernelDirectory_ );
 
-    kernels[ clKernel::RenderingMode::RENDERING_MODE_MaxIntensity ] =
-            new clKernel::CLMaxIntensityProjectionRenderingKernel(
+    kernels[ CLKernel::RenderingMode::RENDERING_MODE_MaxIntensity ] =
+            new CLKernel::CLMaxIntensityProjectionRenderingKernel(
                 context_ ,
                 kernelDirectory_ );
 
-    kernels[ clKernel::RenderingMode::RENDERING_MODE_MinIntensity ] =
-            new clKernel::CLMinIntensityProjectionRenderingKernel(
+    kernels[ CLKernel::RenderingMode::RENDERING_MODE_MinIntensity ] =
+            new CLKernel::CLMinIntensityProjectionRenderingKernel(
                 context_ ,
                 kernelDirectory_ );
 
 
-    kernels[ clKernel::RenderingMode::RENDERING_MODE_AverageIntensity ] =
-            new clKernel::CLAverageIntensityProjectionRenderingKernel(
+    kernels[ CLKernel::RenderingMode::RENDERING_MODE_AverageIntensity ] =
+            new CLKernel::CLAverageIntensityProjectionRenderingKernel(
                 context_ ,
                 kernelDirectory_ );
 
-    kernels[ clKernel::RenderingMode::RENDERING_MODE_IsoSurface ] =
-            new clKernel::CLIsoSurfaceRenderingKernel(
+    kernels[ CLKernel::RenderingMode::RENDERING_MODE_IsoSurface ] =
+            new CLKernel::CLIsoSurfaceRenderingKernel(
                 context_ ,
                 kernelDirectory_ );
 

@@ -2,16 +2,16 @@
 #define CLVOLUME_VARIANTS_HH
 
 #include <QVariant>
-#include "clData.h"
+#include "CLData.hh"
 #include "Volume.h"
 
 
-Q_DECLARE_METATYPE( clparen::clData::CLVolume< uchar >* )
+Q_DECLARE_METATYPE( clparen::CLData::CLVolume< uchar >* )
 Q_DECLARE_METATYPE( Volume< uchar >* )
 
 
 namespace clparen {
-namespace clData {
+namespace CLData {
 
 typedef QVariant CLVolumeVariant ;
 

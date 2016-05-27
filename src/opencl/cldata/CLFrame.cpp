@@ -7,7 +7,7 @@
 #define F2B( f ) (( f ) >= 1.0 ? 255 : (short)( ( f ) * 256.0 ))
 
 namespace clparen {
-namespace clData {
+namespace CLData {
 
 
 template< class T >

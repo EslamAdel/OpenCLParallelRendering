@@ -4,7 +4,7 @@
 #include <Headers.hh>
 
 namespace clparen {
-namespace clData {
+namespace CLData {
 
 
 template class CLBuffer< uint32_t >;

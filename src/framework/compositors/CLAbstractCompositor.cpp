@@ -30,7 +30,7 @@ bool CLAbstractCompositor::readOutReady() const
 }
 
 void CLAbstractCompositor::switchCompositingKernel(
-        const clKernel::RenderingMode mode )
+        const CLKernel::RenderingMode mode )
 {
     QMutexLocker lock( &switchKernelMutex_ );
 
@@ -71,30 +71,30 @@ void CLAbstractCompositor::initializeContext_()
 }
 
 
-clKernel::CLCompositingKernels
+CLKernel::CLCompositingKernels
 CLAbstractCompositor::allocateKernels_( ) const
 {
 
-    clKernel::CLCompositingKernels kernels ;
+    CLKernel::CLCompositingKernels kernels ;
 
 
-    kernels[ clKernel::RenderingMode::RENDERING_MODE_Xray ] =
-            new clKernel::CLXRayCompositingKernel( context_ ,
+    kernels[ CLKernel::RenderingMode::RENDERING_MODE_Xray ] =
+            new CLKernel::CLXRayCompositingKernel( context_ ,
                                          "xray_compositing_patch" ,
                                          "xray_compositing.cl" ,
                                          kernelDirectory_ );
 
 
-    kernels[ clKernel::RenderingMode::RENDERING_MODE_MinIntensity ] =
-            new clKernel::CLMinIntensityProjectionCompositingKernel(
+    kernels[ CLKernel::RenderingMode::RENDERING_MODE_MinIntensity ] =
+            new CLKernel::CLMinIntensityProjectionCompositingKernel(
                 context_ ,
                 "minIntensityProjection_compositing" ,
                 "minIntensityProjection_compositing.cl",
                 kernelDirectory_ );
 
 
-    kernels[ clKernel::RenderingMode::RENDERING_MODE_MaxIntensity ] =
-            new clKernel::CLMaxIntensityProjectionCompositingKernel(
+    kernels[ CLKernel::RenderingMode::RENDERING_MODE_MaxIntensity ] =
+            new CLKernel::CLMaxIntensityProjectionCompositingKernel(
                 context_ ,
                 "maxIntensityProjection_compositing" ,
                 "maxIntensityProjection_compositing.cl" ,

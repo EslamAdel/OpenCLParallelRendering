@@ -90,7 +90,7 @@ protected:
     /**
      * @brief threadSafeFrame_
      */
-    QScopedPointer< clData::CLImage2D< F >> clFrame_;
+    QScopedPointer< CLData::CLImage2D< F >> clFrame_;
 
 
     /**

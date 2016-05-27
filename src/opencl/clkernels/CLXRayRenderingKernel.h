@@ -4,7 +4,7 @@
 #include "CLRenderingKernel.h"
 
 namespace clparen {
-namespace clKernel {
+namespace CLKernel {
 
 class CLXRayRenderingKernel : public CLRenderingKernel
 {

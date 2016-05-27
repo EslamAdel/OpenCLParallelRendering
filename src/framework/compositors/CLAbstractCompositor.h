@@ -9,7 +9,7 @@
 #include "oclHWDL.h"
 #include "CLRenderer.h"
 #include "Logger.h"
-#include "clData.h"
+#include "CLData.hh"
 #include "ProfilingExterns.h"
 #include "CLXRayCompositingKernel.h"
 #include "CLMaxIntensityProjectionCompositingKernel.h"
@@ -72,7 +72,7 @@ public:
      * @brief getFinalFrame
      * @return
      */
-    virtual const clData::CLFrameVariant &getFinalFrame() const = 0 ;
+    virtual const CLData::CLFrameVariant &getFinalFrame() const = 0 ;
 
     /**
      * @brief getGPUIndex
@@ -90,7 +90,7 @@ public:
      * @brief switchCompositingKernel
      * @param mode
      */
-    void switchCompositingKernel( const clKernel::RenderingMode mode ) ;
+    void switchCompositingKernel( const CLKernel::RenderingMode mode ) ;
 
 private:
     /**
@@ -107,7 +107,7 @@ private:
      * @brief allocateKernels_
      * @return
      */
-    clKernel::CLCompositingKernels allocateKernels_( ) const;
+    CLKernel::CLCompositingKernels allocateKernels_( ) const;
 
 protected:
     /**
@@ -176,7 +176,7 @@ protected:
     /**
      * @brief finalFrameVariant_
      */
-    mutable clData::CLFrameVariant finalFrameVariant_ ;
+    mutable CLData::CLFrameVariant finalFrameVariant_ ;
 
     /**
      * @brief readOutReady_
@@ -191,12 +191,12 @@ protected:
     /**
      * @brief renderingKernels_
      */
-    clKernel::CLCompositingKernels compositingKernels_ ;
+    CLKernel::CLCompositingKernels compositingKernels_ ;
 
     /**
      * @brief activeRenderingKernel_
      */
-    clKernel::CLCompositingKernel* activeCompositingKernel_;
+    CLKernel::CLCompositingKernel* activeCompositingKernel_;
 };
 
 }

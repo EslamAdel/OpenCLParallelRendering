@@ -5,9 +5,11 @@
 #include "Volume.h"
 #include <QMutex>
 #include <QMutexLocker>
+#include <typeinfo>
+
 
 namespace clparen {
-namespace clData {
+namespace CLData {
 
 enum VOLUME_PRECISION
 {
@@ -15,7 +17,8 @@ enum VOLUME_PRECISION
     VOLUME_CL_UNSIGNED_INT16,
     VOLUME_CL_UNSIGNED_INT32,
     VOLUME_CL_HALF_FLOAT,
-    VOLUME_CL_FLOAT
+    VOLUME_CL_FLOAT,
+    VOLUME_CL_DEFAULT
 };
 
 
@@ -31,7 +34,9 @@ public:
      * @param volume
      * @param precision
      */
-    CLVolume( Volume< T >* volume, const VOLUME_PRECISION precision );
+    CLVolume( Volume< T >* volume,
+              const VOLUME_PRECISION precision =
+            VOLUME_PRECISION::VOLUME_CL_DEFAULT );
 
 public:
 
@@ -68,6 +73,11 @@ public:
      * @param brickParameters
      */
     void copyHostData( const BrickParameters< T > &brickParameters );
+
+private:
+
+    static VOLUME_PRECISION defaultVolumePrecision_( );
+
 private:
 
     /**

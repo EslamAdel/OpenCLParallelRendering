@@ -4,7 +4,7 @@
 
 
 namespace clparen {
-namespace clKernel {
+namespace CLKernel {
 
 
 CLMaxIntensityProjectionRenderingKernel::

@@ -1,17 +1,19 @@
 #include "CLVolume.h"
 #include <typeinfo>
+#include <type_traits>
 #include <Logger.h>
 #include <oclHWDL.h>
 
 namespace clparen {
-namespace clData {
+namespace CLData {
 
 
 template< class T >
 CLVolume< T >::CLVolume( Volume< T >* volume,
                          const VOLUME_PRECISION precision )
     : volume_( volume )
-    , precision_( precision )
+    , precision_(( precision == VOLUME_PRECISION::VOLUME_CL_DEFAULT )?
+                      defaultVolumePrecision_() : precision )
 {
     imageDescriptor_.image_type = CL_MEM_OBJECT_IMAGE3D ;
 
@@ -203,6 +205,26 @@ void CLVolume< T >::copyHostData(
     QMutexLocker lock( &hostDataMutex_ );
 
     volume_->copyData( brickParameters );
+}
+
+template< class T >
+VOLUME_PRECISION CLVolume< T >::defaultVolumePrecision_()
+{
+
+    if( std::is_same< T , uchar >::value )
+        return VOLUME_PRECISION::VOLUME_CL_UNSIGNED_INT8 ;
+
+    if( std::is_same< T , uint16_t >::value )
+        return VOLUME_PRECISION::VOLUME_CL_UNSIGNED_INT16 ;
+
+    if( std::is_same< T , half >::value )
+        return VOLUME_PRECISION::VOLUME_CL_HALF_FLOAT ;
+
+    if( std::is_same< T , float >::value )
+        return VOLUME_PRECISION::VOLUME_CL_FLOAT;
+
+    LOG_ERROR("%s is not supported as volume precision!",
+                typeid( T ).name());
 }
 
 }

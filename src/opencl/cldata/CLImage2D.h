@@ -9,7 +9,7 @@ template< class T > class SerializableFrame ;
 
 
 namespace clparen {
-namespace clData {
+namespace CLData {
 
 
 template< class T >

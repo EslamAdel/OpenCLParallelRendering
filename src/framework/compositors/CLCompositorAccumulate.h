@@ -32,7 +32,7 @@ public:
 
     void loadFinalFrame() override ;
 
-    const clData::CLFrameVariant &getFinalFrame( ) const override;
+    const CLData::CLFrameVariant &getFinalFrame( ) const override;
 
     uint framesCount() const ;
 
@@ -57,16 +57,16 @@ protected:
 
     uint8_t compositedFramesCount_ ;
 
-    clData::CLFrame< T > *currentFrame_ ;
-    clData::CLFrame< T > *finalFrame_ ;
+    CLData::CLFrame< T > *currentFrame_ ;
+    CLData::CLFrame< T > *finalFrame_ ;
 
-    clData::CLFrame< T > *finalFrameReadout_ ;
+    CLData::CLFrame< T > *finalFrameReadout_ ;
 
     //empty
     std::unordered_map< const Renderer::CLAbstractRenderer * ,
-                        clData::CLFrame< T >* > frames_ ;
+                        CLData::CLFrame< T >* > frames_ ;
 
-    QQueue< clData::CLFrame< T >* > loadedFrames_ ;
+    QQueue< CLData::CLFrame< T >* > loadedFrames_ ;
 
 };
 

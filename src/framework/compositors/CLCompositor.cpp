@@ -64,8 +64,8 @@ void CLCompositor< T >::collectFrame(
         const cl_bool block )
 {
 
-    clData::CLImage2D< T > *sourceFrame =
-            renderer->getCLFrame().value< clData::CLImage2D< T > *>( );
+    CLData::CLImage2D< T > *sourceFrame =
+            renderer->getCLFrame().value< CLData::CLImage2D< T > *>( );
 
 #ifdef BENCHMARKING
     imagesArray_->readOtherDeviceData( renderer->getCommandQueue() ,
@@ -153,16 +153,16 @@ void CLCompositor< T >::loadFinalFrame()
 }
 
 template< class T >
-const clData::CLFrameVariant
+const CLData::CLFrameVariant
 &CLCompositor<T>::getFinalFrame() const
 {
     this->finalFrameVariant_.
-            setValue(( clData::CLImage2D< T > *) finalFrameReadout_ );
+            setValue(( CLData::CLImage2D< T > *) finalFrameReadout_ );
     return this->finalFrameVariant_ ;
 }
 
 template< class T >
-const clData::CLImage2D< T > &CLCompositor< T >::getFinalFrame( bool )
+const CLData::CLImage2D< T > &CLCompositor< T >::getFinalFrame( bool )
 {
     return *finalFrameReadout_;
 }
@@ -178,20 +178,20 @@ void CLCompositor< T >::initializeBuffers_()
 {
     LOG_DEBUG("Initializing Buffers ...");
 
-    finalFrame_ = new clData::CLImage2D< T >( frameDimensions_ , CL_INTENSITY ,
+    finalFrame_ = new CLData::CLImage2D< T >( frameDimensions_ , CL_INTENSITY ,
                                       CL_FLOAT  );
-    finalFrameReadout_ = new clData::CLImage2D< T >( frameDimensions_ , CL_INTENSITY ,
+    finalFrameReadout_ = new CLData::CLImage2D< T >( frameDimensions_ , CL_INTENSITY ,
                                              CL_FLOAT );
 
     finalFrame_->createDeviceData( context_ );
 
-    imagesArray_ = new clData::CLImage2DArray< T >( frameDimensions_.x ,
+    imagesArray_ = new CLData::CLImage2DArray< T >( frameDimensions_.x ,
                                             frameDimensions_.y ,
                                             0 ,
                                             CL_INTENSITY ,
                                             CL_FLOAT );
 
-    depthIndex_ = new clData::CLBuffer< uint >( 1 );
+    depthIndex_ = new CLData::CLBuffer< uint >( 1 );
 
     depthIndex_->createDeviceData( context_ );
 
@@ -204,9 +204,9 @@ void CLCompositor< T >::initializeKernel_()
     LOG_DEBUG( "Initializing OpenCL Kernels ... " );
 
     activeCompositingKernel_ =
-            compositingKernels_[ clKernel::RenderingMode::RENDERING_MODE_Xray ];
+            compositingKernels_[ CLKernel::RenderingMode::RENDERING_MODE_Xray ];
 
-    for( clKernel::CLCompositingKernel* compositingKernel :
+    for( CLKernel::CLCompositingKernel* compositingKernel :
          compositingKernels_.values( ))
     {
         // Assuming that every thing is going in the right direction.
@@ -225,7 +225,7 @@ template< class T >
 void CLCompositor< T >::updateKernelsArguments_()
 {
 
-    for( clKernel::CLCompositingKernel* compositingKernel :
+    for( CLKernel::CLCompositingKernel* compositingKernel :
          compositingKernels_.values( ))
     {
         // Assuming that every thing is going in the right direction.

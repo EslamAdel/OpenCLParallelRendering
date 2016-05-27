@@ -19,7 +19,7 @@ SortFirstRenderer< V , F >::SortFirstRenderer( Volume< V > *volume,
     frameBuffer_.reset( new F[ frameDimension.imageSize() ]);
     frame_.reset( new Image< F >( frameDimension , frameBuffer_.data( )));
 
-    clFrame_.reset( new clData::CLImage2D< F >( frameDimension ));
+    clFrame_.reset( new CLData::CLImage2D< F >( frameDimension ));
 
     connect( this , SIGNAL(finishedCompositing_SIGNAL()) ,
              this , SLOT(compositingFinished_SLOT()));
@@ -220,8 +220,8 @@ void SortFirstRenderer< V , F >::assemble_(
         Image< F > *finalFrame ,
         F *finalFrameBuffer )
 {
-    clData::CLImage2D< F > *clFrame =
-            renderer->getCLFrame().value< clData::CLImage2D< F > *>();
+    CLData::CLImage2D< F > *clFrame =
+            renderer->getCLFrame().value< CLData::CLImage2D< F > *>();
 
     clFrame->readDeviceData( renderer->getCommandQueue() ,
                              CL_TRUE );

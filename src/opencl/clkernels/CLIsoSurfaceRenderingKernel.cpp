@@ -2,7 +2,7 @@
 #include <oclUtils.h>
 #include <Logger.h>
 
-clparen::clKernel::CLIsoSurfaceRenderingKernel::
+clparen::CLKernel::CLIsoSurfaceRenderingKernel::
 CLIsoSurfaceRenderingKernel( cl_context clContext ,
                                          const std::string kernelDirectory ,
                                          const std::string kernelFile ,
@@ -14,20 +14,20 @@ CLIsoSurfaceRenderingKernel( cl_context clContext ,
 }
 
 void
-clparen::clKernel::CLIsoSurfaceRenderingKernel::retrieveKernelObject_( )
+clparen::CLKernel::CLIsoSurfaceRenderingKernel::retrieveKernelObject_( )
 {
     kernelObject_ = kernelContext_->getKernelObject( kernelName_ );
 }
 
-clparen::clKernel::RenderingMode
-clparen::clKernel::CLIsoSurfaceRenderingKernel::
+clparen::CLKernel::RenderingMode
+clparen::CLKernel::CLIsoSurfaceRenderingKernel::
 getRenderingKernelType( ) const
 {
     return RenderingMode::RENDERING_MODE_MinIntensity;
 }
 
 
-void clparen::clKernel::CLIsoSurfaceRenderingKernel::
+void clparen::CLKernel::CLIsoSurfaceRenderingKernel::
 setImageBrightnessFactor( float brightness )
 {
     cl_int error = clSetKernelArg( kernelObject_, KERNEL_ARG_Brightness ,
@@ -40,7 +40,7 @@ setImageBrightnessFactor( float brightness )
     }
 }
 
-void clparen::clKernel::CLIsoSurfaceRenderingKernel::
+void clparen::CLKernel::CLIsoSurfaceRenderingKernel::
 setVolumeDensityFactor( float density )
 {
     cl_int error = clSetKernelArg( kernelObject_, KERNEL_ARG_Density ,
@@ -53,7 +53,7 @@ setVolumeDensityFactor( float density )
     }
 }
 
-void clparen::clKernel::CLIsoSurfaceRenderingKernel::
+void clparen::CLKernel::CLIsoSurfaceRenderingKernel::
 setVolumeIsoValue( float isovalue )
 {
     cl_int error = clSetKernelArg( kernelObject_, KERNEL_ARG_IsoValue ,

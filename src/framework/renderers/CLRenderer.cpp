@@ -26,9 +26,14 @@ CLRenderer< V , F >::CLRenderer(
     : CLAbstractRenderer( gpuIndex , frameDimensions , kernelDirectory ) ,
       transformation_( transformation )
 {
+    volume_ = 0 ;
+    clVolume_ = 0 ;
+    clFrame_ = 0 ;
+    inverseMatrix_ = 0 ;
+    linearVolumeSampler_ = 0 ;
+    nearestVolumeSampler_ = 0 ;
 
-    clVolume_ = nullptr ;
-    clFrame_ = nullptr ;
+
     LOG_INFO( "Creating Context on Node with GPU <%d>", gpuIndex );
     linearFiltering_ = true;
 
@@ -53,10 +58,10 @@ void CLRenderer< V , F >::createPixelBuffer_()
     if( clFrame_ != nullptr )
         delete clFrame_ ;
 
-    clFrame_ = new clData::CLImage2D< F >( sortFirstDimensions_ ,
+    clFrame_ = new CLData::CLImage2D< F >( sortFirstDimensions_ ,
                                            CL_INTENSITY , CL_FLOAT );
 
-//    LOG_DEBUG("Created Frame[%d]:%s",gpuIndex_,sortFirstDimensions_.toString().c_str());
+    //    LOG_DEBUG("Created Frame[%d]:%s",gpuIndex_,sortFirstDimensions_.toString().c_str());
 
     clFrame_->createDeviceData( context_ );
 }
@@ -80,19 +85,27 @@ const Coordinates3D &CLRenderer< V , F >::getCurrentCenter() const
 template< class V , class F >
 void CLRenderer< V , F >::loadVolume( VolumeVariant &volume )
 {
-    volume_ =  volume.value< Volume< V > *>() ;
-    currentCenter_ = volume_->getUnitCubeCenter();
+    Volume< V > *newVolume = volume.value< Volume< V > *>() ;
+
+    // If no volume yet loaded, initialize the current center.
+    if( !volume_ )
+        currentCenter_ = newVolume->getUnitCubeCenter();
+
+    volume_ =  newVolume ;
+
     LOG_DEBUG("Loaded Volume D(%d,%d,%d)" , volume_->getDimensions().x ,
               volume_->getDimensions().y , volume_->getDimensions().z );
-
 
 
     // Assume everything is fine in the begnning
     cl_int clErrorCode = CL_SUCCESS;
 
-    // Create an OpenCL volume
-    clVolume_ = new clData::CLVolume< V >( volume_ , clData::VOLUME_CL_UNSIGNED_INT8 );
+    // If already clVolume exists, update!
+    if( clVolume_ )
+        delete clVolume_ ;
 
+    // Create an OpenCL volume
+    clVolume_ = new CLData::CLVolume< V >( volume_ );
     clVolume_->createDeviceVolume( context_ );
 
     oclHWDL::Error::checkCLError(clErrorCode);
@@ -114,10 +127,10 @@ uint CLRenderer< V , F >::getFrameIndex() const
 }
 
 template< class V , class F >
-const clparen::clData::CLFrameVariant
+const clparen::CLData::CLFrameVariant
 &CLRenderer< V , F >::getCLFrame() const
 {
-    this->frameVariant_.setValue(( clData::CLImage2D< F > *) clFrame_ );
+    this->frameVariant_.setValue(( CLData::CLImage2D< F > *) clFrame_ );
     return this->frameVariant_ ;
 }
 
@@ -188,20 +201,24 @@ void CLRenderer< V , F >::initializeKernels_()
     // Assuming that every thing is going in the right direction.
     cl_int clErrorCode = CL_SUCCESS;
 
-    linearVolumeSampler_ = clCreateSampler( context_, true,
-                                            CL_ADDRESS_CLAMP_TO_EDGE,
-                                            CL_FILTER_LINEAR, &clErrorCode );
+    if( !linearVolumeSampler_ )
+        linearVolumeSampler_ = clCreateSampler( context_, true,
+                                                CL_ADDRESS_CLAMP_TO_EDGE,
+                                                CL_FILTER_LINEAR,
+                                                &clErrorCode );
 
 
-    nearestVolumeSampler_ = clCreateSampler( context_, true,
-                                             CL_ADDRESS_REPEAT,
-                                             CL_FILTER_NEAREST,
-                                             &clErrorCode );
+    if( !nearestVolumeSampler_ )
+        nearestVolumeSampler_ = clCreateSampler( context_, true,
+                                                 CL_ADDRESS_REPEAT,
+                                                 CL_FILTER_NEAREST,
+                                                 &clErrorCode );
 
-    inverseMatrix_ = clCreateBuffer( context_,
-                                     CL_MEM_READ_ONLY,
-                                     12 * sizeof( float ), 0,
-                                     &clErrorCode );
+    if( !inverseMatrix_ )
+        inverseMatrix_ = clCreateBuffer( context_,
+                                         CL_MEM_READ_ONLY,
+                                         12 * sizeof( float ), 0,
+                                         &clErrorCode );
 
 
 
@@ -212,9 +229,9 @@ void CLRenderer< V , F >::initializeKernels_()
     }
 
 
-    for( const clKernel::RenderingMode mode : renderingKernels_.keys())
+    for( const CLKernel::RenderingMode mode : renderingKernels_.keys())
     {
-        clKernel::CLRenderingKernel* renderingKernel = renderingKernels_[ mode ];
+        CLKernel::CLRenderingKernel* renderingKernel = renderingKernels_[ mode ];
 
         renderingKernel->setFrameBuffer( clFrame_->getDeviceData() );
         renderingKernel->setFrameWidth( frameDimensions_.x );
@@ -382,7 +399,7 @@ void CLRenderer< V , F >::paint_()
 
 
 template< class V , class F >
-clData::CLVolume< V > *CLRenderer< V , F >::getCLVolume()
+CLData::CLVolume< V > *CLRenderer< V , F >::getCLVolume()
 {
     return clVolume_;
 }

@@ -4,7 +4,7 @@
 #include "CLAbstractRenderer.h"
 #include "Volume.h"
 #include "Transformation.h"
-#include "clData.h"
+#include "CLData.hh"
 #include <QMap>
 
 
@@ -66,13 +66,13 @@ public:
      * @brief getCLFrame
      * @return
      */
-    const clData::CLFrameVariant &getCLFrame( ) const override;
+    const CLData::CLFrameVariant &getCLFrame( ) const override;
 
     /**
      * @brief getCLVolume
      * @return
      */
-    clData::CLVolume< V > *getCLVolume();
+    CLData::CLVolume< V > *getCLVolume();
 
     /**
      * @brief reloadVolume
@@ -117,8 +117,6 @@ private:
      */
     void paint_( );
 
-
-
 private:
 
     /**
@@ -144,7 +142,7 @@ private:
     /**
      * @brief clVolume_
      */
-    clData::CLVolume< V >* clVolume_;
+    CLData::CLVolume< V >* clVolume_;
 
     /**
      * @brief inverseMatrix_
@@ -176,7 +174,7 @@ private:
     /**
      * @brief clFrame_
      */
-    clData::CLImage2D< F > *clFrame_ ;
+    CLData::CLImage2D< F > *clFrame_ ;
 
     /**
      * @brief inverseMatrix_

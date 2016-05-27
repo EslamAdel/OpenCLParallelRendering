@@ -400,27 +400,27 @@ void RenderingWindow_Gui::switchRenderingKernel_SLOT()
     if( ui->xrayButton->isChecked( ))
         parallelRenderer_->
                 activateRenderingKernel_SLOT(
-                    clKernel::RenderingMode::RENDERING_MODE_Xray );
+                    CLKernel::RenderingMode::RENDERING_MODE_Xray );
 
     else if( ui->maxIntensityProjectionButton->isChecked( ))
         parallelRenderer_->
                 activateRenderingKernel_SLOT(
-                    clKernel::RenderingMode::RENDERING_MODE_MaxIntensity );
+                    CLKernel::RenderingMode::RENDERING_MODE_MaxIntensity );
 
     else if(ui->minIntensityProjectionButton->isChecked( ))
         parallelRenderer_->
                 activateRenderingKernel_SLOT(
-                    clKernel::RenderingMode::RENDERING_MODE_MinIntensity );
+                    CLKernel::RenderingMode::RENDERING_MODE_MinIntensity );
 
     else if(ui->averageIntensityProjectionButton->isChecked( ))
         parallelRenderer_->
                 activateRenderingKernel_SLOT(
-                    clKernel::RenderingMode::RENDERING_MODE_AverageIntensity );
+                    CLKernel::RenderingMode::RENDERING_MODE_AverageIntensity );
 
     else if(ui->isoSurfaceButton->isChecked( ))
         parallelRenderer_->
                 activateRenderingKernel_SLOT(
-                    clKernel::RenderingMode::RENDERING_MODE_IsoSurface );
+                    CLKernel::RenderingMode::RENDERING_MODE_IsoSurface );
 
 
     ui->isoValueSlider->setEnabled( ui->isoSurfaceButton->isChecked( ));
@@ -452,7 +452,7 @@ void RenderingWindow_Gui::captureView_SLOT()
 
     LOG_DEBUG("Saving resultant frame");
     QPixmap pic( parallelRenderer_->getCLCompositor().getFinalFrame().
-                 value< clparen::clData::CLFrame< float > *>()->
+                 value< clparen::CLData::CLFrame< float > *>()->
                  getFramePixmap().
                  scaledToHeight( width ).scaledToWidth( height ));
     pic.save( newDir + "/result.jpg");
@@ -463,9 +463,9 @@ void RenderingWindow_Gui::captureView_SLOT()
     {
 
         LOG_DEBUG("Saving frame<%d>", gpuIndex );
-        clData::CLFrame< float > *sourceFrame =
+        CLData::CLFrame< float > *sourceFrame =
                 parallelRenderer_->getCLRenderer( gpuIndex ).
-                getCLFrame().value< clData::CLFrame< float > *>() ;
+                getCLFrame().value< CLData::CLFrame< float > *>() ;
 
         QPixmap framePixmap( sourceFrame->
                              getFramePixmap().

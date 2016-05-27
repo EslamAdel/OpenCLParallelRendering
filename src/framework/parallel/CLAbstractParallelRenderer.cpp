@@ -234,7 +234,7 @@ void CLAbstractParallelRenderer::updateIsoValue_SLOT(float isoValue)
 }
 
 void CLAbstractParallelRenderer::activateRenderingKernel_SLOT(
-        clKernel::RenderingMode type )
+        CLKernel::RenderingMode type )
 {
     for( Renderer::CLAbstractRenderer *renderer : renderers_.values())
         renderer->switchRenderingKernel( type );

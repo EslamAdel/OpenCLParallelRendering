@@ -32,9 +32,9 @@ void CLCompositorAccumulate< T >::allocateFrame(
 
     renderers_ << renderer ;
 
-    clData::CLFrame< T > *frame =
-            new clData::CLFrame< T >(
-                renderer->getCLFrame().value< clData::CLImage2D< T > *>()->
+    CLData::CLFrame< T > *frame =
+            new CLData::CLFrame< T >(
+                renderer->getCLFrame().value< CLData::CLImage2D< T > *>()->
                 getFrameDimensions( ));
 
     frame->createDeviceData( context_ );
@@ -51,8 +51,8 @@ void CLCompositorAccumulate< T >::collectFrame(
         const cl_bool block )
 {
 
-    clData::CLFrame< T > *sourceFrame =
-            renderer->getCLFrame().value< clData::CLImage2D< T > *>( );
+    CLData::CLFrame< T > *sourceFrame =
+            renderer->getCLFrame().value< CLData::CLImage2D< T > *>( );
 
     sourceFrame->readDeviceData( renderer->getCommandQueue() ,
                                  block );
@@ -136,7 +136,7 @@ void CLCompositorAccumulate< T >::loadFinalFrame()
 }
 
 template< class T >
-const clData::CLFrameVariant &
+const CLData::CLFrameVariant &
 CLCompositorAccumulate< T >::getFinalFrame() const
 {
     this->finalFrameVariant_ = QVariant::fromValue( finalFrameReadout_  );
@@ -160,7 +160,7 @@ void CLCompositorAccumulate< T >::initializeBuffers_()
 {
     LOG_DEBUG("Initializing Buffers ...");
 
-    finalFrameReadout_ = new clData::CLFrame< T >( frameDimensions_ );
+    finalFrameReadout_ = new CLData::CLFrame< T >( frameDimensions_ );
 
     LOG_DEBUG("[DONE] Initializing Buffers ...");
 }

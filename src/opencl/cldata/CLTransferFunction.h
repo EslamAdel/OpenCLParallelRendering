@@ -4,7 +4,7 @@
 #include "CLImage2D.h"
 
 namespace clparen {
-namespace clData {
+namespace CLData {
 
 
 class CLTransferFunction : public CLImage2D< float >

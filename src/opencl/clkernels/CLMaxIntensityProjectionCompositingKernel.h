@@ -6,7 +6,7 @@
 
 
 namespace clparen {
-namespace clKernel {
+namespace CLKernel {
 
 class CLMaxIntensityProjectionCompositingKernel : public CLCompositingKernel
 {

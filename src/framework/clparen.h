@@ -7,8 +7,8 @@
 #include "Calibrator.h"
 #include "CLCompositor.h"
 #include "CLRenderer.h"
-#include "clKernel.h"
-#include "clData.h"
+#include "CLKernel.hh"
+#include "CLData.hh"
 
 
 #endif // FRAMEWORK_H

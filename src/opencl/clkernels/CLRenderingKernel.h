@@ -16,7 +16,7 @@
 
 
 namespace clparen {
-namespace clKernel {
+namespace CLKernel {
 
 enum RenderingMode
 {

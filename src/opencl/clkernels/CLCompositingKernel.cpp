@@ -2,7 +2,7 @@
 
 
 namespace clparen {
-namespace clKernel {
+namespace CLKernel {
 
 
 CLCompositingKernel::CLCompositingKernel(

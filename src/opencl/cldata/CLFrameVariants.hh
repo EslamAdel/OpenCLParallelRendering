@@ -3,14 +3,14 @@
 
 #include <QVariant>
 
-#include "clData.h"
+#include "CLData.hh"
 
 
-Q_DECLARE_METATYPE( clparen::clData::CLFrame< float >* )
-Q_DECLARE_METATYPE( clparen::clData::CLImage2D< float >* )
+Q_DECLARE_METATYPE( clparen::CLData::CLFrame< float >* )
+Q_DECLARE_METATYPE( clparen::CLData::CLImage2D< float >* )
 
 namespace clparen {
-namespace clData {
+namespace CLData {
 
 typedef QVariant CLFrameVariant ;
 

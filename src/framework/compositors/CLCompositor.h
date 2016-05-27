@@ -57,14 +57,14 @@ public:
      * @brief getFinalFrame
      * @return
      */
-    const clData::CLFrameVariant &getFinalFrame( ) const override;
+    const CLData::CLFrameVariant &getFinalFrame( ) const override;
 
     /**
      * @brief getFinalFrame
      * @param clImage2D
      * @return
      */
-    const clData::CLImage2D< T > &getFinalFrame( bool clImage2D );
+    const CLData::CLImage2D< T > &getFinalFrame( bool clImage2D );
 
     /**
      * @brief framesCount
@@ -111,12 +111,12 @@ protected:
     /**
      * @brief finalFrame_
      */
-    clData::CLImage2D< T > *finalFrame_ ;
+    CLData::CLImage2D< T > *finalFrame_ ;
 
     /**
      * @brief finalFrameReadout_
      */
-    clData::CLImage2D< T > *finalFrameReadout_ ;
+    CLData::CLImage2D< T > *finalFrameReadout_ ;
 
 
 
@@ -124,12 +124,12 @@ protected:
     /**
      * @brief imagesArray_
      */
-    clData::CLImage2DArray< T > *imagesArray_ ;
+    CLData::CLImage2DArray< T > *imagesArray_ ;
 
     /**
      * @brief depthIndex_
      */
-    clData::CLBuffer< uint > *depthIndex_ ;
+    CLData::CLBuffer< uint > *depthIndex_ ;
 
     /**
      * @brief criticalMutex_

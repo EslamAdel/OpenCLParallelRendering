@@ -106,7 +106,7 @@ SET( CLPAREN_HEADER_FILES
     geometry/Vector2.ipp
     geometry/Vector3.ipp
     geometry/Vector4.ipp
-    opencl/cldata/clData.h
+    opencl/cldata/CLData.hh
     opencl/cldata/CLFrame.h
     opencl/cldata/CLFrame.ipp
     opencl/cldata/CLImage2D.h
@@ -116,7 +116,7 @@ SET( CLPAREN_HEADER_FILES
     opencl/cldata/CLTransferFunction.h
     opencl/cldata/CLVolume.h
     opencl/cldata/CLVolume.ipp
-    opencl/clkernels/clKernel.h
+    opencl/clkernels/CLKernel.hh
     opencl/clkernels/CLXRayCompositingKernel.h
     opencl/clkernels/CLRenderingKernel.h
     opencl/clkernels/CLCompositingKernel.h

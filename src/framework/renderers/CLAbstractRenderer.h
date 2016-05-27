@@ -6,7 +6,7 @@
 #include <QMutexLocker>
 #include <oclHWDL.h>
 
-#include "clData.h"
+#include "CLData.hh"
 #include "CLRenderingKernel.h"
 #include "CLXRayRenderingKernel.h"
 #include "CLMaxIntensityProjectionRenderingKernel.h"
@@ -99,7 +99,7 @@ public:
      * @brief getCLFrame
      * @return
      */
-    virtual const clData::CLFrameVariant &getCLFrame( ) const = 0;
+    virtual const CLData::CLFrameVariant &getCLFrame( ) const = 0;
 
     /**
      * @brief getCurrentCenter
@@ -118,7 +118,7 @@ public:
      * @brief switchRenderingKernel
      * @param type
      */
-    void switchRenderingKernel( const clKernel::RenderingMode type ) ;
+    void switchRenderingKernel( const CLKernel::RenderingMode type ) ;
 
 
     /**
@@ -218,7 +218,7 @@ private:
      * @brief allocateKernels_
      * @return
      */
-    clKernel::CLRenderingKernels allocateKernels_( ) const;
+    CLKernel::CLRenderingKernels allocateKernels_( ) const;
 protected:
 
     /**
@@ -277,7 +277,7 @@ protected:
     /**
      * @brief frameVariant_
      */
-    mutable clData::CLFrameVariant frameVariant_ ;
+    mutable CLData::CLFrameVariant frameVariant_ ;
 
 
     /**
@@ -288,17 +288,17 @@ protected:
     /**
      * @brief renderingKernels_
      */
-    clKernel::CLRenderingKernels renderingKernels_ ;
+    CLKernel::CLRenderingKernels renderingKernels_ ;
 
     /**
      * @brief activeRenderingKernel_
      */
-    clKernel::CLRenderingKernel* activeRenderingKernel_;
+    CLKernel::CLRenderingKernel* activeRenderingKernel_;
 
     /**
      * @brief activeRenderingMode_
      */
-    clKernel::RenderingMode activeRenderingMode_ ;
+    CLKernel::RenderingMode activeRenderingMode_ ;
 
     /**
      * @brief GPUExecution_

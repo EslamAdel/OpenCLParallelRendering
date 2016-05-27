@@ -5,7 +5,7 @@
 #include "CLCompositingKernel.h"
 
 namespace clparen {
-namespace clKernel {
+namespace CLKernel {
 
 
 class CLMinIntensityProjectionCompositingKernel : public CLCompositingKernel

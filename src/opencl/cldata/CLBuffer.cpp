@@ -3,7 +3,7 @@
 
 
 namespace clparen {
-namespace clData {
+namespace CLData {
 
 
 template< class T >

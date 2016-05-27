@@ -68,7 +68,7 @@ void SortLastRenderer< V , F >::addCLRenderer( const uint64_t gpuIndex )
 
     Task::TaskMakePixmap *taskPixmap = new Task::TaskMakePixmap( );
     taskPixmap->setFrame( renderer->getCLFrame( ).
-                          value< clData::CLImage2D< F > *>());
+                          value< CLData::CLImage2D< F > *>());
     taskPixmap->setRenderer( renderer );
 
     makePixmapTasks_[ renderer ] = taskPixmap ;
@@ -276,8 +276,8 @@ void SortLastRenderer< V , F >::finishedRendering_SLOT(
     }
     else
     {
-        clData::CLImage2D< F > *rendererdFrame =
-                renderer->getCLFrame().value< clData::CLImage2D< F > *>( );
+        CLData::CLImage2D< F > *rendererdFrame =
+                renderer->getCLFrame().value< CLData::CLImage2D< F > *>( );
 
         rendererdFrame->readDeviceData( renderer->getCommandQueue() ,
                                         CL_TRUE );
@@ -299,7 +299,7 @@ void SortLastRenderer< V , F >::compositingFinished_SLOT()
 
 #ifndef BENCHMARKING
     finalFramePixmapTask_->setFrame(
-                compositor_->getFinalFrame().value< clData::CLImage2D< F >*>( ));
+                compositor_->getFinalFrame().value< CLData::CLImage2D< F >*>( ));
 
     pixmapMakerPool_.start( finalFramePixmapTask_ );
 #endif

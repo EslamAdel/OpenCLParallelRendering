@@ -2,7 +2,7 @@
 #include "Logger.h"
 
 namespace clparen {
-namespace clData {
+namespace CLData {
 
 
 template< class T >

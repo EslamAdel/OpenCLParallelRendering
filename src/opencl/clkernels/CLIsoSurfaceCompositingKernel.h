@@ -6,7 +6,7 @@
 
 
 namespace clparen {
-namespace clKernel {
+namespace CLKernel {
 
 class CLIsoSurfaceCompositingKernel : public CLCompositingKernel
 {

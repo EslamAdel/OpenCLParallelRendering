@@ -7,7 +7,7 @@
 
 
 namespace clparen {
-namespace clData {
+namespace CLData {
 
 
 // Forward declarations

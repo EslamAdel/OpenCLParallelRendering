@@ -161,7 +161,7 @@ void VirtualParallelRendering::frameLoadedToDevice_SLOT(
 
     emit this->frameReady_SIGNAL( &renderer->
                                   getCLFrame().
-                                  value< clData::CLImage2D< float >* >()->
+                                  value< CLData::CLImage2D< float >* >()->
                                   getFramePixmap() ,
                                   renderer  );
 
@@ -185,7 +185,7 @@ void VirtualParallelRendering::compositingFinished_SLOT()
 
     emit this->finalFrameReady_SIGNAL(
                 &compositor_->getFinalFrame().
-                value< clData::CLImage2D< float >*>()->
+                value< CLData::CLImage2D< float >*>()->
                 getFramePixmap( ));
 
     if( this->pendingTransformations_ )
