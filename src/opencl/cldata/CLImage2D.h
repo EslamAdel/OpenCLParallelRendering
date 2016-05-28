@@ -67,21 +67,10 @@ public:
                                       const CLFrame< T > &sourceFrame ,
                                       const cl_bool blocking ) override;
 
-    /**
-     * @brief frameChannelOrder
-     * @return
-     */
-    FRAME_CHANNEL_ORDER frameChannelOrder() const;
-
 private:
 
 
-
 protected :
-
-
-
-
 
     /**
      * @brief imageFormat_

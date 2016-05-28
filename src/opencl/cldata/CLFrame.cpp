@@ -362,6 +362,7 @@ uint8_t CLFrame< T >::channelsInPixel() const
                   4 : 1 ;
 }
 
+
 template< class T >
 FRAME_CHANNEL_TYPE CLFrame< T >::frameChannelType()
 {
@@ -460,7 +461,7 @@ bool CLFrame< T >::isChannelConflict( FRAME_CHANNEL_ORDER order )
 
 
 template< class T >
-FRAME_CHANNEL_ORDER CLFrame< T >::frameChannelOrder( ) const
+FRAME_CHANNEL_ORDER CLFrame< T >::channelOrder( ) const
 {
     return channelOrder_;
 }

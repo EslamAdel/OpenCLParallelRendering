@@ -5,29 +5,18 @@
 namespace clparen {
 namespace CLKernel {
 
-const QSet< CLData::FRAME_CHANNEL_TYPE > CLRenderingKernel::framePrecision_RGBA_ =
-        QSet< CLData::FRAME_CHANNEL_TYPE >()
-        << CLData::FRAME_CHANNEL_TYPE::FRAME_CL_UNSIGNED_INT8
-        << CLData::FRAME_CHANNEL_TYPE::FRAME_CL_UNSIGNED_INT16
-        << CLData::FRAME_CHANNEL_TYPE::FRAME_CL_UNSIGNED_INT32 ;
-
-const QSet< CLData::FRAME_CHANNEL_TYPE > CLRenderingKernel::framePrecision_Luminance_ =
-        QSet< CLData::FRAME_CHANNEL_TYPE >()
-        << CLData::FRAME_CHANNEL_TYPE::FRAME_CL_UNSIGNED_INT8
-        << CLData::FRAME_CHANNEL_TYPE::FRAME_CL_UNSIGNED_INT16
-        << CLData::FRAME_CHANNEL_TYPE::FRAME_CL_UNSIGNED_INT32
-        << CLData::FRAME_CHANNEL_TYPE::FRAME_CL_FLOAT
-        << CLData::FRAME_CHANNEL_TYPE::FRAME_CL_HALF_FLOAT ;
 
 CLRenderingKernel::CLRenderingKernel(
         cl_context clContext,
+        const CLData::FRAME_CHANNEL_ORDER channelOrderSupport ,
         const std::string kernelName,
         const std::string kernelDirectory,
         const std::string kernelFile  )
     : clContext_( clContext ) ,
       kernelName_( kernelName ),
       kernelDirectory_( kernelDirectory ) ,
-      kernelFile_( kernelFile )
+      kernelFile_( kernelFile ),
+      channelOrderSupport_( channelOrderSupport )
 {
 
 }
@@ -54,6 +43,11 @@ void CLRenderingKernel::retrieveKernelObject_()
 {
     kernelObject_ = kernelContext_->getKernelObject( kernelName_ );
 
+}
+
+CLData::FRAME_CHANNEL_ORDER CLRenderingKernel::getChannelOrderSupport() const
+{
+    return channelOrderSupport_;
 }
 
 std::string CLRenderingKernel::getKernelDirectory( ) const

@@ -26,8 +26,6 @@ public:
 
     void setVolumeIsoValue( float isoValue ) override ;
 
-    bool isFramePrecisionSupported(
-            CLData::FRAME_CHANNEL_TYPE precision ) override;
 
 };
 

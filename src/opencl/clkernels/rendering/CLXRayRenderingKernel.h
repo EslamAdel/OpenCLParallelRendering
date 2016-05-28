@@ -24,8 +24,6 @@ public:
                            const std::string kernelName = "xray" );
 
 
-    bool isFramePrecisionSupported(
-            CLData::FRAME_CHANNEL_TYPE precision ) override;
 };
 
 

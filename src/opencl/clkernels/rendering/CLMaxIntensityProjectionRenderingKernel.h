@@ -20,8 +20,6 @@ public:
             const std::string kernelName = "maxIntensityProjection" );
 
 
-    bool isFramePrecisionSupported(
-            CLData::FRAME_CHANNEL_TYPE precision ) override;
 };
 
 

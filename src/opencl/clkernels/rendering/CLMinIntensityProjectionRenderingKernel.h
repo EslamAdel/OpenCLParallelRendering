@@ -24,8 +24,7 @@ public:
             const std::string kernelFile = "minIntensityProjection.cl" ,
             const std::string kernelName = "minIntensityProjection" );
 
-    bool isFramePrecisionSupported(
-            CLData::FRAME_CHANNEL_TYPE precision ) override;
+
 };
 
 

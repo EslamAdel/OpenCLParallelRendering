@@ -20,9 +20,11 @@ CLRenderer< V , F >::CLRenderer(
         const uint64_t gpuIndex ,
         const Transformation &transformation ,
         const Dimensions2D frameDimensions ,
+        const CLData::FRAME_CHANNEL_ORDER channelOrder ,
         const std::string kernelDirectory)
     : CLAbstractRenderer( gpuIndex , frameDimensions , kernelDirectory ) ,
-      transformation_( transformation )
+      transformation_( transformation ) ,
+      frameChannelOrder_( channelOrder )
 {
     volume_ = 0 ;
     clVolume_ = 0 ;
@@ -56,7 +58,8 @@ void CLRenderer< V , F >::createPixelBuffer_()
     if( clFrame_ != nullptr )
         delete clFrame_ ;
 
-    clFrame_ = new CLData::CLImage2D< F >( sortFirstDimensions_ );
+    clFrame_ = new CLData::CLImage2D< F >( sortFirstDimensions_ ,
+                                           frameChannelOrder_ );
 
     //    LOG_DEBUG("Created Frame[%d]:%s",gpuIndex_,sortFirstDimensions_.toString().c_str());
 
@@ -419,9 +422,11 @@ template< class V , class F >
 bool CLRenderer< V , F >::isRenderingModeSupported(
         CLKernel::RenderingMode mode )
 {
-    return renderingKernels_[ mode ]
-            ->isFramePrecisionSupported(
-                CLData::CLFrame< F >::frameChannelType( ));
+    if( clFrame_ == 0 )
+        return false ;
+
+    return renderingKernels_[ mode ]->getChannelOrderSupport()
+            == clFrame_->channelOrder() ;
 }
 
 

@@ -24,10 +24,11 @@ CL3DUltrasoundRenderingKernel::CL3DUltrasoundRenderingKernel(
         const std::string kernelDirectory,
         const std::string kernelFile,
         const std::string kernelName )
-    : CLRenderingKernel( clContext, kernelName , kernelDirectory, kernelFile )
+    : CLRenderingKernel( clContext, CLData::FRAME_CHANNEL_ORDER::ORDER_RGBA,
+                         kernelName , kernelDirectory, kernelFile )
 {
     buildKernel_( );
-    retrieveKernelObject_();
+    retrieveKernelObject_( );
 }
 
 void CL3DUltrasoundRenderingKernel::setTransferFunctionData( cl_mem data )
@@ -104,11 +105,6 @@ void CL3DUltrasoundRenderingKernel::setZScale( float scale )
     }
 }
 
-bool CL3DUltrasoundRenderingKernel::isFramePrecisionSupported(
-        CLData::FRAME_CHANNEL_TYPE precision )
-{
-    return framePrecision_RGBA_.contains( precision );
-}
 
 }
 }

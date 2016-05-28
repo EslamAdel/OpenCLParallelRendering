@@ -37,7 +37,8 @@ CLShadedRenderingKernel::CLShadedRenderingKernel(
         const std::string kernelDirectory,
         const std::string kernelFile,
         const std::string kernelName )
-    : CLRenderingKernel( clContext, kernelName , kernelDirectory, kernelFile )
+    : CLRenderingKernel( clContext, CLData::FRAME_CHANNEL_ORDER::ORDER_RGBA,
+                         kernelName , kernelDirectory, kernelFile )
 {
     buildKernel_( );
     retrieveKernelObject_();
@@ -70,11 +71,6 @@ void CLShadedRenderingKernel::setTransferFunctionSampler( cl_sampler sampler )
     }
 }
 
-bool CLShadedRenderingKernel::isFramePrecisionSupported(
-        CLData::FRAME_CHANNEL_TYPE precision )
-{
-    return framePrecision_RGBA_.contains( precision );
-}
 
 }
 }

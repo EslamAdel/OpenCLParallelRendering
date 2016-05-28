@@ -64,6 +64,7 @@ public:
      */
     CLRenderingKernel(
             cl_context clContext ,
+            const CLData::FRAME_CHANNEL_ORDER channelOrderSupport ,
             const std::string kernelName ,
             const std::string kernelFile ,
             const std::string kernelDirectory = DEFAULT_KERNELS_DIRECTORY );
@@ -201,9 +202,11 @@ public:
      */
     void releaseKernel( );
 
-
-    virtual bool isFramePrecisionSupported(
-            CLData::FRAME_CHANNEL_TYPE precision ) = 0;
+    /**
+     * @brief getChannelOrderSupport
+     * @return
+     */
+    CLData::FRAME_CHANNEL_ORDER getChannelOrderSupport() const;
 
 protected:
 
@@ -256,9 +259,7 @@ protected:
     RenderingMode kernelType_;
 
 
-    static const QSet< CLData::FRAME_CHANNEL_TYPE > framePrecision_RGBA_ ;
-
-    static const QSet< CLData::FRAME_CHANNEL_TYPE > framePrecision_Luminance_;
+    const CLData::FRAME_CHANNEL_ORDER channelOrderSupport_ ;
 };
 
 /**

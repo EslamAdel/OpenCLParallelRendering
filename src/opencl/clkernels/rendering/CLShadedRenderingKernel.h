@@ -27,8 +27,7 @@ public:
 
     void setTransferFunctionSampler( cl_sampler sampler ) override ;
 
-    bool isFramePrecisionSupported(
-            CLData::FRAME_CHANNEL_TYPE precision ) override;
+
 };
 
 }

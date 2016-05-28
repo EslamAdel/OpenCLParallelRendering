@@ -13,17 +13,14 @@ CLMinIntensityProjectionRenderingKernel(
         const std::string kernelDirectory,
         const std::string kernelFile,
         const std::string kernelName )
-    : CLRenderingKernel( clContext, kernelName , kernelDirectory, kernelFile )
+    : CLRenderingKernel( clContext, CLData::FRAME_CHANNEL_ORDER::ORDER_INTENSITY,
+                         kernelName , kernelDirectory, kernelFile )
 {
     buildKernel_( );
     retrieveKernelObject_( );
 }
 
-bool CLMinIntensityProjectionRenderingKernel::isFramePrecisionSupported(
-        CLData::FRAME_CHANNEL_TYPE precision )
-{
-    return framePrecision_Luminance_.contains( precision );
-}
+
 
 }
 }

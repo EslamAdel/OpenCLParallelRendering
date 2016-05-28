@@ -223,7 +223,8 @@ public:
      * @brief frameChannelOrder
      * @return
      */
-    FRAME_CHANNEL_ORDER frameChannelOrder() const;
+    FRAME_CHANNEL_ORDER channelOrder() const;
+
 
 
 protected:

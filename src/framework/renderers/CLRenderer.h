@@ -28,6 +28,8 @@ public:
             const uint64_t gpuIndex,
             const Transformation &transformation ,
             const Dimensions2D frameDimensions ,
+            const CLData::FRAME_CHANNEL_ORDER channelOrder =
+            CLData::FRAME_CHANNEL_ORDER::ORDER_DEFAULT,
             const std::string kernelDirectory = DEFAULT_KERNELS_DIRECTORY );
 
 
@@ -183,6 +185,11 @@ private:
      * @brief inverseMatrix_
      */
     float inverseMatrixArray_[ 12 ];
+
+    /**
+     * @brief frameChannelOrder_
+     */
+    const CLData::FRAME_CHANNEL_ORDER frameChannelOrder_ ;
 };
 
 

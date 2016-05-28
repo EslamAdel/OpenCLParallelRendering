@@ -38,8 +38,6 @@ public:
     void setYScale( float scale );
     void setZScale( float scale );
 
-    bool isFramePrecisionSupported(
-            CLData::FRAME_CHANNEL_TYPE precision ) override;
 
 };
 

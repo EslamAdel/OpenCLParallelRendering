@@ -18,9 +18,6 @@ public:
             const std::string kernelFile = "averageIntensityProjection.cl" ,
             const std::string kernelName = "averageIntensityProjection" );
 
-
-    bool isFramePrecisionSupported(
-            CLData::FRAME_CHANNEL_TYPE precision ) override;
 };
 
 
