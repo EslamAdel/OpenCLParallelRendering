@@ -30,39 +30,57 @@ int intersectBox(float4 r_o, float4 r_d, float4 boxmin, float4 boxmax, float *tn
     float largest_tmin = max(max(tmin.x, tmin.y), max(tmin.x, tmin.z));
     float smallest_tmax = min(min(tmax.x, tmax.y), min(tmax.x, tmax.z));
 
-	*tnear = largest_tmin;
-	*tfar = smallest_tmax;
+    *tnear = largest_tmin;
+    *tfar = smallest_tmax;
 
-	return smallest_tmax > largest_tmin;
+    return smallest_tmax > largest_tmin;
 }
 
 uint rgbaFloatToInt(float4 rgba)
 {
-    rgba.x = clamp(rgba.x,0.0f,1.0f);  
-    rgba.y = clamp(rgba.y,0.0f,1.0f);  
-    rgba.z = clamp(rgba.z,0.0f,1.0f);  
-    rgba.w = clamp(rgba.w,0.0f,1.0f);  
+    rgba.x = clamp(rgba.x,0.0f,1.0f);
+    rgba.y = clamp(rgba.y,0.0f,1.0f);
+    rgba.z = clamp(rgba.z,0.0f,1.0f);
+    rgba.w = clamp(rgba.w,0.0f,1.0f);
     return ((uint)(rgba.w*255.0f)<<24) | ((uint)(rgba.z*255.0f)<<16) | ((uint)(rgba.y*255.0f)<<8) | (uint)(rgba.x*255.0f);
 }
 
 
 __kernel void
-shaded( __global uint *d_output,
-        uint imageW, uint imageH,
+shaded( __write_only image2d_t frameBuffer,
+
+        uint frameWidth, uint frameHeight,
+
         uint sortFirstWidth , uint sortFirstHeight ,
-        __constant float* invViewMatrix,
+
+        __constant  float* invViewMatrix,
+
         __read_only image3d_t volume,
-        sampler_t volumeSampler,
-        float density, float brightness,
+
+        sampler_t   volumeSampler ,
+
+        float density, float brightness ,
+
         __read_only image2d_t transferFunc,
+
         sampler_t transferFuncSampler )
 
 {	
-    uint x = get_global_id(0);
-    uint y = get_global_id(1);
+    const uint x = get_global_id( 0 );
+    const uint y = get_global_id( 1 );
 
-    float u = (x / (float) imageW)*2.0f-1.0f;
-    float v = (y / (float) imageH)*2.0f-1.0f;
+    const uint offsetX = get_global_offset( 0 );
+    const uint offsetY = get_global_offset( 1 );
+
+    // If out of boundaries, return.
+    if( x - offsetX - 1 > sortFirstWidth )
+        return ;
+
+    if( y - offsetY - 1 > sortFirstHeight )
+        return ;
+
+    float u = (x / (float) frameWidth)*2.0f-1.0f;
+    float v = (y / (float) frameHeight)*2.0f-1.0f;
 
 
     float4 boxMin = (float4)(-1.f, -1.f, -1.f,1.0f);
@@ -78,7 +96,7 @@ shaded( __global uint *d_output,
     float4 eyeRay_o;
     float4 eyeRay_d;
 
-    eyeRay_o = (float4)(invViewMatrix[3], invViewMatrix[7], invViewMatrix[11], 1.0f);   
+    eyeRay_o = (float4)(invViewMatrix[3], invViewMatrix[7], invViewMatrix[11], 1.0f);
 
     float4 temp = normalize(((float4)(u, v, -2.0f,0.0f)));
     eyeRay_d.x = dot(temp, ((float4)(invViewMatrix[0],invViewMatrix[1],invViewMatrix[2],invViewMatrix[3])));
@@ -87,28 +105,32 @@ shaded( __global uint *d_output,
     eyeRay_d.w = 0.0f;
 
     // find intersection with box
-	float tnear, tfar;
-	int hit = intersectBox(eyeRay_o, eyeRay_d, boxMin, boxMax, &tnear, &tfar);
-    if (!hit) {
-        if ((x < imageW) && (y < imageH)) {
-            // write output color
-            uint i =(y * imageW) + x;
-            d_output[i] = 0;
-        }
+    float tnear, tfar;
+    int hit = intersectBox(eyeRay_o, eyeRay_d, boxMin, boxMax, &tnear, &tfar);
+
+    // If it doesn't hit, then return a black value in the corresponding pixel
+    if( !hit )
+    {
+        // Get the 1D index of the pixel to set its color, and return
+        const float4 nullPixel = ( float4 )( 0.f , 0.f , 0.f , 0.f );
+        const int2 location = (int2)( x - offsetX , y - offsetY );
+        write_imagef( frameBuffer , location , nullPixel );
+
         return;
     }
-	if (tnear < 0.0f) tnear = 0.0f;     // clamp to near plane
+
+    if (tnear < 0.0f) tnear = 0.0f;     // clamp to near plane
 
     // march along ray from back to front, accumulating color
     temp = (float4)(0.0f,0.0f,0.0f,0.0f);
     float t = tfar;
 
-    for(uint i=0; i<maxSteps; i++) {		
+    for(uint i=0; i<maxSteps; i++) {
         float4 pos = eyeRay_o + eyeRay_d*t;
 
         pos = (pos*0.5f) +0.5f;    // map position to [0, 1] coordinates
 
-        // read from 3D texture        
+        // read from 3D texture
 #ifdef IMAGE_SUPPORT        
         float4 sample = read_imagef(volume, volumeSampler, pos);
         
@@ -129,10 +151,8 @@ shaded( __global uint *d_output,
     }
     temp *= brightness;
 
-    if ((x < imageW) && (y < imageH)) {
-        // write output color
-        uint i =(y * imageW) + x;
-        d_output[i] = rgbaFloatToInt(temp);
-    }
+    // Get a 1D index of the pixel in the _frameBuffer_
+    const int2 location = (int2)( x - offsetX , y - offsetY );
+    write_imagef( frameBuffer , location , temp );
 }
 

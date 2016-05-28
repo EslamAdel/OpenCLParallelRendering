@@ -245,5 +245,7 @@ const Dimensions2D &CLAbstractRenderer::getFrameDimensions() const
     return frameDimensions_;
 }
 
+
+
 }
 }

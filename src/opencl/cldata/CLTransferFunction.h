@@ -24,7 +24,9 @@ public:
      * @brief createDeviceData
      * @param context
      */
-    void createDeviceData( cl_context context ) Q_DECL_OVERRIDE ;
+    void createDeviceData(
+            cl_context context ,
+            const cl_mem_flags flags ) Q_DECL_OVERRIDE ;
 
     /**
      * @brief writeDeviceData

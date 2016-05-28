@@ -3,11 +3,15 @@
 
 #include <QVariant>
 
-#include "CLData.hh"
 
 
+Q_DECLARE_METATYPE( clparen::CLData::CLFrame< uint8_t >* )
+Q_DECLARE_METATYPE( clparen::CLData::CLFrame< uint16_t >* )
+Q_DECLARE_METATYPE( clparen::CLData::CLFrame< uint32_t >* )
+Q_DECLARE_METATYPE( clparen::CLData::CLFrame< half >* )
 Q_DECLARE_METATYPE( clparen::CLData::CLFrame< float >* )
-Q_DECLARE_METATYPE( clparen::CLData::CLImage2D< float >* )
+
+
 
 namespace clparen {
 namespace CLData {

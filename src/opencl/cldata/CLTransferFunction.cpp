@@ -17,7 +17,8 @@ CLTransferFunction::CLTransferFunction(
     this->imageDescriptor_.image_height = 1 ;
 }
 
-void CLTransferFunction::createDeviceData( cl_context context )
+void CLTransferFunction::createDeviceData( cl_context context ,
+                                           const cl_mem_flags  )
 {
     const cl_mem_flags flags = CL_MEM_READ_ONLY | CL_MEM_HOST_WRITE_ONLY ;
 

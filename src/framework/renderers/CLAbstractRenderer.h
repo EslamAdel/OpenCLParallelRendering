@@ -155,6 +155,11 @@ public:
     const Dimensions2D &getSortFirstDimensions() const;
 
 
+    /**
+     * @brief setSortFirstSettings
+     * @param sortFirstOffset
+     * @param sortFirstDimensions
+     */
     void setSortFirstSettings( const Dimensions2D sortFirstOffset ,
                                const Dimensions2D sortFirstDimensions );
 
@@ -166,6 +171,13 @@ public:
      * @return
      */
     virtual bool isRenderingModeSupported( CLKernel::RenderingMode mode ) = 0;
+
+
+    /**
+     * @brief updateTransferFunction
+     * @param transferFunction
+     */
+    virtual void updateTransferFunction( float *transferFunction  ) = 0 ;
 
 protected:
 

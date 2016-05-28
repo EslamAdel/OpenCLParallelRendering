@@ -319,9 +319,6 @@ protected:
 };
 
 
-typedef CLFrame< uint > CLFrame32 ;
-
-
 }
 }
 

@@ -8,14 +8,14 @@ namespace clparen  {
 namespace CLKernel {
 
 
-class CLIsoSurfaceRenderingKernel : public CLXRayRenderingKernel
+class CLIsoSurfaceRenderingKernel : public CLRenderingKernel
 {
 
 private:
     enum KernelArgument
     {
         KERNEL_ARG_IsoValue =
-        CLXRayRenderingKernel::KERNEL_ARG_XRayDerivedKernelOffset
+        CLRenderingKernel::KERNEL_ARG_DerivedKernelsOffset
     };
 
 public:

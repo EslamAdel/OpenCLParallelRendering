@@ -6,7 +6,10 @@
 namespace clparen {
 namespace CLData {
 
-template class CLFrame< uint >;
+template class CLFrame< uint8_t >;
+template class CLFrame< uint16_t >;
+template class CLFrame< uint32_t >;
+template class CLFrame< half >;
 template class CLFrame< float >;
 
 }

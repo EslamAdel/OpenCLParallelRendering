@@ -1,6 +1,7 @@
 #include "SortLastRenderer.h"
 #include <Logger.h>
 #include "Typedefs.hh"
+#include "CLFrameVariants.hh"
 #include <QList>
 
 #ifdef BENCHMARKING

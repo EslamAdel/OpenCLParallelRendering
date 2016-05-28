@@ -18,31 +18,6 @@ CLXRayRenderingKernel::CLXRayRenderingKernel(
     retrieveKernelObject_();
 }
 
-void CLXRayRenderingKernel::setMaxSteps( uint maxSteps )
-{
-    cl_int error = clSetKernelArg( kernelObject_,
-                                   KERNEL_ARG_MaxSteps ,
-                                   sizeof( uint ),
-                                   ( void* ) &maxSteps );
-    if( error != CL_SUCCESS )
-    {
-        oclHWDL::Error::checkCLError( error );
-        LOG_ERROR("Exiting Due to OpenCL Error!");
-    }
-}
-
-void CLXRayRenderingKernel::setStepSize( float tStep )
-{
-    cl_int error = clSetKernelArg( kernelObject_,
-                                   KERNEL_ARG_StepSize ,
-                                   sizeof( float ),
-                                   ( void* ) &tStep );
-    if( error != CL_SUCCESS )
-    {
-        oclHWDL::Error::checkCLError( error );
-        LOG_ERROR("Exiting Due to OpenCL Error!");
-    }
-}
 
 
 }

@@ -92,5 +92,11 @@ private:
 }
 }
 
+Q_DECLARE_METATYPE( clparen::CLData::CLImage2D< uint8_t >* )
+Q_DECLARE_METATYPE( clparen::CLData::CLImage2D< uint16_t >* )
+Q_DECLARE_METATYPE( clparen::CLData::CLImage2D< uint32_t >* )
+Q_DECLARE_METATYPE( clparen::CLData::CLImage2D< half >* )
+Q_DECLARE_METATYPE( clparen::CLData::CLImage2D< float >* )
+
 
 #endif // CLIMAGE2D_H

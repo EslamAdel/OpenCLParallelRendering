@@ -62,6 +62,16 @@ struct Transformation
      * @brief apexAngle
      */
     float apexAngle ;
+
+    /**
+     * @brief maxSteps
+     */
+    uint maxSteps ;
+
+    /**
+     * @brief stepSize
+     */
+    float stepSize ;
 };
 
 #endif // TRANSFORMATION_H

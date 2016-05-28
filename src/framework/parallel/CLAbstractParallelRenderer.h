@@ -252,6 +252,30 @@ public slots :
     void updateVolumeDensity_SLOT( float density );
 
     /**
+     * @brief updateMaxSteps_SLOT
+     * @param value
+     */
+    void updateMaxSteps_SLOT( int value );
+
+    /**
+     * @brief updateStepSize_SLOT
+     * @param value
+     */
+    void updateStepSize_SLOT( float value );
+
+    /**
+     * @brief updateApexAngle_SLOT
+     * @param value
+     */
+    void updateApexAngle_SLOT( int value );
+
+    /**
+     * @brief updateTransferFunction_SLOT
+     * @param transferFunction
+     */
+    void updateTransferFunction_SLOT( float *transferFunction );
+
+    /**
      * @brief activateRenderingKernel_SLOT
      */
     /**

@@ -12,16 +12,17 @@ CLIsoSurfaceRenderingKernel(
         const std::string kernelDirectory,
         const std::string kernelFile,
         const std::string kernelName )
-    : CLXRayRenderingKernel( clContext , kernelDirectory ,
-                             kernelFile , kernelName )
+    : CLRenderingKernel( clContext, CLData::FRAME_CHANNEL_ORDER::ORDER_INTENSITY,
+                         kernelName , kernelDirectory, kernelFile )
 {
-
+    buildKernel_();
+    retrieveKernelObject_();
 }
 
 void CLIsoSurfaceRenderingKernel::setVolumeIsoValue( float isoValue )
 {
     cl_int error = clSetKernelArg( kernelObject_,
-                                   KERNEL_ARG_XRayDerivedKernelOffset ,
+                                   KERNEL_ARG_DerivedKernelsOffset ,
                                    sizeof( float ),
                                    ( void* ) &isoValue );
     if( error != CL_SUCCESS )

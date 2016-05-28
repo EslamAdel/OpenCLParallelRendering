@@ -35,9 +35,7 @@ CLRenderer< V , F >::CLRenderer(
     transferFunctionSampler_ = 0 ;
     transferFunctionArray_ = 0 ;
 
-    tStep_ = 0.01;
-    maxSteps_ = 500;
-    apexAngle_ = 0.1f;
+
 
     LOG_INFO( "Creating Context on Node with GPU <%d>", gpuIndex );
     linearFiltering_ = true;
@@ -175,6 +173,9 @@ void CLRenderer< V , F >::renderFrame()
     activeRenderingKernel_->setXScale( transformation_.ultrasoundScale.x );
     activeRenderingKernel_->setYScale( transformation_.ultrasoundScale.y );
     activeRenderingKernel_->setZScale( transformation_.ultrasoundScale.z );
+    activeRenderingKernel_->setApexAngle( transformation_.apexAngle );
+    activeRenderingKernel_->setStepSize( transformation_.stepSize );
+    activeRenderingKernel_->setMaxSteps( transformation_.maxSteps );
 
     // Enqueue the kernel for execution
     clErrorCode |= clEnqueueNDRangeKernel(
@@ -282,9 +283,6 @@ void CLRenderer< V , F >::initializeKernels_()
                 ( linearFiltering_ ? linearVolumeSampler_ : nearestVolumeSampler_);
         renderingKernel->setTransferFunctionSampler( transferFunctionSampler_ );
         renderingKernel->setTransferFunctionData( transferFunctionArray_ );
-        renderingKernel->setMaxSteps( maxSteps_ );
-        renderingKernel->setStepSize( tStep_ );
-        renderingKernel->setApexAngle( apexAngle_ );
     }
 
     LOG_DEBUG( "[DONE] Initializing an OpenCL Kernels ... " );
@@ -474,6 +472,36 @@ bool CLRenderer< V , F >::isRenderingModeSupported(
 
     return renderingKernels_[ mode ]->getChannelOrderSupport()
             == clFrame_->channelOrder() ;
+}
+
+template< class V , class F >
+void CLRenderer< V , F >::updateTransferFunction( float *transferFunction )
+{
+
+    QMutexLocker lock( &this->switchKernelMutex_ );
+
+    transferFunction_ = transferFunction;
+
+    // Release  the old transfer function and update the new one
+    if( transferFunctionArray_ )
+        clReleaseMemObject( transferFunctionArray_ );
+
+    // Transfer function format
+    cl_image_format tfFormat;
+    tfFormat.image_channel_order = CL_RGBA;
+    tfFormat.image_channel_data_type = CL_FLOAT;
+
+    // Upload the transfer function to the volume.
+    // TODO: Fix the hardcoded values.
+    cl_int clErrorCode;
+    transferFunctionArray_ = clCreateImage2D
+            ( context_,
+              CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
+              &tfFormat, 256, 1, sizeof( float ) * 256 * 4,
+              transferFunction_, &clErrorCode );
+    oclHWDL::Error::checkCLError(clErrorCode);
+
+    activeRenderingKernel_->setTransferFunctionData( transferFunctionArray_ );
 }
 
 

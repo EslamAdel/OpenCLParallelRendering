@@ -8,7 +8,7 @@ namespace clparen  {
 namespace CLKernel {
 
 
-class CLMaxIntensityProjectionRenderingKernel : public CLXRayRenderingKernel
+class CLMaxIntensityProjectionRenderingKernel : public CLRenderingKernel
 {
 
 

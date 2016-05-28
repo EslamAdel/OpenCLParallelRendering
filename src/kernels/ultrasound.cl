@@ -9,8 +9,7 @@
  *
  */
 
-#define maxSteps 500
-#define tstep 0.01f
+
 #define M_PI 3.14
 
 float d2r(float angle)
@@ -53,14 +52,6 @@ bool rayTriangleIntersection(float3 o, float3 dir, float3 v0, float3 v1, float3 
         return false;
     }
 }
-
-
-
-
-
-
-
-
 
 // intersect ray with a box
 // http://www.siggraph.org/education/materials/HyperGraph/raytrace/rtinter3.htm
@@ -265,20 +256,41 @@ uint rgbaFloatToInt(float4 rgba)
 
 
 __kernel void
-ultrasound( __global uint *d_output,
-            uint imageW, uint imageH,
+ultrasound( __write_only image2d_t frameBuffer,
+
+            uint frameWidth, uint frameHeight,
+
             uint sortFirstWidth , uint sortFirstHeight ,
-            __constant float* invViewMatrix,
+
+            __constant  float* invViewMatrix,
+
             __read_only image3d_t volume,
-            sampler_t volumeSampler,
-            float density, float brightness,
+
+            sampler_t   volumeSampler ,
+
+            float density, float brightness ,
+
+            uint maxSteps, float tStep
+
             __read_only image2d_t transferFunc,
+
             sampler_t transferFuncSampler, float apex,
+
             float xScale, float yScale, float zScale)
 
 {
-    uint x = get_global_id(0);
-    uint y = get_global_id(1);
+    const uint x = get_global_id( 0 );
+    const uint y = get_global_id( 1 );
+
+    const uint offsetX = get_global_offset( 0 );
+    const uint offsetY = get_global_offset( 1 );
+
+    // If out of boundaries, return.
+    if( x - offsetX - 1 > sortFirstWidth )
+        return ;
+
+    if( y - offsetY - 1 > sortFirstHeight )
+        return ;
     
     float u = (x / (float) imageW)*2.0f-1.0f;
     float v = (y / (float) imageH)*2.0f-1.0f;
@@ -306,14 +318,17 @@ ultrasound( __global uint *d_output,
     float tnear, tfar;
     // int hit = intersectBox(eyeRay_o, eyeRay_d, boxMin, boxMax, &tnear, &tfar);
     int hit = intersectPyramidalGrid(eyeRay_o, eyeRay_d, apex, &tnear, &tfar, xScale, yScale, zScale);
-    if (!hit) {
-        if ((x < imageW) && (y < imageH)) {
-            // write output color
-            uint i =(y * imageW) + x;
-            d_output[i] = 0;
-        }
+    // If it doesn't hit, then return a black value in the corresponding pixel
+    if( !hit )
+    {
+        // Get the 1D index of the pixel to set its color, and return
+        const float4 nullPixel = ( float4 )( 0.f , 0.f , 0.f , 0.f );
+        const int2 location = (int2)( x - offsetX , y - offsetY );
+        write_imagef( frameBuffer , location , nullPixel );
+
         return;
     }
+
     if (tnear < 0.0f) tnear = 0.0f;     // clamp to near plane
     
     
@@ -354,16 +369,15 @@ ultrasound( __global uint *d_output,
         float a = col.w*density;
         temp = mix(temp, col, (float4)(a, a, a, a));
         
-        t -= tstep;
+        t -= tStep;
         if (t < tnear) break;
     }
     temp *= brightness;
     
-    if ((x < imageW) && (y < imageH)) {
-        // write output color
-        uint i =(y * imageW) + x;
-        d_output[i] = rgbaFloatToInt(temp);
-    }
+
+    // Get a 1D index of the pixel in the _frameBuffer_
+    const int2 location = (int2)( x - offsetX , y - offsetY );
+    write_imagef( frameBuffer , location , temp );
 }
 
 

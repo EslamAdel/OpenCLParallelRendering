@@ -13,10 +13,11 @@ CLMaxIntensityProjectionRenderingKernel(
         const std::string kernelDirectory,
         const std::string kernelFile,
         const std::string kernelName )
-    : CLXRayRenderingKernel( clContext , kernelDirectory ,
-                             kernelFile , kernelName )
+    : CLRenderingKernel( clContext, CLData::FRAME_CHANNEL_ORDER::ORDER_INTENSITY,
+                         kernelName , kernelDirectory, kernelFile )
 {
-
+    buildKernel_();
+    retrieveKernelObject_();
 }
 
 

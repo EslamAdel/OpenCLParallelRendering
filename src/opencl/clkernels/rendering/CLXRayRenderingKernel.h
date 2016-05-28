@@ -8,13 +8,6 @@ namespace CLKernel {
 
 class CLXRayRenderingKernel : public CLRenderingKernel
 {
-protected:
-    enum XRayKernelArgument
-    {
-        KERNEL_ARG_MaxSteps = CLRenderingKernel::KERNEL_ARG_DerivedKernelsOffset ,
-        KERNEL_ARG_StepSize ,
-        KERNEL_ARG_XRayDerivedKernelOffset
-    };
 
 public:
     /**
@@ -28,12 +21,6 @@ public:
                            const std::string kernelDirectory = ".",
                            const std::string kernelFile = "xray.cl" ,
                            const std::string kernelName = "xray" );
-
-
-
-    void setMaxSteps( uint maxSteps ) Q_DECL_OVERRIDE ;
-
-    void setStepSize( float tStep ) Q_DECL_OVERRIDE ;
 
 };
 

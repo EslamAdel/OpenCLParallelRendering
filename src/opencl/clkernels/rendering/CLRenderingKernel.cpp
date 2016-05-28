@@ -202,20 +202,35 @@ void CLRenderingKernel::setImageBrightnessFactor( float brightness )
     }
 }
 
+void CLRenderingKernel::setMaxSteps( uint maxSteps )
+{
+    cl_int error = clSetKernelArg( kernelObject_,
+                                   KERNEL_ARG_MaxSteps ,
+                                   sizeof( uint ),
+                                   ( void* ) &maxSteps );
+    if( error != CL_SUCCESS )
+    {
+        oclHWDL::Error::checkCLError( error );
+        LOG_ERROR("Exiting Due to OpenCL Error!");
+    }
+}
+
+void CLRenderingKernel::setStepSize( float tStep )
+{
+    cl_int error = clSetKernelArg( kernelObject_,
+                                   KERNEL_ARG_StepSize ,
+                                   sizeof( float ),
+                                   ( void* ) &tStep );
+    if( error != CL_SUCCESS )
+    {
+        oclHWDL::Error::checkCLError( error );
+        LOG_ERROR("Exiting Due to OpenCL Error!");
+    }
+}
+
 void CLRenderingKernel::setVolumeIsoValue( float  )
 {
     // No implementation by default.
-}
-
-void CLRenderingKernel::setMaxSteps( uint  )
-{
-    // No implementation by default.
-}
-
-void CLRenderingKernel::setStepSize( float  )
-{
-    // No implementation by default.
-
 }
 
 void CLRenderingKernel::setTransferFunctionData( cl_mem  )

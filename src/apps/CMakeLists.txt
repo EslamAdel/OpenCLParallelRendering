@@ -10,4 +10,4 @@
 
 add_subdirectory(develop)
 add_subdirectory(release)
-
+add_subdirectory(oclUSR)

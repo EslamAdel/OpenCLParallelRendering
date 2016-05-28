@@ -52,6 +52,10 @@ CLAbstractParallelRenderer::CLAbstractParallelRenderer(
     transformation_.transferFunctionOffset = INITIAL_TRANSFER_OFFSET;
     transformation_.transferFunctionScale  = INITIAL_TRANSFER_SCALE;
 
+    transformation_.maxSteps = 500 ;
+    transformation_.stepSize = 0.01 ;
+    transformation_.apexAngle = 0.1f ;
+
 }
 
 int CLAbstractParallelRenderer::getCLRenderersCount() const
@@ -226,6 +230,27 @@ void CLAbstractParallelRenderer::updateVolumeDensity_SLOT( float density )
     else pendingTransformations_ = true ;
 }
 
+void CLAbstractParallelRenderer::updateMaxSteps_SLOT( int value )
+{
+    transformation_.maxSteps = value ;
+    if( renderersReady_ ) applyTransformation_();
+    else pendingTransformations_ = true ;
+}
+
+void CLAbstractParallelRenderer::updateStepSize_SLOT( float value )
+{
+    transformation_.stepSize = value ;
+    if( renderersReady_ ) applyTransformation_();
+    else pendingTransformations_ = true ;
+}
+
+void CLAbstractParallelRenderer::updateApexAngle_SLOT( int value )
+{
+    transformation_.apexAngle = value ;
+    if( renderersReady_ ) applyTransformation_();
+    else pendingTransformations_ = true ;
+}
+
 void CLAbstractParallelRenderer::updateIsoValue_SLOT(float isoValue)
 {
     transformation_.isoValue = isoValue;
@@ -272,6 +297,14 @@ void CLAbstractParallelRenderer::benchmark_( )
 
 
     EXIT_PROFILING();
+}
+
+
+void CLAbstractParallelRenderer::updateTransferFunction_SLOT(
+        float *transferFunction )
+{
+    for( Renderer::CLAbstractRenderer *renderer : renderers_.values())
+        renderer->updateTransferFunction( transferFunction );
 }
 
 

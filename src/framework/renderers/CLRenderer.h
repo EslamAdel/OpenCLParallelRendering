@@ -92,6 +92,10 @@ public:
 
 
     bool isRenderingModeSupported( CLKernel::RenderingMode mode ) Q_DECL_OVERRIDE;
+
+
+    void updateTransferFunction( float *transferFunction ) Q_DECL_OVERRIDE;
+
 protected:
 
     /**
@@ -206,9 +210,6 @@ private:
      */
     const CLData::FRAME_CHANNEL_ORDER frameChannelOrder_ ;
 
-    float tStep_ ;
-    float maxSteps_ ;
-    float apexAngle_ ;
 };
 
 

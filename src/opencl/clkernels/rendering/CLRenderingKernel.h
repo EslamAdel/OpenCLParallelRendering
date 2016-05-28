@@ -50,6 +50,8 @@ protected:
         KERNEL_ARG_VolumeSampler ,
         KERNEL_ARG_Density ,
         KERNEL_ARG_Brightness ,
+        KERNEL_ARG_MaxSteps ,
+        KERNEL_ARG_StepSize ,
         KERNEL_ARG_DerivedKernelsOffset
     };
 
