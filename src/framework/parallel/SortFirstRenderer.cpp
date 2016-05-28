@@ -18,10 +18,11 @@ SortFirstRenderer< V , F >::SortFirstRenderer(
 
     Dimensions2D frameDimension( frameWidth , frameHeight );
 
-    frameBuffer_.reset( new F[ frameDimension.imageSize() ]);
-    frame_.reset( new Image< F >( frameDimension , frameBuffer_.data( )));
+    clFrame_.reset( new CLData::CLImage2D< F >( frameDimension ,
+                                                channelOrder ));
 
-    clFrame_.reset( new CLData::CLImage2D< F >( frameDimension ));
+    clFrameReadout_.reset( new CLData::CLImage2D< F >( frameDimension ,
+                                                       channelOrder ));
 
     connect( this , SIGNAL(finishedCompositing_SIGNAL()) ,
              this , SLOT(compositingFinished_SLOT()));
@@ -143,8 +144,7 @@ void SortFirstRenderer< V , F >::finishedRendering_SLOT(
 {
 
     QtConcurrent::run(  this , &SortFirstRenderer::assemble_ ,
-                        renderer , frame_.data( ) ,
-                        frameBuffer_.data( ));
+                        renderer , clFrame_.data( ));
 
 
 }
@@ -219,8 +219,7 @@ void SortFirstRenderer< V , F >::SortFirstRenderer::render_(
 template< class V , class F >
 void SortFirstRenderer< V , F >::assemble_(
         Renderer::CLAbstractRenderer *renderer ,
-        Image< F > *finalFrame ,
-        F *finalFrameBuffer )
+        CLData::CLFrame< F > *finalFrame )
 {
     CLData::CLImage2D< F > *clFrame =
             renderer->getCLFrame().value< CLData::CLImage2D< F > *>();
@@ -231,13 +230,13 @@ void SortFirstRenderer< V , F >::assemble_(
     //    LOG_DEBUG("Frame[%d]:%s",renderer->getGPUIndex() ,
     //              clFrame->getFrameDimensions().toString().c_str());
 
-    const Dimensions2D finalFrameSize = finalFrame->getDimensions();
+    const Dimensions2D finalFrameSize = finalFrame->getFrameDimensions();
 
     const Dimensions2D &offset = renderer->getSortFirstOffset();
     const Dimensions2D &frameSize = renderer->getSortFirstDimensions();
 
-    const uint8_t channelsPerElement = clFrame->channelsInPixel();
 
+    F *finalFrameBuffer = finalFrame->getHostData();
     F *frameBuffer = clFrame->getHostData();
 
 
@@ -306,7 +305,7 @@ void SortFirstRenderer< V , F >::clone_( )
 {
 
     frameCopyMutex_.lockForWrite();
-    clFrame_->copyHostData( *frame_.data( ));
+    clFrameReadout_->copyHostData( *clFrame_.data( ));
     emit this->frameReady_SIGNAL( &clFrame_->getFramePixmap( ) , nullptr );
     frameCopyMutex_.unlock();
 

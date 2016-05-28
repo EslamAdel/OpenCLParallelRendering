@@ -44,7 +44,8 @@ void SortLastRenderer< V , F >::addCLRenderer( const uint64_t gpuIndex )
     Renderer::CLAbstractRenderer *renderer =
             new Renderer::CLRenderer< V , F >(
                 gpuIndex, transformationAsync_ ,
-                Dimensions2D( frameWidth_ , frameHeight_ ));
+                Dimensions2D( frameWidth_ , frameHeight_ ) ,
+                frameChannelOrder_ );
 
     ATTACH_RENDERING_PROFILE( renderer );
     ATTACH_COLLECTING_PROFILE( renderer );

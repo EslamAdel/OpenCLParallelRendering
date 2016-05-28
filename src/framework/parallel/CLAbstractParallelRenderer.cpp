@@ -307,6 +307,9 @@ void CLAbstractParallelRenderer::updateTransferFunction_SLOT(
 {
     for( Renderer::CLAbstractRenderer *renderer : renderers_.values())
         renderer->updateTransferFunction( transferFunction , length );
+
+    if( renderersReady_ ) applyTransformation_();
+    else pendingTransformations_ = true ;
 }
 
 

@@ -68,8 +68,7 @@ private:
     static void render_( Renderer::CLAbstractRenderer *renderer );
 
     void assemble_(  Renderer::CLAbstractRenderer *renderer,
-                     Image< F > *finalFrame ,
-                     F *finalFrameBuffer );
+                     CLData::CLFrame< F > *finalFrame   );
 
     void clone_( );
 
@@ -80,21 +79,17 @@ protected:
      */
     QScopedPointer< Volume< V >> baseVolume_;
 
-    /**
-     * @brief frame_
-     */
-    QScopedPointer< Image< F >> frame_;
 
     /**
-     * @brief frameBuffer_
-     */
-    QScopedArrayPointer< F > frameBuffer_ ;
-
-    /**
-     * @brief threadSafeFrame_
+     * @brief clFrame_
      */
     QScopedPointer< CLData::CLImage2D< F >> clFrame_;
 
+
+    /**
+     * @brief clFrameReadout_ for thread-safety considerations.
+     */
+    QScopedPointer< CLData::CLImage2D< F >> clFrameReadout_ ;
 
     /**
      * @brief frameCopyMutex_
