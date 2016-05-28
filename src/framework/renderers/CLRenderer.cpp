@@ -15,8 +15,6 @@
 namespace clparen {
 namespace Renderer {
 
-
-
 template< class V , class F >
 CLRenderer< V , F >::CLRenderer(
         const uint64_t gpuIndex ,
@@ -58,8 +56,7 @@ void CLRenderer< V , F >::createPixelBuffer_()
     if( clFrame_ != nullptr )
         delete clFrame_ ;
 
-    clFrame_ = new CLData::CLImage2D< F >( sortFirstDimensions_ ,
-                                           CL_INTENSITY , CL_FLOAT );
+    clFrame_ = new CLData::CLImage2D< F >( sortFirstDimensions_ );
 
     //    LOG_DEBUG("Created Frame[%d]:%s",gpuIndex_,sortFirstDimensions_.toString().c_str());
 
@@ -417,6 +414,16 @@ void CLRenderer< V , F >::copyHostData(
 {
     clVolume_->copyHostData( brickParameters );
 }
+
+template< class V , class F >
+bool CLRenderer< V , F >::isRenderingModeSupported(
+        CLKernel::RenderingMode mode )
+{
+    return renderingKernels_[ mode ]
+            ->isFramePrecisionSupported(
+                CLData::CLFrame< F >::frameChannelType( ));
+}
+
 
 }
 }

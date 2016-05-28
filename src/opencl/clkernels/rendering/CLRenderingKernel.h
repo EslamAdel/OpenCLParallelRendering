@@ -4,9 +4,10 @@
 #include "Headers.h"
 #include <oclHWDL/oclHWDL.h>
 #include <QMap>
-
+#include <QSet>
 #include <QCoreApplication>
 #include <QDir>
+#include "CLFrame.h"
 #define DEFAULT_KERNELS_DIRECTORY \
     QString( qApp->applicationDirPath() + \
     QDir::separator() + \
@@ -47,6 +48,8 @@ protected:
         KERNEL_ARG_InverseMatrix ,
         KERNEL_ARG_Volume ,
         KERNEL_ARG_VolumeSampler ,
+        KERNEL_ARG_Density ,
+        KERNEL_ARG_Brightness ,
         KERNEL_ARG_DerivedKernelsOffset
     };
 
@@ -61,6 +64,7 @@ public:
      */
     CLRenderingKernel(
             cl_context clContext ,
+            const std::string kernelName ,
             const std::string kernelFile ,
             const std::string kernelDirectory = DEFAULT_KERNELS_DIRECTORY );
 
@@ -98,7 +102,7 @@ public:
      * @brief getRenderingKernelType
      * @return
      */
-    virtual RenderingMode getRenderingKernelType( ) const = 0;
+    virtual RenderingMode getRenderingKernelType( ) const;
 
     /**
      * @brief setFrameBuffer
@@ -152,14 +156,14 @@ public:
      * @brief setVolumeDensityFactor
      * @param density
      */
-    virtual void setVolumeDensityFactor( float density ) = 0;
+    virtual void setVolumeDensityFactor( float density ) ;
 
     /**
      * @brief setImageBrightnessFactor
      * @param brightness
      */
 
-    virtual void setImageBrightnessFactor( float brightness ) = 0;
+    virtual void setImageBrightnessFactor( float brightness );
     /**
      * @brief setVolumeIsoValue
      * @param isovalue
@@ -167,9 +171,39 @@ public:
     virtual void setVolumeIsoValue( float isovalue ) ;
 
     /**
+     * @brief setMaxSteps
+     * @param maxSteps
+     */
+    virtual void setMaxSteps( uint maxSteps );
+
+    /**
+     * @brief setStepSize
+     * @param tStep
+     */
+    virtual void setStepSize( float tStep );
+
+
+    /**
+     * @brief setTransferFunctionData
+     * @param data
+     */
+    virtual void setTransferFunctionData( cl_mem data );
+
+    /**
+     * @brief setTransferFunctionSampler
+     * @param sampler
+     */
+    virtual void setTransferFunctionSampler( cl_sampler sampler );
+
+
+    /**
      * @brief releaseKernel
      */
     void releaseKernel( );
+
+
+    virtual bool isFramePrecisionSupported(
+            CLData::FRAME_CHANNEL_TYPE precision ) = 0;
 
 protected:
 
@@ -177,12 +211,12 @@ protected:
      * @brief buildKernel_
      * @param extraBuildOptions
      */
-    void buildKernel_( const std::string extraBuildOptions = "" );
+    virtual void buildKernel_( const std::string extraBuildOptions = "" );
 
     /**
      * @brief retrieveKernelObject_
      */
-    virtual void retrieveKernelObject_( ) = 0;
+    void retrieveKernelObject_( );
 
 protected:
 
@@ -195,6 +229,11 @@ protected:
      * @brief kernelFile_
      */
     const std::string kernelFile_;
+
+    /**
+     * @brief kernelName_
+     */
+    const std::string kernelName_;
 
     /**
      * @brief clContext_
@@ -216,6 +255,10 @@ protected:
       */
     RenderingMode kernelType_;
 
+
+    static const QSet< CLData::FRAME_CHANNEL_TYPE > framePrecision_RGBA_ ;
+
+    static const QSet< CLData::FRAME_CHANNEL_TYPE > framePrecision_Luminance_;
 };
 
 /**

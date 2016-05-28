@@ -5,16 +5,31 @@
 namespace clparen {
 namespace CLKernel {
 
+const QSet< CLData::FRAME_CHANNEL_TYPE > CLRenderingKernel::framePrecision_RGBA_ =
+        QSet< CLData::FRAME_CHANNEL_TYPE >()
+        << CLData::FRAME_CHANNEL_TYPE::FRAME_CL_UNSIGNED_INT8
+        << CLData::FRAME_CHANNEL_TYPE::FRAME_CL_UNSIGNED_INT16
+        << CLData::FRAME_CHANNEL_TYPE::FRAME_CL_UNSIGNED_INT32 ;
+
+const QSet< CLData::FRAME_CHANNEL_TYPE > CLRenderingKernel::framePrecision_Luminance_ =
+        QSet< CLData::FRAME_CHANNEL_TYPE >()
+        << CLData::FRAME_CHANNEL_TYPE::FRAME_CL_UNSIGNED_INT8
+        << CLData::FRAME_CHANNEL_TYPE::FRAME_CL_UNSIGNED_INT16
+        << CLData::FRAME_CHANNEL_TYPE::FRAME_CL_UNSIGNED_INT32
+        << CLData::FRAME_CHANNEL_TYPE::FRAME_CL_FLOAT
+        << CLData::FRAME_CHANNEL_TYPE::FRAME_CL_HALF_FLOAT ;
 
 CLRenderingKernel::CLRenderingKernel(
         cl_context clContext,
+        const std::string kernelName,
         const std::string kernelDirectory,
         const std::string kernelFile  )
     : clContext_( clContext ) ,
+      kernelName_( kernelName ),
       kernelDirectory_( kernelDirectory ) ,
       kernelFile_( kernelFile )
 {
-    buildKernel_( );
+
 }
 
 void CLRenderingKernel::buildKernel_(
@@ -33,6 +48,12 @@ void CLRenderingKernel::buildKernel_(
     buildOptions += " -DIMAGE_SUPPORT";
     buildOptions += extraBuildOptions;
     kernelContext_->buildProgram(buildOptions);
+}
+
+void CLRenderingKernel::retrieveKernelObject_()
+{
+    kernelObject_ = kernelContext_->getKernelObject( kernelName_ );
+
 }
 
 std::string CLRenderingKernel::getKernelDirectory( ) const
@@ -55,6 +76,11 @@ cl_kernel
 CLRenderingKernel::getKernelObject( ) const
 {
     return kernelObject_;
+}
+
+RenderingMode CLRenderingKernel::getRenderingKernelType() const
+{
+
 }
 
 
@@ -157,10 +183,59 @@ void CLRenderingKernel::setInverseViewMatrix( cl_mem matrix )
     }
 }
 
-void CLRenderingKernel::setVolumeIsoValue( float isovalue )
+void CLRenderingKernel::setVolumeDensityFactor( float density )
 {
 
+    cl_int error = clSetKernelArg( kernelObject_, KERNEL_ARG_Density ,
+                                   sizeof( float ),
+                                   ( void* ) &density );
+    if( error != CL_SUCCESS )
+    {
+        oclHWDL::Error::checkCLError( error );
+        LOG_ERROR("Exiting Due to OpenCL Error!");
+    }
 }
+
+void CLRenderingKernel::setImageBrightnessFactor( float brightness )
+{
+    cl_int error = clSetKernelArg( kernelObject_, KERNEL_ARG_Brightness ,
+                                   sizeof( float ),
+                                   ( void* ) &brightness );
+    if( error != CL_SUCCESS )
+    {
+        oclHWDL::Error::checkCLError( error );
+        LOG_ERROR("Exiting Due to OpenCL Error!");
+    }
+}
+
+void CLRenderingKernel::setVolumeIsoValue( float isovalue )
+{
+    // No implementation by default.
+}
+
+void CLRenderingKernel::setMaxSteps( uint maxSteps )
+{
+    // No implementation by default.
+}
+
+void CLRenderingKernel::setStepSize( float tStep )
+{
+    // No implementation by default.
+
+}
+
+void CLRenderingKernel::setTransferFunctionData( cl_mem data )
+{
+    // No implementation by default.
+
+}
+
+void CLRenderingKernel::setTransferFunctionSampler( cl_sampler sampler )
+{
+    // No implementation by default.
+
+}
+
 
 
 
@@ -178,6 +253,8 @@ CLRenderingKernel::~CLRenderingKernel( )
 {
     releaseKernel( );
 }
+
+
 
 
 }

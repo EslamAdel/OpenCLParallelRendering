@@ -17,9 +17,9 @@ namespace Compositor {
 
 template< class T >
 CLCompositor< T >::CLCompositor( const uint64_t gpuIndex,
-                                                    const uint frameWidth ,
-                                                    const uint frameHeight ,
-                                                    const std::string kernelDirectory )
+                                 const uint frameWidth ,
+                                 const uint frameHeight ,
+                                 const std::string kernelDirectory )
     : CLAbstractCompositor( gpuIndex  ,frameWidth , frameHeight, kernelDirectory )
 {
     framesCount_ = 0 ;
@@ -178,18 +178,16 @@ void CLCompositor< T >::initializeBuffers_()
 {
     LOG_DEBUG("Initializing Buffers ...");
 
-    finalFrame_ = new CLData::CLImage2D< T >( frameDimensions_ , CL_INTENSITY ,
-                                      CL_FLOAT  );
-    finalFrameReadout_ = new CLData::CLImage2D< T >( frameDimensions_ , CL_INTENSITY ,
-                                             CL_FLOAT );
+    finalFrame_ = new CLData::CLImage2D< T >( frameDimensions_ );
+
+    finalFrameReadout_ = new CLData::CLImage2D< T >( frameDimensions_ );
 
     finalFrame_->createDeviceData( context_ );
 
-    imagesArray_ = new CLData::CLImage2DArray< T >( frameDimensions_.x ,
-                                            frameDimensions_.y ,
-                                            0 ,
-                                            CL_INTENSITY ,
-                                            CL_FLOAT );
+    imagesArray_ = new CLData::CLImage2DArray< T >(
+                frameDimensions_.x ,
+                frameDimensions_.y ,
+                0 );
 
     depthIndex_ = new CLData::CLBuffer< uint >( 1 );
 

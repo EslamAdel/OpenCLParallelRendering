@@ -35,21 +35,23 @@ SET( CLPAREN_SOURCE_FILES
     opencl/cldata/CLFrame.cpp
     opencl/cldata/CLImage2D.cpp
     opencl/cldata/CLImage2DArray.cpp
-    opencl/clkernels/CLRenderingKernel.cpp
-    opencl/clkernels/CLCompositingKernel.cpp
     opencl/cldata/CLTransferFunction.cpp
     opencl/cldata/CLVolume.cpp
-    opencl/clkernels/CLXRayCompositingKernel.cpp
-    opencl/clkernels/CLXRayRenderingKernel.cpp
-    opencl/clkernels/CLMaxIntensityProjectionRenderingKernel.cpp
-    opencl/clkernels/CLMinIntensityProjectionRenderingKernel.cpp
-    opencl/clkernels/CLAverageIntensityProjectionRenderingKernel.cpp
-    opencl/clkernels/CLIsoSurfaceRenderingKernel.cpp
-    opencl/clkernels/CLMinIntensityProjectionCompositingKernel.cpp
-    opencl/clkernels/CLMaxIntensityProjectionCompositingKernel.cpp
-    opencl/clkernels/CLAverageIntensityProjectionCompositingKernel.cpp
-    opencl/clkernels/CLAverageIntensityProjectionCompositingKernel.cpp
-    opencl/clkernels/CLIsoSurfaceCompositingKernel.cpp
+    opencl/clkernels/rendering/CLRenderingKernel.cpp
+    opencl/clkernels/compositing/CLCompositingKernel.cpp
+    opencl/clkernels/rendering/CLXRayRenderingKernel.cpp
+    opencl/clkernels/rendering/CLMaxIntensityProjectionRenderingKernel.cpp
+    opencl/clkernels/rendering/CLMinIntensityProjectionRenderingKernel.cpp
+    opencl/clkernels/rendering/CLAverageIntensityProjectionRenderingKernel.cpp
+    opencl/clkernels/rendering/CLIsoSurfaceRenderingKernel.cpp
+    opencl/clkernels/rendering/CL3DUltrasoundRenderingKernel.cpp
+    opencl/clkernels/rendering/CLShadedRenderingKernel.cpp
+    opencl/clkernels/compositing/CLXRayCompositingKernel.cpp
+    opencl/clkernels/compositing/CLMinIntensityProjectionCompositingKernel.cpp
+    opencl/clkernels/compositing/CLMaxIntensityProjectionCompositingKernel.cpp
+    opencl/clkernels/compositing/CLAverageIntensityProjectionCompositingKernel.cpp
+    opencl/clkernels/compositing/CLAverageIntensityProjectionCompositingKernel.cpp
+    opencl/clkernels/compositing/CLIsoSurfaceCompositingKernel.cpp
     opencl/cldata/CLBuffer.cpp
     profiling/ProfilingExterns.cpp
     system/oclUtils.cpp
@@ -117,19 +119,21 @@ SET( CLPAREN_HEADER_FILES
     opencl/cldata/CLVolume.h
     opencl/cldata/CLVolume.ipp
     opencl/clkernels/CLKernel.hh
-    opencl/clkernels/CLXRayCompositingKernel.h
-    opencl/clkernels/CLRenderingKernel.h
-    opencl/clkernels/CLCompositingKernel.h
-    opencl/clkernels/CLXRayRenderingKernel.h
-    opencl/clkernels/CLMaxIntensityProjectionRenderingKernel.h
-    opencl/clkernels/CLMinIntensityProjectionRenderingKernel.h
-    opencl/clkernels/CLAverageIntensityProjectionRenderingKernel.h
-    opencl/clkernels/CLIsoSurfaceRenderingKernel.h
-    opencl/clkernels/CLMinIntensityProjectionCompositingKernel.h
-    opencl/clkernels/CLMaxIntensityProjectionCompositingKernel.h
-    opencl/clkernels/CLAverageIntensityProjectionCompositingKernel.h
-    opencl/clkernels/CLAverageIntensityProjectionCompositingKernel.h
-    opencl/clkernels/CLIsoSurfaceCompositingKernel.h
+    opencl/clkernels/compositing/CLXRayCompositingKernel.h
+    opencl/clkernels/rendering/CLRenderingKernel.h
+    opencl/clkernels/compositing/CLCompositingKernel.h
+    opencl/clkernels/rendering/CLXRayRenderingKernel.h
+    opencl/clkernels/rendering/CLMaxIntensityProjectionRenderingKernel.h
+    opencl/clkernels/rendering/CLMinIntensityProjectionRenderingKernel.h
+    opencl/clkernels/rendering/CLAverageIntensityProjectionRenderingKernel.h
+    opencl/clkernels/rendering/CLIsoSurfaceRenderingKernel.h
+    opencl/clkernels/rendering/CL3DUltrasoundRenderingKernel.h
+    opencl/clkernels/rendering/CLShadedRenderingKernel.h
+    opencl/clkernels/compositing/CLMinIntensityProjectionCompositingKernel.h
+    opencl/clkernels/compositing/CLMaxIntensityProjectionCompositingKernel.h
+    opencl/clkernels/compositing/CLAverageIntensityProjectionCompositingKernel.h
+    opencl/clkernels/compositing/CLAverageIntensityProjectionCompositingKernel.h
+    opencl/clkernels/compositing/CLIsoSurfaceCompositingKernel.h
     opencl/cldata/CLBuffer.h
     opencl/cldata/CLFrameVariants.hh
     opencl/cldata/CLVolumeVariants.hh
@@ -155,6 +159,8 @@ set( CLPAREN_KERNELS
     kernels/averageIntensityProjection_compositing.cl
     kernels/isoSurface.cl
     kernels/isoSurface_compositing.cl
+    kernels/shaded.cl
+    kernels/ultrasound.cl
 )
 
 
@@ -174,6 +180,8 @@ include_directories( kernels )
 include_directories( opencl )
 include_directories( opencl/cldata )
 include_directories( opencl/clkernels )
+include_directories( opencl/clkernels/rendering )
+include_directories( opencl/clkernels/compositing )
 include_directories( rendering )
 include_directories( system )
 include_directories( profiling )

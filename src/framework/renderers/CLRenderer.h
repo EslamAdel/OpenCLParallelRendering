@@ -63,7 +63,7 @@ public:
     uint getFrameIndex( ) const override ;
 
     /**
-     * @brief getCLFrame
+     * @brief getCLFrame Returns the pixel buffer being rendered to.
      * @return
      */
     const CLData::CLFrameVariant &getCLFrame( ) const override;
@@ -75,19 +75,22 @@ public:
     CLData::CLVolume< V > *getCLVolume();
 
     /**
-     * @brief reloadVolume
+     * @brief reloadVolume If data underlying CLData::CLVolume updated, call this function to load the new buffer at host to the device.
+     * @param blocking If set CL_TRUE, then this function will block until data transferred to device.
      */
     void reloadVolume( const cl_bool blocking );
 
 
+
     /**
-     * @brief copyHostData
-     * @param brickParameters
+     * @brief copyHostData Extract volume data from BrickParameters structure to the buffer underlying CLData::CLVolume.
+     * @param brickParameters Data to be extracted to the underlying buffer in CLData::CLVolume [in].
      */
     void copyHostData( const BrickParameters< V > &brickParameters );
 
 
 
+    bool isRenderingModeSupported( CLKernel::RenderingMode mode ) override;
 protected:
 
     /**

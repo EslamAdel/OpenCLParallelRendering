@@ -13,6 +13,23 @@ using namespace SystemUtilities;
 namespace clparen {
 namespace CLData {
 
+enum FRAME_CHANNEL_ORDER
+{
+    ORDER_INTENSITY ,
+    ORDER_RGBA ,
+    ORDER_DEFAULT
+};
+
+enum FRAME_CHANNEL_TYPE
+{
+    FRAME_CL_UNSIGNED_INT8,
+    FRAME_CL_UNSIGNED_INT16,
+    FRAME_CL_UNSIGNED_INT32,
+    FRAME_CL_HALF_FLOAT,
+    FRAME_CL_FLOAT,
+};
+
+
 template< class T >
 class CLFrame
 {
@@ -27,12 +44,15 @@ public:
      * @param volume
      * @param precision
      */
-    CLFrame( const Dimensions2D dimensions  );
+    CLFrame( const Dimensions2D dimensions ,
+             const FRAME_CHANNEL_ORDER channelOrder =
+            FRAME_CHANNEL_ORDER::ORDER_DEFAULT );
 
     /**
      * @brief CLFrame
      */
-    CLFrame( );
+    CLFrame( const FRAME_CHANNEL_ORDER channelOrder =
+            FRAME_CHANNEL_ORDER::ORDER_DEFAULT );
 
     ~CLFrame( ) ;
 
@@ -164,6 +184,48 @@ public:
      */
     bool dimensionsDefined( ) const ;
 
+
+    /**
+     * @brief frameChannelPrecision
+     * @return
+     */
+    static FRAME_CHANNEL_TYPE frameChannelType( );
+
+
+    /**
+     * @brief clChannelType
+     * @return
+     */
+    static cl_channel_type clChannelType( );
+
+
+    /**
+     * @brief defaultChannelOrder
+     * @return
+     */
+    static FRAME_CHANNEL_ORDER defaultChannelOrder( );
+
+    /**
+     * @brief clChannelOrder
+     * @param order
+     * @return
+     */
+    static cl_channel_order clChannelOrder( FRAME_CHANNEL_ORDER order );
+
+
+
+    /**
+     * @brief checkChannelConflict_
+     */
+    static bool isChannelConflict( FRAME_CHANNEL_ORDER order );
+
+    /**
+     * @brief frameChannelOrder
+     * @return
+     */
+    FRAME_CHANNEL_ORDER frameChannelOrder() const;
+
+
 protected:
     /**
      * @brief releaseDeviceData_
@@ -189,6 +251,18 @@ protected:
     void convertColorToRGBA_( uint Color,
                               uint8_t &r , uint8_t &g,
                               uint8_t &b , uint8_t &a );
+
+    /**
+     * @brief pixelSize
+     * @return
+     */
+    uint8_t pixelSize( ) const ;
+
+    /**
+     * @brief channelsInPixel
+     * @return
+     */
+    uint8_t channelsInPixel( ) const ;
 protected:
 
     /**
@@ -237,6 +311,10 @@ protected:
      */
     bool dimensionsDefined_ ;
 
+    /**
+     * @brief channelOrder_
+     */
+    const FRAME_CHANNEL_ORDER channelOrder_ ;
 };
 
 

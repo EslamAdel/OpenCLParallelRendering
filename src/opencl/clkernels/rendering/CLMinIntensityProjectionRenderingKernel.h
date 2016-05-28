@@ -9,12 +9,6 @@ namespace CLKernel {
 
 class CLMinIntensityProjectionRenderingKernel : public CLRenderingKernel
 {
-private:
-    enum XRayKernelArgument
-    {
-        KERNEL_ARG_Density = KERNEL_ARG_DerivedKernelsOffset  ,
-        KERNEL_ARG_Brightness
-    };
 
 public:
     /**
@@ -30,41 +24,8 @@ public:
             const std::string kernelFile = "minIntensityProjection.cl" ,
             const std::string kernelName = "minIntensityProjection" );
 
-public:
-
-    /**
-     * @brief getRenderingKernelType
-     * @return
-     */
-    virtual RenderingMode getRenderingKernelType( ) const final ;
-
-
-    /**
-     * @brief setVolumeDensityFactor
-     * @param density
-     */
-    virtual void setVolumeDensityFactor( float density ) final;
-
-    /**
-     * @brief setImageBrightnessFactor
-     * @param brightness
-     */
-    virtual void setImageBrightnessFactor( float brightness ) final;
-
-
-protected:
-
-    /**
-     * @brief retrieveKernelObject_
-     */
-    virtual void retrieveKernelObject_( ) final ;
-
-private:
-
-    /**
-     * @brief kernelName_
-     */
-    const std::string kernelName_;
+    bool isFramePrecisionSupported(
+            CLData::FRAME_CHANNEL_TYPE precision ) override;
 };
 
 

@@ -11,33 +11,39 @@ namespace CLData {
 
 
 template< class T >
-CLFrame< T >::CLFrame( const Dimensions2D dimensions  )
+CLFrame< T >::CLFrame( const Dimensions2D dimensions ,
+                       const FRAME_CHANNEL_ORDER channelOrder )
     : dimensions_( dimensions ),
       pixmapSynchronized_( false ) ,
       inDevice_( false ),
-      deviceData_( nullptr )
+      deviceData_( nullptr ),
+      channelOrder_(( channelOrder == FRAME_CHANNEL_ORDER::ORDER_DEFAULT)?
+                        defaultChannelOrder() : channelOrder )
 {
-    hostData_ = new T[ dimensions.imageSize() ];
 
-    // RGBA image
-    if( typeid( T ) == typeid( uint ))
-    {
-        pixmapData_ = new uchar[ dimensions.imageSize() * 4  ];
+    if( isChannelConflict( channelOrder_ ))
+        LOG_ERROR("Channel Order conflicts with channel type.");
 
-    }
-    // Intensity image
-    else if( typeid( T ) == typeid( float ))
-    {
-        pixmapData_ = new uchar[ dimensions.imageSize()  ];
-    }
+
+    hostData_ = new T[ dimensions.imageSize() * channelsInPixel() ];
+    pixmapData_ = new uchar[ dimensions.imageSize() * channelsInPixel()  ];
+
 
 }
 
 template< class T >
-CLFrame< T >::CLFrame( )
-    : hostData_( nullptr ) ,
-      pixmapData_( nullptr )
+CLFrame< T >::CLFrame( const FRAME_CHANNEL_ORDER channelOrder )
+    : hostData_( 0 ) ,
+      pixmapData_( 0 ),
+      pixmapSynchronized_( false ) ,
+      inDevice_( false ),
+      deviceData_( 0 ),
+      channelOrder_(( channelOrder == FRAME_CHANNEL_ORDER::ORDER_DEFAULT)?
+                        defaultChannelOrder() : channelOrder )
 {
+    if( isChannelConflict( channelOrder_ ))
+        LOG_ERROR("Channel Order conflicts with channel type.");
+
     dimensionsDefined_ = false ;
 }
 
@@ -63,7 +69,7 @@ void CLFrame< T >::createDeviceData( cl_context context ,
     cl_int error = CL_SUCCESS;
     deviceData_ = clCreateBuffer( context,
                                   flags ,
-                                  dimensions_.imageSize() * sizeof( T ) ,
+                                  dimensions_.imageSize() * pixelSize() ,
                                   0 ,
                                   &error );
     if( error != CL_SUCCESS )
@@ -89,7 +95,7 @@ void CLFrame< T >::writeDeviceData( cl_command_queue cmdQueue ,
     // Initially, assume that everything is fine
     cl_int error = CL_SUCCESS;
     error = clEnqueueWriteBuffer( cmdQueue , deviceData_ , blocking ,
-                                  0 , dimensions_.imageSize() * sizeof( T ) ,
+                                  0 , dimensions_.imageSize() * pixelSize() ,
                                   ( const void *) hostData_ ,
                                   0 , 0 , 0 );
 
@@ -106,7 +112,7 @@ void CLFrame< T >::readDeviceData( cl_command_queue cmdQueue ,
 {
     static cl_int error = CL_SUCCESS;
     error = clEnqueueReadBuffer( cmdQueue, deviceData_ , blocking ,
-                                 0 , dimensions_.imageSize() * sizeof(T) ,
+                                 0 , dimensions_.imageSize() * pixelSize() ,
                                  ( void * ) hostData_ ,
                                  0 , 0 , 0);
 
@@ -131,7 +137,7 @@ void CLFrame< T >::readOtherDeviceData(
     static cl_int error = CL_SUCCESS;
     error = clEnqueueReadBuffer( sourceCmdQueue , sourceFrame.getDeviceData() ,
                                  blocking ,
-                                 0 , dimensions_.imageSize() * sizeof( T )  ,
+                                 0 , dimensions_.imageSize() * pixelSize()  ,
                                  ( void * ) hostData_ ,
                                  0 , 0 , 0 );
 
@@ -160,7 +166,7 @@ void CLFrame< T >::copyDeviceData(
     error = clEnqueueCopyBuffer( cmdQueue ,
                                  frame.getDeviceData() , deviceData_ ,
                                  0 , 0 ,
-                                 dimensions_.imageSize() * sizeof( T ) ,
+                                 dimensions_.imageSize() * pixelSize() ,
                                  0 , 0 , 0 ) ;
 
     if( error != CL_SUCCESS )
@@ -187,19 +193,28 @@ QPixmap &CLFrame<T>::getFramePixmap()
     if( pixmapSynchronized_ ) return frame_ ;
 
 
-    if( typeid( T ) == typeid( uint ))
+    if( channelOrder_ == FRAME_CHANNEL_ORDER::ORDER_RGBA )
     {
         for( int i = 0; i < dimensions_.imageSize() ; i++)
         {
-            u_int8_t r, g, b, a;
-            uint rgba = hostData_[i];
+            pixmapData_[ 4 * i ] =
+                    static_cast< uchar >( hostData_[  4 * i ] );
+            pixmapData_[ 4 * i + 1 ] =
+                    static_cast< uchar >(hostData_[  4 * i + 1 ]);
+            pixmapData_[ 4 * i + 2 ] =
+                    static_cast< uchar >(hostData_[  4 * i + 2 ]);
+            pixmapData_[ 4 * i + 3 ] =
+                    static_cast< uchar >(hostData_[  4 * i + 3 ]);
 
-            convertColorToRGBA_( rgba, r, g, b, a );
+            //            u_int8_t r, g, b, a;
+            //            uint rgba = hostData_[i];
 
-            pixmapData_[ 4 * i ] = r;
-            pixmapData_[ 4 * i + 1 ] = g;
-            pixmapData_[ 4 * i + 2 ] = b;
-            pixmapData_[ 4 * i + 3 ] = a;
+            //            convertColorToRGBA_( rgba, r, g, b, a );
+
+            //            pixmapData_[ 4 * i ] = r;
+            //            pixmapData_[ 4 * i + 1 ] = g;
+            //            pixmapData_[ 4 * i + 2 ] = b;
+            //            pixmapData_[ 4 * i + 3 ] = a;
         }
 
         // Create a QImage and send it back to the rendering window.
@@ -210,7 +225,7 @@ QPixmap &CLFrame<T>::getFramePixmap()
 
     }
 
-    else if( typeid( T ) == typeid( float ))
+    else if( channelOrder_ == FRAME_CHANNEL_ORDER::ORDER_INTENSITY )
     {
         for( int i = 0; i < dimensions_.imageSize() ; i++)
             pixmapData_[ i ] = F2B( hostData_[i] );
@@ -229,7 +244,8 @@ QPixmap &CLFrame<T>::getFramePixmap()
 template< class T >
 void CLFrame< T >::copyHostData( const T *data )
 {
-    std::copy( &data[ 0 ] , &data[ dimensions_.imageSize() - 1 ] ,
+    std::copy( &data[ 0 ] ,
+            &data[ dimensions_.imageSize() * channelsInPixel() - 1 ] ,
             hostData_ );
     pixmapSynchronized_ = false ;
 }
@@ -241,7 +257,7 @@ void CLFrame< T >::copyHostData( const CLFrame< T > &sourceFrame )
     const uint64_t frameSize = sourceFrame.getFrameDimensions().imageSize() ;
 
     std::copy( &hostData_SOURCE[ 0 ] ,
-            &hostData_SOURCE[ frameSize - 1 ] ,  hostData_ );
+            &hostData_SOURCE[ frameSize * channelsInPixel() - 1 ] ,  hostData_ );
 
     pixmapSynchronized_ = false ;
 
@@ -332,6 +348,122 @@ void CLFrame< T >::convertColorToRGBA_( uint Color ,
     a = Color & 0xFF;
 }
 
+template< class T >
+uint8_t CLFrame< T >::pixelSize() const
+{
+    return ( channelOrder_ == FRAME_CHANNEL_ORDER::ORDER_RGBA )?
+                sizeof( T ) * 4 : sizeof( T );
+}
+
+template< class T >
+uint8_t CLFrame< T >::channelsInPixel() const
+{
+    return ( channelOrder_ == FRAME_CHANNEL_ORDER::ORDER_RGBA )?
+                  4 : 1 ;
+}
+
+template< class T >
+FRAME_CHANNEL_TYPE CLFrame< T >::frameChannelType()
+{
+    if( std::is_same< T , uchar >::value )
+        return FRAME_CHANNEL_TYPE::FRAME_CL_UNSIGNED_INT8 ;
+
+    if( std::is_same< T , uint16_t >::value )
+        return FRAME_CHANNEL_TYPE::FRAME_CL_UNSIGNED_INT16 ;
+
+    if( std::is_same< T , uint32_t >::value )
+        return FRAME_CHANNEL_TYPE::FRAME_CL_UNSIGNED_INT32 ;
+
+    if( std::is_same< T , half >::value )
+        return FRAME_CHANNEL_TYPE::FRAME_CL_HALF_FLOAT ;
+
+    if( std::is_same< T , float >::value )
+        return FRAME_CHANNEL_TYPE::FRAME_CL_FLOAT;
+}
+
+
+
+template< class T >
+FRAME_CHANNEL_ORDER CLFrame< T >::defaultChannelOrder()
+{
+    // If integers, return RGBA order.
+    // If float/half, return intensity channel order.
+    /**
+    https://www.khronos.org/registry/cl/sdk/1.0/docs/man/xhtml/cl_image_format.html
+ **/
+
+    if( std::is_same< T , uint8_t >::value )
+        return FRAME_CHANNEL_ORDER::ORDER_RGBA ;
+
+    if( std::is_same< T , uint16_t >::value )
+        return FRAME_CHANNEL_ORDER::ORDER_INTENSITY ;
+
+    if( std::is_same< T , half >::value )
+        return FRAME_CHANNEL_ORDER::ORDER_INTENSITY ;
+
+    if( std::is_same< T , float >::value )
+        return FRAME_CHANNEL_ORDER::ORDER_INTENSITY;
+
+
+    LOG_ERROR("%s is not supported as frame precision!",
+              typeid( T ).name());
+
+}
+
+template< class T >
+cl_channel_order CLFrame< T >::clChannelOrder( FRAME_CHANNEL_ORDER order )
+{
+    switch( order )
+    {
+    case FRAME_CHANNEL_ORDER::ORDER_INTENSITY :
+        return CL_INTENSITY ;
+    case FRAME_CHANNEL_ORDER::ORDER_RGBA:
+        return CL_RGBA;
+    default:
+        LOG_WARNING("Not defined");
+        return 0;
+    }
+}
+
+template< class T >
+cl_channel_type CLFrame< T >::clChannelType()
+{
+    if( std::is_same< T , uint8_t >::value )
+        return CL_UNORM_INT8 ;
+
+    if( std::is_same< T , uint16_t >::value )
+        return CL_UNORM_INT16 ;
+
+    if( std::is_same< T , half >::value )
+        return CL_HALF_FLOAT ;
+
+    if( std::is_same< T , float >::value )
+        return CL_FLOAT;
+
+    LOG_ERROR("%s is not supported as frame precision!",
+              typeid( T ).name());
+}
+
+
+template< class T >
+bool CLFrame< T >::isChannelConflict( FRAME_CHANNEL_ORDER order )
+{
+    const FRAME_CHANNEL_TYPE type = CLFrame< T >::frameChannelType();
+
+    if( order == FRAME_CHANNEL_ORDER::ORDER_RGBA &&
+            type != FRAME_CHANNEL_TYPE::FRAME_CL_UNSIGNED_INT8 )
+        return true ;
+
+    else return false ;
+
+}
+
+
+template< class T >
+FRAME_CHANNEL_ORDER CLFrame< T >::frameChannelOrder( ) const
+{
+    return channelOrder_;
+}
 
 }
 }

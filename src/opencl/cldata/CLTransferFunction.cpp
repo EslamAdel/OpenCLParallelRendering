@@ -9,7 +9,7 @@ CLTransferFunction::CLTransferFunction(
         const uint length ,
         const float *transferFunctionData )
     : length_( length ) ,
-      CLImage2D< float >( Dimensions2D( length , 4 ) , CL_RGBA , CL_FLOAT )
+      CLImage2D< float >( Dimensions2D( length , 4 ))
 {
     this->copyHostData( transferFunctionData );
 

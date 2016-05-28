@@ -118,7 +118,7 @@ public:
      * @brief switchRenderingKernel
      * @param type
      */
-    void switchRenderingKernel( const CLKernel::RenderingMode type ) ;
+    void switchRenderingKernel( const CLKernel::RenderingMode type );
 
 
     /**
@@ -157,6 +157,15 @@ public:
 
     void setSortFirstSettings( const Dimensions2D sortFirstOffset ,
                                const Dimensions2D sortFirstDimensions );
+
+
+
+    /**
+     * @brief isRenderingModeSupported
+     * @param mode
+     * @return
+     */
+    virtual bool isRenderingModeSupported( CLKernel::RenderingMode mode ) = 0;
 
 protected:
 

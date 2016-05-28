@@ -217,6 +217,9 @@ VOLUME_PRECISION CLVolume< T >::defaultVolumePrecision_()
     if( std::is_same< T , uint16_t >::value )
         return VOLUME_PRECISION::VOLUME_CL_UNSIGNED_INT16 ;
 
+    if( std::is_same< T , uint32_t >::value )
+        return VOLUME_PRECISION::VOLUME_CL_UNSIGNED_INT32 ;
+
     if( std::is_same< T , half >::value )
         return VOLUME_PRECISION::VOLUME_CL_HALF_FLOAT ;
 

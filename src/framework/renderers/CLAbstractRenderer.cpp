@@ -61,6 +61,26 @@ cl_command_queue CLAbstractRenderer::getCommandQueue() const
     return commandQueue_ ;
 }
 
+void CLAbstractRenderer::switchRenderingKernel( const CLKernel::RenderingMode mode )
+{
+
+    QMutexLocker lock( &switchKernelMutex_ );
+
+    if( !renderingKernels_.contains( mode ))
+        return;
+
+    if( !isRenderingModeSupported( mode ))
+    {
+        LOG_WARNING("Rendering mode is not supported by renderer");
+        return;
+    }
+
+    activeRenderingMode_ = mode ;
+
+    activeRenderingKernel_ = renderingKernels_[ mode ];
+
+}
+
 bool CLAbstractRenderer::lessThan( const CLAbstractRenderer *lhs ,
                                    const CLAbstractRenderer *rhs )
 {
@@ -151,18 +171,7 @@ void CLAbstractRenderer::createCommandQueue_()
 }
 
 
-void CLAbstractRenderer::switchRenderingKernel(
-        const CLKernel::RenderingMode type )
-{
-    QMutexLocker lock( &switchKernelMutex_ );
 
-    if( !renderingKernels_.contains( type ))
-        return;
-
-    activeRenderingMode_ = type ;
-
-    activeRenderingKernel_ = renderingKernels_[ type ];
-}
 
 CLKernel::CLRenderingKernels
 CLAbstractRenderer::allocateKernels_() const
@@ -218,10 +227,10 @@ void CLAbstractRenderer::setSortFirstSettings(
             sortFirstOffset_.y + sortFirstDimensions_.y > frameDimensions_.y )
         LOG_ERROR("Rendered region exceeds the frame region.");
 
-//    LOG_DEBUG("GPU<%d> offset:[%s],sortFDim:[%s] ",
-//              gpuIndex_ ,
-//              sortFirstOffset.toString().c_str() ,
-//              sortFirstDimensions.toString().c_str());
+    //    LOG_DEBUG("GPU<%d> offset:[%s],sortFDim:[%s] ",
+    //              gpuIndex_ ,
+    //              sortFirstOffset.toString().c_str() ,
+    //              sortFirstDimensions.toString().c_str());
 
     createPixelBuffer_();
 }

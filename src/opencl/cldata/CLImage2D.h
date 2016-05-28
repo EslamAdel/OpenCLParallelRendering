@@ -24,9 +24,10 @@ public:
      * @param channelOrder
      * @param channelType
      */
-    CLImage2D(  const Dimensions2D dimensions ,
-                const cl_channel_order channelOrder = CL_RGBA ,
-                const cl_channel_type channelType = CL_UNORM_INT8  );
+    CLImage2D(
+            const Dimensions2D dimensions ,
+            const FRAME_CHANNEL_ORDER channelOrder =
+            FRAME_CHANNEL_ORDER::ORDER_DEFAULT );
 
     CLImage2D( );
 
@@ -66,9 +67,22 @@ public:
                                       const CLFrame< T > &sourceFrame ,
                                       const cl_bool blocking ) override;
 
+    /**
+     * @brief frameChannelOrder
+     * @return
+     */
+    FRAME_CHANNEL_ORDER frameChannelOrder() const;
+
+private:
+
 
 
 protected :
+
+
+
+
+
     /**
      * @brief imageFormat_
      */

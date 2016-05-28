@@ -7,12 +7,14 @@ namespace CLData {
 
 template< class T >
 CLImage2D< T >::CLImage2D( const Dimensions2D dimensions ,
-                           const cl_channel_order channelOrder ,
-                           const cl_channel_type channelType )
-    : CLFrame< T >( dimensions )
+                           const FRAME_CHANNEL_ORDER channelOrder )
+    : CLFrame< T >( dimensions  , channelOrder )
 {
-    imageFormat_.image_channel_order = channelOrder;
-    imageFormat_.image_channel_data_type = channelType;
+
+    imageFormat_.image_channel_order =
+            CLFrame< T >::clChannelOrder( this->channelOrder_ );
+    imageFormat_.image_channel_data_type =
+            CLFrame< T >::clChannelType();
 
     imageDescriptor_.image_type = CL_MEM_OBJECT_IMAGE2D ;
     imageDescriptor_.image_width = dimensions.x ;
@@ -72,12 +74,13 @@ void CLImage2D< T >::writeDeviceData( cl_command_queue cmdQueue,
 
     // Initially, assume that everything is fine
     cl_int error = CL_SUCCESS;
-    error = clEnqueueWriteImage( cmdQueue, this->deviceData_ , blocking ,
-                                 origin , region ,
-                                 this->dimensions_.x * sizeof(T)  ,
-                                 this->dimensions_.imageSize() * sizeof(T) ,
-                                 ( const void * ) this->hostData_ ,
-                                 0 , 0 , 0 );
+    error = clEnqueueWriteImage(
+                cmdQueue, this->deviceData_ , blocking ,
+                origin , region ,
+                this->dimensions_.x * CLFrame< T >::pixelSize()  ,
+                this->dimensions_.imageSize() * CLFrame< T >::pixelSize() ,
+                ( const void * ) this->hostData_ ,
+                0 , 0 , 0 );
 
     if( error != CL_SUCCESS )
     {
@@ -94,16 +97,17 @@ void CLImage2D< T >::readDeviceData( cl_command_queue cmdQueue ,
     const size_t
             region[3] = { this->dimensions_.x , this->dimensions_.y , 1 };
 
-//    LOG_DEBUG("ImageDim:%s", this->dimensions_.toString().c_str());
+    //    LOG_DEBUG("ImageDim:%s", this->dimensions_.toString().c_str());
 
     // Initially, assume that everything is fine
     cl_int error = CL_SUCCESS;
-    error = clEnqueueReadImage( cmdQueue, this->deviceData_ , blocking ,
-                                origin , region ,
-                                this->dimensions_.x * sizeof(T)  ,
-                                this->dimensions_.imageSize() * sizeof(T) ,
-                                ( void *) this->hostData_ ,
-                                0 , 0 , 0 );
+    error = clEnqueueReadImage(
+                cmdQueue, this->deviceData_ , blocking ,
+                origin , region ,
+                this->dimensions_.x * CLFrame< T >::pixelSize()  ,
+                this->dimensions_.imageSize() * CLFrame< T >::pixelSize() ,
+                ( void *) this->hostData_ ,
+                0 , 0 , 0 );
     if( error != CL_SUCCESS )
     {
         oclHWDL::Error::checkCLError( error );
@@ -129,12 +133,13 @@ void CLImage2D< T >::readOtherDeviceData(
 
     static cl_int error = CL_SUCCESS;
 
-    error = clEnqueueReadImage( sourceCmdQueue , sourceFrame.getDeviceData() ,
-                                blocking , origin , region ,
-                                this->dimensions_.x * sizeof(T)  ,
-                                this->dimensions_.imageSize() * sizeof(T) ,
-                                ( void * ) this->hostData_ ,
-                                0 , 0 , 0 );
+    error = clEnqueueReadImage(
+                sourceCmdQueue , sourceFrame.getDeviceData() ,
+                blocking , origin , region ,
+                this->dimensions_.x * CLFrame< T >::pixelSize() ,
+                this->dimensions_.imageSize() * CLFrame< T >::pixelSize() ,
+                ( void * ) this->hostData_ ,
+                0 , 0 , 0 );
 
     if( error != CL_SUCCESS )
     {
@@ -142,6 +147,10 @@ void CLImage2D< T >::readOtherDeviceData(
         LOG_ERROR("OpenCL Error!");
     }
 }
+
+
+
+
 
 }
 }

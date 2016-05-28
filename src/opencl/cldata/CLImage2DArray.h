@@ -24,10 +24,11 @@ public:
      * @param channelOrder
      * @param channelType
      */
-    CLImage2DArray( const uint width , const uint height ,
-                    const uint arraySize ,
-                    const cl_channel_order channelOrder = CL_RGBA ,
-                    const cl_channel_type channelType = CL_UNORM_INT8  );
+    CLImage2DArray(
+            const uint width , const uint height ,
+            const uint arraySize ,
+            const FRAME_CHANNEL_ORDER channelOrder =
+            FRAME_CHANNEL_ORDER::ORDER_DEFAULT );
 
     ~CLImage2DArray();
 
@@ -98,6 +99,11 @@ public:
      */
     bool inDevice() const ;
 
+    /**
+     * @brief pixelSize
+     * @return
+     */
+    uint8_t pixelSize( ) const ;
 private :
     /**
      * @brief releaseDeviceData_
@@ -120,6 +126,11 @@ private:
      * @brief arraySize_
      */
     uint arraySize_ ;
+
+    /**
+     * @brief channelOrder_
+     */
+    const FRAME_CHANNEL_ORDER channelOrder_ ;
 
     /**
      * @brief deviceData_
