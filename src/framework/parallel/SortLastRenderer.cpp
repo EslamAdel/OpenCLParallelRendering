@@ -12,17 +12,17 @@ DEFINE_PROFILES
 
 #endif
 
-namespace clparen
-{
-namespace Parallel
-{
+namespace clparen {
+namespace Parallel{
 
 template< class V , class F >
-SortLastRenderer< V , F >::SortLastRenderer( Volume< V > *volume ,
-                                      const uint64_t frameWidth ,
-                                      const uint64_t frameHeight )
+        SortLastRenderer< V , F >::SortLastRenderer(
+        Volume< V > *volume ,
+        const uint64_t frameWidth ,
+        const uint64_t frameHeight ,
+        const CLData::FRAME_CHANNEL_ORDER channelOrder )
     : baseVolume_( volume ),
-      CLAbstractParallelRenderer( frameWidth , frameHeight )
+      CLAbstractParallelRenderer( frameWidth , frameHeight , channelOrder )
 {
 
     compositorPool_.setMaxThreadCount( 1 );
@@ -144,7 +144,7 @@ void SortLastRenderer< V , F >::addCLCompositor( const uint64_t gpuIndex )
 
             Compositor::Task::TaskComposite *compositingTask =
                     new Compositor::Task::TaskComposite( compositor_ ,
-                                             renderer );
+                                                         renderer );
 
             compositingTasks_[ renderer ] = compositingTask ;
 

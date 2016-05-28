@@ -37,9 +37,12 @@ class CLAbstractParallelRenderer : public QObject
 {
     Q_OBJECT
 public:
-    explicit CLAbstractParallelRenderer( const uint64_t frameWidth = 512 ,
-                                         const uint64_t frameHeight = 512  ,
-                                         QObject *parent = 0 );
+    explicit CLAbstractParallelRenderer(
+            const uint64_t frameWidth = 512 ,
+            const uint64_t frameHeight = 512  ,
+            const CLData::FRAME_CHANNEL_ORDER channelOrder =
+            CLData::FRAME_CHANNEL_ORDER::ORDER_DEFAULT ,
+            QObject *parent = 0 );
 
 
     /**
@@ -182,7 +185,7 @@ public slots :
      * otherwise, it belongs to CLRenderer referenced by the pointer.
      */
     virtual void pixmapReady_SLOT( QPixmap *pixmap ,
-                           const Renderer::CLAbstractRenderer * renderer ) = 0;
+                                   const Renderer::CLAbstractRenderer * renderer ) = 0;
 
     /**
      * @brief updateRotationX_SLOT
@@ -273,7 +276,7 @@ public slots :
      * @brief updateTransferFunction_SLOT
      * @param transferFunction
      */
-    void updateTransferFunction_SLOT( float *transferFunction );
+    void updateTransferFunction_SLOT( float *transferFunction , uint length );
 
     /**
      * @brief activateRenderingKernel_SLOT
@@ -357,7 +360,7 @@ protected :
      * @brief collectorPool_
      */
     QThreadPool collectorPool_ ; //[producer] for renderer pool AND
-                                 //[consumer] for renderer pool.
+    //[consumer] for renderer pool.
     /**
      * @brief pixmapMakerPool_
      */
@@ -408,6 +411,9 @@ protected :
     uint machineGPUsCount_;
     const uint64_t frameWidth_ ;
     const uint64_t frameHeight_ ;
+
+
+    const CLData::FRAME_CHANNEL_ORDER frameChannelOrder_ ;
 
 };
 

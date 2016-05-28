@@ -94,7 +94,13 @@ public:
     bool isRenderingModeSupported( CLKernel::RenderingMode mode ) Q_DECL_OVERRIDE;
 
 
-    void updateTransferFunction( float *transferFunction ) Q_DECL_OVERRIDE;
+
+
+    void updateTransferFunction(
+            float *transferFunction , uint length ) Q_DECL_OVERRIDE;
+
+    CLData::FRAME_CHANNEL_ORDER getFrameChannelOrder() const Q_DECL_OVERRIDE;
+
 
 protected:
 
@@ -158,11 +164,6 @@ private:
     cl_mem inverseMatrix_;
 
     /**
-     * @brief transferFunctionArray_
-     */
-    cl_mem transferFunctionArray_;
-
-    /**
      * @brief linearVolumeSampler_
      */
     cl_sampler linearVolumeSampler_;
@@ -192,7 +193,7 @@ private:
     /**
      * @brief transferFunction_
      */
-    float* transferFunction_;
+    CLData::CLTransferFunction *transferFunction_;
 
 
     /**
@@ -205,10 +206,7 @@ private:
      */
     float inverseMatrixArray_[ 12 ];
 
-    /**
-     * @brief frameChannelOrder_
-     */
-    const CLData::FRAME_CHANNEL_ORDER frameChannelOrder_ ;
+
 
 };
 

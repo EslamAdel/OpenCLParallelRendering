@@ -225,6 +225,17 @@ public:
      */
     FRAME_CHANNEL_ORDER channelOrder() const;
 
+    /**
+     * @brief pixelSize
+     * @return
+     */
+    uint8_t pixelSize( ) const ;
+
+    /**
+     * @brief channelsInPixel
+     * @return
+     */
+    uint8_t channelsInPixel( ) const ;
 
 
 protected:
@@ -253,17 +264,7 @@ protected:
                               uint8_t &r , uint8_t &g,
                               uint8_t &b , uint8_t &a );
 
-    /**
-     * @brief pixelSize
-     * @return
-     */
-    uint8_t pixelSize( ) const ;
 
-    /**
-     * @brief channelsInPixel
-     * @return
-     */
-    uint8_t channelsInPixel( ) const ;
 protected:
 
     /**

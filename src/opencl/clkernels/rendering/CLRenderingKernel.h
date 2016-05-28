@@ -26,7 +26,8 @@ enum RenderingMode
     RENDERING_MODE_MaxIntensity ,
     RENDERING_MODE_AverageIntensity ,
     RENDERING_MODE_IsoSurface ,
-    RENDERING_MODE_AlphaBlending
+    RENDERING_MODE_Shaded ,
+    RENDERING_MODE_Ultrasound
 };
 
 
@@ -234,6 +235,17 @@ public:
      */
     CLData::FRAME_CHANNEL_ORDER getChannelOrderSupport() const;
 
+    /**
+     * @brief isUltrasound
+     * @return
+     */
+    virtual bool isUltrasound() const ;
+
+    /**
+     * @brief supportTransferFunction
+     * @return
+     */
+    virtual bool supportTransferFunction() const ;
 protected:
 
     /**

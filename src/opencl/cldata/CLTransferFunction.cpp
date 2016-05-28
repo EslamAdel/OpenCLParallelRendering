@@ -50,6 +50,11 @@ void CLTransferFunction::writeDeviceData(
     }
 }
 
+uint CLTransferFunction::length() const
+{
+    return length_;
+}
+
 
 }
 }

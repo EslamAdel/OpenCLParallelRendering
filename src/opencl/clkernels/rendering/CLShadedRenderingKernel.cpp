@@ -71,6 +71,11 @@ void CLShadedRenderingKernel::setTransferFunctionSampler( cl_sampler sampler )
     }
 }
 
+bool CLShadedRenderingKernel::supportTransferFunction() const
+{
+    return true;
+}
+
 
 }
 }

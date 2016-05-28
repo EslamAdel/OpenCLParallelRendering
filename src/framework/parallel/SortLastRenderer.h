@@ -31,9 +31,12 @@ public:
      * @param frameWidth
      * @param frameHeight
      */
-    SortLastRenderer( Volume< V >* volume ,
-                       const uint64_t frameWidth = 512 ,
-                       const uint64_t frameHeight = 512 );
+    SortLastRenderer(
+            Volume< V >* volume ,
+            const uint64_t frameWidth = 512 ,
+            const uint64_t frameHeight = 512 ,
+            const CLData::FRAME_CHANNEL_ORDER channelOrder
+            = CLData::FRAME_CHANNEL_ORDER::ORDER_INTENSITY );
 
 
 

@@ -10,11 +10,11 @@
  */
 
 
-#define M_PI 3.14
+#define M_PI_2DEC 3.14
 
 float d2r(float angle)
 {
-    return(angle*M_PI/180.0);
+    return(angle*M_PI_2DEC/180.0);
 }
 
 // Intersects a ray with a triangle defined by three vertices.
@@ -270,7 +270,7 @@ ultrasound( __write_only image2d_t frameBuffer,
 
             float density, float brightness ,
 
-            uint maxSteps, float tStep
+            uint maxSteps, float tStep ,
 
             __read_only image2d_t transferFunc,
 
@@ -292,8 +292,8 @@ ultrasound( __write_only image2d_t frameBuffer,
     if( y - offsetY - 1 > sortFirstHeight )
         return ;
     
-    float u = (x / (float) imageW)*2.0f-1.0f;
-    float v = (y / (float) imageH)*2.0f-1.0f;
+    float u = (x / (float) frameWidth)*2.0f-1.0f;
+    float v = (y / (float) frameHeight)*2.0f-1.0f;
     
     //float tstep = 0.01f;
     float4 boxMin = (float4)(-1.0f, -1.0f, -1.0f,1.0f);

@@ -9,8 +9,7 @@
  *
  */
 
-#define maxSteps 500
-#define tstep 0.01f
+
 
 // intersect ray with a box
 // http://www.siggraph.org/education/materials/HyperGraph/raytrace/rtinter3.htm
@@ -60,6 +59,8 @@ shaded( __write_only image2d_t frameBuffer,
         sampler_t   volumeSampler ,
 
         float density, float brightness ,
+
+        uint maxSteps, float tStep ,
 
         __read_only image2d_t transferFunc,
 
@@ -146,7 +147,7 @@ shaded( __write_only image2d_t frameBuffer,
         float a = col.w*density;
         temp = mix(temp, col, (float4)(a, a, a, a));
 
-        t -= tstep;
+        t -= tStep;
         if (t < tnear) break;
     }
     temp *= brightness;

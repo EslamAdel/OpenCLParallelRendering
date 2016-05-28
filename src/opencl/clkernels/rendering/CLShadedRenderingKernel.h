@@ -28,6 +28,8 @@ public:
     void setTransferFunctionSampler( cl_sampler sampler ) Q_DECL_OVERRIDE ;
 
 
+    bool supportTransferFunction() const Q_DECL_OVERRIDE;
+
 };
 
 }

@@ -26,7 +26,7 @@ public:
      */
     void createDeviceData(
             cl_context context ,
-            const cl_mem_flags flags ) Q_DECL_OVERRIDE ;
+            const cl_mem_flags flags = 0 ) Q_DECL_OVERRIDE ;
 
     /**
      * @brief writeDeviceData
@@ -35,6 +35,8 @@ public:
      */
     void writeDeviceData(  cl_command_queue cmdQueue ,
                            const cl_bool blocking ) Q_DECL_OVERRIDE ;
+
+    uint length() const;
 
 private:
     /**

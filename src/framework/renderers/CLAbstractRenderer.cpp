@@ -8,6 +8,7 @@ namespace Renderer {
 CLAbstractRenderer::CLAbstractRenderer(
         const uint64_t gpuIndex,
         const Dimensions2D frameDimensions,
+        const CLData::FRAME_CHANNEL_ORDER frameChannelOrder,
         const std::string kernelDirectory,
         QObject *parent )
     : gpuIndex_( gpuIndex ) ,
@@ -15,7 +16,8 @@ CLAbstractRenderer::CLAbstractRenderer(
       sortFirstOffset_( Dimensions2D( 0 , 0 )) ,
       sortFirstDimensions_( frameDimensions ) ,
       kernelDirectory_( kernelDirectory ),
-      QObject(parent)
+      frameChannelOrder_( frameChannelOrder ),
+      QObject( parent )
 {
 
     /// @note The oclHWDL scans the entire system, and returns a list of
@@ -25,8 +27,10 @@ CLAbstractRenderer::CLAbstractRenderer(
     /// one of them based on the given GPU ID.
     initializeContext_( );
     renderingKernels_ = allocateKernels_();
+
+
     activeRenderingKernel_ =
-            renderingKernels_[ CLKernel::RenderingMode::RENDERING_MODE_Xray ];
+            renderingKernels_[ defaultRenderingMode_() ];
 
 }
 
@@ -127,6 +131,14 @@ void CLAbstractRenderer::calculateExecutionTime_()
 
 }
 
+CLKernel::RenderingMode CLAbstractRenderer::defaultRenderingMode_() const
+{
+    if( frameChannelOrder_ == CLData::FRAME_CHANNEL_ORDER::ORDER_INTENSITY )
+        return CLKernel::RenderingMode::RENDERING_MODE_Xray ;
+    else
+        return CLKernel::RenderingMode::RENDERING_MODE_Ultrasound;
+}
+
 void CLAbstractRenderer::initializeContext_()
 {
     LOG_DEBUG( "Initializing an OpenCL context ... " );
@@ -207,6 +219,15 @@ CLAbstractRenderer::allocateKernels_() const
                 context_ ,
                 kernelDirectory_ );
 
+    kernels[ CLKernel::RenderingMode::RENDERING_MODE_Shaded ] =
+            new CLKernel::CLShadedRenderingKernel(
+                context_ ,
+                kernelDirectory_ );
+
+    kernels[ CLKernel::RenderingMode::RENDERING_MODE_Ultrasound ] =
+            new CLKernel::CL3DUltrasoundRenderingKernel(
+                context_ ,
+                kernelDirectory_ );
 
     return kernels ;
 }

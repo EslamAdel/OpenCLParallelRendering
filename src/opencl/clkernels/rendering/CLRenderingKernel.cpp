@@ -50,6 +50,16 @@ CLData::FRAME_CHANNEL_ORDER CLRenderingKernel::getChannelOrderSupport() const
     return channelOrderSupport_;
 }
 
+bool CLRenderingKernel::isUltrasound() const
+{
+    return false ;
+}
+
+bool CLRenderingKernel::supportTransferFunction() const
+{
+    return false;
+}
+
 std::string CLRenderingKernel::getKernelDirectory( ) const
 {
     return kernelDirectory_;

@@ -7,12 +7,7 @@
 #include <oclHWDL.h>
 
 #include "CLData.hh"
-#include "CLRenderingKernel.h"
-#include "CLXRayRenderingKernel.h"
-#include "CLMaxIntensityProjectionRenderingKernel.h"
-#include "CLMinIntensityProjectionRenderingKernel.h"
-#include "CLAverageIntensityProjectionRenderingKernel.h"
-#include "CLIsoSurfaceRenderingKernel.h"
+#include "CLKernel.hh"
 
 
 namespace clparen {
@@ -36,6 +31,7 @@ public:
     explicit CLAbstractRenderer(
             const uint64_t gpuIndex ,
             const Dimensions2D frameDimensions  ,
+            const CLData::FRAME_CHANNEL_ORDER frameChannelOrder ,
             const std::string kernelDirectory  = DEFAULT_KERNELS_DIRECTORY ,
             QObject *parent = 0 );
 
@@ -164,6 +160,7 @@ public:
                                const Dimensions2D sortFirstDimensions );
 
 
+    virtual CLData::FRAME_CHANNEL_ORDER getFrameChannelOrder( ) const = 0;
 
     /**
      * @brief isRenderingModeSupported
@@ -177,7 +174,8 @@ public:
      * @brief updateTransferFunction
      * @param transferFunction
      */
-    virtual void updateTransferFunction( float *transferFunction  ) = 0 ;
+    virtual void updateTransferFunction(
+            float *transferFunction , uint length  ) = 0 ;
 
 protected:
 
@@ -206,6 +204,12 @@ protected:
      */
     void calculateExecutionTime_();
 
+
+    /**
+     * @brief defaultRenderingMode_
+     * @return
+     */
+    virtual CLKernel::RenderingMode defaultRenderingMode_() const;
 signals:
     /**
      * @brief finishedRendering
@@ -331,6 +335,10 @@ protected:
      */
     double renderingTime_ ;
 
+    /**
+     * @brief frameChannelOrder_
+     */
+    const CLData::FRAME_CHANNEL_ORDER frameChannelOrder_ ;
 };
 
 

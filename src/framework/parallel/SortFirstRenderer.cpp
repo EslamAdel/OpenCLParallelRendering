@@ -7,10 +7,12 @@ namespace Parallel
 {
 
 template< class V , class F >
-SortFirstRenderer< V , F >::SortFirstRenderer( Volume< V > *volume,
-                                               const uint64_t frameWidth,
-                                               const uint64_t frameHeight )
-    : CLAbstractParallelRenderer( frameWidth , frameHeight )
+SortFirstRenderer< V , F >::SortFirstRenderer(
+        Volume< V > *volume,
+        const uint64_t frameWidth,
+        const uint64_t frameHeight ,
+        const CLData::FRAME_CHANNEL_ORDER channelOrder )
+    : CLAbstractParallelRenderer( frameWidth , frameHeight , channelOrder )
 {
     baseVolume_.reset( volume );
 
@@ -28,7 +30,7 @@ SortFirstRenderer< V , F >::SortFirstRenderer( Volume< V > *volume,
                                               const Renderer::CLAbstractRenderer* )) ,
              this, SLOT( pixmapReady_SLOT( QPixmap*,
                                            const Renderer::CLAbstractRenderer*)) ,
-            Qt::BlockingQueuedConnection );
+             Qt::BlockingQueuedConnection );
 
 }
 
@@ -234,6 +236,8 @@ void SortFirstRenderer< V , F >::assemble_(
     const Dimensions2D &offset = renderer->getSortFirstOffset();
     const Dimensions2D &frameSize = renderer->getSortFirstDimensions();
 
+    const uint8_t channelsPerElement = clFrame->channelsInPixel();
+
     F *frameBuffer = clFrame->getHostData();
 
 
@@ -246,23 +250,51 @@ void SortFirstRenderer< V , F >::assemble_(
     //              frameSize.toString().c_str());
 
     frameCopyMutex_.lockForRead();
-    // Frames Assembly.
-    for( uint64_t i = 0 ; i < frameSize.x ; i++ )
-    {
-        const uint64_t x = i + offset.x ;
-        for( uint64_t j = 0 ; j < frameSize.y ; j++ )
+
+    if( clFrame->channelOrder() == CLData::FRAME_CHANNEL_ORDER::ORDER_INTENSITY )
+        // Frames Assembly.
+        for( uint64_t i = 0 ; i < frameSize.x ; i++ )
         {
-            const uint64_t y = j + offset.y ;
+            const uint64_t x = i + offset.x ;
+            for( uint64_t j = 0 ; j < frameSize.y ; j++ )
+            {
+                const uint64_t y = j + offset.y ;
 
-            // small frame flat index.
-            const uint64_t frameIndex =  i +  frameSize.x * j ;
-            // big frame flat index.
-            const uint64_t finalFrameIndex = x + finalFrameSize.x * y ;
+                // small frame flat index.
+                const uint64_t frameIndex =  i +  frameSize.x * j ;
+                // big frame flat index.
+                const uint64_t finalFrameIndex = x + finalFrameSize.x * y ;
 
-            finalFrameBuffer[ finalFrameIndex ] = frameBuffer[ frameIndex ];
+                finalFrameBuffer[ finalFrameIndex ] = frameBuffer[ frameIndex ];
+            }
         }
-    }
 
+    else
+        for( uint64_t i = 0 ; i < frameSize.x ; i++ )
+        {
+            const uint64_t x = i + offset.x ;
+            for( uint64_t j = 0 ; j < frameSize.y ; j++ )
+            {
+                const uint64_t y = j + offset.y ;
+
+                // small frame flat index.
+                const uint64_t frameIndex =  i +  frameSize.x * j ;
+                // big frame flat index.
+                const uint64_t finalFrameIndex = x + finalFrameSize.x * y ;
+
+                finalFrameBuffer[ finalFrameIndex * 4 ] =
+                        frameBuffer[ frameIndex * 4 ];
+
+                finalFrameBuffer[ finalFrameIndex * 4 + 1 ] =
+                        frameBuffer[ frameIndex * 4 + 1 ];
+
+                finalFrameBuffer[ finalFrameIndex * 4 + 2 ] =
+                        frameBuffer[ frameIndex * 4 + 2 ];
+
+                finalFrameBuffer[ finalFrameIndex * 4 + 3 ] =
+                        frameBuffer[ frameIndex * 4 + 3 ];
+            }
+        }
     frameCopyMutex_.unlock();
 
     emit this->compositingFinished_SLOT();

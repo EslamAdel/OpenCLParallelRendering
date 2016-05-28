@@ -39,6 +39,9 @@ public:
     void setZScale( float scale ) Q_DECL_OVERRIDE;
 
 
+    bool isUltrasound() const Q_DECL_OVERRIDE ;
+
+    bool supportTransferFunction() const Q_DECL_OVERRIDE;
 
 };
 

@@ -28,7 +28,7 @@ MainWindow::MainWindow(
   , parallelRenderer_( parallelRenderer )
 {
     // RGBA * 256
-    transferFunctionTable_ = new float[1024];
+    transferFunctionTable_ = new float[ 1024 ];
 
     qRegisterMetaType< UInt8Vector >("UInt8Vector");
     ui->setupUi(this);
@@ -191,7 +191,7 @@ void MainWindow::_publishTransferFunction()
     }
 
     // updateKernel
-    parallelRenderer_.updateTransferFunction_SLOT( transferFunctionTable_ );
+    parallelRenderer_.updateTransferFunction_SLOT( transferFunctionTable_ , 256);
 
 }
 
@@ -363,6 +363,8 @@ void MainWindow::startRendering_( )
              this , SLOT( displayFrame( QPixmap* )));
 
     parallelRenderer_.startRendering();
+    parallelRenderer_.activateRenderingKernel_SLOT(
+                clparen::CLKernel::RenderingMode::RENDERING_MODE_Ultrasound );
 
 }
 

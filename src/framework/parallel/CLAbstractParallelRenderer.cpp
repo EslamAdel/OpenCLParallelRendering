@@ -21,13 +21,15 @@ namespace Parallel
 CLAbstractParallelRenderer::CLAbstractParallelRenderer(
         const uint64_t frameWidth,
         const uint64_t frameHeight,
+        const CLData::FRAME_CHANNEL_ORDER channelOrder ,
         QObject *parent )
     : QObject( parent ) ,
       frameWidth_( frameWidth ) ,
       frameHeight_( frameHeight ),
       renderersReady_( false ),
       compositedFramesCount_( 0 ) ,
-      compositor_( nullptr )
+      compositor_( nullptr ),
+      frameChannelOrder_( channelOrder )
 {
 
     listGPUs_ = clHardware_.getListGPUs();
@@ -301,10 +303,10 @@ void CLAbstractParallelRenderer::benchmark_( )
 
 
 void CLAbstractParallelRenderer::updateTransferFunction_SLOT(
-        float *transferFunction )
+        float *transferFunction , uint length )
 {
     for( Renderer::CLAbstractRenderer *renderer : renderers_.values())
-        renderer->updateTransferFunction( transferFunction );
+        renderer->updateTransferFunction( transferFunction , length );
 }
 
 

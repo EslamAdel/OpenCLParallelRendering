@@ -3,19 +3,6 @@
 #include <Logger.h>
 
 
-
-/*
- * __kernel void
-ultrasound(__global uint *d_output,
-         uint imageW, uint imageH,
-         float density, float brightness,
-         __constant float* invViewMatrix
-         ,__read_only image3d_t volume,
-         __read_only image2d_t transferFunc,
-         sampler_t volumeSampler,
-         sampler_t transferFuncSampler, float apex
-         )
-*/
 namespace  clparen  {
 namespace CLKernel {
 
@@ -103,6 +90,16 @@ void CL3DUltrasoundRenderingKernel::setZScale( float scale )
         oclHWDL::Error::checkCLError( error );
         LOG_ERROR("Exiting Due to OpenCL Error!");
     }
+}
+
+bool CL3DUltrasoundRenderingKernel::isUltrasound() const
+{
+    return true;
+}
+
+bool CL3DUltrasoundRenderingKernel::supportTransferFunction() const
+{
+    return true;
 }
 
 

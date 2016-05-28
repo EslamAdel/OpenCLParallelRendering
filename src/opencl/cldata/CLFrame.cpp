@@ -193,7 +193,7 @@ QPixmap &CLFrame<T>::getFramePixmap()
 
     if( channelOrder_ == FRAME_CHANNEL_ORDER::ORDER_RGBA )
     {
-        for( int i = 0; i < dimensions_.imageSize() ; i++)
+        for( int i = 0; i < dimensions_.imageSize() ; i++ )
         {
             pixmapData_[ 4 * i ] =
                     static_cast< uchar >( hostData_[  4 * i ] );
