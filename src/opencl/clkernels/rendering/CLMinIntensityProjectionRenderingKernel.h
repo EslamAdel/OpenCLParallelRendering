@@ -1,13 +1,13 @@
 #ifndef CLMinIntensityProjectionRENDERINGKERNEL_H
 #define CLMinIntensityProjectionRENDERINGKERNEL_H
 
-#include "CLRenderingKernel.h"
+#include "CLXRayRenderingKernel.h"
 
 namespace  clparen {
 namespace CLKernel {
 
 
-class CLMinIntensityProjectionRenderingKernel : public CLRenderingKernel
+class CLMinIntensityProjectionRenderingKernel : public CLXRayRenderingKernel
 {
 
 public:

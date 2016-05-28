@@ -23,7 +23,7 @@ CLImage2DArray< T >::CLImage2DArray(
         LOG_ERROR("Channel Order conflicts with channel type.");
 
     for( auto i = 0 ; i < arraySize ; i++ )
-        framesData_.push_back( new T[ width * height * pixelSize() ] );
+        framesData_.push_back( new T[ width * height * channelsInPixel() ] );
 
 
 
@@ -100,7 +100,7 @@ void CLImage2DArray< T >::setFrameData(
     if( data != framesData_[ index ])
     {
         std::copy( &data[0] ,
-                &data[ width_ * height_ * pixelSize() - 1 ] ,
+                &data[ width_ * height_ * channelsInPixel() - 1 ] ,
                 &framesData_[ index ][0] );
     }
 }
@@ -169,7 +169,7 @@ void CLImage2DArray< T >::resize( const uint newArraySize ,
 
     else
         for( uint i = 0 ; i < delta ; i++ )
-            framesData_.push_back( new T[ width_ * height_ * pixelSize() ]);
+            framesData_.push_back( new T[ width_ * height_ * channelsInPixel() ]);
 
 
     releaseDeviceData_( );
@@ -222,6 +222,14 @@ uint8_t CLImage2DArray< T >::pixelSize() const
 {
     return ( channelOrder_ == FRAME_CHANNEL_ORDER::ORDER_RGBA )?
                 sizeof( T ) * 4 : sizeof( T );
+}
+
+
+template< class T >
+uint8_t CLImage2DArray< T >::channelsInPixel() const
+{
+    return ( channelOrder_ == FRAME_CHANNEL_ORDER::ORDER_RGBA )?
+                 4 : 1;
 }
 
 template< class T >

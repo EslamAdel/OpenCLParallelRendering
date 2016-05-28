@@ -39,7 +39,7 @@ public:
     virtual void createDeviceData(
             cl_context context ,
             const cl_mem_flags flags
-            = CL_MEM_HOST_READ_ONLY | CL_MEM_WRITE_ONLY  ) override;
+            = CL_MEM_HOST_READ_ONLY | CL_MEM_WRITE_ONLY  ) Q_DECL_OVERRIDE;
 
     /**
      * @brief writeDeviceData
@@ -47,7 +47,7 @@ public:
      * @param blocking
      */
     virtual void writeDeviceData(  cl_command_queue cmdQueue ,
-                                   const cl_bool blocking ) override;
+                                   const cl_bool blocking ) Q_DECL_OVERRIDE;
 
     /**
      * @brief readDeviceData
@@ -55,7 +55,7 @@ public:
      * @param blocking
      */
     virtual void readDeviceData( cl_command_queue cmdQueue ,
-                                 const cl_bool blocking ) override;
+                                 const cl_bool blocking ) Q_DECL_OVERRIDE;
 
     /**
      * @brief readOtherDeviceData
@@ -65,7 +65,7 @@ public:
      */
     virtual void readOtherDeviceData( cl_command_queue sourceCmdQueue ,
                                       const CLFrame< T > &sourceFrame ,
-                                      const cl_bool blocking ) override;
+                                      const cl_bool blocking ) Q_DECL_OVERRIDE;
 
 private:
 

@@ -68,6 +68,18 @@ void CLCompositorAccumulate< T >::collectFrame(
     loadedFrames_.enqueue( frames_[ renderer ] );
 }
 
+
+template< class T >
+bool CLCompositorAccumulate< T >::isRenderingModeSupported(
+        CLKernel::RenderingMode mode )
+{
+    if( finalFrame_ == 0 )
+        return false ;
+
+    return compositingKernels_[ mode ]->getChannelOrderSupport()
+            == finalFrame_->channelOrder() ;
+}
+
 template< class T >
 void CLCompositorAccumulate< T >::composite( )
 {

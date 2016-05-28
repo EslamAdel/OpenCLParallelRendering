@@ -9,7 +9,8 @@ CLTransferFunction::CLTransferFunction(
         const uint length ,
         const float *transferFunctionData )
     : length_( length ) ,
-      CLImage2D< float >( Dimensions2D( length , 4 ))
+      CLImage2D< float >( Dimensions2D( length , 1 ) ,
+                          FRAME_CHANNEL_ORDER::ORDER_RGBA )
 {
     this->copyHostData( transferFunctionData );
 
@@ -36,7 +37,7 @@ void CLTransferFunction::writeDeviceData(
     error = clEnqueueWriteImage(
                 cmdQueue, this->deviceData_ , blocking ,
                 origin , region ,
-                length_ * sizeof( float )  ,
+                length_ * sizeof( float ) * 4 ,
                 0 ,
                 ( const void * ) this->hostData_ ,
                 0 , 0 , 0 );

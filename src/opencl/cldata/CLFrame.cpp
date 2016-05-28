@@ -27,8 +27,6 @@ CLFrame< T >::CLFrame( const Dimensions2D dimensions ,
 
     hostData_ = new T[ dimensions.imageSize() * channelsInPixel() ];
     pixmapData_ = new uchar[ dimensions.imageSize() * channelsInPixel()  ];
-
-
 }
 
 template< class T >
@@ -449,14 +447,13 @@ cl_channel_type CLFrame< T >::clChannelType()
 template< class T >
 bool CLFrame< T >::isChannelConflict( FRAME_CHANNEL_ORDER order )
 {
-    const FRAME_CHANNEL_TYPE type = CLFrame< T >::frameChannelType();
+    /**
+      TODO: Implement the rules based on the specs in the link:
+      https://www.khronos.org/registry/cl/sdk/1.0/docs/man/xhtml/cl_image_format.html
+      **/
 
-    if( order == FRAME_CHANNEL_ORDER::ORDER_RGBA &&
-            type != FRAME_CHANNEL_TYPE::FRAME_CL_UNSIGNED_INT8 )
-        return true ;
 
-    else return false ;
-
+    return false ;
 }
 
 

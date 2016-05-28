@@ -34,33 +34,33 @@ public:
 
 
 
-    virtual void addCLRenderer( const uint64_t gpuIndex ) override;
+    virtual void addCLRenderer( const uint64_t gpuIndex ) Q_DECL_OVERRIDE;
 
 
 
-    virtual void addCLCompositor( const uint64_t gpuIndex ) override;
+    virtual void addCLCompositor( const uint64_t gpuIndex ) Q_DECL_OVERRIDE;
 
 
-    virtual void distributeBaseVolume( ) override;
+    virtual void distributeBaseVolume( ) Q_DECL_OVERRIDE;
 
-    void initializeRenderers( ) override;
+    void initializeRenderers( ) Q_DECL_OVERRIDE;
 
-    void finishedRendering_SLOT( Renderer::CLAbstractRenderer *renderer ) override;
+    void finishedRendering_SLOT( Renderer::CLAbstractRenderer *renderer ) Q_DECL_OVERRIDE;
 
-    void compositingFinished_SLOT( ) override;
+    void compositingFinished_SLOT( ) Q_DECL_OVERRIDE;
 
 
-    void frameLoadedToDevice_SLOT( Renderer::CLAbstractRenderer *renderer ) override;
+    void frameLoadedToDevice_SLOT( Renderer::CLAbstractRenderer *renderer ) Q_DECL_OVERRIDE;
 
 
     void pixmapReady_SLOT( QPixmap *pixmap ,
-                           const Renderer::CLAbstractRenderer * renderer ) override;
+                           const Renderer::CLAbstractRenderer * renderer ) Q_DECL_OVERRIDE;
 
 
 protected:
-    void applyTransformation_() override;
+    void applyTransformation_() Q_DECL_OVERRIDE;
 
-    void benchmark_() override;
+    void benchmark_() Q_DECL_OVERRIDE;
 private:
     static void render_( Renderer::CLAbstractRenderer *renderer );
 

@@ -92,6 +92,13 @@ public:
      */
     void switchCompositingKernel( const CLKernel::RenderingMode mode ) ;
 
+
+    /**
+     * @brief isRenderingModeSupported
+     * @param mode
+     * @return
+     */
+    virtual bool isRenderingModeSupported( CLKernel::RenderingMode mode ) = 0;
 private:
     /**
      * @brief selectGPU_

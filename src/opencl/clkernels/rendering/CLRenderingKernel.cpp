@@ -74,7 +74,7 @@ CLRenderingKernel::getKernelObject( ) const
 
 RenderingMode CLRenderingKernel::getRenderingKernelType() const
 {
-
+    return kernelType_ ;
 }
 
 
@@ -202,29 +202,53 @@ void CLRenderingKernel::setImageBrightnessFactor( float brightness )
     }
 }
 
-void CLRenderingKernel::setVolumeIsoValue( float isovalue )
+void CLRenderingKernel::setVolumeIsoValue( float  )
 {
     // No implementation by default.
 }
 
-void CLRenderingKernel::setMaxSteps( uint maxSteps )
+void CLRenderingKernel::setMaxSteps( uint  )
 {
     // No implementation by default.
 }
 
-void CLRenderingKernel::setStepSize( float tStep )
-{
-    // No implementation by default.
-
-}
-
-void CLRenderingKernel::setTransferFunctionData( cl_mem data )
+void CLRenderingKernel::setStepSize( float  )
 {
     // No implementation by default.
 
 }
 
-void CLRenderingKernel::setTransferFunctionSampler( cl_sampler sampler )
+void CLRenderingKernel::setTransferFunctionData( cl_mem  )
+{
+    // No implementation by default.
+
+}
+
+void CLRenderingKernel::setTransferFunctionSampler( cl_sampler  )
+{
+    // No implementation by default.
+
+}
+
+void CLRenderingKernel::setApexAngle( float  )
+{
+    // No implementation by default.
+
+}
+
+void CLRenderingKernel::setXScale( float  )
+{
+    // No implementation by default.
+
+}
+
+void CLRenderingKernel::setYScale( float  )
+{
+    // No implementation by default.
+
+}
+
+void CLRenderingKernel::setZScale( float  )
 {
     // No implementation by default.
 

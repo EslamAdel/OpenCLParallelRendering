@@ -34,6 +34,7 @@ public:
      * @param kernelDirectory
      */
     CLCompositingKernel( const cl_context clContext ,
+                         const CLData::FRAME_CHANNEL_ORDER channelOrderSupport ,
                          const std::string kernelName ,
                          const std::string kernelFile ,
                          const std::string kernelDirectory );
@@ -66,6 +67,12 @@ public:
      * @return
      */
     cl_kernel getKernelObject( ) const;
+
+    /**
+     * @brief getChannelOrderSupport
+     * @return
+     */
+    CLData::FRAME_CHANNEL_ORDER getChannelOrderSupport() const;
 
 private:
 
@@ -110,6 +117,11 @@ private:
      * @brief kernelFile_
      */
     const std::string kernelFile_;
+
+    /**
+     * @brief channelOrderSupport
+     */
+    const CLData::FRAME_CHANNEL_ORDER channelOrderSupport_ ;
 };
 
 /**

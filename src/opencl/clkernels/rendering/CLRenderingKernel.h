@@ -198,6 +198,30 @@ public:
 
 
     /**
+     * @brief setApexAngle
+     * @param apexAngle
+     */
+    virtual void setApexAngle( float apexAngle ) ;
+
+    /**
+     * @brief setXScale
+     * @param scale
+     */
+    virtual void setXScale( float scale );
+
+    /**
+     * @brief setYScale
+     * @param scale
+     */
+    virtual void setYScale( float scale );
+
+    /**
+     * @brief setZScale
+     * @param scale
+     */
+    virtual void setZScale( float scale );
+
+    /**
      * @brief releaseKernel
      */
     void releaseKernel( );
@@ -259,6 +283,9 @@ protected:
     RenderingMode kernelType_;
 
 
+    /**
+     * @brief channelOrderSupport_
+     */
     const CLData::FRAME_CHANNEL_ORDER channelOrderSupport_ ;
 };
 

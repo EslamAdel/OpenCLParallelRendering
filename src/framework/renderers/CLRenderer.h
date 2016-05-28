@@ -39,36 +39,36 @@ public:
      * @brief loadVolume
      * @param volume
      */
-    void loadVolume( VolumeVariant &volume ) override ;
+    void loadVolume( VolumeVariant &volume ) Q_DECL_OVERRIDE ;
 
     /**
      * @brief applyTransformation
      */
-    void applyTransformation( ) override ;
+    void applyTransformation( ) Q_DECL_OVERRIDE ;
 
     /**
      * @brief setFrameIndex
      * @param frameIndex
      */
-    void setFrameIndex( const uint frameIndex  ) override;
+    void setFrameIndex( const uint frameIndex  ) Q_DECL_OVERRIDE;
 
     /**
      * @brief getCurrentCenter
      * @return
      */
-    const Coordinates3D &getCurrentCenter() const override ;
+    const Coordinates3D &getCurrentCenter() const Q_DECL_OVERRIDE ;
 
     /**
      * @brief getFrameIndex
      * @return
      */
-    uint getFrameIndex( ) const override ;
+    uint getFrameIndex( ) const Q_DECL_OVERRIDE ;
 
     /**
      * @brief getCLFrame Returns the pixel buffer being rendered to.
      * @return
      */
-    const CLData::CLFrameVariant &getCLFrame( ) const override;
+    const CLData::CLFrameVariant &getCLFrame( ) const Q_DECL_OVERRIDE;
 
     /**
      * @brief getCLVolume
@@ -91,29 +91,28 @@ public:
     void copyHostData( const BrickParameters< V > &brickParameters );
 
 
-
-    bool isRenderingModeSupported( CLKernel::RenderingMode mode ) override;
+    bool isRenderingModeSupported( CLKernel::RenderingMode mode ) Q_DECL_OVERRIDE;
 protected:
 
     /**
      * @brief renderFrame
      */
-    void renderFrame() override ;
+    void renderFrame() Q_DECL_OVERRIDE ;
 
     /**
      * @brief createPixelBuffer_
      */
-    void createPixelBuffer_() override ;
+    void createPixelBuffer_() Q_DECL_OVERRIDE ;
 
     /**
      * @brief initializeKernels_
      */
-    void initializeKernels_() override ;
+    void initializeKernels_() Q_DECL_OVERRIDE ;
 
     /**
      * @brief freeBuffers_
      */
-    void freeBuffers_() override ;
+    void freeBuffers_() Q_DECL_OVERRIDE ;
 
 private:
 
@@ -154,6 +153,10 @@ private:
      */
     cl_mem inverseMatrix_;
 
+    /**
+     * @brief transferFunctionArray_
+     */
+    cl_mem transferFunctionArray_;
 
     /**
      * @brief linearVolumeSampler_
@@ -165,6 +168,12 @@ private:
      */
     cl_sampler nearestVolumeSampler_;
 
+
+    /**
+     * @brief transferFunctionSampler_
+     */
+    cl_sampler transferFunctionSampler_;
+
     /**
      * @brief linearFiltering_
      */
@@ -174,6 +183,12 @@ private:
      * @brief gridSize_
      */
     size_t gridSize_[ 2 ];
+
+
+    /**
+     * @brief transferFunction_
+     */
+    float* transferFunction_;
 
 
     /**
@@ -190,6 +205,10 @@ private:
      * @brief frameChannelOrder_
      */
     const CLData::FRAME_CHANNEL_ORDER frameChannelOrder_ ;
+
+    float tStep_ ;
+    float maxSteps_ ;
+    float apexAngle_ ;
 };
 
 

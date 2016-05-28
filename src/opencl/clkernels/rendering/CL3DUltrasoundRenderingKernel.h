@@ -28,15 +28,16 @@ public:
 
 public:
 
-    void setTransferFunctionData( cl_mem data );
+    void setTransferFunctionData( cl_mem data ) Q_DECL_OVERRIDE ;
 
-    void setTransferFunctionSampler( cl_sampler sampler );
+    void setTransferFunctionSampler( cl_sampler sampler ) Q_DECL_OVERRIDE ;
 
-    void setApexAngle( float apexAngle );
+    void setApexAngle( float apexAngle ) Q_DECL_OVERRIDE;
 
-    void setXScale( float scale );
-    void setYScale( float scale );
-    void setZScale( float scale );
+    void setXScale( float scale ) Q_DECL_OVERRIDE;
+    void setYScale( float scale ) Q_DECL_OVERRIDE;
+    void setZScale( float scale ) Q_DECL_OVERRIDE;
+
 
 
 };

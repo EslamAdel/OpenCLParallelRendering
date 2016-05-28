@@ -1,14 +1,14 @@
 #ifndef CLMaxIntensityProjectionRENDERINGKERNEL_H
 #define CLMaxIntensityProjectionRENDERINGKERNEL_H
 
-#include "CLRenderingKernel.h"
+#include "CLXRayRenderingKernel.h"
 
 
 namespace clparen  {
 namespace CLKernel {
 
 
-class CLMaxIntensityProjectionRenderingKernel : public CLRenderingKernel
+class CLMaxIntensityProjectionRenderingKernel : public CLXRayRenderingKernel
 {
 
 

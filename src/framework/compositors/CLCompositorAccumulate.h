@@ -22,17 +22,17 @@ public:
                             const uint frameHeight ,
                             const std::string kernelDirectory  );
 
-    void allocateFrame( Renderer::CLAbstractRenderer *renderer ) override ;
+    void allocateFrame( Renderer::CLAbstractRenderer *renderer ) Q_DECL_OVERRIDE ;
 
 
     void collectFrame( Renderer::CLAbstractRenderer *renderer ,
-                               const cl_bool block ) override ;
+                               const cl_bool block ) Q_DECL_OVERRIDE ;
 
-    void composite() override ;
+    void composite() Q_DECL_OVERRIDE ;
 
-    void loadFinalFrame() override ;
+    void loadFinalFrame() Q_DECL_OVERRIDE ;
 
-    const CLData::CLFrameVariant &getFinalFrame( ) const override;
+    const CLData::CLFrameVariant &getFinalFrame( ) const Q_DECL_OVERRIDE;
 
     uint framesCount() const ;
 
@@ -40,11 +40,13 @@ public:
 
     bool readOutReady() const ;
 
+    bool isRenderingModeSupported( CLKernel::RenderingMode mode ) Q_DECL_OVERRIDE;
+
 protected :
 
-    virtual void initializeBuffers_() override ;
+    virtual void initializeBuffers_() Q_DECL_OVERRIDE ;
 
-    virtual void initializeKernel_() override ;
+    virtual void initializeKernel_() Q_DECL_OVERRIDE ;
 
 protected:
 

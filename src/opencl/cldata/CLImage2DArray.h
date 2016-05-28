@@ -104,6 +104,14 @@ public:
      * @return
      */
     uint8_t pixelSize( ) const ;
+
+
+    /**
+     * @brief channelsInPixel
+     * @return
+     */
+    uint8_t channelsInPixel( ) const;
+
 private :
     /**
      * @brief releaseDeviceData_

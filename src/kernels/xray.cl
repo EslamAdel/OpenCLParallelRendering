@@ -90,9 +90,9 @@ __kernel void xray( __write_only image2d_t frameBuffer,
 
                     sampler_t   volumeSampler ,
 
-                    float density,
+                    float density, float brightness ,
 
-                    float brightness )
+                    uint maxSteps, float tStep )
 {
 
     const uint x = get_global_id( 0 );
@@ -165,7 +165,7 @@ __kernel void xray( __write_only image2d_t frameBuffer,
     float4 intensityBuffer = ( float4 )( 0.f, 0.f, 0.f, 0.f );
     float t = tFar;
 
-    for( uint i = 0 ; i < MAX_STEPS ; i++ )
+    for( uint i = 0 ; i < maxSteps ; i++ )
     {
         // Current position along the ray
         float4 position = eyeRayOrigin + eyeRayDirection * t;
@@ -186,7 +186,7 @@ __kernel void xray( __write_only image2d_t frameBuffer,
                                ( float4 )( alpha, alpha, alpha, alpha ));
 
         // Get the parametric value of the next sample along the ray
-        t -= T_STEP;
+        t -= tStep;
         if( t < tNear )
             break;
     }

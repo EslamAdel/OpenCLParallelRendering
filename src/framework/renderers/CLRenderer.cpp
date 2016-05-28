@@ -32,7 +32,12 @@ CLRenderer< V , F >::CLRenderer(
     inverseMatrix_ = 0 ;
     linearVolumeSampler_ = 0 ;
     nearestVolumeSampler_ = 0 ;
+    transferFunctionSampler_ = 0 ;
+    transferFunctionArray_ = 0 ;
 
+    tStep_ = 0.01;
+    maxSteps_ = 500;
+    apexAngle_ = 0.1f;
 
     LOG_INFO( "Creating Context on Node with GPU <%d>", gpuIndex );
     linearFiltering_ = true;
@@ -164,12 +169,12 @@ void CLRenderer< V , F >::renderFrame()
 
     activeRenderingKernel_->
             setVolumeDensityFactor( transformation_.volumeDensity );
-
     activeRenderingKernel_->
             setImageBrightnessFactor( transformation_.brightness );
-
     activeRenderingKernel_->setVolumeIsoValue( transformation_.isoValue );
-
+    activeRenderingKernel_->setXScale( transformation_.ultrasoundScale.x );
+    activeRenderingKernel_->setYScale( transformation_.ultrasoundScale.y );
+    activeRenderingKernel_->setZScale( transformation_.ultrasoundScale.z );
 
     // Enqueue the kernel for execution
     clErrorCode |= clEnqueueNDRangeKernel(
@@ -221,6 +226,38 @@ void CLRenderer< V , F >::initializeKernels_()
                                          &clErrorCode );
 
 
+    // Create transfer function texture (this is the default HEAT MAP)
+    float transferFunctionTable[] =
+    {
+        0.0, 0.0, 0.0, 0.0,
+        1.0, 0.0, 0.0, 1.0,
+        1.0, 0.5, 0.0, 1.0,
+        1.0, 1.0, 0.0, 1.0,
+        0.0, 1.0, 0.0, 1.0,
+        0.0, 1.0, 1.0, 1.0,
+        0.0, 0.0, 1.0, 1.0,
+        1.0, 0.0, 1.0, 1.0,
+        0.0, 0.0, 0.0, 0.0,
+    };
+
+    // Transfer function format
+    cl_image_format tfFormat;
+    tfFormat.image_channel_order = CL_RGBA;
+    tfFormat.image_channel_data_type = CL_FLOAT;
+
+    if( !transferFunctionArray_)
+        transferFunctionArray_ = clCreateImage2D
+                ( context_,
+                  CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
+                  &tfFormat, 9, 1, sizeof( float ) * 9 * 4,
+                  transferFunctionTable, &clErrorCode );
+
+    // Create samplers (same as texture in OpenGL) for transfer function
+    // and the volume for linear interpolation and nearest interpolation.
+    if( !transferFunctionSampler_ )
+        transferFunctionSampler_ = clCreateSampler( context_, true,
+                                                    CL_ADDRESS_CLAMP_TO_EDGE,
+                                                    CL_FILTER_LINEAR, &clErrorCode );
 
     if( clErrorCode != CL_SUCCESS )
     {
@@ -239,11 +276,15 @@ void CLRenderer< V , F >::initializeKernels_()
         renderingKernel->setSortFirstWidth( sortFirstDimensions_.x );
         renderingKernel->setSortFirstHeight( sortFirstDimensions_.y );
         renderingKernel->setInverseViewMatrix( inverseMatrix_ );
-
         renderingKernel->setVolumeData( clVolume_->getDeviceData( ));
 
         renderingKernel->setVolumeSampler
                 ( linearFiltering_ ? linearVolumeSampler_ : nearestVolumeSampler_);
+        renderingKernel->setTransferFunctionSampler( transferFunctionSampler_ );
+        renderingKernel->setTransferFunctionData( transferFunctionArray_ );
+        renderingKernel->setMaxSteps( maxSteps_ );
+        renderingKernel->setStepSize( tStep_ );
+        renderingKernel->setApexAngle( apexAngle_ );
     }
 
     LOG_DEBUG( "[DONE] Initializing an OpenCL Kernels ... " );
@@ -273,6 +314,12 @@ void CLRenderer< V , F >::freeBuffers_()
 
     if( context_ )
         clReleaseContext(context_);
+
+    if( transferFunctionSampler_ )
+        clReleaseSampler( transferFunctionSampler_ );
+
+    if( transferFunctionArray_ )
+        clReleaseMemObject( transferFunctionArray_ );
 }
 
 template< class V , class F >

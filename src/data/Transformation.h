@@ -52,6 +52,16 @@ struct Transformation
      * @brief isoValue
      */
     float isoValue;
+
+    /**
+     * @brief ultrasoundScale_
+     */
+    Coordinates3D ultrasoundScale ;
+
+    /**
+     * @brief apexAngle
+     */
+    float apexAngle ;
 };
 
 #endif // TRANSFORMATION_H

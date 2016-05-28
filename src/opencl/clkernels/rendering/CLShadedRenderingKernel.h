@@ -23,9 +23,9 @@ public:
 
 public:
 
-    void setTransferFunctionData( cl_mem data ) override ;
+    void setTransferFunctionData( cl_mem data ) Q_DECL_OVERRIDE ;
 
-    void setTransferFunctionSampler( cl_sampler sampler ) override ;
+    void setTransferFunctionSampler( cl_sampler sampler ) Q_DECL_OVERRIDE ;
 
 
 };

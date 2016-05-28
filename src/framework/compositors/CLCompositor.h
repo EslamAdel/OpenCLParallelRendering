@@ -25,6 +25,8 @@ public:
     CLCompositor(
             const uint64_t gpuIndex ,
             const uint frameWidth , const uint frameHeight,
+            const CLData::FRAME_CHANNEL_ORDER channelOrder =
+            CLData::FRAME_CHANNEL_ORDER::ORDER_DEFAULT,
             const std::string kernelDirectory = DEFAULT_KERNELS_DIRECTORY ) ;
 
     ~CLCompositor( );
@@ -33,7 +35,7 @@ public:
      * @brief allocateFrame
      * @param renderer
      */
-    void allocateFrame( Renderer::CLAbstractRenderer *renderer ) override ;
+    void allocateFrame( Renderer::CLAbstractRenderer *renderer ) Q_DECL_OVERRIDE ;
 
     /**
      * @brief collectFrame
@@ -41,23 +43,23 @@ public:
      * @param block
      */
     void collectFrame( Renderer::CLAbstractRenderer *renderer ,
-                       const cl_bool block ) override ;
+                       const cl_bool block ) Q_DECL_OVERRIDE ;
 
     /**
      * @brief composite
      */
-    void composite( ) override ;
+    void composite( ) Q_DECL_OVERRIDE ;
 
     /**
      * @brief loadFinalFrame
      */
-    void loadFinalFrame( ) override ;
+    void loadFinalFrame( ) Q_DECL_OVERRIDE ;
 
     /**
      * @brief getFinalFrame
      * @return
      */
-    const CLData::CLFrameVariant &getFinalFrame( ) const override;
+    const CLData::CLFrameVariant &getFinalFrame( ) const Q_DECL_OVERRIDE;
 
     /**
      * @brief getFinalFrame
@@ -78,17 +80,20 @@ public:
      */
     uint8_t getCompositedFramesCount( ) const;
 
+
+    bool isRenderingModeSupported( CLKernel::RenderingMode mode ) Q_DECL_OVERRIDE;
+
 protected :
 
     /**
      * @brief initializeBuffers_
      */
-    void initializeBuffers_( ) override ;
+    void initializeBuffers_( ) Q_DECL_OVERRIDE ;
 
     /**
      * @brief initializeKernel_
      */
-    void initializeKernel_( ) override ;
+    void initializeKernel_( ) Q_DECL_OVERRIDE ;
 
     /**
      * @brief updateKernelsArguments
@@ -135,6 +140,11 @@ protected:
      * @brief criticalMutex_
      */
     QMutex criticalMutex_ ;
+
+    /**
+     * @brief channelOrder_
+     */
+    const CLData::FRAME_CHANNEL_ORDER channelOrder_ ;
 };
 
 }

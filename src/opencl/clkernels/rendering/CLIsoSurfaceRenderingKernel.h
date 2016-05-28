@@ -1,20 +1,21 @@
 #ifndef CLIsoSurfaceRENDERINGKERNEL_H
 #define CLIsoSurfaceRENDERINGKERNEL_H
 
-#include "CLRenderingKernel.h"
+#include "CLXRayRenderingKernel.h"
 
 
 namespace clparen  {
 namespace CLKernel {
 
 
-class CLIsoSurfaceRenderingKernel : public CLRenderingKernel
+class CLIsoSurfaceRenderingKernel : public CLXRayRenderingKernel
 {
 
 private:
     enum KernelArgument
     {
-        KERNEL_ARG_IsoValue = CLRenderingKernel::KERNEL_ARG_DerivedKernelsOffset
+        KERNEL_ARG_IsoValue =
+        CLXRayRenderingKernel::KERNEL_ARG_XRayDerivedKernelOffset
     };
 
 public:
@@ -24,7 +25,7 @@ public:
             const std::string kernelFile = "isoSurface.cl" ,
             const std::string kernelName = "isoSurface" );
 
-    void setVolumeIsoValue( float isoValue ) override ;
+    void setVolumeIsoValue( float isoValue ) Q_DECL_OVERRIDE ;
 
 
 };

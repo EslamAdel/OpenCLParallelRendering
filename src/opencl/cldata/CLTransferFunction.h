@@ -24,7 +24,7 @@ public:
      * @brief createDeviceData
      * @param context
      */
-    void createDeviceData( cl_context context )  ;
+    void createDeviceData( cl_context context ) Q_DECL_OVERRIDE ;
 
     /**
      * @brief writeDeviceData
@@ -32,7 +32,7 @@ public:
      * @param blocking
      */
     void writeDeviceData(  cl_command_queue cmdQueue ,
-                           const cl_bool blocking ) override ;
+                           const cl_bool blocking ) Q_DECL_OVERRIDE ;
 
 private:
     /**

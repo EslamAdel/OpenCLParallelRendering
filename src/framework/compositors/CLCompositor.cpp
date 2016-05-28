@@ -19,9 +19,14 @@ template< class T >
 CLCompositor< T >::CLCompositor( const uint64_t gpuIndex,
                                  const uint frameWidth ,
                                  const uint frameHeight ,
+                                 const CLData::FRAME_CHANNEL_ORDER channelOrder ,
                                  const std::string kernelDirectory )
-    : CLAbstractCompositor( gpuIndex  ,frameWidth , frameHeight, kernelDirectory )
+    : CLAbstractCompositor( gpuIndex  , frameWidth , frameHeight, kernelDirectory ),
+      channelOrder_( channelOrder )
 {
+    finalFrame_ = 0 ;
+    finalFrameReadout_ = 0 ;
+    imagesArray_ = 0 ;
     framesCount_ = 0 ;
     framesInCompositor_ = 0 ;
     depthIndex_ = nullptr;
@@ -173,21 +178,36 @@ uint CLCompositor< T >::framesCount() const
     return framesCount_ ;
 }
 
+
+template< class T >
+bool CLCompositor< T >::isRenderingModeSupported(
+        CLKernel::RenderingMode mode )
+{
+    if( finalFrame_ == 0 )
+        return false ;
+
+    return compositingKernels_[ mode ]->getChannelOrderSupport()
+            == finalFrame_->channelOrder() ;
+}
+
 template< class T >
 void CLCompositor< T >::initializeBuffers_()
 {
     LOG_DEBUG("Initializing Buffers ...");
 
-    finalFrame_ = new CLData::CLImage2D< T >( frameDimensions_ );
+    finalFrame_ = new CLData::CLImage2D< T >( frameDimensions_ ,
+                                              channelOrder_ );
 
-    finalFrameReadout_ = new CLData::CLImage2D< T >( frameDimensions_ );
+    finalFrameReadout_ = new CLData::CLImage2D< T >( frameDimensions_ ,
+                                                     channelOrder_ );
 
     finalFrame_->createDeviceData( context_ );
 
     imagesArray_ = new CLData::CLImage2DArray< T >(
                 frameDimensions_.x ,
                 frameDimensions_.y ,
-                0 );
+                0 ,
+                channelOrder_ );
 
     depthIndex_ = new CLData::CLBuffer< uint >( 1 );
 

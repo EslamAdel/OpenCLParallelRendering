@@ -7,13 +7,15 @@ namespace CLKernel {
 
 CLCompositingKernel::CLCompositingKernel(
         const cl_context clContext ,
+        const CLData::FRAME_CHANNEL_ORDER channelOrderSupport ,
         const std::string kernelName ,
         const std::string kernelFile ,
         const std::string kernelDirectory )
     : clContext_( clContext ),
       kernelDirectory_( kernelDirectory ),
       kernelFile_( kernelFile ),
-      kernelName_( kernelName )
+      kernelName_( kernelName ),
+      channelOrderSupport_( channelOrderSupport )
 {
     buildKernel_();
     retrieveKernelObject_();
@@ -100,6 +102,12 @@ void CLCompositingKernel::buildKernel_(const std::string extraBuildOptions )
 void CLCompositingKernel::retrieveKernelObject_( )
 {
     kernelObject_ = kernelContext_->getKernelObject( kernelName_ );
+}
+
+CLData::FRAME_CHANNEL_ORDER
+CLCompositingKernel::getChannelOrderSupport() const
+{
+    return channelOrderSupport_;
 }
 
 

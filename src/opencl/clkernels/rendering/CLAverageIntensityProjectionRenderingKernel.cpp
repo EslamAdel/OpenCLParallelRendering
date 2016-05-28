@@ -12,11 +12,10 @@ CLAverageIntensityProjectionRenderingKernel(
         const std::string kernelDirectory,
         const std::string kernelFile,
         const std::string kernelName )
-    : CLRenderingKernel( clContext, CLData::FRAME_CHANNEL_ORDER::ORDER_INTENSITY,
-                         kernelName , kernelDirectory, kernelFile )
+    : CLXRayRenderingKernel( clContext , kernelDirectory ,
+                             kernelFile , kernelName )
 {
-    buildKernel_();
-    retrieveKernelObject_();
+
 }
 
 

@@ -62,8 +62,8 @@ uint rgbaFloatToInt( float4 rgba )
     rgba.z = clamp( rgba.z, 0.f, 1.f);
     rgba.w = clamp( rgba.w, 0.f, 1.f);
     return (( uint )( rgba.w * 255.f ) << 24 ) |     // Alpha
-           (( uint )( rgba.z * 255.f ) << 16 ) |     // Blue
-           (( uint )( rgba.y * 255.f ) << 8  ) |     // Green
+            (( uint )( rgba.z * 255.f ) << 16 ) |     // Blue
+            (( uint )( rgba.y * 255.f ) << 8  ) |     // Green
             ( uint )( rgba.x * 255.f );              // Red
 }
 
@@ -78,22 +78,23 @@ uint rgbaFloatToInt( float4 rgba )
  * @param volume
  * @param volumeSampler
  */
-__kernel void minIntensityProjection(  __write_only image2d_t frameBuffer,
+__kernel void minIntensityProjection(
+        __write_only image2d_t frameBuffer,
 
-                    uint frameWidth, uint frameHeight,
+        uint frameWidth, uint frameHeight,
 
-                    uint sortFirstWidth , uint sortFirstHeight ,
+        uint sortFirstWidth , uint sortFirstHeight ,
 
-                    __constant  float* invViewMatrix,
+        __constant  float* invViewMatrix,
 
-                    __read_only image3d_t volume,
+        __read_only image3d_t volume,
 
-                    sampler_t   volumeSampler ,
+        sampler_t   volumeSampler ,
 
-                    float density,
+        float density, float brightness ,
 
-                    float brightness )
-                    {
+        uint maxSteps, float tStep )
+{
 
     const uint x = get_global_id( 0 );
     const uint y = get_global_id( 1 );
@@ -119,24 +120,24 @@ __kernel void minIntensityProjection(  __write_only image2d_t frameBuffer,
     float4 eyeRayDirection;
 
     const float4 eyeRayOrigin =
-                   ( float4 )( invViewMatrix[ 3  ],
-                               invViewMatrix[ 7  ],
-                               invViewMatrix[ 11 ],
-                               1.f );
+            ( float4 )( invViewMatrix[ 3  ],
+            invViewMatrix[ 7  ],
+            invViewMatrix[ 11 ],
+            1.f );
 
     const float4 direction = normalize((( float4 )( u, v, -2.f, 0.f )));
     eyeRayDirection.x = dot( direction, (( float4 )( invViewMatrix[ 0  ],
-                                                     invViewMatrix[ 1  ],
-                                                     invViewMatrix[ 2  ],
-                                                     invViewMatrix[ 3  ] )));
+                                         invViewMatrix[ 1  ],
+                             invViewMatrix[ 2  ],
+            invViewMatrix[ 3  ] )));
     eyeRayDirection.y = dot( direction, (( float4 )( invViewMatrix[ 4  ],
-                                                     invViewMatrix[ 5  ],
-                                                     invViewMatrix[ 6  ],
-                                                     invViewMatrix[ 7  ] )));
+                                         invViewMatrix[ 5  ],
+                             invViewMatrix[ 6  ],
+            invViewMatrix[ 7  ] )));
     eyeRayDirection.z = dot( direction, (( float4 )( invViewMatrix[ 8  ],
-                                                     invViewMatrix[ 9  ],
-                                                     invViewMatrix[ 10 ],
-                                                     invViewMatrix[ 11 ] )));
+                                         invViewMatrix[ 9  ],
+                             invViewMatrix[ 10 ],
+            invViewMatrix[ 11 ] )));
     eyeRayDirection.w = 1.f;
 
     // Find the intersection of the ray with the box
@@ -147,10 +148,10 @@ __kernel void minIntensityProjection(  __write_only image2d_t frameBuffer,
     // If it doesn't hit, then return a black value in the corresponding pixel
     if( !hit )
     {
-       // Get the 1D index of the pixel to set its color, and return
-       const float4 nullPixel = ( float4 )( 0.f , 0.f , 0.f , 0.f );
-       const int2 location = (int2)( x - offsetX , y - offsetY );
-       write_imagef( frameBuffer , location , nullPixel );
+        // Get the 1D index of the pixel to set its color, and return
+        const float4 nullPixel = ( float4 )( 0.f , 0.f , 0.f , 0.f );
+        const int2 location = (int2)( x - offsetX , y - offsetY );
+        write_imagef( frameBuffer , location , nullPixel );
 
     }
 
@@ -162,7 +163,7 @@ __kernel void minIntensityProjection(  __write_only image2d_t frameBuffer,
     float4 intensityBuffer = ( float4 )( 1.f, 1.f, 1.f, 1.f );
     float t = tFar;
 
-    for( uint i = 0 ; i < MAX_STEPS ; i++ )
+    for( uint i = 0 ; i < maxSteps ; i++ )
     {
         // Current position along the ray
         float4 position = eyeRayOrigin + eyeRayDirection * t;
@@ -179,7 +180,7 @@ __kernel void minIntensityProjection(  __write_only image2d_t frameBuffer,
         if(intensityBuffer.x > intensity.x && intensity.x != 0 )
             intensityBuffer = intensity;
 
-/**
+        /**
         float4 col;
         if(enableTranferFunction != 0)
         {
@@ -198,7 +199,7 @@ __kernel void minIntensityProjection(  __write_only image2d_t frameBuffer,
 
 
         // Get the parametric value of the next sample along the ray
-        t -= T_STEP;
+        t -= tStep;
         if( t < tNear )
             break;
     }
