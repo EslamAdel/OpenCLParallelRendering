@@ -26,7 +26,8 @@ public:
      */
     void createDeviceData(
             cl_context context ,
-            const cl_mem_flags flags = 0 ) Q_DECL_OVERRIDE ;
+            const cl_mem_flags flags
+            = CL_MEM_HOST_READ_ONLY | CL_MEM_WRITE_ONLY  ) Q_DECL_OVERRIDE ;
 
     /**
      * @brief writeDeviceData

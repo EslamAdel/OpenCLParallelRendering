@@ -268,7 +268,8 @@ void SortFirstRenderer< V , F >::assemble_(
             }
         }
 
-    else
+    else if ( clFrame->channelOrder() ==
+              CLData::FRAME_CHANNEL_ORDER::ORDER_RGBA )
         for( uint64_t i = 0 ; i < frameSize.x ; i++ )
         {
             const uint64_t x = i + offset.x ;

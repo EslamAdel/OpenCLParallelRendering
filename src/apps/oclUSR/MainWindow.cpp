@@ -366,6 +366,7 @@ void MainWindow::startRendering_( )
     parallelRenderer_.activateRenderingKernel_SLOT(
                 clparen::CLKernel::RenderingMode::RENDERING_MODE_Ultrasound );
 
+
 }
 
 void MainWindow::displayFrame( QPixmap* frame )
