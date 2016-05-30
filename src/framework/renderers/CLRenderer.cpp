@@ -8,8 +8,7 @@
 
 #define DEG_TO_RAD(x) (x * 0.0174532925199f)
 
-#define LOCAL_SIZE_X    16
-#define LOCAL_SIZE_Y    16
+
 
 
 namespace clparen {
@@ -55,6 +54,8 @@ CLRenderer< V , F >::~CLRenderer()
 template< class V , class F >
 void CLRenderer< V , F >::createPixelBuffer_()
 {
+
+    LOG_DEBUG("SF:%s",sortFirstDimensions_.toString().c_str());
     gridSize_[0] = SystemUtilities::roundUp( LOCAL_SIZE_X, sortFirstDimensions_.x );
     gridSize_[1] = SystemUtilities::roundUp( LOCAL_SIZE_Y, sortFirstDimensions_.y );
 
@@ -520,6 +521,8 @@ CLData::FRAME_CHANNEL_ORDER CLRenderer< V , F >::getFrameChannelOrder() const
 {
     return frameChannelOrder_ ;
 }
+
+
 
 
 }

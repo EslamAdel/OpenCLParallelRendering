@@ -1,5 +1,6 @@
 #include "CLAbstractRenderer.h"
 #include "Logger.h"
+#include <system/Utilities.h>
 
 namespace clparen {
 namespace Renderer {
@@ -241,8 +242,9 @@ void CLAbstractRenderer::setSortFirstSettings(
         const Dimensions2D sortFirstOffset,
         const Dimensions2D sortFirstDimensions )
 {
-    sortFirstOffset_ = sortFirstOffset ;
     sortFirstDimensions_ = sortFirstDimensions ;
+    sortFirstOffset_ = sortFirstOffset ;
+
 
     if( sortFirstOffset_.x + sortFirstDimensions_.x > frameDimensions_.x ||
             sortFirstOffset_.y + sortFirstDimensions_.y > frameDimensions_.y )

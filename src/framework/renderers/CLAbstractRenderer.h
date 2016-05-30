@@ -10,6 +10,10 @@
 #include "CLKernel.hh"
 
 
+#define LOCAL_SIZE_X    16
+#define LOCAL_SIZE_Y    16
+
+
 namespace clparen {
 namespace Renderer{
 

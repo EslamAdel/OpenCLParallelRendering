@@ -106,10 +106,10 @@ __kernel void isoSurface(
     const uint offsetY = get_global_offset( 1 );
 
     // If out of boundaries, return.
-    if( x - offsetX  > sortFirstWidth + 1 )
+    if( x - offsetX  >= sortFirstWidth   )
         return ;
 
-    if( y - offsetY  > sortFirstHeight + 1 )
+    if( y - offsetY  >= sortFirstHeight  )
         return ;
 
     const float u = ( x / ( float ) frameWidth ) * 2.f - 1.f;

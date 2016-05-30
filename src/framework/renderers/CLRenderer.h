@@ -101,7 +101,6 @@ public:
 
     CLData::FRAME_CHANNEL_ORDER getFrameChannelOrder() const Q_DECL_OVERRIDE;
 
-
 protected:
 
     /**
