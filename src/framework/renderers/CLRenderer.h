@@ -103,24 +103,15 @@ public:
 
 protected:
 
-    /**
-     * @brief renderFrame
-     */
-    void renderFrame() Q_DECL_OVERRIDE ;
 
-    /**
-     * @brief createPixelBuffer_
-     */
+    void setRegion_() Q_DECL_OVERRIDE;
+
+    void renderFrame_() Q_DECL_OVERRIDE ;
+
     void createPixelBuffer_() Q_DECL_OVERRIDE ;
 
-    /**
-     * @brief initializeKernels_
-     */
     void initializeKernels_() Q_DECL_OVERRIDE ;
 
-    /**
-     * @brief freeBuffers_
-     */
     void freeBuffers_() Q_DECL_OVERRIDE ;
 
 private:

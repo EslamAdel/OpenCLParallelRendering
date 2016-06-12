@@ -227,9 +227,6 @@ void SortFirstRenderer< V , F >::assemble_(
     clFrame->readDeviceData( renderer->getCommandQueue() ,
                              CL_TRUE );
 
-    //    LOG_DEBUG("Frame[%d]:%s",renderer->getGPUIndex() ,
-    //              clFrame->getFrameDimensions().toString().c_str());
-
     const Dimensions2D finalFrameSize = finalFrame->getFrameDimensions();
 
     const Dimensions2D &offset = renderer->getSortFirstOffset();
@@ -238,15 +235,6 @@ void SortFirstRenderer< V , F >::assemble_(
 
     F *finalFrameBuffer = finalFrame->getHostData();
     F *frameBuffer = clFrame->getHostData();
-
-
-    //    LOG_DEBUG("GPU<%d>:offset:%s" ,
-    //              renderer->getGPUIndex() ,
-    //              offset.toString().c_str());
-
-    //    LOG_DEBUG("GPU<%d>:size:%s",
-    //              renderer->getGPUIndex(),
-    //              frameSize.toString().c_str());
 
     frameCopyMutex_.lockForRead();
 

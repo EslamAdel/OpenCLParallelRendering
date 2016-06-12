@@ -69,16 +69,16 @@ template< class T >
 void CLImage2D< T >::writeDeviceData( cl_command_queue cmdQueue,
                                       const cl_bool blocking )
 {
-    const size_t origin[3] = { 0 , 0 , 0 };
-    const size_t region[3] = { this->dimensions_.x , this->dimensions_.y , 1 };
+    const size_t origin[3] = { this->offset_.x , this->offset_.y , 0 };
+    const size_t region[3] = { this->region_.x , this->region_.y , 1 };
 
     // Initially, assume that everything is fine
     cl_int error = CL_SUCCESS;
     error = clEnqueueWriteImage(
                 cmdQueue, this->deviceData_ , blocking ,
                 origin , region ,
-                this->dimensions_.x * CLFrame< T >::pixelSize()  ,
-                this->dimensions_.imageSize() * CLFrame< T >::pixelSize() ,
+                this->region_.x * CLFrame< T >::pixelSize()  ,
+                this->region_.imageSize() * CLFrame< T >::pixelSize() ,
                 ( const void * ) this->hostData_ ,
                 0 , 0 , 0 );
 
@@ -93,9 +93,8 @@ template< class T >
 void CLImage2D< T >::readDeviceData( cl_command_queue cmdQueue ,
                                      const cl_bool blocking )
 {
-    const size_t origin[3] = { 0 , 0 , 0 };
-    const size_t
-            region[3] = { this->dimensions_.x , this->dimensions_.y , 1 };
+    const size_t origin[3] = { this->offset_.x , this->offset_.y , 0 };
+    const size_t region[3] = { this->region_.x , this->region_.y , 1 };
 
     //    LOG_DEBUG("ImageDim:%s", this->dimensions_.toString().c_str());
 
@@ -104,8 +103,8 @@ void CLImage2D< T >::readDeviceData( cl_command_queue cmdQueue ,
     error = clEnqueueReadImage(
                 cmdQueue, this->deviceData_ , blocking ,
                 origin , region ,
-                this->dimensions_.x * CLFrame< T >::pixelSize()  ,
-                this->dimensions_.imageSize() * CLFrame< T >::pixelSize() ,
+                this->region_.x * CLFrame< T >::pixelSize()  ,
+                this->region_.imageSize() * CLFrame< T >::pixelSize() ,
                 ( void *) this->hostData_ ,
                 0 , 0 , 0 );
     if( error != CL_SUCCESS )
@@ -124,20 +123,16 @@ void CLImage2D< T >::readOtherDeviceData(
     if( sourceFrame.getFrameDimensions() != this->dimensions_ )
         LOG_ERROR("Dimensions mismatch!");
 
-    //    LOG_DEBUG("Reading device image %dx%d = %d",
-    //              this->dimensions_.x , this->dimensions_.y ,
-    //              this->dimensions_.imageSize( ));
-
-    const size_t origin[3] = { 0 , 0 , 0 };
-    const size_t region[] = { this->dimensions_.x , this->dimensions_.y , 1 } ;
+    const size_t origin[3] = { this->offset_.x , this->offset_.y , 0 };
+    const size_t region[3] = { this->region_.x , this->region_.y , 1 };
 
     static cl_int error = CL_SUCCESS;
 
     error = clEnqueueReadImage(
                 sourceCmdQueue , sourceFrame.getDeviceData() ,
                 blocking , origin , region ,
-                this->dimensions_.x * CLFrame< T >::pixelSize() ,
-                this->dimensions_.imageSize() * CLFrame< T >::pixelSize() ,
+                this->region_.x * CLFrame< T >::pixelSize() ,
+                this->region_.imageSize() * CLFrame< T >::pixelSize() ,
                 ( void * ) this->hostData_ ,
                 0 , 0 , 0 );
 

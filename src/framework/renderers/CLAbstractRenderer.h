@@ -184,9 +184,14 @@ public:
 protected:
 
     /**
+     * @brief setRegionOfInterest_
+     */
+    virtual void setRegion_( ) = 0 ;
+
+    /**
      * @brief renderFrame
      */
-    virtual void renderFrame( ) = 0 ;
+    virtual void renderFrame_( ) = 0 ;
 
     /**
      * @brief createPixelBuffer_
@@ -206,7 +211,7 @@ protected:
     /**
      * @brief calculateExecutionTime_
      */
-    void calculateExecutionTime_();
+    void calculateExecutionTime_( );
 
 
     /**

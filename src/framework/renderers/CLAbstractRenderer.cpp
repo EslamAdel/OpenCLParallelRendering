@@ -245,17 +245,12 @@ void CLAbstractRenderer::setSortFirstSettings(
     sortFirstDimensions_ = sortFirstDimensions ;
     sortFirstOffset_ = sortFirstOffset ;
 
-
     if( sortFirstOffset_.x + sortFirstDimensions_.x > frameDimensions_.x ||
             sortFirstOffset_.y + sortFirstDimensions_.y > frameDimensions_.y )
         LOG_ERROR("Rendered region exceeds the frame region.");
 
-    //    LOG_DEBUG("GPU<%d> offset:[%s],sortFDim:[%s] ",
-    //              gpuIndex_ ,
-    //              sortFirstOffset.toString().c_str() ,
-    //              sortFirstDimensions.toString().c_str());
+    setRegion_();
 
-    createPixelBuffer_();
 }
 
 const Dimensions2D &CLAbstractRenderer::getSortFirstOffset() const

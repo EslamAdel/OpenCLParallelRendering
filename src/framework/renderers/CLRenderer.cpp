@@ -62,11 +62,8 @@ void CLRenderer< V , F >::createPixelBuffer_()
     if( clFrame_ != nullptr )
         delete clFrame_ ;
 
-    clFrame_ = new CLData::CLImage2D< F >( sortFirstDimensions_ ,
+    clFrame_ = new CLData::CLImage2D< F >( frameDimensions_ ,
                                            frameChannelOrder_ );
-
-    //    LOG_DEBUG("Created Frame[%d]:%s",gpuIndex_,sortFirstDimensions_.toString().c_str());
-
     clFrame_->createDeviceData( context_ );
 }
 
@@ -140,7 +137,7 @@ const clparen::CLData::CLFrameVariant
 
 
 template< class V , class F >
-void CLRenderer< V , F >::renderFrame()
+void CLRenderer< V , F >::renderFrame_()
 {
     QMutexLocker lock( &this->switchKernelMutex_ );
 
@@ -438,7 +435,7 @@ void CLRenderer< V , F >::paint_()
 
     TIC( RENDERING_PROFILE( gpuIndex_ ).rendering_TIMER );
 
-    renderFrame( );
+    renderFrame_( );
 
     TOC( RENDERING_PROFILE( gpuIndex_ ).rendering_TIMER );
 }
@@ -520,6 +517,12 @@ template< class V , class F >
 CLData::FRAME_CHANNEL_ORDER CLRenderer< V , F >::getFrameChannelOrder() const
 {
     return frameChannelOrder_ ;
+}
+
+template< class V , class F >
+void CLRenderer< V , F >::setRegion_()
+{
+    clFrame_->setRegion( sortFirstOffset_ , sortFirstDimensions_ );
 }
 
 

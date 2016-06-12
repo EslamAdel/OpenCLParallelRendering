@@ -238,6 +238,27 @@ public:
     uint8_t channelsInPixel( ) const ;
 
 
+    /**
+     * @brief getRegion
+     * @return
+     */
+    const Dimensions2D &getRegion() const;
+
+    /**
+     * @brief getOffset
+     * @return
+     */
+    const Dimensions2D &getOffset() const;
+
+
+    /**
+     * @brief setRegion
+     * @param offset
+     * @param region
+     */
+    void setRegion( const Dimensions2D  &offset ,
+                    const Dimensions2D &region );
+
 protected:
     /**
      * @brief releaseDeviceData_
@@ -291,6 +312,16 @@ protected:
      * @brief dimensions_
      */
     Dimensions2D dimensions_ ;
+
+    /**
+     * @brief region_
+     */
+    Dimensions2D region_ ;
+
+    /**
+     * @brief offset_
+     */
+    Dimensions2D offset_ ;
 
     /**
      * @brief context_

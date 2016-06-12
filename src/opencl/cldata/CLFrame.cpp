@@ -14,6 +14,8 @@ template< class T >
 CLFrame< T >::CLFrame( const Dimensions2D dimensions ,
                        const FRAME_CHANNEL_ORDER channelOrder )
     : dimensions_( dimensions ),
+      region_( dimensions ) ,
+      offset_( Dimensions2D( 0 , 0 )),
       pixmapSynchronized_( false ) ,
       inDevice_( false ),
       deviceData_( nullptr ),
@@ -93,7 +95,8 @@ void CLFrame< T >::writeDeviceData( cl_command_queue cmdQueue ,
     // Initially, assume that everything is fine
     cl_int error = CL_SUCCESS;
     error = clEnqueueWriteBuffer( cmdQueue , deviceData_ , blocking ,
-                                  0 , dimensions_.imageSize() * pixelSize() ,
+                                  offset_.imageSize( ) * pixelSize( ) ,
+                                  region_.imageSize( ) * pixelSize( ) ,
                                   ( const void *) hostData_ ,
                                   0 , 0 , 0 );
 
@@ -110,7 +113,8 @@ void CLFrame< T >::readDeviceData( cl_command_queue cmdQueue ,
 {
     static cl_int error = CL_SUCCESS;
     error = clEnqueueReadBuffer( cmdQueue, deviceData_ , blocking ,
-                                 0 , dimensions_.imageSize() * pixelSize() ,
+                                 offset_.imageSize( ) * pixelSize( ) ,
+                                 region_.imageSize( ) * pixelSize( ) ,
                                  ( void * ) hostData_ ,
                                  0 , 0 , 0);
 
@@ -135,7 +139,8 @@ void CLFrame< T >::readOtherDeviceData(
     static cl_int error = CL_SUCCESS;
     error = clEnqueueReadBuffer( sourceCmdQueue , sourceFrame.getDeviceData() ,
                                  blocking ,
-                                 0 , dimensions_.imageSize() * pixelSize()  ,
+                                 offset_.imageSize( ) * pixelSize( ) ,
+                                 region_.imageSize( ) * pixelSize( ) ,
                                  ( void * ) hostData_ ,
                                  0 , 0 , 0 );
 
@@ -161,11 +166,13 @@ void CLFrame< T >::copyDeviceData(
         LOG_ERROR("Dimensions mismatch!");
 
     cl_bool error = CL_SUCCESS ;
-    error = clEnqueueCopyBuffer( cmdQueue ,
-                                 frame.getDeviceData() , deviceData_ ,
-                                 0 , 0 ,
-                                 dimensions_.imageSize() * pixelSize() ,
-                                 0 , 0 , 0 ) ;
+    error = clEnqueueCopyBuffer(
+                cmdQueue ,
+                frame.getDeviceData() , deviceData_ ,
+                frame.getOffset( ).imageSize( ) * frame.pixelSize( ) ,
+                offset_.imageSize( ) * pixelSize( ) ,
+                region_.imageSize() * pixelSize( ) ,
+                0 , 0 , 0 ) ;
 
     if( error != CL_SUCCESS )
     {
@@ -193,16 +200,16 @@ QPixmap &CLFrame<T>::getFramePixmap()
 
     if( channelOrder_ == FRAME_CHANNEL_ORDER::ORDER_RGBA )
     {
-        for( int i = 0; i < dimensions_.imageSize() ; i++ )
+        for( int i = 0; i < region_.imageSize() ; i++ )
         {
             pixmapData_[ 4 * i ] =
                     static_cast< uchar >( hostData_[  4 * i ] );
             pixmapData_[ 4 * i + 1 ] =
-                    static_cast< uchar >(hostData_[  4 * i + 1 ]);
+                    static_cast< uchar >( hostData_[  4 * i + 1 ]);
             pixmapData_[ 4 * i + 2 ] =
-                    static_cast< uchar >(hostData_[  4 * i + 2 ]);
+                    static_cast< uchar >( hostData_[  4 * i + 2 ]);
             pixmapData_[ 4 * i + 3 ] =
-                    static_cast< uchar >(hostData_[  4 * i + 3 ]);
+                    static_cast< uchar >( hostData_[  4 * i + 3 ]);
 
             //            u_int8_t r, g, b, a;
             //            uint rgba = hostData_[i];
@@ -217,7 +224,7 @@ QPixmap &CLFrame<T>::getFramePixmap()
 
         // Create a QImage and send it back to the rendering window.
         const QImage image( pixmapData_,
-                            dimensions_.x , dimensions_.y ,
+                            region_.x , region_.y ,
                             QImage::Format_ARGB32);
         frame_ = frame_.fromImage( image );
 
@@ -225,12 +232,12 @@ QPixmap &CLFrame<T>::getFramePixmap()
 
     else if( channelOrder_ == FRAME_CHANNEL_ORDER::ORDER_INTENSITY )
     {
-        for( int i = 0; i < dimensions_.imageSize() ; i++)
+        for( int i = 0; i < region_.imageSize() ; i++)
             pixmapData_[ i ] = F2B( hostData_[i] );
 
         // Create a QImage and send it back to the rendering window.
         const QImage image( pixmapData_,
-                            dimensions_.x , dimensions_.y ,
+                            region_.x , region_.y ,
                             QImage::Format_Grayscale8 );
         frame_ = frame_.fromImage( image );
     }
@@ -347,6 +354,31 @@ void CLFrame< T >::convertColorToRGBA_( uint Color ,
 }
 
 template< class T >
+const Dimensions2D &CLFrame< T >::getOffset() const
+{
+    return offset_;
+}
+
+template< class T >
+void CLFrame< T >::setRegion( const Dimensions2D &offset ,
+                              const Dimensions2D &region )
+{
+    offset_ = offset ;
+    region_ = region ;
+
+    if( offset_.x + region_.x > dimensions_.x ||
+            offset_.y + region_.y > dimensions_.y )
+        LOG_ERROR("Region exceeds the frame dimension.");
+}
+
+template< class T >
+const Dimensions2D &CLFrame< T >::getRegion() const
+{
+    return region_;
+}
+
+
+template< class T >
 uint8_t CLFrame< T >::pixelSize() const
 {
     return ( channelOrder_ == FRAME_CHANNEL_ORDER::ORDER_RGBA )?
@@ -357,7 +389,7 @@ template< class T >
 uint8_t CLFrame< T >::channelsInPixel() const
 {
     return ( channelOrder_ == FRAME_CHANNEL_ORDER::ORDER_RGBA )?
-                  4 : 1 ;
+                4 : 1 ;
 }
 
 
