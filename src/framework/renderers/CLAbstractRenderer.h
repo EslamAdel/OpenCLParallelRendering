@@ -134,7 +134,7 @@ public:
      * @brief getRenderingTime
      * @return
      */
-    double getRenderingTime();
+    double getRenderingTime() const;
 
     /**
      * @brief getFrameDimensions
@@ -208,11 +208,11 @@ protected:
      */
     virtual void freeBuffers_( ) = 0 ;
 
-    /**
-     * @brief calculateExecutionTime_
-     */
-    void calculateExecutionTime_( );
 
+    /**
+     * @brief calculateRenderingTime_
+     */
+    virtual double calculateRenderingTime_( );
 
     /**
      * @brief defaultRenderingMode_

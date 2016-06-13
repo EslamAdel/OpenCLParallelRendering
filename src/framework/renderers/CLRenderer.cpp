@@ -191,8 +191,10 @@ void CLRenderer< V , F >::renderFrame_()
                 &clGPUExecution_ );
 
 
+    renderingTime_ = calculateRenderingTime_();
 
     clFinish( commandQueue_ );
+
     if( clErrorCode != CL_SUCCESS )
     {
         oclHWDL::Error::checkCLError( clErrorCode );

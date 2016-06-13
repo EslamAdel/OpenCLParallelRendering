@@ -52,7 +52,7 @@ CLData::FRAME_CHANNEL_ORDER CLRenderingKernel::getChannelOrderSupport() const
 
 bool CLRenderingKernel::isUltrasound() const
 {
-    return false ;
+    return kernelType_ == RenderingMode::RENDERING_MODE_Ultrasound ;
 }
 
 bool CLRenderingKernel::supportTransferFunction() const

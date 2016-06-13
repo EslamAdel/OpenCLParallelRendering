@@ -18,14 +18,13 @@ CLFrame< T >::CLFrame( const Dimensions2D dimensions ,
       offset_( Dimensions2D( 0 , 0 )),
       pixmapSynchronized_( false ) ,
       inDevice_( false ),
-      deviceData_( nullptr ),
+      deviceData_( 0 ),
       channelOrder_(( channelOrder == FRAME_CHANNEL_ORDER::ORDER_DEFAULT)?
                         defaultChannelOrder() : channelOrder )
 {
 
     if( isChannelConflict( channelOrder_ ))
         LOG_ERROR("Channel Order conflicts with channel type.");
-
 
     hostData_ = new T[ dimensions.imageSize() * channelsInPixel() ];
     pixmapData_ = new uchar[ dimensions.imageSize() * channelsInPixel()  ];
@@ -44,6 +43,7 @@ CLFrame< T >::CLFrame( const FRAME_CHANNEL_ORDER channelOrder )
     if( isChannelConflict( channelOrder_ ))
         LOG_ERROR("Channel Order conflicts with channel type.");
 
+
     dimensionsDefined_ = false ;
 }
 
@@ -57,6 +57,7 @@ CLFrame< T >::~CLFrame()
 
     if( pixmapData_ )
         delete [] pixmapData_ ;
+
 }
 
 template< class T >
@@ -92,6 +93,8 @@ void CLFrame< T >::writeDeviceData( cl_command_queue cmdQueue ,
     if( !inDevice_ )
         LOG_ERROR("No allocation for the buffer in device!");
 
+    QReadLocker lock( &regionLock_ );
+
     // Initially, assume that everything is fine
     cl_int error = CL_SUCCESS;
     error = clEnqueueWriteBuffer( cmdQueue , deviceData_ , blocking ,
@@ -105,13 +108,17 @@ void CLFrame< T >::writeDeviceData( cl_command_queue cmdQueue ,
         oclHWDL::Error::checkCLError( error );
         LOG_ERROR("OpenCL Error!");
     }
+
 }
 
 template< class T >
 void CLFrame< T >::readDeviceData( cl_command_queue cmdQueue ,
                                    const cl_bool blocking )
 {
-    static cl_int error = CL_SUCCESS;
+    cl_int error = CL_SUCCESS;
+
+    QReadLocker lock( &regionLock_ );
+
     error = clEnqueueReadBuffer( cmdQueue, deviceData_ , blocking ,
                                  offset_.imageSize( ) * pixelSize( ) ,
                                  region_.imageSize( ) * pixelSize( ) ,
@@ -125,6 +132,7 @@ void CLFrame< T >::readDeviceData( cl_command_queue cmdQueue ,
     }
     //Now, neither QPixmap frame_ nor rgbaFrame represents the recent raw data.
     pixmapSynchronized_ = false ;
+
 }
 
 template< class T >
@@ -135,6 +143,8 @@ void CLFrame< T >::readOtherDeviceData(
 {
     if( sourceFrame.getFrameDimensions() != dimensions_ )
         LOG_ERROR("Dimensions mismatch!");
+
+    QReadLocker lock( &regionLock_ );
 
     static cl_int error = CL_SUCCESS;
     error = clEnqueueReadBuffer( sourceCmdQueue , sourceFrame.getDeviceData() ,
@@ -164,6 +174,8 @@ void CLFrame< T >::copyDeviceData(
 
     if( frame.getFrameDimensions() != dimensions_ )
         LOG_ERROR("Dimensions mismatch!");
+
+    QReadLocker lock( &regionLock_ );
 
     cl_bool error = CL_SUCCESS ;
     error = clEnqueueCopyBuffer(
@@ -197,6 +209,8 @@ QPixmap &CLFrame<T>::getFramePixmap()
 {
     if( pixmapSynchronized_ ) return frame_ ;
 
+
+    QReadLocker lock( &regionLock_ );
 
     if( channelOrder_ == FRAME_CHANNEL_ORDER::ORDER_RGBA )
     {
@@ -249,8 +263,10 @@ QPixmap &CLFrame<T>::getFramePixmap()
 template< class T >
 void CLFrame< T >::copyHostData( const T *data )
 {
+    QReadLocker lock( &regionLock_ );
+
     std::copy( &data[ 0 ] ,
-            &data[ dimensions_.imageSize() * channelsInPixel() - 1 ] ,
+            &data[ region_.imageSize() * channelsInPixel() - 1 ] ,
             hostData_ );
     pixmapSynchronized_ = false ;
 }
@@ -258,8 +274,10 @@ void CLFrame< T >::copyHostData( const T *data )
 template< class T >
 void CLFrame< T >::copyHostData( const CLFrame< T > &sourceFrame )
 {
+    QReadLocker lock( &regionLock_ );
+
     const T *hostData_SOURCE = sourceFrame.getHostData();
-    const uint64_t frameSize = sourceFrame.getFrameDimensions().imageSize() ;
+    const uint64_t frameSize = sourceFrame.getRegion().imageSize() ;
 
     std::copy( &hostData_SOURCE[ 0 ] ,
             &hostData_SOURCE[ frameSize * channelsInPixel() - 1 ] ,  hostData_ );
@@ -356,6 +374,7 @@ void CLFrame< T >::convertColorToRGBA_( uint Color ,
 template< class T >
 const Dimensions2D &CLFrame< T >::getOffset() const
 {
+    QReadLocker lock( &regionLock_ );
     return offset_;
 }
 
@@ -363,6 +382,8 @@ template< class T >
 void CLFrame< T >::setRegion( const Dimensions2D &offset ,
                               const Dimensions2D &region )
 {
+    QWriteLocker lock( &regionLock_ );
+
     offset_ = offset ;
     region_ = region ;
 
@@ -374,6 +395,7 @@ void CLFrame< T >::setRegion( const Dimensions2D &offset ,
 template< class T >
 const Dimensions2D &CLFrame< T >::getRegion() const
 {
+    QReadLocker lock( &regionLock_ );
     return region_;
 }
 

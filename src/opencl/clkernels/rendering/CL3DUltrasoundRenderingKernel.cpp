@@ -14,6 +14,7 @@ CL3DUltrasoundRenderingKernel::CL3DUltrasoundRenderingKernel(
     : CLRenderingKernel( clContext, CLData::FRAME_CHANNEL_ORDER::ORDER_RGBA,
                          kernelName , kernelDirectory, kernelFile )
 {
+    kernelType_ = RenderingMode::RENDERING_MODE_Ultrasound ;
     buildKernel_( );
     retrieveKernelObject_( );
 }
@@ -54,7 +55,7 @@ void CL3DUltrasoundRenderingKernel::setApexAngle( float apexAngle )
         oclHWDL::Error::checkCLError( error );
         LOG_ERROR("Exiting Due to OpenCL Error!");
     }
-    printf("apex %f \n", apexAngle );
+//    printf("apex %f \n", apexAngle );
 }
 
 void CL3DUltrasoundRenderingKernel::setXScale( float scale )
@@ -92,10 +93,6 @@ void CL3DUltrasoundRenderingKernel::setZScale( float scale )
     }
 }
 
-bool CL3DUltrasoundRenderingKernel::isUltrasound() const
-{
-    return true;
-}
 
 bool CL3DUltrasoundRenderingKernel::supportTransferFunction() const
 {

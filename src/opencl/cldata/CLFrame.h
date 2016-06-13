@@ -6,9 +6,9 @@
 #include <oclHWDL/ErrorHandler.h>
 #include "Utilities.h"
 #include "Image.h"
-
-namespace SystemUtilities {}
-using namespace SystemUtilities;
+#include <QReadWriteLock>
+#include <QReadLocker>
+#include <QWriteLocker>
 
 namespace clparen {
 namespace CLData {
@@ -53,6 +53,7 @@ public:
      */
     CLFrame( const FRAME_CHANNEL_ORDER channelOrder =
             FRAME_CHANNEL_ORDER::ORDER_DEFAULT );
+
 
     ~CLFrame( ) ;
 
@@ -348,6 +349,12 @@ protected:
      * @brief channelOrder_
      */
     const FRAME_CHANNEL_ORDER channelOrder_ ;
+
+
+    /**
+     * @brief readWriteLock_
+     */
+    mutable QReadWriteLock regionLock_;
 };
 
 

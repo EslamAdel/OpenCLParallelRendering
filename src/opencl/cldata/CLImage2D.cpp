@@ -69,6 +69,8 @@ template< class T >
 void CLImage2D< T >::writeDeviceData( cl_command_queue cmdQueue,
                                       const cl_bool blocking )
 {
+    QReadLocker lock( &this->regionLock_ );
+
     const size_t origin[3] = { this->offset_.x , this->offset_.y , 0 };
     const size_t region[3] = { this->region_.x , this->region_.y , 1 };
 
@@ -93,6 +95,8 @@ template< class T >
 void CLImage2D< T >::readDeviceData( cl_command_queue cmdQueue ,
                                      const cl_bool blocking )
 {
+    QReadLocker lock( &this->regionLock_ );
+
     const size_t origin[3] = { this->offset_.x , this->offset_.y , 0 };
     const size_t region[3] = { this->region_.x , this->region_.y , 1 };
 
@@ -122,6 +126,8 @@ void CLImage2D< T >::readOtherDeviceData(
 {
     if( sourceFrame.getFrameDimensions() != this->dimensions_ )
         LOG_ERROR("Dimensions mismatch!");
+
+    QReadLocker lock( &this->regionLock_ );
 
     const size_t origin[3] = { this->offset_.x , this->offset_.y , 0 };
     const size_t region[3] = { this->region_.x , this->region_.y , 1 };

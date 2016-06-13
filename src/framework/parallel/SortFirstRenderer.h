@@ -64,6 +64,11 @@ protected:
     void applyTransformation_() Q_DECL_OVERRIDE;
 
     void benchmark_() Q_DECL_OVERRIDE;
+
+    /**
+     * @brief heuristicLoadBalance_
+     */
+    virtual void heuristicLoadBalance_();
 private:
     static void render_( Renderer::CLAbstractRenderer *renderer );
 
@@ -106,6 +111,11 @@ protected:
      * @brief assembledFramesCount_
      */
     uint assembledFramesCount_ ;
+
+    /**
+     * @brief renderingTimes_
+     */
+    QVector< float > renderingTimes_ ;
 };
 
 

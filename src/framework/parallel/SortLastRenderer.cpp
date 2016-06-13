@@ -265,6 +265,7 @@ void SortLastRenderer< V , F >::distributeBaseVolumeMemoryWeighted()
     emit this->frameworkReady_SIGNAL();
 }
 
+
 template< class V , class F >
 void SortLastRenderer< V , F >::finishedRendering_SLOT(
         Renderer::CLAbstractRenderer *renderer )

@@ -20,7 +20,7 @@ CLAbstractRenderer::CLAbstractRenderer(
       frameChannelOrder_( frameChannelOrder ),
       QObject( parent )
 {
-
+    renderingTime_ = 1.f ;
     /// @note The oclHWDL scans the entire system, and returns a list of
     /// platforms and devices. Since we don't really care about the different
     /// platforms in the system and curious only to get the GPUs, we get a
@@ -92,44 +92,9 @@ bool CLAbstractRenderer::lessThan( const CLAbstractRenderer *lhs ,
     return lhs->getCurrentCenter().z < rhs->getCurrentCenter().z ;
 }
 
-double CLAbstractRenderer::getRenderingTime()
+double CLAbstractRenderer::getRenderingTime() const
 {
-    calculateExecutionTime_();
     return renderingTime_;
-}
-
-void CLAbstractRenderer::calculateExecutionTime_()
-{
-    // Assuming that every thing is going in the right direction.
-    cl_int clErrorCode = CL_SUCCESS;
-
-    cl_ulong start , end;
-
-    clErrorCode =
-            clWaitForEvents( 1 , &clGPUExecution_ );
-
-    clErrorCode |=
-            clGetEventProfilingInfo( clGPUExecution_,
-                                     CL_PROFILING_COMMAND_END,
-                                     sizeof(cl_ulong),
-                                     &end,
-                                     NULL );
-
-    clErrorCode |=
-            clGetEventProfilingInfo( clGPUExecution_,
-                                     CL_PROFILING_COMMAND_START,
-                                     sizeof(cl_ulong),
-                                     &start,
-                                     NULL );
-
-    if( clErrorCode != CL_SUCCESS )
-    {
-        oclHWDL::Error::checkCLError( clErrorCode );
-        LOG_ERROR("Exiting Due to OpenCL Error!");
-    }
-
-    renderingTime_ = static_cast< double >( end -  start ) / 1e6 ;
-
 }
 
 CLKernel::RenderingMode CLAbstractRenderer::defaultRenderingMode_() const
@@ -182,8 +147,6 @@ void CLAbstractRenderer::createCommandQueue_()
 
     oclHWDL::Error::checkCLError(clErrorCode);
 }
-
-
 
 
 CLKernel::CLRenderingKernels
@@ -245,12 +208,55 @@ void CLAbstractRenderer::setSortFirstSettings(
     sortFirstDimensions_ = sortFirstDimensions ;
     sortFirstOffset_ = sortFirstOffset ;
 
-    if( sortFirstOffset_.x + sortFirstDimensions_.x > frameDimensions_.x ||
-            sortFirstOffset_.y + sortFirstDimensions_.y > frameDimensions_.y )
-        LOG_ERROR("Rendered region exceeds the frame region.");
+    if( sortFirstOffset_.x + sortFirstDimensions_.x > frameDimensions_.x )
+        LOG_ERROR("Rendered region exceeds the frame region. (%ld>%ld)" ,
+                  sortFirstOffset_.x + sortFirstDimensions_.x ,
+                  frameDimensions_.x );
+
+    if( sortFirstOffset_.y + sortFirstDimensions_.y > frameDimensions_.y )
+        LOG_ERROR("Rendered region exceeds the frame region. (%ld>%ld)" ,
+                  sortFirstOffset_.y + sortFirstDimensions_.y ,
+                  frameDimensions_.y );
+
 
     setRegion_();
 
+}
+
+
+double CLAbstractRenderer::calculateRenderingTime_()
+{
+    // Assuming that every thing is going in the right direction.
+    cl_int clErrorCode = CL_SUCCESS;
+
+    cl_ulong start , end;
+
+    clErrorCode =
+            clWaitForEvents( 1 , &clGPUExecution_ );
+
+
+    clErrorCode |=
+            clGetEventProfilingInfo( clGPUExecution_,
+                                     CL_PROFILING_COMMAND_END,
+                                     sizeof(cl_ulong),
+                                     &end,
+                                     0 );
+
+    clErrorCode |=
+            clGetEventProfilingInfo( clGPUExecution_,
+                                     CL_PROFILING_COMMAND_START,
+                                     sizeof(cl_ulong),
+                                     &start,
+                                     0 );
+
+
+    if( clErrorCode != CL_SUCCESS )
+    {
+        oclHWDL::Error::checkCLError( clErrorCode );
+        LOG_ERROR("Exiting Due to OpenCL Error!");
+    }
+
+    return static_cast< double >( end -  start ) / 1e6 ;
 }
 
 const Dimensions2D &CLAbstractRenderer::getSortFirstOffset() const
