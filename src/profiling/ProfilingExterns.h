@@ -48,6 +48,11 @@
     printf("Statistics: framework\n"); }\
     while( 0 )
 
+#define LOAD_BALANCING_PROFILE_TAG()\
+    do{\
+    printf("Statistics: Load Balancing Overhead."); }\
+    while( 0 )
+
 #define ATTACH_RENDERING_PROFILE( renderer )\
     do{\
     renderingProfiles[ renderer ] = new RenderingProfile ; }\
@@ -63,7 +68,8 @@
     RenderingProfiles renderingProfiles = RenderingProfiles() ; \
     CollectingProfiles collectingProfiles = CollectingProfiles() ; \
     CompositingProfile compositingProfile = CompositingProfile() ; \
-    FrameworkProfile frameworkProfile = FrameworkProfile();
+    FrameworkProfile frameworkProfile = FrameworkProfile();\
+    LoadBalancingProfile loadBalancingProfile = LoadBalancingProfile();
 
 #define EXIT_PROFILING()\
     do{\
@@ -116,6 +122,11 @@
     do{  }\
     while( 0 )
 
+#define LOAD_BALANCING_PROFILE_TAG()\
+    do{  }\
+    while( 0 )
+
+
 #define ATTACH_RENDERING_PROFILE( renderingNode )\
     do{  }\
     while( 0 )
@@ -144,6 +155,7 @@ extern RenderingProfiles renderingProfiles ;
 extern CollectingProfiles collectingProfiles ;
 extern CompositingProfile compositingProfile;
 extern FrameworkProfile frameworkProfile;
+extern LoadBalancingProfile loadBalancingProfile;
 extern uint testFrames ;
 
 RenderingProfile &getRenderingProfile(

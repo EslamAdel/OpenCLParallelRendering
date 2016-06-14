@@ -4,13 +4,7 @@
 #include "CLFrameVariants.hh"
 #include <QList>
 
-#ifdef BENCHMARKING
-//Profiles Difinitions
-DEFINE_PROFILES
 
-#define AUTO_ROTATE
-
-#endif
 
 namespace clparen {
 namespace Parallel{

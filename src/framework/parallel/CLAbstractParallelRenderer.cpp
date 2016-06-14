@@ -13,6 +13,14 @@
 #define INITIAL_TRANSFER_OFFSET   0.0
 
 
+#ifdef BENCHMARKING
+//Profiles Difinitions
+DEFINE_PROFILES
+
+#define AUTO_ROTATE
+
+#endif
+
 namespace clparen
 {
 namespace Parallel

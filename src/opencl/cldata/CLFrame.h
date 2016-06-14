@@ -307,7 +307,7 @@ protected:
     /**
      * @brief frame_
      */
-    QPixmap frame_ ;
+    QPixmap *pixmap_ ;
 
     /**
      * @brief dimensions_

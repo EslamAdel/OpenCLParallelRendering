@@ -49,6 +49,12 @@ struct FrameworkProfile
     Timer64 renderingLoop_TIMER;
 };
 
+struct LoadBalancingProfile
+{
+    LoadBalancingProfile() : loadBlancing_TIMER("Load Balancing Overhead"){}
+    Timer64 loadBlancing_TIMER;
+
+};
 
 typedef QMap< const clparen::Renderer::CLAbstractRenderer* , RenderingProfile* > RenderingProfiles;
 

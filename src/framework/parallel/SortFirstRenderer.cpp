@@ -1,6 +1,7 @@
 #include "SortFirstRenderer.h"
 #include "Logger.h"
 
+
 namespace clparen
 {
 namespace Parallel
@@ -72,6 +73,9 @@ void SortFirstRenderer< V , F >::addCLRenderer( const uint64_t gpuIndex )
              SIGNAL( finishedRendering( Renderer::CLAbstractRenderer* )),
              this ,
              SLOT( finishedRendering_SLOT( Renderer::CLAbstractRenderer* )));
+
+
+    ATTACH_RENDERING_PROFILE( renderer );
 }
 
 template< class V , class F >
@@ -158,6 +162,17 @@ void SortFirstRenderer< V , F >::finishedRendering_SLOT(
     if( QThread::currentThread() != this->thread())
         LOG_ERROR("Foreign thread!");
 
+
+//#ifdef BENCHMARKING
+//    static int renderedFrames = 0 ;
+//    if( ++rendererdFrames == 1 )
+//        TIC( compositingProfile.compositing_TIMER );
+//    else if( renderedFrames == renderers_.size())
+//        renderedFrames = 0 ;
+
+//#endif
+
+
     QtConcurrent::run(  this , &SortFirstRenderer::assemble_ ,
                         renderer , clFrame_.data( ));
 
@@ -176,13 +191,32 @@ void SortFirstRenderer< V , F >::compositingFinished_SLOT( )
 
 
 
-//    clone_();
+    TOC( frameworkProfile.renderingLoop_TIMER );
+
     if( pendingTransformations_ )
         applyTransformation_();
     else
+    {
         renderersReady_ = true ;
 
+#ifdef BENCHMARKING
+        static uint framesCounter = 0 ;
+        if( ++framesCounter < testFrames )
+        {
+            updateRotationX_SLOT( transformation_.rotation.x + 1 );
+            updateRotationY_SLOT( transformation_.rotation.y + 1 );
+            updateRotationZ_SLOT( transformation_.rotation.z + 1 );
+        }
+        else
+            benchmark_();
+
+#endif
+    }
+
+#ifndef BENCHMARKING
     QtConcurrent::run( this ,  &SortFirstRenderer::clone_ );
+#endif
+
 }
 
 template< class V , class F >
@@ -210,13 +244,17 @@ void SortFirstRenderer< V , F >::applyTransformation_()
     if( QThread::currentThread() != this->thread())
         LOG_ERROR("Foreign thread!");
 
+    TIC( frameworkProfile.renderingLoop_TIMER );
+
     renderersReady_ = false;
     pendingTransformations_ = false;
     renderedFramesCount_ = 0 ;
     assembledFramesCount_ = 0 ;
 
 
+    TIC( loadBalancingProfile.loadBlancing_TIMER );
     heuristicLoadBalance_();
+    TOC( loadBalancingProfile.loadBlancing_TIMER );
 
     // fetch new transformations if exists.
     syncTransformation_( );
@@ -231,7 +269,21 @@ void SortFirstRenderer< V , F >::applyTransformation_()
 template< class V , class F >
 void SortFirstRenderer< V , F >::benchmark_()
 {
+    for( Renderer::CLAbstractRenderer *renderer : renderers_ )
+    {
+        RENDERING_PROFILE_TAG( renderer );
+        PRINT( RENDERING_PROFILE( renderer ).mvMatrix_TIMER );
+        PRINT( RENDERING_PROFILE( renderer ).rendering_TIMER );
+    }
 
+    LOAD_BALANCING_PROFILE_TAG();
+    PRINT( loadBalancingProfile.loadBlancing_TIMER );
+
+    FRAMEWORK_PROFILE_TAG( );
+    PRINT( frameworkProfile.renderingLoop_TIMER );
+
+
+    EXIT_PROFILING();
 }
 
 template< class V , class F >
@@ -262,7 +314,15 @@ void SortFirstRenderer< V , F >::heuristicLoadBalance_( )
         frameWidthChange.append( static_cast< float >( frameWidth ));
         renderingTime.append( time );
         meanTime += time;
+
+        printf("time[%d]:%f,size:%dx%d\n",
+               static_cast< int >(renderer->getGPUIndex()),
+               time ,
+               static_cast< int >( frameWidth ),
+               static_cast< int >( renderer->getFrameDimensions().y ));
     }
+
+    printf("\n");
 
 
     meanTime /= static_cast< float >( renderersCount );
@@ -442,12 +502,10 @@ void SortFirstRenderer< V , F >::assemble_(
 template< class V , class F >
 void SortFirstRenderer< V , F >::clone_( )
 {
-
     frameCopyMutex_.lockForWrite();
     clFrameReadout_->copyHostData( *clFrame_.data( ));
     emit this->frameReady_SIGNAL( &clFrame_->getFramePixmap( ) , nullptr );
     frameCopyMutex_.unlock();
-
 }
 
 

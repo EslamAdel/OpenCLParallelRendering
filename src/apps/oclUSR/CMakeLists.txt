@@ -6,7 +6,7 @@
 set( OCL_USR_APP_EXECUTABLE "oclUSR" )
 
 ### Application source/header/ui files
-set( OCL_USR_APP_SOURCES main.cpp 
+set( OCL_USR_APP_SOURCES oclUSR.cpp
     ColorMapWidget.cpp
     HoverPoints.cpp
     TFWidget.cpp
@@ -49,3 +49,40 @@ qt5_use_modules( ${OCL_USR_APP_EXECUTABLE} Core Widgets OpenGL Gui )
 
 # Install the executable (generate with 'make install' in the bin directory)
 install( TARGETS ${OCL_USR_APP_EXECUTABLE} DESTINATION bin )
+
+
+
+
+## -------------------------- BENCHMARK SETTING--------------------------------##
+
+message("Benchmarking Executable Setting...")
+
+### Benchmarking Application name
+set( OCL_USR_BENCHMARK_EXECUTABLE "oclUSR_Benchmark" )
+
+## BENCHMARKING source/header files.
+set( OCL_USR_BENCHMARK_HEADER_FILES     CommandLineParser.h
+    CommandLineParser_Benchmark.h )
+
+set( OCL_USR_BENCHMARK_SOURCE_FILES
+    oclUSR_Benchmark.cpp
+    CommandLineParser_Benchmark.cpp
+    CommandLineParser.cpp )
+
+set( OCL_USR_BENCHMARK_APP_FORMS ${OCL_MGPUVR_APP_FORMS} )
+
+### Generate the executable
+add_executable( ${OCL_USR_BENCHMARK_EXECUTABLE}
+    ${OCL_USR_BENCHMARK_HEADER_FILES}
+    ${OCL_USR_BENCHMARK_SOURCE_FILES}
+    ${OCL_USR_BENCHMARK_APP_FORMS}
+    )
+
+### Link the application against the oclMGPUVR library
+target_link_libraries( ${OCL_USR_BENCHMARK_EXECUTABLE} ${CLPAREN_LIBRARY_BENCHMARK} )
+
+### Make sure to use the required Qt modules
+qt5_use_modules( ${OCL_USR_BENCHMARK_EXECUTABLE} Core Widgets OpenGL Gui )
+
+# Install the executable (generate with 'make install' in the bin directory)
+install( TARGETS ${OCL_USR_BENCHMARK_EXECUTABLE} DESTINATION bin )

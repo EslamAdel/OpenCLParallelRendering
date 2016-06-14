@@ -19,6 +19,7 @@ CLFrame< T >::CLFrame( const Dimensions2D dimensions ,
       pixmapSynchronized_( false ) ,
       inDevice_( false ),
       deviceData_( 0 ),
+      pixmap_( 0 ),
       channelOrder_(( channelOrder == FRAME_CHANNEL_ORDER::ORDER_DEFAULT)?
                         defaultChannelOrder() : channelOrder )
 {
@@ -37,6 +38,7 @@ CLFrame< T >::CLFrame( const FRAME_CHANNEL_ORDER channelOrder )
       pixmapSynchronized_( false ) ,
       inDevice_( false ),
       deviceData_( 0 ),
+      pixmap_( 0 ),
       channelOrder_(( channelOrder == FRAME_CHANNEL_ORDER::ORDER_DEFAULT)?
                         defaultChannelOrder() : channelOrder )
 {
@@ -57,6 +59,9 @@ CLFrame< T >::~CLFrame()
 
     if( pixmapData_ )
         delete [] pixmapData_ ;
+
+    if( pixmap_ )
+        delete pixmap_ ;
 
 }
 
@@ -207,7 +212,10 @@ T *CLFrame<T>::getHostData() const
 template< class T >
 QPixmap &CLFrame<T>::getFramePixmap()
 {
-    if( pixmapSynchronized_ ) return frame_ ;
+    if ( !pixmap_ )
+        pixmap_ = new QPixmap();
+
+    if( pixmapSynchronized_ ) return *pixmap_ ;
 
 
     QReadLocker lock( &regionLock_ );
@@ -240,7 +248,9 @@ QPixmap &CLFrame<T>::getFramePixmap()
         const QImage image( pixmapData_,
                             region_.x , region_.y ,
                             QImage::Format_ARGB32);
-        frame_ = frame_.fromImage( image );
+
+
+        *pixmap_ = pixmap_->fromImage( image );
 
     }
 
@@ -253,10 +263,10 @@ QPixmap &CLFrame<T>::getFramePixmap()
         const QImage image( pixmapData_,
                             region_.x , region_.y ,
                             QImage::Format_Grayscale8 );
-        frame_ = frame_.fromImage( image );
+        *pixmap_ = pixmap_->fromImage( image );
     }
 
-    return frame_ ;
+    return *pixmap_ ;
 
 }
 
