@@ -69,6 +69,11 @@ protected:
      * @brief heuristicLoadBalance_
      */
     virtual void heuristicLoadBalance_();
+
+    /**
+     * @brief calculateTransferTimeMean_
+     */
+    void calculateTransferTimeMean_();
 private:
     static void render_( Renderer::CLAbstractRenderer *renderer );
 
@@ -83,7 +88,6 @@ protected:
      * @brief baseVolume_
      */
     QScopedPointer< Volume< V >> baseVolume_;
-
 
     /**
      * @brief clFrame_
@@ -101,7 +105,6 @@ protected:
      */
     QReadWriteLock frameCopyMutex_ ;
 
-
     /**
      * @brief framesReady_
      */
@@ -113,9 +116,15 @@ protected:
     uint assembledFramesCount_ ;
 
     /**
-     * @brief renderingTimes_
+     * @brief transferTimeMean_
      */
-    QVector< float > renderingTimes_ ;
+    QMap< uint64_t , float > transferTimeMean_ ;
+
+    /**
+     * @brief renderingLoopCounter_
+     */
+    uint64_t renderingLoopCounter_ ;
+
 };
 
 

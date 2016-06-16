@@ -13,7 +13,8 @@ SortFirstRenderer< V , F >::SortFirstRenderer(
         const uint64_t frameWidth,
         const uint64_t frameHeight ,
         const CLData::FRAME_CHANNEL_ORDER channelOrder )
-    : CLAbstractParallelRenderer( frameWidth , frameHeight , channelOrder )
+    : CLAbstractParallelRenderer( frameWidth , frameHeight , channelOrder ),
+      renderingLoopCounter_( 0 )
 {
     if( QThread::currentThread() != this->thread())
         LOG_ERROR("Foreign thread!");
@@ -76,6 +77,7 @@ void SortFirstRenderer< V , F >::addCLRenderer( const uint64_t gpuIndex )
 
 
     ATTACH_RENDERING_PROFILE( renderer );
+    transferTimeMean_[ gpuIndex ] = 0.0 ;
 }
 
 template< class V , class F >
@@ -244,6 +246,9 @@ void SortFirstRenderer< V , F >::applyTransformation_()
     if( QThread::currentThread() != this->thread())
         LOG_ERROR("Foreign thread!");
 
+    calculateTransferTimeMean_();
+    renderingLoopCounter_++;
+
     TIC( frameworkProfile.renderingLoop_TIMER );
 
     renderersReady_ = false;
@@ -274,6 +279,9 @@ void SortFirstRenderer< V , F >::benchmark_()
         RENDERING_PROFILE_TAG( renderer );
         PRINT( RENDERING_PROFILE( renderer ).mvMatrix_TIMER );
         PRINT( RENDERING_PROFILE( renderer ).rendering_TIMER );
+        printf("Statistics: Transfer Frame from GPU<%lo>: mean=%f\n\n" ,
+               renderer->getGPUIndex(),
+               transferTimeMean_[ renderer->getGPUIndex() ]);
     }
 
     LOAD_BALANCING_PROFILE_TAG();
@@ -290,7 +298,7 @@ template< class V , class F >
 void SortFirstRenderer< V , F >::heuristicLoadBalance_( )
 {
     if( QThread::currentThread() != this->thread())
-        LOG_ERROR("Foreign thread!");
+        LOG_ERROR("Foreign thread!");    
 
     const uint renderersCount = renderers_.size();
 
@@ -413,6 +421,27 @@ void SortFirstRenderer< V , F >::heuristicLoadBalance_( )
 //    LOG_DEBUG("Gap:%f, thread:%p", positiveGap + negativeGap , QThread::currentThread( ));
 
     LOG_DEBUG("mean:%f,variance:%f",meanTime, variance);
+}
+
+template< class V , class F >
+void SortFirstRenderer< V , F >::calculateTransferTimeMean_()
+{
+
+    if( renderingLoopCounter_ == 0 )
+        return;
+
+    for( const Renderer::CLAbstractRenderer *renderer : renderers_ )
+    {
+        const uint64_t gpuIndex = renderer->getGPUIndex();
+        const CLData::CLImage2D< F > *clFrame =
+                renderer->getCLFrame().value< CLData::CLImage2D< F > *>();
+        const float transferTime = clFrame->getTransferTime();
+        printf("tranfer time: %f\n",transferTime);
+        transferTimeMean_[ gpuIndex ] =
+                ( transferTimeMean_[ gpuIndex ] * renderingLoopCounter_ +
+                  transferTime ) / ( renderingLoopCounter_ + 1 ) ;
+    }
+
 }
 
 

@@ -80,6 +80,13 @@ public:
      */
     uint64_t getGPUIndex( ) const;
 
+
+    /**
+     * @brief getGPUName
+     * @return
+     */
+    std::string getGPUName( ) const ;
+
     /**
      * @brief readOutReady
      * @return
@@ -154,6 +161,11 @@ protected:
      * @brief gpuIndex_
      */
     const uint64_t gpuIndex_;
+
+    /**
+     * @brief name_
+     */
+    std::string name_ ;
 
     /**
      * @brief platform_

@@ -29,18 +29,25 @@
     }while( 0 )
 
 #define RENDERING_PROFILE_TAG( renderer )\
-    do{ printf("Statistics: Rendering on GPU <%lo>\n" , renderer->getGPUIndex() ); }\
+    do{ printf("Statistics: Rendering on GPU <%lo>: %s\n" , \
+    renderer->getGPUIndex() , \
+    renderer->getGPUName( ).c_str( )); }\
     while( 0 )
 
 #define COLLECTING_PROFILE_TAG( renderer , compositor )\
     do{\
-    printf("Statistics: Data Transfer from GPU <%lo> --> Host --> GPU <%lo>\n" ,\
-    renderer->getGPUIndex() , compositor->getGPUIndex() ) ; }\
+    printf("Statistics: Data Transfer from GPU <%lo>: %s --> Host --> GPU <%lo>: %s\n" ,\
+    renderer->getGPUIndex( ), \
+    renderer->getGPUName().c_str( ) ,\
+    compositor->getGPUIndex( ) ,\
+    compositor->getGPUName( ).c_str( )); }\
     while( 0 )
 
 #define COMPOSITING_PROFILE_TAG( compositor )\
     do{\
-    printf("Statistics: Compositing on GPU <%lo>\n", compositor->getGPUIndex() ) ;}\
+    printf("Statistics: Compositing on GPU <%lo>: %s\n",\
+    compositor->getGPUIndex( ) ,\
+    compositor->getGPUName( ).c_str( ));}\
     while( 0 )
 
 #define FRAMEWORK_PROFILE_TAG()\

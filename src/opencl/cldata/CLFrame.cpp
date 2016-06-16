@@ -106,13 +106,15 @@ void CLFrame< T >::writeDeviceData( cl_command_queue cmdQueue ,
                                   offset_.imageSize( ) * pixelSize( ) ,
                                   region_.imageSize( ) * pixelSize( ) ,
                                   ( const void *) hostData_ ,
-                                  0 , 0 , 0 );
+                                  0 , 0 , &clTransferEvent_ );
 
     if( error != CL_SUCCESS )
     {
         oclHWDL::Error::checkCLError( error );
         LOG_ERROR("OpenCL Error!");
     }
+
+    transferTime_ = calculateTransferTime_();
 
 }
 
@@ -128,7 +130,7 @@ void CLFrame< T >::readDeviceData( cl_command_queue cmdQueue ,
                                  offset_.imageSize( ) * pixelSize( ) ,
                                  region_.imageSize( ) * pixelSize( ) ,
                                  ( void * ) hostData_ ,
-                                 0 , 0 , 0);
+                                 0 , 0 , &clTransferEvent_ );
 
     if( error != CL_SUCCESS )
     {
@@ -137,6 +139,8 @@ void CLFrame< T >::readDeviceData( cl_command_queue cmdQueue ,
     }
     //Now, neither QPixmap frame_ nor rgbaFrame represents the recent raw data.
     pixmapSynchronized_ = false ;
+
+    transferTime_ = calculateTransferTime_();
 
 }
 
@@ -157,7 +161,7 @@ void CLFrame< T >::readOtherDeviceData(
                                  offset_.imageSize( ) * pixelSize( ) ,
                                  region_.imageSize( ) * pixelSize( ) ,
                                  ( void * ) hostData_ ,
-                                 0 , 0 , 0 );
+                                 0 , 0 , &clTransferEvent_ );
 
     if( error != CL_SUCCESS )
     {
@@ -166,6 +170,8 @@ void CLFrame< T >::readOtherDeviceData(
     }
     //Now, neither QPixmap frame_ nor rgbaFrame represents the recent raw data.
     pixmapSynchronized_ = false ;
+
+    transferTime_ = calculateTransferTime_();
 }
 
 template< class T >
@@ -189,7 +195,7 @@ void CLFrame< T >::copyDeviceData(
                 frame.getOffset( ).imageSize( ) * frame.pixelSize( ) ,
                 offset_.imageSize( ) * pixelSize( ) ,
                 region_.imageSize() * pixelSize( ) ,
-                0 , 0 , 0 ) ;
+                0 , 0 , &clTransferEvent_ ) ;
 
     if( error != CL_SUCCESS )
     {
@@ -200,6 +206,7 @@ void CLFrame< T >::copyDeviceData(
     if( blocking )
         clFinish( cmdQueue );
 
+    transferTime_ = calculateTransferTime_();
 }
 
 
@@ -379,6 +386,49 @@ void CLFrame< T >::convertColorToRGBA_( uint Color ,
     g = Color & 0xFF; Color >>= 8;
     r = Color & 0xFF; Color >>= 8;
     a = Color & 0xFF;
+}
+
+template< class T >
+float CLFrame< T >::calculateTransferTime_( )
+{
+    // Assuming that every thing is going in the right direction.
+    cl_int clErrorCode = CL_SUCCESS;
+
+    cl_ulong start , end;
+
+    clErrorCode =
+            clWaitForEvents( 1 , &clTransferEvent_ );
+
+
+    clErrorCode |=
+            clGetEventProfilingInfo( clTransferEvent_,
+                                     CL_PROFILING_COMMAND_END,
+                                     sizeof(cl_ulong),
+                                     &end,
+                                     0 );
+
+    clErrorCode |=
+            clGetEventProfilingInfo( clTransferEvent_,
+                                     CL_PROFILING_COMMAND_START,
+                                     sizeof(cl_ulong),
+                                     &start,
+                                     0 );
+
+
+    if( clErrorCode != CL_SUCCESS )
+    {
+        oclHWDL::Error::checkCLError( clErrorCode );
+        LOG_ERROR("Exiting Due to OpenCL Error!");
+    }
+
+    return static_cast< float >( end -  start ) / 1e6 ;
+
+}
+
+template< class T >
+float CLFrame< T >::getTransferTime() const
+{
+    return transferTime_;
 }
 
 template< class T >

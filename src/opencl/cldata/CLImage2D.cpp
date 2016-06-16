@@ -82,13 +82,15 @@ void CLImage2D< T >::writeDeviceData( cl_command_queue cmdQueue,
                 this->region_.x * CLFrame< T >::pixelSize()  ,
                 this->region_.imageSize() * CLFrame< T >::pixelSize() ,
                 ( const void * ) this->hostData_ ,
-                0 , 0 , 0 );
+                0 , 0 , &this->clTransferEvent_ );
 
     if( error != CL_SUCCESS )
     {
         oclHWDL::Error::checkCLError( error );
         LOG_ERROR("OpenCL Error!");
     }
+
+    this->transferTime_ = CLFrame< T >::calculateTransferTime_();
 }
 
 template< class T >
@@ -110,12 +112,14 @@ void CLImage2D< T >::readDeviceData( cl_command_queue cmdQueue ,
                 this->region_.x * CLFrame< T >::pixelSize()  ,
                 this->region_.imageSize() * CLFrame< T >::pixelSize() ,
                 ( void *) this->hostData_ ,
-                0 , 0 , 0 );
+                0 , 0 , &this->clTransferEvent_ );
     if( error != CL_SUCCESS )
     {
         oclHWDL::Error::checkCLError( error );
         LOG_ERROR("OpenCL Error!");
     }
+
+    this->transferTime_ = CLFrame< T >::calculateTransferTime_();
 }
 
 template< class T >
@@ -140,13 +144,15 @@ void CLImage2D< T >::readOtherDeviceData(
                 this->region_.x * CLFrame< T >::pixelSize() ,
                 this->region_.imageSize() * CLFrame< T >::pixelSize() ,
                 ( void * ) this->hostData_ ,
-                0 , 0 , 0 );
+                0 , 0 , &this->clTransferEvent_ );
 
     if( error != CL_SUCCESS )
     {
         oclHWDL::Error::checkCLError( error );
         LOG_ERROR("OpenCL Error!");
     }
+
+    this->transferTime_ = CLFrame< T >::calculateTransferTime_();
 }
 
 

@@ -260,6 +260,12 @@ public:
     void setRegion( const Dimensions2D  &offset ,
                     const Dimensions2D &region );
 
+    /**
+     * @brief getTransferTime
+     * @return
+     */
+    float getTransferTime() const;
+
 protected:
     /**
      * @brief releaseDeviceData_
@@ -287,6 +293,11 @@ protected:
                               uint8_t &b , uint8_t &a );
 
 
+    /**
+     * @brief calculateTransferTime_
+     * @return
+     */
+    float calculateTransferTime_();
 protected:
 
     /**
@@ -329,6 +340,11 @@ protected:
      */
     cl_context context_ ;
 
+    /**
+     * @brief transferEvent_
+     */
+    cl_event clTransferEvent_ ;
+
     //flags
     /**
      * @brief pixmapSynchronized_
@@ -350,11 +366,16 @@ protected:
      */
     const FRAME_CHANNEL_ORDER channelOrder_ ;
 
-
     /**
      * @brief readWriteLock_
      */
     mutable QReadWriteLock regionLock_;
+
+    /**
+     * @brief transferTime_
+     */
+    float transferTime_ ;
+
 };
 
 

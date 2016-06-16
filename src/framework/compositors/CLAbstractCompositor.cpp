@@ -24,6 +24,11 @@ uint64_t CLAbstractCompositor::getGPUIndex() const
     return gpuIndex_ ;
 }
 
+std::string CLAbstractCompositor::getGPUName() const
+{
+    return name_;
+}
+
 bool CLAbstractCompositor::readOutReady() const
 {
     return readOutReady_ ;
@@ -50,6 +55,7 @@ void CLAbstractCompositor::selectGPU_()
     // Select the GPU that will be used for running the kernel
     oclHWDL::Device* selectedGPU = listGPUs.at( gpuIndex_ );
     device_ = selectedGPU->getId();
+    name_ = selectedGPU->getName();
 
     // Get the platform that corresponds to the GPU
     platform_ = selectedGPU->getPlatform()->getPlatformId();
