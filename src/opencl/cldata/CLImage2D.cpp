@@ -152,7 +152,8 @@ void CLImage2D< T >::readOtherDeviceData(
         LOG_ERROR("OpenCL Error!");
     }
 
-    this->transferTime_ = CLFrame< T >::calculateTransferTime_();
+//    LOG_DEBUG("Calculate Transfer Time");
+//    this->transferTime_ = CLFrame< T >::calculateTransferTime_();
 }
 
 
