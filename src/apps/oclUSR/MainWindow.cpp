@@ -364,7 +364,7 @@ void MainWindow::startRendering_( )
 
     parallelRenderer_.startRendering();
     parallelRenderer_.activateRenderingKernel_SLOT(
-                clparen::CLKernel::RenderingMode::RENDERING_MODE_Ultrasound );
+                clparen::CLKernel::RenderingMode::RENDERING_MODE_Shaded );
 
 
 }
