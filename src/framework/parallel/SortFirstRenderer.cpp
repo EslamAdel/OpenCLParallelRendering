@@ -239,6 +239,12 @@ void SortFirstRenderer< V , F >::pixmapReady_SLOT(
     emit this->finalFrameReady_SIGNAL( pixmap );
 }
 
+template< class V , class F >
+void SortFirstRenderer< V , F >::setLoadBalancing( bool useLoadBalancing )
+{
+    useLoadBalancing_ = useLoadBalancing;
+}
+
 
 template< class V , class F >
 void SortFirstRenderer< V , F >::applyTransformation_()
@@ -256,9 +262,8 @@ void SortFirstRenderer< V , F >::applyTransformation_()
     renderedFramesCount_ = 0 ;
     assembledFramesCount_ = 0 ;
 
-
     TIC( loadBalancingProfile.loadBlancing_TIMER );
-    heuristicLoadBalance_();
+    if( useLoadBalancing_ ) heuristicLoadBalance_();
     TOC( loadBalancingProfile.loadBlancing_TIMER );
 
     // fetch new transformations if exists.

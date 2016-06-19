@@ -60,6 +60,14 @@ public:
                            const Renderer::CLAbstractRenderer * renderer ) Q_DECL_OVERRIDE;
 
 
+
+    /**
+     * @brief setLoadBalancing
+     * @param useLoadBalancing
+     */
+    void setLoadBalancing( bool useLoadBalancing );
+
+
 protected:
     void applyTransformation_() Q_DECL_OVERRIDE;
 
@@ -124,6 +132,12 @@ protected:
      * @brief renderingLoopCounter_
      */
     uint64_t renderingLoopCounter_ ;
+
+
+    /**
+     * @brief useLoadBalancing_
+     */
+    bool useLoadBalancing_ ;
 
 };
 

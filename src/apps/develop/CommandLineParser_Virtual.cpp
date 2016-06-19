@@ -39,6 +39,7 @@ CommandLineParser_Virtual::tokenize_virtual( Volume<uchar> *&volume ,
         }
 
     }
+    LoadBalancingMode loadBalancingMode_dummy;
 
     std::list< uint > renderers ;
     uint compositorIndex ;
@@ -47,6 +48,7 @@ CommandLineParser_Virtual::tokenize_virtual( Volume<uchar> *&volume ,
                            frameHeight ,
                            renderers ,
                            compositorIndex ,
+                           loadBalancingMode_dummy ,
                            errorMessage );
 }
 

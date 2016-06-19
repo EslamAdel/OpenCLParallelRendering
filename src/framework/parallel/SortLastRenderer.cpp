@@ -10,12 +10,14 @@ namespace clparen {
 namespace Parallel{
 
 template< class V , class F >
-        SortLastRenderer< V , F >::SortLastRenderer(
+SortLastRenderer< V , F >::SortLastRenderer(
         Volume< V > *volume ,
         const uint64_t frameWidth ,
         const uint64_t frameHeight ,
+        const LoadBalancingMode loadBalancing ,
         const CLData::FRAME_CHANNEL_ORDER channelOrder )
     : baseVolume_( volume ),
+      loadBalancingMode_( loadBalancing ) ,
       CLAbstractParallelRenderer( frameWidth , frameHeight , channelOrder )
 {
 
@@ -351,7 +353,25 @@ void SortLastRenderer< V , F >::pixmapReady_SLOT(
 template< class V , class F >
 void SortLastRenderer< V , F >::distributeBaseVolume()
 {
-    distributeBaseVolume1D();
+
+    switch( loadBalancingMode_ )
+    {
+    case LoadBalancingMode::LOAD_BALANCING_COMPUTATIONAL :
+        distributeBaseVolumeWeighted();
+        break;
+
+    case LoadBalancingMode::LOAD_BALANCING_MEMORY :
+        distributeBaseVolumeMemoryWeighted();
+        break;
+
+    case LoadBalancingMode::LOAD_BALANCING_OFF:
+        distributeBaseVolume1D();
+        break;
+
+    default:
+        LOG_ERROR("Unexpected value!");
+    }
+
 }
 
 template< class V , class F >

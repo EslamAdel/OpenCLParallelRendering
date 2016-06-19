@@ -1,6 +1,5 @@
 #include <QApplication>
-#include <QCommandLineParser>
-#include "CommandLineParser_Benchmark.h"
+#include "CommandLineParser_SortFirst.h"
 #include "clparen.h"
 
 void setTransferFunction( clparen::Parallel::CLAbstractParallelRenderer &parallelRenderer );
@@ -14,20 +13,18 @@ int main( int argc, char *argv[] )
     QCoreApplication::setApplicationName("oclUSR Benchmark");
 
     QCommandLineParser parser;
-    CommandLineParserBenchmark myParser( app , parser , "oclUSR Benchmark Help" );
+    CommandLineParserSortFirst myParser( app , parser , "oclUSR Help" );
 
     Volume< uchar > *volume ;
     uint frameWidth , frameHeight ;
     std::list< uint > deployGPUs ;
-    uint compositorGPUIndex ;
+    bool loadBalancing ;
     QString *errorMessage = nullptr ;
-    bool gui = false ;
-
 
     CommandLineParser::CommandLineResult result =
-            myParser.tokenize_benchmark( volume , frameWidth , frameHeight ,
-                                         deployGPUs , compositorGPUIndex ,
-                                         errorMessage , gui , testFrames );
+            myParser.tokenize_sortfirst( volume , frameWidth , frameHeight ,
+                                         deployGPUs , errorMessage, testFrames ,
+                                         loadBalancing );
 
     switch( result )
     {
@@ -49,7 +46,7 @@ int main( int argc, char *argv[] )
 
     parallelRenderer.initializeRenderers();
     parallelRenderer.distributeBaseVolume();
-
+    parallelRenderer.setLoadBalancing( loadBalancing );
 
     parallelRenderer.startRendering();
     parallelRenderer.activateRenderingKernel_SLOT(

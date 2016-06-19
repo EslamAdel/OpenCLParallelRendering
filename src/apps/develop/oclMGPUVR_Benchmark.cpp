@@ -8,6 +8,7 @@
 
 uint testFrames = 0 ;
 
+using namespace clparen::Parallel;
 
 int main(int argc, char *argv[])
 {
@@ -28,12 +29,13 @@ int main(int argc, char *argv[])
     uint compositorGPUIndex ;
     QString *errorMessage = nullptr ;
     bool gui = false ;
-    //uint testFrames = 0 ;
+    LoadBalancingMode balancingMode ;
 
     CommandLineParser::CommandLineResult result =
             myParser.tokenize_benchmark( volume , frameWidth , frameHeight ,
                                          deployGPUs , compositorGPUIndex ,
-                                         errorMessage , gui , testFrames );
+                                         balancingMode,  errorMessage ,
+                                         gui , testFrames );
 
     switch( result )
     {
@@ -48,14 +50,15 @@ int main(int argc, char *argv[])
     }
 
     clparen::Parallel::SortLastRenderer< uchar , float >
-            parallelRenderer( volume , frameWidth , frameHeight );
+            parallelRenderer( volume , frameWidth ,
+                              frameHeight , balancingMode );
 
     for( const uint rendererIndex : deployGPUs )
         parallelRenderer.addCLRenderer( rendererIndex );
 
     parallelRenderer.addCLCompositor( compositorGPUIndex );
 
-    parallelRenderer.distributeBaseVolumeMemoryWeighted();
+    parallelRenderer.distributeBaseVolume();
 
 
 

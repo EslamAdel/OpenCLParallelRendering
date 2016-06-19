@@ -15,6 +15,10 @@ namespace Parallel {
 
 
 
+enum LoadBalancingMode { LOAD_BALANCING_MEMORY ,
+                         LOAD_BALANCING_COMPUTATIONAL ,
+                         LOAD_BALANCING_OFF };
+
 
 /**
  * @brief The SortLastRenderer class
@@ -25,6 +29,7 @@ class SortLastRenderer : public CLAbstractParallelRenderer
 
 public:
 
+
     /**
      * @brief SortLastRenderer
      * @param volume
@@ -32,9 +37,16 @@ public:
      * @param frameHeight
      */
     SortLastRenderer(
+
             Volume< V >* volume ,
+
             const uint64_t frameWidth = 512 ,
+
             const uint64_t frameHeight = 512 ,
+
+            const LoadBalancingMode loadBalancingMdoe
+            = LoadBalancingMode::LOAD_BALANCING_OFF ,
+
             const CLData::FRAME_CHANNEL_ORDER channelOrder
             = CLData::FRAME_CHANNEL_ORDER::ORDER_INTENSITY );
 
@@ -65,6 +77,8 @@ public:
 
     void initializeRenderers() Q_DECL_OVERRIDE;
 
+protected:
+
     /**
      * @brief distributeBaseVolume1D
      * Distribute the baseVolume_ over the CLRenderers_ evenly based on
@@ -90,6 +104,10 @@ protected:
     Volume< V > *baseVolume_;
 
 
+    /**
+     * @brief loadBalancingMode_
+     */
+    const LoadBalancingMode loadBalancingMode_;
 };
 
 }

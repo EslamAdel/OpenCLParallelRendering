@@ -6,6 +6,9 @@
 #include <QCommandLineParser>
 #include "CommandLineParser.h"
 
+
+using namespace clparen::Parallel;
+
 int main(int argc, char *argv[])
 {
 
@@ -25,10 +28,11 @@ int main(int argc, char *argv[])
     std::list< uint > deployGPUs ;
     uint compositorGPUIndex ;
     QString *errorMessage = nullptr ;
+    LoadBalancingMode balancingMode ;
 
     CommandLineParser::CommandLineResult result =
             myParser.tokenize( volume , frameWidth , frameHeight , deployGPUs ,
-                               compositorGPUIndex , errorMessage );
+                               compositorGPUIndex , balancingMode , errorMessage );
 
     switch( result )
     {
@@ -49,8 +53,8 @@ int main(int argc, char *argv[])
     //        LOG_INFO("Deploy GPU<%d>", index );
     //    LOG_INFO("compositor: GPU<%d>", compositorGPUIndex );
 
-    clparen::Parallel::SortFirstRenderer< uchar , float >
-            parallelRenderer( volume , frameWidth , frameHeight );
+    clparen::Parallel::SortLastRenderer< uchar , float >
+            parallelRenderer( volume , frameWidth , frameHeight , balancingMode );
 
 
 

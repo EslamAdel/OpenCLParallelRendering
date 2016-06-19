@@ -5,6 +5,7 @@
 #include "CommandLineParser.h"
 #include "oclHWDL.h"
 
+using namespace clparen::Parallel;
 
 
 #define DEFAULT_TEST_TURNS 5
@@ -22,18 +23,20 @@ public:
 
 
 
-    CommandLineResult tokenize_benchmark( Volume<uchar> *&volume ,
-                                          uint &frameWidth ,
-                                          uint &frameHeight ,
-                                          std::list<uint> &renderers ,
-                                          uint &compositorGPUIndex ,
-                                          QString *&errorMessage ,
-                                          bool &gui ,
-                                          uint &testFrames );
+    CommandLineResult tokenize_benchmark(
+            Volume<uchar> *&volume ,
+            uint &frameWidth ,
+            uint &frameHeight ,
+            std::list<uint> &renderers ,
+            uint &compositorGPUIndex ,
+            LoadBalancingMode &balancingMode ,
+            QString *&errorMessage ,
+            bool &gui ,
+            uint &testFrames );
 
-private:
+protected:
 
-    void addMoreDefinitions_();
+    virtual void addMoreDefinitions_();
 };
 
 #endif // COMMANDLINEPARSER_H

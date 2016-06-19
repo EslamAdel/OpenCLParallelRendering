@@ -72,7 +72,18 @@ void CommandLineParser::addDefinitions_( )
                                    "set, default GPU index "
                                    "will be deployed." ,
                                    "Compositor Index" ,
-                                   QString::number( DEFAULT_COMPOSITOR_INDEX ));
+                                   QString::number( DEFAULT_COMPOSITOR_INDEX ))
+            <<
+               QCommandLineOption( QStringList() << "M" << "balancing-mode" ,
+                                   "Choose static load balancing option: "
+                                   "(0)Set Load Balancing off (default), "
+                                   "(1)Memory-Based Load Balancing, "
+                                   "(2)Computational-Based Load Balancing. "
+                                   "Note: This option is considered only for "
+                                   "sort last rendering." ,
+                                   "Balancing-Mode" ,
+                                   QString::number( 0 ));
+
 
     parser_.addOptions( options );
 
@@ -115,12 +126,14 @@ std::list< uint > &CommandLineParser::getAllGPUs_() const
 }
 
 CommandLineParser::CommandLineResult
-CommandLineParser::tokenize( Volume<uchar> *&volume ,
-                             uint &frameWidth ,
-                             uint &frameHeight ,
-                             std::list< uint > &renderers ,
-                             uint &compositorGPUIndex ,
-                             QString *&errorMessage )
+CommandLineParser::tokenize(
+        Volume<uchar> *&volume ,
+        uint &frameWidth ,
+        uint &frameHeight ,
+        std::list< uint > &renderers ,
+        uint &compositorGPUIndex ,
+        LoadBalancingMode &mode ,
+        QString *&errorMessage )
 {
     parser_.process( app_ );
 
@@ -172,6 +185,20 @@ CommandLineParser::tokenize( Volume<uchar> *&volume ,
     {
         errorMessage = new QString("Bad GPU index");
         return CommandLineResult::CommandLineError ;
+    }
+
+    switch( parser_.value("balancing-mode").toUInt())
+    {
+    case 1:
+        mode = LoadBalancingMode::LOAD_BALANCING_MEMORY ;
+        break;
+
+    case 2:
+        mode = LoadBalancingMode::LOAD_BALANCING_COMPUTATIONAL;
+        break;
+
+    default:
+        mode = LoadBalancingMode::LOAD_BALANCING_OFF;
     }
 
     return CommandLineResult::CommandLineOk ;

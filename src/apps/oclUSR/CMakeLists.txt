@@ -5,6 +5,10 @@
 ### Application name
 set( OCL_USR_APP_EXECUTABLE "oclUSR" )
 
+
+### To use the CommandLineParser class as is.
+include_directories( ../develop )
+
 ### Application source/header/ui files
 set( OCL_USR_APP_SOURCES oclUSR.cpp
     ColorMapWidget.cpp
@@ -13,7 +17,10 @@ set( OCL_USR_APP_SOURCES oclUSR.cpp
     MainWindow.cpp
     TransferFunctionEditor.cpp
     oclUSRWindow.cpp
-    CommandLineParser.cpp
+    CommandLineParser_SortFirst.cpp
+    ../develop/CommandLineParser.cpp
+    ../develop/CommandLineParser_Benchmark.cpp
+
     )
 set( OCL_USR_APP_HEADERS 
     ColorMapWidget.h
@@ -23,7 +30,10 @@ set( OCL_USR_APP_HEADERS
     oclUSRWindow.h
     MainWindow.h
     TransferFunctionEditor.cpp
-    CommandLineParser.h
+    CommandLineParser_SortFirst.h
+    ../develop/CommandLineParser.h
+    ../develop/CommandLineParser_Benchmark.h
+
     )
 set( OCL_USR_APP_FORMS 
     TransferFunctionEditor.ui
@@ -61,13 +71,16 @@ message("Benchmarking Executable Setting...")
 set( OCL_USR_BENCHMARK_EXECUTABLE "oclUSR_Benchmark" )
 
 ## BENCHMARKING source/header files.
-set( OCL_USR_BENCHMARK_HEADER_FILES     CommandLineParser.h
-    CommandLineParser_Benchmark.h )
+set( OCL_USR_BENCHMARK_HEADER_FILES
+    ../develop/CommandLineParser.h
+    ../develop/CommandLineParser_Benchmark.h
+    CommandLineParser_SortFirst.h )
 
 set( OCL_USR_BENCHMARK_SOURCE_FILES
     oclUSR_Benchmark.cpp
-    CommandLineParser_Benchmark.cpp
-    CommandLineParser.cpp )
+    ../develop/CommandLineParser_Benchmark.cpp
+    ../develop/CommandLineParser.cpp
+    CommandLineParser_SortFirst.cpp )
 
 set( OCL_USR_BENCHMARK_APP_FORMS ${OCL_MGPUVR_APP_FORMS} )
 

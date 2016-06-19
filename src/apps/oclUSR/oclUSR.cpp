@@ -3,8 +3,7 @@
 #include "MainWindow.h"
 #include "TransferFunctionEditor.h"
 #include "oclUSRWindow.h"
-#include <QCommandLineParser>
-#include "CommandLineParser.h"
+#include "CommandLineParser_SortFirst.h"
 
 int main( int argc, char *argv[] )
 {
@@ -12,29 +11,32 @@ int main( int argc, char *argv[] )
 
     QCoreApplication::setApplicationName("oclUSR");
 
+
     QCommandLineParser parser;
-    CommandLineParser myParser( app , parser , "oclUSR Help" );
+    CommandLineParserSortFirst myParser( app , parser , "oclUSR Help" );
 
     Volume< uchar > *volume ;
     uint frameWidth , frameHeight ;
     std::list< uint > deployGPUs ;
-    uint compositorGPUIndex ;
+    bool loadBalancing ;
     QString *errorMessage = nullptr ;
+    uint testFrames ;
 
     CommandLineParser::CommandLineResult result =
-            myParser.tokenize( volume , frameWidth , frameHeight , deployGPUs ,
-                               compositorGPUIndex , errorMessage );
+            myParser.tokenize_sortfirst( volume , frameWidth , frameHeight ,
+                                         deployGPUs , errorMessage, testFrames ,
+                                         loadBalancing );
 
     switch( result )
     {
-        case CommandLineParser::CommandLineError :
-        {
-            if( errorMessage != nullptr )
-                LOG_ERROR("%s", errorMessage->toStdString().c_str() );
-            else
-                LOG_ERROR("Unknown Error");
-            break ;
-        }
+    case CommandLineParser::CommandLineError :
+    {
+        if( errorMessage != nullptr )
+            LOG_ERROR("%s", errorMessage->toStdString().c_str() );
+        else
+            LOG_ERROR("Unknown Error");
+        break ;
+    }
     }
 
     clparen::Parallel::SortFirstRenderer< uchar , uint8_t >
@@ -45,7 +47,7 @@ int main( int argc, char *argv[] )
 
     parallelRenderer.initializeRenderers();
     parallelRenderer.distributeBaseVolume();
-
+    parallelRenderer.setLoadBalancing( loadBalancing );
 
 
     MainWindow* mainWindow = new MainWindow( parallelRenderer );

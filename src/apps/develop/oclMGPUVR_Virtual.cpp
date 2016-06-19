@@ -55,7 +55,7 @@ int main(int argc, char *argv[])
 
     parallelRenderer.addCLCompositor( 0 );
 
-    parallelRenderer.distributeBaseVolume1D();
+    parallelRenderer.distributeBaseVolume();
 
     RenderingWindow rw( &parallelRenderer ) ;
     rw.show();

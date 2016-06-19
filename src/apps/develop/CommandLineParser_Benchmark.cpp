@@ -16,13 +16,15 @@ CommandLineParserBenchmark::CommandLineParserBenchmark(
 
 
 CommandLineParser::CommandLineResult
-CommandLineParserBenchmark::tokenize_benchmark( Volume<uchar> *&volume,
-                                                uint &frameWidth,
-                                                uint &frameHeight,
-                                                std::list<uint> &renderers,
-                                                uint &compositorGPUIndex,
-                                                QString *&errorMessage ,
-                                                bool &gui , uint &testFrames )
+CommandLineParserBenchmark::tokenize_benchmark(
+        Volume<uchar> *&volume,
+        uint &frameWidth,
+        uint &frameHeight,
+        std::list<uint> &renderers,
+        uint &compositorGPUIndex,
+        LoadBalancingMode &balancingMode ,
+        QString *&errorMessage ,
+        bool &gui , uint &testFrames )
 {
     addMoreDefinitions_( );
 
@@ -36,7 +38,8 @@ CommandLineParserBenchmark::tokenize_benchmark( Volume<uchar> *&volume,
     testFrames = parser_.value( "T" ).toUInt() * 360 ;
 
     return this->tokenize( volume , frameWidth , frameHeight ,
-                           renderers , compositorGPUIndex , errorMessage );
+                           renderers , compositorGPUIndex ,
+                           balancingMode , errorMessage );
 }
 
 void CommandLineParserBenchmark::addMoreDefinitions_()

@@ -3,12 +3,14 @@
 #include "Volume.h"
 #include <QCommandLineParser>
 #include "oclHWDL.h"
+#include "SortLastRenderer.h"
 
 #define DEFAULT_FRAME_WIDTH 512
 #define DEFAULT_FRAME_HEIGHT 512
 #define MAX_FRAME_DIMENSION 2048
 #define DEFAULT_COMPOSITOR_INDEX 0
 
+using namespace clparen::Parallel;
 
 class CommandLineParser
 {
@@ -27,12 +29,15 @@ public:
 
 
 
-    CommandLineParser::CommandLineResult tokenize( Volume<uchar> *&volume ,
-                                                   uint &frameWidth ,
-                                                   uint &frameHeight ,
-                                                   std::list<uint> &renderers ,
-                                                   uint &compositorGPUIndex ,
-                                                   QString *&errorMessage );
+    CommandLineParser::CommandLineResult tokenize(
+            Volume<uchar> *&volume ,
+            uint &frameWidth ,
+            uint &frameHeight ,
+            std::list<uint> &renderers ,
+            uint &compositorGPUIndex ,
+            LoadBalancingMode &mode ,
+            QString *&errorMessage );
+
 private:
 
     void addDefinitions_( );
