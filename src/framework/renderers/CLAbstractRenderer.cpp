@@ -224,15 +224,13 @@ void CLAbstractRenderer::setSortFirstSettings(
 }
 
 
-double CLAbstractRenderer::calculateRenderingTime_()
+float CLAbstractRenderer::calculateRenderingTime_()
 {
     // Assuming that every thing is going in the right direction.
     cl_int clErrorCode = CL_SUCCESS;
 
     cl_ulong start , end;
 
-    clErrorCode =
-            clWaitForEvents( 1 , &clGPUExecution_ );
 
 
     clErrorCode |=
@@ -256,7 +254,7 @@ double CLAbstractRenderer::calculateRenderingTime_()
         LOG_ERROR("Exiting Due to OpenCL Error!");
     }
 
-    return static_cast< double >( end -  start ) / 1e6 ;
+    return static_cast< float >( end -  start ) / 1e6 ;
 }
 
 const Dimensions2D &CLAbstractRenderer::getSortFirstOffset() const

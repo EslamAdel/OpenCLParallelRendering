@@ -212,7 +212,7 @@ protected:
     /**
      * @brief calculateRenderingTime_
      */
-    virtual double calculateRenderingTime_( );
+    virtual float calculateRenderingTime_( );
 
     /**
      * @brief defaultRenderingMode_

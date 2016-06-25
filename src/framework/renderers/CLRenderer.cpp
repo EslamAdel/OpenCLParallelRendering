@@ -191,9 +191,12 @@ void CLRenderer< V , F >::renderFrame_()
                 &clGPUExecution_ );
 
 
-    renderingTime_ = calculateRenderingTime_();
+//    clFinish( commandQueue_ );
 
-    clFinish( commandQueue_ );
+    clErrorCode |=
+            clWaitForEvents( 1 , &clGPUExecution_ );
+
+    renderingTime_ = calculateRenderingTime_();
 
     if( clErrorCode != CL_SUCCESS )
     {
@@ -435,11 +438,11 @@ void CLRenderer< V , F >::paint_()
 
     TOC( RENDERING_PROFILE( gpuIndex_ ).mvMatrix_TIMER );
 
-    TIC( RENDERING_PROFILE( gpuIndex_ ).rendering_TIMER );
 
     renderFrame_( );
 
-    TOC( RENDERING_PROFILE( gpuIndex_ ).rendering_TIMER );
+    ACCUMULATE( RENDERING_PROFILE( gpuIndex_ ).rendering_TIMER ,
+                renderingTime_ );
 }
 
 

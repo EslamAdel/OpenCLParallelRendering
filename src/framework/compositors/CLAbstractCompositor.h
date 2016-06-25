@@ -15,8 +15,8 @@
 #include "CLMaxIntensityProjectionCompositingKernel.h"
 #include "CLMinIntensityProjectionCompositingKernel.h"
 
-#define LOCAL_SIZE_X    16
-#define LOCAL_SIZE_Y    16
+#define COMPOSITING_LOCAL_SIZE_X    16
+#define COMPOSITING_LOCAL_SIZE_Y    16
 
 
 namespace clparen {

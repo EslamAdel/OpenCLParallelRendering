@@ -67,11 +67,8 @@ void SortFirstRenderer< V , F >::addCLRenderer( const uint64_t gpuIndex )
 
     rendererPool_.setMaxThreadCount( renderers_.size( ));
 
-
-    // Map the signal emitted from rendering node after rendering is finished
-    // to the corresponding slot.
-    connect( renderer ,
-             SIGNAL( finishedRendering( Renderer::CLAbstractRenderer* )),
+    connect( this ,
+             SIGNAL( finishedRendering_SIGNAL( Renderer::CLAbstractRenderer* )),
              this ,
              SLOT( finishedRendering_SLOT( Renderer::CLAbstractRenderer* )));
 
@@ -98,13 +95,10 @@ void SortFirstRenderer< V , F >::distributeBaseVolume( )
     QVector< QFuture< void >> loadVolumeFuture;
 
     for( Renderer::CLAbstractRenderer *renderer : renderers_ )
-    {
         loadVolumeFuture.append(
                     QtConcurrent::run( renderer ,
                                        &Renderer::CLAbstractRenderer::loadVolume,
                                        volume ));
-    }
-
 
     for( QFuture< void > &future : loadVolumeFuture )
         future.waitForFinished();
@@ -165,19 +159,14 @@ void SortFirstRenderer< V , F >::finishedRendering_SLOT(
         LOG_ERROR("Foreign thread!");
 
 
-//#ifdef BENCHMARKING
-//    static int renderedFrames = 0 ;
-//    if( ++rendererdFrames == 1 )
-//        TIC( compositingProfile.compositing_TIMER );
-//    else if( renderedFrames == renderers_.size())
-//        renderedFrames = 0 ;
-
-//#endif
-
+#ifdef BENCHMARKING
+    compositingFinished_SLOT();
+#else
 
     QtConcurrent::run(  this , &SortFirstRenderer::assemble_ ,
                         renderer , clFrame_.data( ));
 
+#endif
 
 }
 
@@ -192,8 +181,13 @@ void SortFirstRenderer< V , F >::compositingFinished_SLOT( )
         return;
 
 
+    ACCUMULATE( frameworkProfile.renderingLoop_TIMER ,
+                renderingLoopTime_( ));
 
-    TOC( frameworkProfile.renderingLoop_TIMER );
+
+    calculateTransferTimeMean_();
+    renderingLoopCounter_++;
+
 
     if( pendingTransformations_ )
         applyTransformation_();
@@ -252,26 +246,20 @@ void SortFirstRenderer< V , F >::applyTransformation_()
     if( QThread::currentThread() != this->thread())
         LOG_ERROR("Foreign thread!");
 
-    calculateTransferTimeMean_();
-    renderingLoopCounter_++;
-
-    TIC( frameworkProfile.renderingLoop_TIMER );
 
     renderersReady_ = false;
     pendingTransformations_ = false;
     renderedFramesCount_ = 0 ;
     assembledFramesCount_ = 0 ;
 
-    TIC( loadBalancingProfile.loadBlancing_TIMER );
     if( useLoadBalancing_ ) heuristicLoadBalance_();
-    TOC( loadBalancingProfile.loadBlancing_TIMER );
 
     // fetch new transformations if exists.
     syncTransformation_( );
 
 
     for( Renderer::CLAbstractRenderer *renderer : renderers_ )
-        QtConcurrent::run( &SortFirstRenderer::render_ ,
+        QtConcurrent::run( this , &SortFirstRenderer::render_ ,
                            renderer );
 
 }
@@ -289,8 +277,8 @@ void SortFirstRenderer< V , F >::benchmark_()
                transferTimeMean_[ renderer->getGPUIndex() ]);
     }
 
-    LOAD_BALANCING_PROFILE_TAG();
-    PRINT( loadBalancingProfile.loadBlancing_TIMER );
+//    LOAD_BALANCING_PROFILE_TAG();
+//    PRINT( loadBalancingProfile.loadBlancing_TIMER );
 
     FRAMEWORK_PROFILE_TAG( );
     PRINT( frameworkProfile.renderingLoop_TIMER );
@@ -303,12 +291,12 @@ template< class V , class F >
 void SortFirstRenderer< V , F >::heuristicLoadBalance_( )
 {
     if( QThread::currentThread() != this->thread())
-        LOG_ERROR("Foreign thread!");    
+        LOG_ERROR("Foreign thread!");
 
     const uint renderersCount = renderers_.size();
+    const float tolerance = 0.05f ;
+    const float epsilon = 0.01f ;
 
-    const float tolerance = 0.5f ;
-    const float epsilon = 0.05 ;
 
     if( renderersCount < 2 )
         return;
@@ -320,10 +308,8 @@ void SortFirstRenderer< V , F >::heuristicLoadBalance_( )
     float meanTime = 0.f ;
     for( const Renderer::CLAbstractRenderer *renderer : renderers_ )
     {
-//        LOG_DEBUG("%d:%p",i++, QThread::currentThread());
         float time = static_cast< float >( renderer->getRenderingTime( ));
         uint64_t frameWidth =  renderer->getSortFirstDimensions().x ;
-//        LOG_DEBUG("Last Width:%ld, time:%f", frameWidth , time );
         frameWidthChange.append( static_cast< float >( frameWidth ));
         renderingTime.append( time );
         meanTime += time;
@@ -334,7 +320,6 @@ void SortFirstRenderer< V , F >::heuristicLoadBalance_( )
                static_cast< int >( frameWidth ),
                static_cast< int >( renderer->getFrameDimensions().y ));
     }
-
     printf("\n");
 
 
@@ -356,9 +341,9 @@ void SortFirstRenderer< V , F >::heuristicLoadBalance_( )
         else if( ratio < 1.f - tolerance )
             ratio = 1.f - tolerance ;
 
-        frameWidthChange[ i ] *= ( 1.f - ratio );
+        frameWidthChange[ i ] *= ( 1.f - ratio ) ;
 
-//        LOG_DEBUG("delta=%f", frameWidthChange[i] );
+        //        LOG_DEBUG("delta=%f", frameWidthChange[i] );
 
         if( frameWidthChange[ i ] > 0 )
             positiveGap += frameWidthChange[ i ];
@@ -369,10 +354,8 @@ void SortFirstRenderer< V , F >::heuristicLoadBalance_( )
 
     // 3. If balanced enough (gap < epsilon), return.
     if( positiveGap + negativeGap < 2 * epsilon * frameWidth_ )
-    {
-//        LOG_DEBUG("Gap = %f < %f ", positiveGap + negativeGap ,2 * epsilon * frameWidth_ );
         return;
-    }
+
 
     // 4. Compute the actual changes in overloaded/underloaded frames.
     if( negativeGap > positiveGap)
@@ -395,13 +378,6 @@ void SortFirstRenderer< V , F >::heuristicLoadBalance_( )
 
     for( Renderer::CLAbstractRenderer *renderer : renderers_ )
     {
-//        LOG_DEBUG("New framewidth: %ld + %f = %ld, offset = %ld",
-//                  renderer->getSortFirstDimensions().x ,
-//                  frameWidthChange[ i ] ,
-//                  renderer->getSortFirstDimensions().x +
-//                  static_cast< int64_t >( frameWidthChange[ i ] ) ,
-//                  currentOffset );
-
         const uint64_t newFrameWidth =
                 renderer->getSortFirstDimensions().x +
                 static_cast< int64_t >( frameWidthChange[ i ] );
@@ -422,15 +398,15 @@ void SortFirstRenderer< V , F >::heuristicLoadBalance_( )
         i++;
         currentOffset += newFrameWidth ;
     }
-
-//    LOG_DEBUG("Gap:%f, thread:%p", positiveGap + negativeGap , QThread::currentThread( ));
-
     LOG_DEBUG("mean:%f,variance:%f",meanTime, variance);
 }
 
 template< class V , class F >
 void SortFirstRenderer< V , F >::calculateTransferTimeMean_()
 {
+
+    if( QThread::currentThread() != this->thread())
+        LOG_ERROR("Foreign thread!");
 
     if( renderingLoopCounter_ == 0 )
         return;
@@ -455,6 +431,17 @@ void SortFirstRenderer< V , F >::SortFirstRenderer::render_(
         Renderer::CLAbstractRenderer *renderer )
 {
     renderer->applyTransformation();
+
+#ifdef BENCHMARKING
+    CLData::CLImage2D< F > *clFrame =
+            renderer->getCLFrame().value< CLData::CLImage2D< F > *>();
+
+    clFrame->readDeviceData( renderer->getCommandQueue() ,
+                             CL_TRUE );
+#endif
+
+
+    emit this->finishedRendering_SIGNAL( renderer );
 }
 
 template< class V , class F >
@@ -462,6 +449,10 @@ void SortFirstRenderer< V , F >::assemble_(
         Renderer::CLAbstractRenderer *renderer ,
         CLData::CLFrame< F > *finalFrame )
 {
+#ifdef BENCHMARKING
+    LOG_ERROR("This not to be invoked in benchmarking mode");
+#endif
+
     CLData::CLImage2D< F > *clFrame =
             renderer->getCLFrame().value< CLData::CLImage2D< F > *>();
 
@@ -536,10 +527,40 @@ void SortFirstRenderer< V , F >::assemble_(
 template< class V , class F >
 void SortFirstRenderer< V , F >::clone_( )
 {
+#ifdef BENCHMARKING
+    LOG_ERROR("This not to be invoked in benchmarking mode");
+#endif
+
     frameCopyMutex_.lockForWrite();
     clFrameReadout_->copyHostData( *clFrame_.data( ));
     emit this->frameReady_SIGNAL( &clFrame_->getFramePixmap( ) , nullptr );
     frameCopyMutex_.unlock();
+}
+
+template< class V , class F >
+float SortFirstRenderer< V , F >::renderingLoopTime_()
+{
+#ifndef BENCHMARKING
+    LOG_ERROR("Invoked only in benchmarking mode!");
+#endif
+
+    if( QThread::currentThread() != this->thread())
+        LOG_ERROR("Foreign thread!");
+
+    float renderingLoopTime = 0 ;
+    for( const Renderer::CLAbstractRenderer *renderer : renderers_ )
+    {
+        const CLData::CLImage2D< F > *clFrame =
+                renderer->getCLFrame().value< CLData::CLImage2D< F > *>();
+        const float transferTime = clFrame->getTransferTime();
+        const float renderingTime =
+                static_cast< float >( renderer->getRenderingTime( ));
+
+        if( transferTime + renderingTime > renderingLoopTime )
+            renderingLoopTime = transferTime + renderingTime;
+    }
+
+    return renderingLoopTime;
 }
 
 

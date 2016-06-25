@@ -83,12 +83,14 @@ protected:
      */
     void calculateTransferTimeMean_();
 private:
-    static void render_( Renderer::CLAbstractRenderer *renderer );
+    void render_( Renderer::CLAbstractRenderer *renderer );
 
     void assemble_(  Renderer::CLAbstractRenderer *renderer,
                      CLData::CLFrame< F > *finalFrame   );
 
     void clone_( );
+
+    float renderingLoopTime_();
 
 protected:
     //Volume Data

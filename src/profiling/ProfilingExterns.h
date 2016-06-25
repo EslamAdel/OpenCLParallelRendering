@@ -7,6 +7,10 @@
 
 #ifdef BENCHMARKING
 
+#define ACCUMULATE( timer , time ) \
+    do{ timer.accumulate( time ); }\
+    while( 0 )
+
 #define TIC( timer ) \
     do{ timer.start(); } \
     while( 0 )
@@ -96,6 +100,11 @@
 #define TOC( timer ) \
     do{  } \
     while( 0 )
+
+#define ACCUMULATE( timer , time ) \
+    do{  }\
+    while( 0 )
+
 
 #define RENDERING_PROFILE( gpuIndex )\
     do{  } \

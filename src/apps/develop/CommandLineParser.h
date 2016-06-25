@@ -7,7 +7,7 @@
 
 #define DEFAULT_FRAME_WIDTH 512
 #define DEFAULT_FRAME_HEIGHT 512
-#define MAX_FRAME_DIMENSION 2048
+#define MAX_FRAME_DIMENSION 16384
 #define DEFAULT_COMPOSITOR_INDEX 0
 
 using namespace clparen::Parallel;

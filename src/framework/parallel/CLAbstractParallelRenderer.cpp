@@ -158,7 +158,7 @@ void CLAbstractParallelRenderer::updateRotationX_SLOT( int angle )
 {
     transformation_.rotation.x = angle ;
     if( renderersReady_ ) applyTransformation_();
-    pendingTransformations_ = true ;
+    else pendingTransformations_ = true ;
 }
 
 void CLAbstractParallelRenderer::updateRotationY_SLOT( int angle )

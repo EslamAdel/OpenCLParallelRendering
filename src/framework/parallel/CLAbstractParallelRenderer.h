@@ -143,7 +143,10 @@ signals:
     void finishedCompositing_SIGNAL( );
 
 
-
+    /**
+     * @brief finishedRendering_SIGNAL
+     */
+    void finishedRendering_SIGNAL( Renderer::CLAbstractRenderer* );
 
 public slots :
 
