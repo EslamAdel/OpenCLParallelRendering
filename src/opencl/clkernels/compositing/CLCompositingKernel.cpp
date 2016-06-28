@@ -29,11 +29,7 @@ void CLCompositingKernel::setFinalFrame(const cl_mem collageFrame)
     error = clSetKernelArg( kernelObject_, KernelArgument::KERNEL_ARG_FinalFrame,
                             sizeof( cl_mem ),
                             ( void* ) &collageFrame );
-    if( error != CL_SUCCESS )
-    {
-        oclHWDL::Error::checkCLError( error );
-        LOG_ERROR("Exiting due to OpenCL Error!");
-    }
+    CL_ASSERT( error );
 }
 
 
@@ -46,11 +42,7 @@ void CLCompositingKernel::setFrame( const cl_mem frameImage2D )
                             sizeof( cl_mem ),
                             ( void* ) &frameImage2D );
 
-    if( error != CL_SUCCESS )
-    {
-        oclHWDL::Error::checkCLError( error );
-        LOG_ERROR("Exiting due to OpenCL Error!");
-    }
+    CL_ASSERT( error );
 }
 
 void CLCompositingKernel::setDepthIndex( const cl_mem depthIndex )
@@ -61,11 +53,7 @@ void CLCompositingKernel::setDepthIndex( const cl_mem depthIndex )
                             sizeof( cl_mem ) ,
                             ( void* ) &depthIndex );
 
-    if( error != CL_SUCCESS )
-    {
-        oclHWDL::Error::checkCLError( error );
-        LOG_ERROR("Exiting due to OpenCL Error!");
-    }
+    CL_ASSERT( error );
 }
 
 

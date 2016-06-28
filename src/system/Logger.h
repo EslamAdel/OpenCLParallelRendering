@@ -4,6 +4,7 @@
 #include <LogLevel.hh>
 #include <iostream>
 #include <string>
+#include "oclHWDL.h"
 
 /**
  * @brief The Logger class
@@ -75,6 +76,10 @@ private: // Private Member Variables
 /** \brief Log error messages with out extra arguments */
 #define LOG_ERROR( ARG... )                                                     \
     Logger::instance()->log( ERROR, __FILE__, __LINE__, __FUNCTION__, ARG )
+
+#define CL_ASSERT( success ) if( success != CL_SUCCESS )                        \
+        LOG_ERROR("OpenCL Error:%s!", oclHWDL::Error::getErrorString( success ).c_str())
+
 
 #ifdef DEBUG_OPENGL_LOOP
 /** \brief Log debugging information for OpenGL loop */

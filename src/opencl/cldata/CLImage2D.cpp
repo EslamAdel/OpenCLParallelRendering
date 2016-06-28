@@ -52,11 +52,7 @@ void CLImage2D< T >::createDeviceData( cl_context context ,
                                        &imageDescriptor_ ,
                                        0 ,
                                        &error );
-    if( error != CL_SUCCESS )
-    {
-        oclHWDL::Error::checkCLError( error );
-        LOG_ERROR("OpenCL Error!");
-    }
+    CL_ASSERT( error );
 
     this->context_ = context ;
     this->inDevice_ = true ;
@@ -84,13 +80,9 @@ void CLImage2D< T >::writeDeviceData( cl_command_queue cmdQueue,
                 ( const void * ) this->hostData_ ,
                 0 , 0 , &this->clTransferEvent_ );
 
-    if( error != CL_SUCCESS )
-    {
-        oclHWDL::Error::checkCLError( error );
-        LOG_ERROR("OpenCL Error!");
-    }
+    CL_ASSERT( error );
 
-    this->transferTime_ = CLFrame< T >::calculateTransferTime_();
+    CLFrame< T >::evaluateTransferTime_();
 }
 
 template< class T >
@@ -113,13 +105,10 @@ void CLImage2D< T >::readDeviceData( cl_command_queue cmdQueue ,
                 this->region_.imageSize() * CLFrame< T >::pixelSize() ,
                 ( void *) this->hostData_ ,
                 0 , 0 , &this->clTransferEvent_ );
-    if( error != CL_SUCCESS )
-    {
-        oclHWDL::Error::checkCLError( error );
-        LOG_ERROR("OpenCL Error!");
-    }
 
-    this->transferTime_ = CLFrame< T >::calculateTransferTime_();
+    CL_ASSERT( error );
+
+    CLFrame< T >::evaluateTransferTime_();
 }
 
 template< class T >
@@ -133,27 +122,31 @@ void CLImage2D< T >::readOtherDeviceData(
 
     QReadLocker lock( &this->regionLock_ );
 
-    const size_t origin[3] = { this->offset_.x , this->offset_.y , 0 };
-    const size_t region[3] = { this->region_.x , this->region_.y , 1 };
+    const size_t origin[3] = { sourceFrame.offset_.x ,
+                               sourceFrame.offset_.y , 0 };
 
-    static cl_int error = CL_SUCCESS;
+    const size_t region[3] = { sourceFrame.region_.x ,
+                               sourceFrame.region_.y , 1 };
+
+    cl_int error = CL_SUCCESS;
 
     error = clEnqueueReadImage(
                 sourceCmdQueue , sourceFrame.getDeviceData() ,
                 blocking , origin , region ,
-                this->region_.x * CLFrame< T >::pixelSize() ,
-                this->region_.imageSize() * CLFrame< T >::pixelSize() ,
-                ( void * ) this->hostData_ ,
-                0 , 0 , &this->clTransferEvent_ );
+                sourceFrame.region_.x * CLFrame< T >::pixelSize() ,
+                sourceFrame.region_.imageSize() * CLFrame< T >::pixelSize() ,
+                ( void * ) &this->hostData_[ sourceFrame.offset_.imageSize( )] ,
+                0 , 0 , &sourceFrame.clTransferEvent_ );
 
-    if( error != CL_SUCCESS )
-    {
-        oclHWDL::Error::checkCLError( error );
-        LOG_ERROR("OpenCL Error!");
-    }
+    CL_ASSERT( error );
 
-//    LOG_DEBUG("Calculate Transfer Time");
-//    this->transferTime_ = CLFrame< T >::calculateTransferTime_();
+    LOG_DEBUG("offset:(%lo,%lo),region(%lo,%lo)",
+              sourceFrame.offset_.x ,
+              sourceFrame.offset_.y ,
+              sourceFrame.region_.x ,
+              sourceFrame.region_.y );
+
+    sourceFrame.evaluateTransferTime_();
 }
 
 

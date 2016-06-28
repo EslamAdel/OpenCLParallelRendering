@@ -3,7 +3,12 @@
 
 #include <QObject>
 #include <QMutex>
+
 #include <QMutexLocker>
+#include <QReadWriteLock>
+#include <QReadLocker>
+#include <QWriteLocker>
+
 #include <oclHWDL.h>
 
 #include "CLData.hh"
@@ -345,9 +350,17 @@ protected:
     double renderingTime_ ;
 
     /**
+     * @brief renderingTimeLock_
+     */
+    mutable QReadWriteLock renderingTimeLock_;
+
+    /**
      * @brief frameChannelOrder_
      */
     const CLData::FRAME_CHANNEL_ORDER frameChannelOrder_ ;
+
+
+
 };
 
 

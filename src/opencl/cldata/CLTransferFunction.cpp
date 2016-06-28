@@ -20,9 +20,12 @@ CLTransferFunction::CLTransferFunction(
 void CLTransferFunction::createDeviceData( cl_context context ,
                                            const cl_mem_flags  )
 {
+
     const cl_mem_flags flags = CL_MEM_READ_ONLY | CL_MEM_HOST_WRITE_ONLY ;
 
     this->CLImage2D< float >::createDeviceData( context , flags );
+
+
 }
 
 
@@ -43,11 +46,8 @@ void CLTransferFunction::writeDeviceData(
                 ( const void * ) this->hostData_ ,
                 0 , 0 , 0 );
 
-    if( error != CL_SUCCESS )
-    {
-        oclHWDL::Error::checkCLError( error );
-        LOG_ERROR("OpenCL Error!");
-    }
+    CL_ASSERT( error );
+
 }
 
 uint CLTransferFunction::length() const

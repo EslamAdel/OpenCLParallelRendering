@@ -123,11 +123,8 @@ void CLCompositorAccumulate< T >::composite( )
                                           NULL ) ;
 
 
-    if( clErrorCode != CL_SUCCESS )
-    {
-        oclHWDL::Error::checkCLError( clErrorCode );
-        LOG_ERROR("OpenCL Error!");
-    }
+    CL_ASSERT( clErrorCode );
+
 
     clFinish( commandQueue_ );
     //    LOG_DEBUG("[DONE] Accumulating Frame[%d]", frameIndex );

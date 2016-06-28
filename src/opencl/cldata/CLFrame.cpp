@@ -78,11 +78,8 @@ void CLFrame< T >::createDeviceData( cl_context context ,
                                   dimensions_.imageSize() * pixelSize() ,
                                   0 ,
                                   &error );
-    if( error != CL_SUCCESS )
-    {
-        oclHWDL::Error::checkCLError( error );
-        LOG_ERROR("OpenCL Error!");
-    }
+    CL_ASSERT( error );
+
 
     context_ = context ;
     inDevice_ = true ;
@@ -107,14 +104,10 @@ void CLFrame< T >::writeDeviceData( cl_command_queue cmdQueue ,
                                   region_.imageSize( ) * pixelSize( ) ,
                                   ( const void *) hostData_ ,
                                   0 , 0 , &clTransferEvent_ );
+    CL_ASSERT( error );
 
-    if( error != CL_SUCCESS )
-    {
-        oclHWDL::Error::checkCLError( error );
-        LOG_ERROR("OpenCL Error!");
-    }
 
-    transferTime_ = calculateTransferTime_();
+    evaluateTransferTime_();
 
 }
 
@@ -132,22 +125,19 @@ void CLFrame< T >::readDeviceData( cl_command_queue cmdQueue ,
                                  ( void * ) hostData_ ,
                                  0 , 0 , &clTransferEvent_ );
 
-    if( error != CL_SUCCESS )
-    {
-        oclHWDL::Error::checkCLError( error );
-        LOG_ERROR("OpenCL Error!");
-    }
+    CL_ASSERT( error );
+
     //Now, neither QPixmap frame_ nor rgbaFrame represents the recent raw data.
     pixmapSynchronized_ = false ;
 
-    transferTime_ = calculateTransferTime_();
+    evaluateTransferTime_();
 
 }
 
 template< class T >
 void CLFrame< T >::readOtherDeviceData(
         cl_command_queue sourceCmdQueue ,
-        const CLFrame<T> &sourceFrame ,
+        const CLFrame< T > &sourceFrame ,
         const cl_bool blocking )
 {
     if( sourceFrame.getFrameDimensions() != dimensions_ )
@@ -155,23 +145,19 @@ void CLFrame< T >::readOtherDeviceData(
 
     QReadLocker lock( &regionLock_ );
 
-    static cl_int error = CL_SUCCESS;
-    error = clEnqueueReadBuffer( sourceCmdQueue , sourceFrame.getDeviceData() ,
-                                 blocking ,
-                                 offset_.imageSize( ) * pixelSize( ) ,
-                                 region_.imageSize( ) * pixelSize( ) ,
-                                 ( void * ) hostData_ ,
-                                 0 , 0 , &clTransferEvent_ );
+    cl_int error = clEnqueueReadBuffer(
+                sourceCmdQueue , sourceFrame.getDeviceData() , blocking ,
+                sourceFrame.getOffset().imageSize( ) * pixelSize( ) ,
+                sourceFrame.getRegion().imageSize( ) * pixelSize( ) ,
+                ( void * ) &hostData_[ sourceFrame.getOffset().imageSize( )] ,
+            0 , 0 , &sourceFrame.clTransferEvent_ );
 
-    if( error != CL_SUCCESS )
-    {
-        oclHWDL::Error::checkCLError( error );
-        LOG_ERROR("OpenCL Error!");
-    }
+    CL_ASSERT( error );
+
     //Now, neither QPixmap frame_ nor rgbaFrame represents the recent raw data.
     pixmapSynchronized_ = false ;
 
-    transferTime_ = calculateTransferTime_();
+    sourceFrame.evaluateTransferTime_();
 }
 
 template< class T >
@@ -197,16 +183,12 @@ void CLFrame< T >::copyDeviceData(
                 region_.imageSize() * pixelSize( ) ,
                 0 , 0 , &clTransferEvent_ ) ;
 
-    if( error != CL_SUCCESS )
-    {
-        oclHWDL::Error::checkCLError( error );
-        LOG_ERROR("Error copying buffers");
-    }
+    CL_ASSERT( error );
 
     if( blocking )
         clFinish( cmdQueue );
 
-    transferTime_ = calculateTransferTime_();
+    evaluateTransferTime_();
 }
 
 
@@ -229,27 +211,21 @@ QPixmap &CLFrame<T>::getFramePixmap()
 
     if( channelOrder_ == FRAME_CHANNEL_ORDER::ORDER_RGBA )
     {
-        for( int i = 0; i < region_.imageSize() ; i++ )
-        {
-            pixmapData_[ 4 * i ] =
-                    static_cast< uchar >( hostData_[  4 * i ] );
-            pixmapData_[ 4 * i + 1 ] =
-                    static_cast< uchar >( hostData_[  4 * i + 1 ]);
-            pixmapData_[ 4 * i + 2 ] =
-                    static_cast< uchar >( hostData_[  4 * i + 2 ]);
-            pixmapData_[ 4 * i + 3 ] =
-                    static_cast< uchar >( hostData_[  4 * i + 3 ]);
-
-            //            u_int8_t r, g, b, a;
-            //            uint rgba = hostData_[i];
-
-            //            convertColorToRGBA_( rgba, r, g, b, a );
-
-            //            pixmapData_[ 4 * i ] = r;
-            //            pixmapData_[ 4 * i + 1 ] = g;
-            //            pixmapData_[ 4 * i + 2 ] = b;
-            //            pixmapData_[ 4 * i + 3 ] = a;
-        }
+        if( clChannelType() == CL_UNORM_INT8 )
+            pixmapData_ = reinterpret_cast< uchar* >( hostData_ ) ;
+        else
+            // Conversion needed.
+            for( int i = 0; i < region_.imageSize() ; i++ )
+            {
+                pixmapData_[ 4 * i ] =
+                        static_cast< uchar >( hostData_[  4 * i ] );
+                pixmapData_[ 4 * i + 1 ] =
+                        static_cast< uchar >( hostData_[  4 * i + 1 ]);
+                pixmapData_[ 4 * i + 2 ] =
+                        static_cast< uchar >( hostData_[  4 * i + 2 ]);
+                pixmapData_[ 4 * i + 3 ] =
+                        static_cast< uchar >( hostData_[  4 * i + 3 ]);
+            }
 
         // Create a QImage and send it back to the rendering window.
         const QImage image( pixmapData_,
@@ -389,8 +365,10 @@ void CLFrame< T >::convertColorToRGBA_( uint Color ,
 }
 
 template< class T >
-float CLFrame< T >::calculateTransferTime_( )
+void CLFrame< T >::evaluateTransferTime_() const
 {
+    QWriteLocker lock( &transferTimeLock_ );
+
     // Assuming that every thing is going in the right direction.
     cl_int clErrorCode = CL_SUCCESS;
 
@@ -415,19 +393,17 @@ float CLFrame< T >::calculateTransferTime_( )
                                      0 );
 
 
-    if( clErrorCode != CL_SUCCESS )
-    {
-        oclHWDL::Error::checkCLError( clErrorCode );
-        LOG_ERROR("Exiting Due to OpenCL Error!");
-    }
+    CL_ASSERT( clErrorCode );
 
-    return static_cast< float >( end -  start ) / 1e6 ;
+
+    transferTime_ = static_cast< float >( end -  start ) / 1e6 ;
 
 }
 
 template< class T >
 float CLFrame< T >::getTransferTime() const
 {
+    QReadLocker lock( &transferTimeLock_ );
     return transferTime_;
 }
 

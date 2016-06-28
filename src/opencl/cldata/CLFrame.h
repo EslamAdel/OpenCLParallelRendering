@@ -30,12 +30,17 @@ enum FRAME_CHANNEL_TYPE
 };
 
 
+// Forward declaration
+template< class T > class CLImage2D;
+
 template< class T >
 class CLFrame
 {
 
     Q_DISABLE_COPY( CLFrame )
 
+protected:
+     friend class CLImage2D< T > ;
 
 public:
 
@@ -297,7 +302,7 @@ protected:
      * @brief calculateTransferTime_
      * @return
      */
-    float calculateTransferTime_();
+    void evaluateTransferTime_() const;
 protected:
 
     /**
@@ -343,7 +348,7 @@ protected:
     /**
      * @brief transferEvent_
      */
-    cl_event clTransferEvent_ ;
+    mutable cl_event clTransferEvent_ ;
 
     //flags
     /**
@@ -374,8 +379,12 @@ protected:
     /**
      * @brief transferTime_
      */
-    float transferTime_ ;
+    mutable float transferTime_ ;
 
+    /**
+     * @brief transferTimeLock_
+     */
+    mutable QReadWriteLock transferTimeLock_;
 };
 
 

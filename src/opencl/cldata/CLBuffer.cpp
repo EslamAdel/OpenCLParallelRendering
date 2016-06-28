@@ -46,12 +46,7 @@ void CLBuffer< T >::createDeviceData( cl_context context )
                             size_ * sizeof( T ) ,  hostData_ ,
                             &error) ;
 
-    if( error != CL_SUCCESS )
-    {
-        oclHWDL::Error::checkCLError( error );
-        LOG_ERROR("Exiting Due to OpenCL Error!");
-    }
-
+    CL_ASSERT( error );
 }
 
 template< class T >
@@ -66,11 +61,7 @@ void CLBuffer< T >::writeDeviceData( cl_command_queue cmdQueue ,
                                   0 , size_ * sizeof( T ) , hostData_ ,
                                   0 , 0 , 0 );
 
-    if( error != CL_SUCCESS )
-    {
-        oclHWDL::Error::checkCLError( error );
-        LOG_ERROR("Exiting Due to OpenCL Error!");
-    }
+    CL_ASSERT( error );
 }
 
 template< class T >
@@ -85,11 +76,7 @@ void CLBuffer< T >::readDeviceData( cl_command_queue cmdQueue ,
                                  0 , size_ * sizeof( T ) , hostData_ ,
                                  0 , 0 , 0 );
 
-    if( error != CL_SUCCESS )
-    {
-        oclHWDL::Error::checkCLError( error );
-        LOG_ERROR("Exiting Due to OpenCL Error!");
-    }
+    CL_ASSERT( error );
 }
 
 template< class T >

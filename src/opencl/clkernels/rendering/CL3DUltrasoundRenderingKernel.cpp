@@ -25,11 +25,7 @@ void CL3DUltrasoundRenderingKernel::setTransferFunctionData( cl_mem data )
                                    KERNEL_ARG_TransferFunctionData,
                                    sizeof( cl_mem ),
                                    ( void* ) &data );
-    if( error != CL_SUCCESS )
-    {
-        oclHWDL::Error::checkCLError( error );
-        LOG_ERROR("Exiting Due to OpenCL Error!");
-    }
+    CL_ASSERT( error );
 }
 
 void CL3DUltrasoundRenderingKernel::setTransferFunctionSampler( cl_sampler sampler )
@@ -38,11 +34,7 @@ void CL3DUltrasoundRenderingKernel::setTransferFunctionSampler( cl_sampler sampl
                                    KERNEL_ARG_TransferFunctionSampler,
                                    sizeof( cl_sampler ),
                                    ( void* ) &sampler );
-    if( error != CL_SUCCESS )
-    {
-        oclHWDL::Error::checkCLError( error );
-        LOG_ERROR("Exiting Due to OpenCL Error!");
-    }
+    CL_ASSERT( error );
 }
 
 void CL3DUltrasoundRenderingKernel::setApexAngle( float apexAngle )
@@ -50,12 +42,7 @@ void CL3DUltrasoundRenderingKernel::setApexAngle( float apexAngle )
     cl_int error = clSetKernelArg( kernelObject_, KERNEL_ARG_ApexAngle,
                                    sizeof( float ),
                                    &apexAngle );
-    if( error != CL_SUCCESS )
-    {
-        oclHWDL::Error::checkCLError( error );
-        LOG_ERROR("Exiting Due to OpenCL Error!");
-    }
-//    printf("apex %f \n", apexAngle );
+    CL_ASSERT( error );
 }
 
 void CL3DUltrasoundRenderingKernel::setXScale( float scale )
@@ -63,11 +50,7 @@ void CL3DUltrasoundRenderingKernel::setXScale( float scale )
     cl_int error = clSetKernelArg( kernelObject_, KERNEL_ARG_XScale,
                                    sizeof( float ),
                                    &scale );
-    if( error != CL_SUCCESS )
-    {
-        oclHWDL::Error::checkCLError( error );
-        LOG_ERROR("Exiting Due to OpenCL Error!");
-    }
+    CL_ASSERT( error );
 }
 
 void CL3DUltrasoundRenderingKernel::setYScale( float scale )
@@ -75,22 +58,14 @@ void CL3DUltrasoundRenderingKernel::setYScale( float scale )
     cl_int error = clSetKernelArg( kernelObject_, KERNEL_ARG_YScale,
                                    sizeof( float ),
                                    &scale );
-    if( error != CL_SUCCESS )
-    {
-        oclHWDL::Error::checkCLError( error );
-        LOG_ERROR("Exiting Due to OpenCL Error!");
-    }
+    CL_ASSERT( error );
 }
 void CL3DUltrasoundRenderingKernel::setZScale( float scale )
 {
     cl_int error = clSetKernelArg( kernelObject_, KERNEL_ARG_ZScale,
                                    sizeof( float ),
                                    &scale );
-    if( error != CL_SUCCESS )
-    {
-        oclHWDL::Error::checkCLError( error );
-        LOG_ERROR("Exiting Due to OpenCL Error!");
-    }
+    CL_ASSERT( error );
 }
 
 

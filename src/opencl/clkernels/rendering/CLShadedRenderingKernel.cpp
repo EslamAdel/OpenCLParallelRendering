@@ -51,11 +51,7 @@ void CLShadedRenderingKernel::setTransferFunctionData( cl_mem data )
                                    KERNEL_ARG_TransferFunctionData ,
                                    sizeof( cl_mem ),
                                    ( void* ) &data );
-    if( error != CL_SUCCESS )
-    {
-        oclHWDL::Error::checkCLError( error );
-        LOG_ERROR("Exiting Due to OpenCL Error!");
-    }
+    CL_ASSERT( error );
 }
 
 void CLShadedRenderingKernel::setTransferFunctionSampler( cl_sampler sampler )
@@ -64,11 +60,7 @@ void CLShadedRenderingKernel::setTransferFunctionSampler( cl_sampler sampler )
                                    KERNEL_ARG_TransferFunctionSampler,
                                    sizeof( cl_sampler ),
                                    ( void* ) &sampler );
-    if( error != CL_SUCCESS )
-    {
-        oclHWDL::Error::checkCLError( error );
-        LOG_ERROR("Exiting Due to OpenCL Error!");
-    }
+    CL_ASSERT( error );
 }
 
 bool CLShadedRenderingKernel::supportTransferFunction() const

@@ -25,11 +25,7 @@ void CLIsoSurfaceRenderingKernel::setVolumeIsoValue( float isoValue )
                                    KERNEL_ARG_DerivedKernelsOffset ,
                                    sizeof( float ),
                                    ( void* ) &isoValue );
-    if( error != CL_SUCCESS )
-    {
-        oclHWDL::Error::checkCLError( error );
-        LOG_ERROR("Exiting Due to OpenCL Error!");
-    }
+    CL_ASSERT( error );
 }
 
 

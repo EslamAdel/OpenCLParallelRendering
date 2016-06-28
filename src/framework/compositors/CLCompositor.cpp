@@ -135,11 +135,7 @@ void CLCompositor< T >::composite( )
                                     NULL ) ;
 
 
-    if( clErrorCode != CL_SUCCESS )
-    {
-        oclHWDL::Error::checkCLError( clErrorCode );
-        LOG_ERROR("OpenCL Error!");
-    }
+    CL_ASSERT( clErrorCode );
 
     clFinish( commandQueue_ );
 
@@ -227,14 +223,8 @@ void CLCompositor< T >::initializeKernel_()
 
     for( CLKernel::CLCompositingKernel* compositingKernel :
          compositingKernels_.values( ))
-    {
-        // Assuming that every thing is going in the right direction.
-        cl_int clErrorCode = CL_SUCCESS;
-
         compositingKernel->setFinalFrame( finalFrame_->getDeviceData( ));
 
-        oclHWDL::Error::checkCLError( clErrorCode );
-    }
 
     LOG_DEBUG( "[DONE] Initializing OpenCL Kernels ... " );
 }
@@ -247,12 +237,7 @@ void CLCompositor< T >::updateKernelsArguments_()
     for( CLKernel::CLCompositingKernel* compositingKernel :
          compositingKernels_.values( ))
     {
-        // Assuming that every thing is going in the right direction.
-        cl_int clErrorCode = CL_SUCCESS;
-
         compositingKernel->setDepthIndex( depthIndex_->getDeviceData( ));
-
-        oclHWDL::Error::checkCLError( clErrorCode );
 
         if( imagesArray_->inDevice())
             compositingKernel->setFrame( imagesArray_->getDeviceData( ));

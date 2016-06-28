@@ -145,11 +145,8 @@ cl_mem CLVolume< T >::createDeviceVolume( cl_context context )
         break;
     }
 
-    if( error != CL_SUCCESS )
-    {
-        oclHWDL::Error::checkCLError( error );
-        LOG_ERROR("Error Creating Device Volume!");
-    }
+    CL_ASSERT( error );
+
     LOG_DEBUG( "[DONE] Creating an OpenCL volume " );
 
     return deviceData_;
@@ -182,11 +179,8 @@ void CLVolume< T >::writeDeviceData( cl_command_queue cmdQueue ,
                                  ( const void * ) volume_->getData() ,
                                  0 , 0 , 0 );
 
-    if( error != CL_SUCCESS )
-    {
-        oclHWDL::Error::checkCLError( error );
-        LOG_ERROR("OpenCL Error!");
-    }
+    CL_ASSERT( error );
+
 }
 
 template< class T >

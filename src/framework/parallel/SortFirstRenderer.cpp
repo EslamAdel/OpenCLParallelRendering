@@ -120,10 +120,10 @@ void SortFirstRenderer< V , F >::initializeRenderers()
 
     LOG_DEBUG("Sort first frames setting..");
     // Each renderer to contribute with a frame of size:
-    // ( Original Width / N ) X ( Original Height )
+    // ( Original Width ) X ( Original Height / N )
 
     // Compensate the round-off error for the last renderer.
-    uint64_t sortFirstWidth = frameWidth_ / renderers_.size();
+    uint64_t sortFirstHeight = frameHeight_ / renderers_.size();
 
 
     uint64_t i = 0 ;
@@ -133,9 +133,9 @@ void SortFirstRenderer< V , F >::initializeRenderers()
     {
         it.value()->setSortFirstSettings(
                     /* offset */
-                    Dimensions2D( sortFirstWidth * i , 0) ,
+                    Dimensions2D( 0 , sortFirstHeight * i ),
                     /* region of interest dimensions */
-                    Dimensions2D( sortFirstWidth     , frameHeight_ ));
+                    Dimensions2D( frameWidth_  ,sortFirstHeight  ));
         it++;
         i++;
     }
@@ -143,9 +143,9 @@ void SortFirstRenderer< V , F >::initializeRenderers()
     i-- ;
     it.value()->setSortFirstSettings(
                 /* offset */
-                Dimensions2D( sortFirstWidth * i , 0) ,
+                Dimensions2D( 0 , sortFirstHeight * i) ,
                 /* region of interest dimensions */
-                Dimensions2D( frameWidth_ - sortFirstWidth * i , frameHeight_ ));
+                Dimensions2D( frameWidth_ , frameHeight_ - sortFirstHeight * i ));
 
     LOG_DEBUG("[DONE] Sort first frames setting..");
 }
@@ -163,7 +163,7 @@ void SortFirstRenderer< V , F >::finishedRendering_SLOT(
     compositingFinished_SLOT();
 #else
 
-    QtConcurrent::run(  this , &SortFirstRenderer::assemble_ ,
+    QtConcurrent::run(  this , &SortFirstRenderer::assemble2_ ,
                         renderer , clFrame_.data( ));
 
 #endif
@@ -202,6 +202,7 @@ void SortFirstRenderer< V , F >::compositingFinished_SLOT( )
             updateRotationX_SLOT( transformation_.rotation.x + 1 );
             updateRotationY_SLOT( transformation_.rotation.y + 1 );
             updateRotationZ_SLOT( transformation_.rotation.z + 1 );
+            //            printf("%d/%d ",framesCounter,testFrames);
         }
         else
             benchmark_();
@@ -277,8 +278,8 @@ void SortFirstRenderer< V , F >::benchmark_()
                transferTimeMean_[ renderer->getGPUIndex() ]);
     }
 
-//    LOAD_BALANCING_PROFILE_TAG();
-//    PRINT( loadBalancingProfile.loadBlancing_TIMER );
+    //    LOAD_BALANCING_PROFILE_TAG();
+    //    PRINT( loadBalancingProfile.loadBlancing_TIMER );
 
     FRAMEWORK_PROFILE_TAG( );
     PRINT( frameworkProfile.renderingLoop_TIMER );
@@ -294,33 +295,33 @@ void SortFirstRenderer< V , F >::heuristicLoadBalance_( )
         LOG_ERROR("Foreign thread!");
 
     const uint renderersCount = renderers_.size();
-    const float tolerance = 0.05f ;
-    const float epsilon = 0.01f ;
+    const float tolerance = 0.01f ;
+    const float epsilon = 0.001f ;
 
 
     if( renderersCount < 2 )
         return;
 
     QVector< float > renderingTime;
-    QVector< float > frameWidthChange;
+    QVector< float > frameHeightChange;
     uint i = 0 ;
     // 1.Get Rendering Times.
     float meanTime = 0.f ;
     for( const Renderer::CLAbstractRenderer *renderer : renderers_ )
     {
         float time = static_cast< float >( renderer->getRenderingTime( ));
-        uint64_t frameWidth =  renderer->getSortFirstDimensions().x ;
-        frameWidthChange.append( static_cast< float >( frameWidth ));
+        uint64_t frameHeight =  renderer->getSortFirstDimensions().y ;
+        frameHeightChange.append( static_cast< float >( frameHeight ));
         renderingTime.append( time );
         meanTime += time;
 
-        printf("time[%d]:%f,size:%dx%d\n",
-               static_cast< int >(renderer->getGPUIndex()),
-               time ,
-               static_cast< int >( frameWidth ),
-               static_cast< int >( renderer->getFrameDimensions().y ));
+        //        printf("time[%d]:%f,size:%dx%d\n",
+        //               static_cast< int >(renderer->getGPUIndex()),
+        //               time ,
+        //               static_cast< int >( frameWidth ),
+        //               static_cast< int >( renderer->getFrameDimensions().y ));
     }
-    printf("\n");
+    //   printf("\n");
 
 
     meanTime /= static_cast< float >( renderersCount );
@@ -341,14 +342,14 @@ void SortFirstRenderer< V , F >::heuristicLoadBalance_( )
         else if( ratio < 1.f - tolerance )
             ratio = 1.f - tolerance ;
 
-        frameWidthChange[ i ] *= ( 1.f - ratio ) ;
+        frameHeightChange[ i ] *= ( 1.f - ratio ) ;
 
         //        LOG_DEBUG("delta=%f", frameWidthChange[i] );
 
-        if( frameWidthChange[ i ] > 0 )
-            positiveGap += frameWidthChange[ i ];
+        if( frameHeightChange[ i ] > 0 )
+            positiveGap += frameHeightChange[ i ];
         else
-            negativeGap -= frameWidthChange[ i ];
+            negativeGap -= frameHeightChange[ i ];
     }
 
 
@@ -361,15 +362,15 @@ void SortFirstRenderer< V , F >::heuristicLoadBalance_( )
     if( negativeGap > positiveGap)
         for( i = 0 ; i < renderersCount ; i++ )
         {
-            if( frameWidthChange[ i ] < 0 )
-                frameWidthChange[ i ] =
-                        positiveGap * ( frameWidthChange[ i ] / negativeGap );
+            if( frameHeightChange[ i ] < 0 )
+                frameHeightChange[ i ] =
+                        positiveGap * ( frameHeightChange[ i ] / negativeGap );
         }
     else
         for( i = 0 ; i < renderersCount ; i++ )
-            if( frameWidthChange[ i ] > 0 )
-                frameWidthChange[ i ] =
-                        negativeGap * ( frameWidthChange[ i ] / positiveGap );
+            if( frameHeightChange[ i ] > 0 )
+                frameHeightChange[ i ] =
+                        negativeGap * ( frameHeightChange[ i ] / positiveGap );
 
 
     // 5.Set new frames widths.
@@ -378,27 +379,27 @@ void SortFirstRenderer< V , F >::heuristicLoadBalance_( )
 
     for( Renderer::CLAbstractRenderer *renderer : renderers_ )
     {
-        const uint64_t newFrameWidth =
-                renderer->getSortFirstDimensions().x +
-                static_cast< int64_t >( frameWidthChange[ i ] );
+        const uint64_t newFrameHeight =
+                renderer->getSortFirstDimensions().y +
+                static_cast< int64_t >( frameHeightChange[ i ] );
 
         if( i < renderersCount - 1 )
             renderer->setSortFirstSettings(
                         /* offset */
-                        Dimensions2D( currentOffset , 0) ,
+                        Dimensions2D( 0 , currentOffset ) ,
                         /* region of interest dimensions */
-                        Dimensions2D( newFrameWidth , frameHeight_ ));
+                        Dimensions2D( frameWidth_ , newFrameHeight ));
         else
             renderer->setSortFirstSettings(
                         /* offset */
-                        Dimensions2D( currentOffset , 0) ,
+                        Dimensions2D( 0 , currentOffset ) ,
                         /* region of interest dimensions */
-                        Dimensions2D( frameWidth_ - currentOffset , frameHeight_ ));
+                        Dimensions2D( frameWidth_  , frameHeight_ - currentOffset ));
 
         i++;
-        currentOffset += newFrameWidth ;
+        currentOffset += newFrameHeight ;
     }
-    LOG_DEBUG("mean:%f,variance:%f",meanTime, variance);
+    //    LOG_DEBUG("mean:%f,variance:%f",meanTime, variance);
 }
 
 template< class V , class F >
@@ -417,7 +418,7 @@ void SortFirstRenderer< V , F >::calculateTransferTimeMean_()
         const CLData::CLImage2D< F > *clFrame =
                 renderer->getCLFrame().value< CLData::CLImage2D< F > *>();
         const float transferTime = clFrame->getTransferTime();
-        printf("tranfer time: %f\n",transferTime);
+        //        printf("tranfer time: %f\n",transferTime);
         transferTimeMean_[ gpuIndex ] =
                 ( transferTimeMean_[ gpuIndex ] * renderingLoopCounter_ +
                   transferTime ) / ( renderingLoopCounter_ + 1 ) ;
@@ -521,6 +522,21 @@ void SortFirstRenderer< V , F >::assemble_(
     frameCopyMutex_.unlock();
 
     emit this->finishedCompositing_SIGNAL();
+}
+
+template< class V , class F >
+void SortFirstRenderer< V , F >::assemble2_(
+        Renderer::CLAbstractRenderer *renderer,
+        CLData::CLFrame< F > *finalFrame )
+{
+    CLData::CLImage2D< F > *clFrame =
+            renderer->getCLFrame().value< CLData::CLImage2D< F > *>();
+
+    frameCopyMutex_.lockForRead();
+    finalFrame->readOtherDeviceData( renderer->getCommandQueue() ,
+                                     *clFrame , CL_TRUE );
+    frameCopyMutex_.unlock();
+
 }
 
 

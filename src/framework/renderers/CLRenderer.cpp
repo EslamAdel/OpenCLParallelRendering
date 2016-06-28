@@ -98,9 +98,6 @@ void CLRenderer< V , F >::loadVolume( VolumeVariant &volume )
               volume_->getDimensions().y , volume_->getDimensions().z );
 
 
-    // Assume everything is fine in the begnning
-    cl_int clErrorCode = CL_SUCCESS;
-
     // If already clVolume exists, update!
     if( clVolume_ )
         delete clVolume_ ;
@@ -108,8 +105,6 @@ void CLRenderer< V , F >::loadVolume( VolumeVariant &volume )
     // Create an OpenCL volume
     clVolume_ = new CLData::CLVolume< V >( volume_ );
     clVolume_->createDeviceVolume( context_ );
-
-    oclHWDL::Error::checkCLError(clErrorCode);
 
 
     initializeKernels_();
@@ -170,6 +165,8 @@ void CLRenderer< V , F >::renderFrame_()
     activeRenderingKernel_->setVolumeIsoValue( transformation_.isoValue );
     activeRenderingKernel_->setStepSize( transformation_.stepSize );
     activeRenderingKernel_->setMaxSteps( transformation_.maxSteps );
+    activeRenderingKernel_->setSortFirstWidth( sortFirstDimensions_.x );
+    activeRenderingKernel_->setSortFirstHeight( sortFirstDimensions_.y );
 
     if( activeRenderingKernel_->isUltrasound( ))
     {
@@ -196,13 +193,11 @@ void CLRenderer< V , F >::renderFrame_()
     clErrorCode |=
             clWaitForEvents( 1 , &clGPUExecution_ );
 
+    QWriteLocker renderingTimelocker( &renderingTimeLock_ );
     renderingTime_ = calculateRenderingTime_();
 
-    if( clErrorCode != CL_SUCCESS )
-    {
-        oclHWDL::Error::checkCLError( clErrorCode );
-        LOG_ERROR("Error in Rendering Execution!");
-    }
+    CL_ASSERT( clErrorCode );
+
 }
 
 template< class V , class F >
@@ -262,12 +257,7 @@ void CLRenderer< V , F >::initializeKernels_()
                                                     CL_ADDRESS_CLAMP_TO_EDGE,
                                                     CL_FILTER_LINEAR, &clErrorCode );
 
-    if( clErrorCode != CL_SUCCESS )
-    {
-        oclHWDL::Error::checkCLError( clErrorCode );
-        LOG_ERROR("Exiting Due to OpenCL Error!");
-    }
-
+    CL_ASSERT( clErrorCode );
 
     for( const CLKernel::RenderingMode mode : renderingKernels_.keys())
     {
@@ -528,6 +518,7 @@ template< class V , class F >
 void CLRenderer< V , F >::setRegion_()
 {
     clFrame_->setRegion( sortFirstOffset_ , sortFirstDimensions_ );
+
 }
 
 

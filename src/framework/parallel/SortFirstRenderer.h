@@ -88,6 +88,9 @@ private:
     void assemble_(  Renderer::CLAbstractRenderer *renderer,
                      CLData::CLFrame< F > *finalFrame   );
 
+    void assemble2_(  Renderer::CLAbstractRenderer *renderer,
+                      CLData::CLFrame< F > *finalFrame   );
+
     void clone_( );
 
     float renderingLoopTime_();

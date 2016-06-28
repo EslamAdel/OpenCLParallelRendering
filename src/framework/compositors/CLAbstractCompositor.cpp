@@ -117,8 +117,7 @@ void CLAbstractCompositor::createCommandQueue_()
                                           device_ ,
                                           0, &clErrorCode );
 
-    if( clErrorCode != CL_SUCCESS )
-        oclHWDL::Error::checkCLError( clErrorCode );
+    CL_ASSERT( clErrorCode );
 }
 
 

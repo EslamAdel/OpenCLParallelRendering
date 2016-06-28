@@ -94,12 +94,7 @@ void CLRenderingKernel::setFrameBuffer( cl_mem frameBuffer )
                                    sizeof( cl_mem ),
                                    ( void* ) &frameBuffer );
 
-    if( error != CL_SUCCESS )
-    {
-        oclHWDL::Error::checkCLError( error );
-        LOG_ERROR("Exiting Due to OpenCL Error!");
-    }
-
+    CL_ASSERT( error );
 }
 
 void CLRenderingKernel::setFrameWidth( uint width )
@@ -107,11 +102,7 @@ void CLRenderingKernel::setFrameWidth( uint width )
     cl_int error = clSetKernelArg( kernelObject_, KERNEL_ARG_FrameWidth ,
                                    sizeof( uint ),
                                    &width );
-    if( error != CL_SUCCESS )
-    {
-        oclHWDL::Error::checkCLError( error );
-        LOG_ERROR("Exiting Due to OpenCL Error!");
-    }
+    CL_ASSERT( error );
 }
 
 void CLRenderingKernel::setFrameHeight( uint height )
@@ -119,11 +110,7 @@ void CLRenderingKernel::setFrameHeight( uint height )
     cl_int error = clSetKernelArg( kernelObject_, KERNEL_ARG_FrameHeight,
                                    sizeof( uint ),
                                    &height );
-    if( error != CL_SUCCESS )
-    {
-        oclHWDL::Error::checkCLError( error );
-        LOG_ERROR("Exiting Due to OpenCL Error!");
-    }
+    CL_ASSERT( error );
 }
 
 void CLRenderingKernel::setSortFirstWidth( uint width )
@@ -131,11 +118,7 @@ void CLRenderingKernel::setSortFirstWidth( uint width )
     cl_int error = clSetKernelArg( kernelObject_, KERNEL_ARG_SortFirstWidth ,
                                    sizeof( uint ),
                                    &width );
-    if( error != CL_SUCCESS )
-    {
-        oclHWDL::Error::checkCLError( error );
-        LOG_ERROR("Exiting Due to OpenCL Error!");
-    }
+    CL_ASSERT( error );
 }
 
 void CLRenderingKernel::setSortFirstHeight( uint height )
@@ -143,11 +126,7 @@ void CLRenderingKernel::setSortFirstHeight( uint height )
     cl_int error = clSetKernelArg( kernelObject_, KERNEL_ARG_SortFirstHeight,
                                    sizeof( uint ),
                                    &height );
-    if( error != CL_SUCCESS )
-    {
-        oclHWDL::Error::checkCLError( error );
-        LOG_ERROR("Exiting Due to OpenCL Error!");
-    }
+    CL_ASSERT( error );
 }
 
 void CLRenderingKernel::setVolumeData( cl_mem data )
@@ -155,11 +134,7 @@ void CLRenderingKernel::setVolumeData( cl_mem data )
     cl_int error = clSetKernelArg( kernelObject_, KERNEL_ARG_Volume ,
                                    sizeof( cl_mem ),
                                    ( void* ) &data );
-    if( error != CL_SUCCESS )
-    {
-        oclHWDL::Error::checkCLError( error );
-        LOG_ERROR("Exiting Due to OpenCL Error!");
-    }
+    CL_ASSERT( error );
 }
 
 void CLRenderingKernel::setVolumeSampler( cl_sampler sampler )
@@ -167,11 +142,7 @@ void CLRenderingKernel::setVolumeSampler( cl_sampler sampler )
     cl_int error = clSetKernelArg( kernelObject_, KERNEL_ARG_VolumeSampler ,
                                    sizeof( cl_sampler ),
                                    &sampler );
-    if( error != CL_SUCCESS )
-    {
-        oclHWDL::Error::checkCLError( error );
-        LOG_ERROR("Exiting Due to OpenCL Error!");
-    }
+    CL_ASSERT( error );
 }
 
 
@@ -180,11 +151,7 @@ void CLRenderingKernel::setInverseViewMatrix( cl_mem matrix )
     cl_int error = clSetKernelArg( kernelObject_, KERNEL_ARG_InverseMatrix ,
                                    sizeof( cl_mem ),
                                    ( void* ) &matrix );
-    if( error != CL_SUCCESS )
-    {
-        oclHWDL::Error::checkCLError( error );
-        LOG_ERROR("Exiting Due to OpenCL Error!");
-    }
+    CL_ASSERT( error );
 }
 
 void CLRenderingKernel::setVolumeDensityFactor( float density )
@@ -193,11 +160,7 @@ void CLRenderingKernel::setVolumeDensityFactor( float density )
     cl_int error = clSetKernelArg( kernelObject_, KERNEL_ARG_Density ,
                                    sizeof( float ),
                                    ( void* ) &density );
-    if( error != CL_SUCCESS )
-    {
-        oclHWDL::Error::checkCLError( error );
-        LOG_ERROR("Exiting Due to OpenCL Error!");
-    }
+    CL_ASSERT( error );
 }
 
 void CLRenderingKernel::setImageBrightnessFactor( float brightness )
@@ -205,11 +168,7 @@ void CLRenderingKernel::setImageBrightnessFactor( float brightness )
     cl_int error = clSetKernelArg( kernelObject_, KERNEL_ARG_Brightness ,
                                    sizeof( float ),
                                    ( void* ) &brightness );
-    if( error != CL_SUCCESS )
-    {
-        oclHWDL::Error::checkCLError( error );
-        LOG_ERROR("Exiting Due to OpenCL Error!");
-    }
+    CL_ASSERT( error );
 }
 
 void CLRenderingKernel::setMaxSteps( uint maxSteps )
@@ -218,11 +177,7 @@ void CLRenderingKernel::setMaxSteps( uint maxSteps )
                                    KERNEL_ARG_MaxSteps ,
                                    sizeof( uint ),
                                    ( void* ) &maxSteps );
-    if( error != CL_SUCCESS )
-    {
-        oclHWDL::Error::checkCLError( error );
-        LOG_ERROR("Exiting Due to OpenCL Error!");
-    }
+    CL_ASSERT( error );
 }
 
 void CLRenderingKernel::setStepSize( float tStep )
@@ -231,11 +186,7 @@ void CLRenderingKernel::setStepSize( float tStep )
                                    KERNEL_ARG_StepSize ,
                                    sizeof( float ),
                                    ( void* ) &tStep );
-    if( error != CL_SUCCESS )
-    {
-        oclHWDL::Error::checkCLError( error );
-        LOG_ERROR("Exiting Due to OpenCL Error!");
-    }
+    CL_ASSERT( error );
 }
 
 void CLRenderingKernel::setVolumeIsoValue( float  )

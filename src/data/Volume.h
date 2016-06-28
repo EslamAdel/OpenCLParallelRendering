@@ -21,6 +21,8 @@ template< class T > class SerializableVolume;
 template < class T >
 class Volume
 {
+protected:
+    friend class SerializableVolume< T > ;
 
 public: // Constructors
 
@@ -371,9 +373,6 @@ protected: // Protected functions
     void releaseData_();
 
 protected: // Protected (private) member variables
-
-    friend class SerializableVolume< T > ;
-
     /**
      * @brief dimensions_
      */

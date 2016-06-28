@@ -35,7 +35,7 @@ CommandLineParserBenchmark::tokenize_benchmark(
     else
         gui = false ;
 
-    testFrames = parser_.value( "T" ).toFloat() * 360 ;
+    testFrames = parser_.value( "T" ).toUInt() * 10;
 
     return this->tokenize( volume , frameWidth , frameHeight ,
                            renderers , compositorGPUIndex ,

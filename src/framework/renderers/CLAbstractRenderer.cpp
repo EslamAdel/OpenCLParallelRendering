@@ -94,6 +94,7 @@ bool CLAbstractRenderer::lessThan( const CLAbstractRenderer *lhs ,
 
 double CLAbstractRenderer::getRenderingTime() const
 {
+    QReadLocker lock( &renderingTimeLock_ );
     return renderingTime_;
 }
 
@@ -139,13 +140,12 @@ void CLAbstractRenderer::selectGPU_()
 
 void CLAbstractRenderer::createCommandQueue_()
 {
-    cl_int clErrorCode;
+    cl_int clErrorCode = CL_SUCCESS;
     commandQueue_ = clCreateCommandQueue( context_,
                                           device_,
                                           CL_QUEUE_PROFILING_ENABLE,
                                           &clErrorCode );
-
-    oclHWDL::Error::checkCLError(clErrorCode);
+    CL_ASSERT( clErrorCode );
 }
 
 
@@ -220,7 +220,6 @@ void CLAbstractRenderer::setSortFirstSettings(
 
 
     setRegion_();
-
 }
 
 
@@ -228,10 +227,7 @@ float CLAbstractRenderer::calculateRenderingTime_()
 {
     // Assuming that every thing is going in the right direction.
     cl_int clErrorCode = CL_SUCCESS;
-
     cl_ulong start , end;
-
-
 
     clErrorCode |=
             clGetEventProfilingInfo( clGPUExecution_,
@@ -247,12 +243,7 @@ float CLAbstractRenderer::calculateRenderingTime_()
                                      &start,
                                      0 );
 
-
-    if( clErrorCode != CL_SUCCESS )
-    {
-        oclHWDL::Error::checkCLError( clErrorCode );
-        LOG_ERROR("Exiting Due to OpenCL Error!");
-    }
+    CL_ASSERT( clErrorCode );
 
     return static_cast< float >( end -  start ) / 1e6 ;
 }

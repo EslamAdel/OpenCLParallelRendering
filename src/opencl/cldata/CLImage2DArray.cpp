@@ -79,13 +79,13 @@ void CLImage2DArray< T >::createDeviceData( cl_context context )
             clCreateImage( context , CL_MEM_READ_ONLY | CL_MEM_HOST_WRITE_ONLY ,
                            &imageFormat_ , &imageDescriptor_ , 0 , &error ) ;
 
+
     if( error != CL_SUCCESS )
-    {
-        oclHWDL::Error::checkCLError( error );
         LOG_DEBUG("Failed creating image3d: %dx%dx%d",
                   width_ , height_ , arraySize_ );
-        LOG_ERROR("OpenCL Error!");
-    }
+
+    CL_ASSERT( error );
+
 
     inDevice_ = true ;
 }
@@ -129,13 +129,7 @@ void CLImage2DArray< T >::loadFrameDataToDevice( const uint index ,
                                  ( const void * ) framesData_[ index ] , 0 ,
                                  0 , 0 ) ;
 
-    if( error != CL_SUCCESS )
-    {
-        oclHWDL::Error::checkCLError( error );
-        LOG_ERROR("OpenCL Error!");
-    }
-
-
+    CL_ASSERT( error );
 }
 
 template< class T >
@@ -203,12 +197,8 @@ void CLImage2DArray< T >::readOtherDeviceData( cl_command_queue cmdQueue ,
                                 ( void * ) framesData_[ index ] , 0 ,
                                 0 , 0  );
 
-    if( error != CL_SUCCESS )
-    {
-        oclHWDL::Error::checkCLError( error );
-        LOG_ERROR("OpenCL Error! Index=%d R(%d,%d)",
-                  origin[2] , region[0] , region[1] );
-    }
+    CL_ASSERT( error );
+
 }
 
 template< class T >
