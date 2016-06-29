@@ -197,7 +197,7 @@ color:#fff;
       <string/>
      </property>
     </widget>
-    <widget class="QLabel" name="frameContainerResult">
+    <widget class="QLabelMouseEvents" name="frameContainerResult">
      <property name="geometry">
       <rect>
        <x>40</x>
@@ -2700,6 +2700,11 @@ border-radius: 4px;
    <class>GPUListView</class>
    <extends>QListWidget</extends>
    <header>GPUListView.h</header>
+  </customwidget>
+  <customwidget>
+   <class>QLabelMouseEvents</class>
+   <extends>QLabel</extends>
+   <header>QLabelMouseEvents.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

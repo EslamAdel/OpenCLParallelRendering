@@ -11,7 +11,8 @@ set( OCL_MGPUVR_GUI_HEADER_FILES
     ../develop/CommandLineParser.h
     GPUListItemWidget.h
     GPUListView.h
-    TaskInitializeFramework.h )
+    TaskInitializeFramework.h
+    QLabelMouseEvents.h )
 
 set( OCL_MGPUVR_GUI_SOURCE_FILES
     oclMGPUVR_Gui.cpp
@@ -19,7 +20,8 @@ set( OCL_MGPUVR_GUI_SOURCE_FILES
     ../develop/CommandLineParser.cpp
     GPUListView.cpp
     GPUListItemWidget.cpp
-    TaskInitializeFramework.cpp )
+    TaskInitializeFramework.cpp
+    QLabelMouseEvents.cpp )
 
 set( OCL_MGPUVR_GUI_APP_FORMS RenderingWindow_Gui.ui )
 

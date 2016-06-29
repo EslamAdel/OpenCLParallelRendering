@@ -4,7 +4,7 @@
 #include <QFileDialog>
 #include <QDateTime>
 #include <QPicture>
-
+#include "QLabelMouseEvents.h"
 #include "Logger.h"
 
 RenderingWindow_Gui::RenderingWindow_Gui(
@@ -155,6 +155,19 @@ void RenderingWindow_Gui::intializeConnections_()
     connect( ui->isoSurfaceButton ,
              SIGNAL( toggled( bool )) ,
              this , SLOT( switchRenderingKernel_SLOT( )));
+
+    connect (ui->frameContainerResult,
+             SIGNAL( mousePressed( QVector2D )),
+             this , SLOT (mousePressed_SLOT( QVector2D )));
+
+    connect (ui->frameContainerResult ,
+             SIGNAL( mouseMoved( QVector2D )),
+             this , SLOT ( mouseMoved_SLOT(QVector2D)) );
+
+    connect (ui->frameContainerResult ,
+             SIGNAL( mouseReleased(QVector2D) ),
+             this , SLOT ( mouseReleased_SLOT(QVector2D) ));
+
 
 }
 
@@ -424,6 +437,66 @@ void RenderingWindow_Gui::switchRenderingKernel_SLOT()
 
 
     ui->isoValueSlider->setEnabled( ui->isoSurfaceButton->isChecked( ));
+}
+
+void RenderingWindow_Gui::mousePressed_SLOT(QVector2D pos)
+{
+
+    LOG_DEBUG("Mouse pressed!" );
+    mousePressPosition_ = pos;
+    lastMousePosition_ =  pos;
+
+}
+
+void RenderingWindow_Gui::mouseMoved_SLOT(QVector2D position)
+{
+
+    LOG_DEBUG("Mouse moved");
+
+    QVector2D diff = position - lastMousePosition_;
+
+    // Rotation axis is perpendicular to the mouse position difference
+    // x rotation
+    if(diff.x() == 0.0)
+    {
+        mouseXRotationAngle_ += diff.y();
+        if(mouseXRotationAngle_ <= 360)
+        {
+        newXRotation_SLOT( mouseXRotationAngle_);
+        LOG_DEBUG("y diff :%f", diff.y() );
+        LOG_DEBUG("Rot x :%f",  mouseXRotationAngle_ );
+        }
+        else
+           mouseXRotationAngle_ = 0;
+
+    }
+    // y rotation
+    else if(diff.y() == 0.0)
+    {
+        mouseYRotationAngle_ += diff.x();
+        if(mouseYRotationAngle_ <= 360)
+        {
+            newYRotation_SLOT(mouseYRotationAngle_);
+            LOG_DEBUG("x diff :%f", diff.x() );
+            LOG_DEBUG("Rot y :%f",  mouseYRotationAngle_ );
+        }
+        else
+            mouseYRotationAngle_ = 0;
+    }
+    // z rotation
+    else
+    {
+
+    }
+
+    // update last position
+    lastMousePosition_ = position;
+
+}
+
+void RenderingWindow_Gui::mouseReleased_SLOT(QVector2D releasedPosition)
+{
+    LOG_DEBUG("Mouse released");
 }
 
 
