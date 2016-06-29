@@ -125,6 +125,7 @@ void SortFirstRenderer< V , F >::initializeRenderers()
     // Compensate the round-off error for the last renderer.
     uint64_t sortFirstHeight = frameHeight_ / renderers_.size();
 
+    LOG_DEBUG("Frame size:(%d,%d) [SF:%d]", frameWidth_ , frameHeight_ , sortFirstHeight );
 
     uint64_t i = 0 ;
     CLRenderers::iterator it = renderers_.begin();
@@ -159,14 +160,9 @@ void SortFirstRenderer< V , F >::finishedRendering_SLOT(
         LOG_ERROR("Foreign thread!");
 
 
-#ifdef BENCHMARKING
-    compositingFinished_SLOT();
-#else
 
     QtConcurrent::run(  this , &SortFirstRenderer::assemble2_ ,
                         renderer , clFrame_.data( ));
-
-#endif
 
 }
 
@@ -181,9 +177,7 @@ void SortFirstRenderer< V , F >::compositingFinished_SLOT( )
         return;
 
 
-    ACCUMULATE( frameworkProfile.renderingLoop_TIMER ,
-                renderingLoopTime_( ));
-
+    TOC( frameworkProfile.renderingLoop_TIMER );
 
     calculateTransferTimeMean_();
     renderingLoopCounter_++;
@@ -210,8 +204,12 @@ void SortFirstRenderer< V , F >::compositingFinished_SLOT( )
 #endif
     }
 
+
 #ifndef BENCHMARKING
-    QtConcurrent::run( this ,  &SortFirstRenderer::clone_ );
+    TIC( frameworkProfile.convertToPixmap_TIMER );
+    emit this->frameReady_SIGNAL( &clFrame_->getFramePixmap( ) , nullptr );
+    TOC( frameworkProfile.convertToPixmap_TIMER );
+//    QtConcurrent::run( this ,  &SortFirstRenderer::clone_ );
 #endif
 
 }
@@ -258,6 +256,8 @@ void SortFirstRenderer< V , F >::applyTransformation_()
     // fetch new transformations if exists.
     syncTransformation_( );
 
+
+    TIC( frameworkProfile.renderingLoop_TIMER );
 
     for( Renderer::CLAbstractRenderer *renderer : renderers_ )
         QtConcurrent::run( this , &SortFirstRenderer::render_ ,
@@ -433,15 +433,6 @@ void SortFirstRenderer< V , F >::SortFirstRenderer::render_(
 {
     renderer->applyTransformation();
 
-#ifdef BENCHMARKING
-    CLData::CLImage2D< F > *clFrame =
-            renderer->getCLFrame().value< CLData::CLImage2D< F > *>();
-
-    clFrame->readDeviceData( renderer->getCommandQueue() ,
-                             CL_TRUE );
-#endif
-
-
     emit this->finishedRendering_SIGNAL( renderer );
 }
 
@@ -537,6 +528,7 @@ void SortFirstRenderer< V , F >::assemble2_(
                                      *clFrame , CL_TRUE );
     frameCopyMutex_.unlock();
 
+    emit this->finishedCompositing_SIGNAL();
 }
 
 
@@ -549,39 +541,9 @@ void SortFirstRenderer< V , F >::clone_( )
 
     frameCopyMutex_.lockForWrite();
     clFrameReadout_->copyHostData( *clFrame_.data( ));
-    emit this->frameReady_SIGNAL( &clFrame_->getFramePixmap( ) , nullptr );
+    emit this->frameReady_SIGNAL( &clFrameReadout_->getFramePixmap( ) , nullptr );
     frameCopyMutex_.unlock();
 }
-
-template< class V , class F >
-float SortFirstRenderer< V , F >::renderingLoopTime_()
-{
-#ifndef BENCHMARKING
-    LOG_ERROR("Invoked only in benchmarking mode!");
-#endif
-
-    if( QThread::currentThread() != this->thread())
-        LOG_ERROR("Foreign thread!");
-
-    float renderingLoopTime = 0 ;
-    for( const Renderer::CLAbstractRenderer *renderer : renderers_ )
-    {
-        const CLData::CLImage2D< F > *clFrame =
-                renderer->getCLFrame().value< CLData::CLImage2D< F > *>();
-        const float transferTime = clFrame->getTransferTime();
-        const float renderingTime =
-                static_cast< float >( renderer->getRenderingTime( ));
-
-        if( transferTime + renderingTime > renderingLoopTime )
-            renderingLoopTime = transferTime + renderingTime;
-    }
-
-    return renderingLoopTime;
-}
-
-
-
-
 
 }
 }

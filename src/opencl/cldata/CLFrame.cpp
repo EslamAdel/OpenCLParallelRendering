@@ -145,12 +145,17 @@ void CLFrame< T >::readOtherDeviceData(
 
     QReadLocker lock( &regionLock_ );
 
+    const uint64_t hostOffset =
+            ( sourceFrame.getOffset().x +
+              sourceFrame.dimensions_.x * sourceFrame.getOffset().y ) *
+            sourceFrame.channelsInPixel( );
+
     cl_int error = clEnqueueReadBuffer(
                 sourceCmdQueue , sourceFrame.getDeviceData() , blocking ,
                 sourceFrame.getOffset().imageSize( ) * pixelSize( ) ,
                 sourceFrame.getRegion().imageSize( ) * pixelSize( ) ,
-                ( void * ) &hostData_[ sourceFrame.getOffset().imageSize( )] ,
-            0 , 0 , &sourceFrame.clTransferEvent_ );
+                ( void * ) &hostData_[ hostOffset ] ,
+                0 , 0 , &sourceFrame.clTransferEvent_ );
 
     CL_ASSERT( error );
 
@@ -180,7 +185,7 @@ void CLFrame< T >::copyDeviceData(
                 frame.getDeviceData() , deviceData_ ,
                 frame.getOffset( ).imageSize( ) * frame.pixelSize( ) ,
                 offset_.imageSize( ) * pixelSize( ) ,
-                region_.imageSize() * pixelSize( ) ,
+                region_.imageSize( ) * pixelSize( ) ,
                 0 , 0 , &clTransferEvent_ ) ;
 
     CL_ASSERT( error );

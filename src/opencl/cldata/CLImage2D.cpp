@@ -130,21 +130,27 @@ void CLImage2D< T >::readOtherDeviceData(
 
     cl_int error = CL_SUCCESS;
 
+    const uint64_t hostOffset =
+            ( sourceFrame.getOffset().x +
+              sourceFrame.dimensions_.x * sourceFrame.getOffset().y ) *
+            sourceFrame.channelsInPixel( );
+
     error = clEnqueueReadImage(
                 sourceCmdQueue , sourceFrame.getDeviceData() ,
                 blocking , origin , region ,
                 sourceFrame.region_.x * CLFrame< T >::pixelSize() ,
                 sourceFrame.region_.imageSize() * CLFrame< T >::pixelSize() ,
-                ( void * ) &this->hostData_[ sourceFrame.offset_.imageSize( )] ,
+                ( void * ) &this->hostData_[ hostOffset ] ,
                 0 , 0 , &sourceFrame.clTransferEvent_ );
 
     CL_ASSERT( error );
 
-    LOG_DEBUG("offset:(%lo,%lo),region(%lo,%lo)",
-              sourceFrame.offset_.x ,
-              sourceFrame.offset_.y ,
-              sourceFrame.region_.x ,
-              sourceFrame.region_.y );
+//    LOG_DEBUG("offset:(%d,%d),region(%d,%d),hostOffset(%d)",
+//              sourceFrame.offset_.x ,
+//              sourceFrame.offset_.y ,
+//              sourceFrame.region_.x ,
+//              sourceFrame.region_.y ,
+//              hostOffset );
 
     sourceFrame.evaluateTransferTime_();
 }

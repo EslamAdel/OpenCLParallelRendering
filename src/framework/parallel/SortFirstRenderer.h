@@ -93,8 +93,6 @@ private:
 
     void clone_( );
 
-    float renderingLoopTime_();
-
 protected:
     //Volume Data
     /**

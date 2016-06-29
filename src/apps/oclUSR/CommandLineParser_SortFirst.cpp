@@ -25,7 +25,7 @@ CommandLineParserSortFirst::tokenize_sortfirst(
 
     loadBalancing = parser_.isSet( "load-balancing" ) ;
 
-    testFrames = parser_.value( "T" ).toUInt() * 45 ;
+    testFrames = parser_.value( "T" ).toFloat() * 360 ;
 
     LoadBalancingMode loadBalancingMode_dummy;
     uint compositorIndex_dummy ;
