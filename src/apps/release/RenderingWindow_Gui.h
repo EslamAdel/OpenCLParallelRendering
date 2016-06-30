@@ -121,8 +121,9 @@ private:
     QVector< QPixmap* > pixmaps_;
     QPixmap *finalFrame_;
 
-    QVector2D mousePressPosition_;
     QVector2D lastMousePosition_;
+    QVector2D mousePositionDifference_;
+
     float mouseXRotationAngle_ = 0;
     float mouseYRotationAngle_ = 0;
     float mouseZRotationAngle_=  0;

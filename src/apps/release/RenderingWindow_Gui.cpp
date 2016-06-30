@@ -6,7 +6,7 @@
 #include <QPicture>
 #include "QLabelMouseEvents.h"
 #include "Logger.h"
-
+#include "QtMath"
 RenderingWindow_Gui::RenderingWindow_Gui(
         clparen::Parallel::CLAbstractParallelRenderer *parallelRenderer ,
         QWidget *parent )
@@ -190,7 +190,6 @@ void RenderingWindow_Gui::startRendering_( )
     newXYZScaling_SLOT( ui->xyzScalingSlider->value( ) );
     newBrightness_SLOT( ui->brightnessSlider->value( ));
     newDensity_SLOT( ui->densitySlider->value( ));
-
 
     parallelRenderer_->startRendering( );
 
@@ -439,31 +438,32 @@ void RenderingWindow_Gui::switchRenderingKernel_SLOT()
     ui->isoValueSlider->setEnabled( ui->isoSurfaceButton->isChecked( ));
 }
 
-void RenderingWindow_Gui::mousePressed_SLOT(QVector2D pos)
+void RenderingWindow_Gui::mousePressed_SLOT(QVector2D pressedPosition)
 {
 
     LOG_DEBUG("Mouse pressed!" );
-    mousePressPosition_ = pos;
-    lastMousePosition_ =  pos;
+    lastMousePosition_ =  mousePressedPosition_;
 
 }
 
-void RenderingWindow_Gui::mouseMoved_SLOT(QVector2D position)
+void RenderingWindow_Gui::mouseMoved_SLOT(QVector2D newMousePosition)
 {
 
     LOG_DEBUG("Mouse moved");
 
-    QVector2D diff = position - lastMousePosition_;
+    mousePositionDifference_ = newMousePosition - lastMousePosition_;
 
     // Rotation axis is perpendicular to the mouse position difference
     // x rotation
-    if(diff.x() == 0.0)
+    if(mousePositionDifference_.x() == 0.0)
     {
-        mouseXRotationAngle_ += diff.y();
+        // update x rotation angle
+        mouseXRotationAngle_ += mousePositionDifference_.y();
         if(mouseXRotationAngle_ <= 360)
         {
-        newXRotation_SLOT( mouseXRotationAngle_);
-        LOG_DEBUG("y diff :%f", diff.y() );
+        ui->xRotationSlider->setValue( mouseXRotationAngle_);
+        parallelRenderer_->updateRotationX_SLOT( mouseXRotationAngle_ );
+        LOG_DEBUG("y diff :%f", mousePositionDifference_.y() );
         LOG_DEBUG("Rot x :%f",  mouseXRotationAngle_ );
         }
         else
@@ -471,26 +471,42 @@ void RenderingWindow_Gui::mouseMoved_SLOT(QVector2D position)
 
     }
     // y rotation
-    else if(diff.y() == 0.0)
+    else if(mousePositionDifference_.y() == 0.0)
     {
-        mouseYRotationAngle_ += diff.x();
+        // update y rotation angle
+        mouseYRotationAngle_ += mousePositionDifference_.x();
         if(mouseYRotationAngle_ <= 360)
         {
-            newYRotation_SLOT(mouseYRotationAngle_);
-            LOG_DEBUG("x diff :%f", diff.x() );
+            ui->yRotationSlider->setValue( mouseYRotationAngle_);
+            parallelRenderer_->updateRotationY_SLOT( mouseYRotationAngle_ );
+            LOG_DEBUG("x diff :%f", mousePositionDifference_.x() );
             LOG_DEBUG("Rot y :%f",  mouseYRotationAngle_ );
         }
         else
             mouseYRotationAngle_ = 0;
     }
     // z rotation
+    /*
     else
     {
 
-    }
+        // update z rotation angle
+        mouseZRotationAngle_ += (mousePositionDifference_.x() + mousePositionDifference_.y());
+        if(mouseZRotationAngle_ <= 360)
+        {
+        ui->zRotationSlider->setValue( mouseZRotationAngle_);
+        parallelRenderer_->updateRotationZ_SLOT( mouseZRotationAngle_ );
+        LOG_DEBUG("y diff :%f", mousePositionDifference_.y() );
+        LOG_DEBUG("x diff :%f", mousePositionDifference_.x() );
+        LOG_DEBUG("Rot z :%f",  mouseZRotationAngle_ );
+        }
+        else
+           mouseZRotationAngle_ = 0;
+     }
+     */
 
     // update last position
-    lastMousePosition_ = position;
+    lastMousePosition_ = newMousePosition;
 
 }
 
