@@ -98,7 +98,7 @@ private slots:
 
     void switchRenderingKernel_SLOT( );
 
-    void mousePressed_SLOT( QVector2D pressedPosition);
+    void mousePressed_SLOT( QVector2D mousePressedPosition);
 
     void mouseMoved_SLOT( QVector2D newPosition);
 

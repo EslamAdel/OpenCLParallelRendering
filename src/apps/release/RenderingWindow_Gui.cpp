@@ -438,11 +438,11 @@ void RenderingWindow_Gui::switchRenderingKernel_SLOT()
     ui->isoValueSlider->setEnabled( ui->isoSurfaceButton->isChecked( ));
 }
 
-void RenderingWindow_Gui::mousePressed_SLOT(QVector2D pressedPosition)
+void RenderingWindow_Gui::mousePressed_SLOT(QVector2D mousePressedPosition)
 {
 
     LOG_DEBUG("Mouse pressed!" );
-    lastMousePosition_ =  mousePressedPosition_;
+    lastMousePosition_ =  mousePressedPosition;
 
 }
 
