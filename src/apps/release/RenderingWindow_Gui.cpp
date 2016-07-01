@@ -47,8 +47,14 @@ RenderingWindow_Gui::RenderingWindow_Gui(
     ui->offsetSlider->setEnabled(false);
     ui->scaleSlider->setEnabled(false);
     ui->isoValueSlider->setEnabled(false);
+    ui->xrayButton->setChecked(true);
 
-
+    // disable active kernel radiobuttons when framework is not ready
+    ui->xrayButton->setEnabled(false);
+    ui->maxIntensityProjectionButton->setEnabled(false);
+    ui->minIntensityProjectionButton->setEnabled(false);
+    ui->averageIntensityProjectionButton->setEnabled(false);
+    ui->isoSurfaceButton->setEnabled(false);
     //disable transformations and transfer function when framework is not ready.
     ui->tabWidget->setTabEnabled( TransformationTabIndex , false );
     ui->tabWidget->setTabEnabled( TransferFunctionTabIndex , false );
@@ -185,7 +191,7 @@ void RenderingWindow_Gui::startRendering_( )
 
 void RenderingWindow_Gui::displayFrame_( QPixmap *frame , uint id )
 {
-    LOG_DEBUG("Set Pixmap<%d>",id );
+//    LOG_DEBUG("Set Pixmap<%d>",id );
     if( frame->isNull() )
         LOG_WARNING("Null frame");
 
@@ -202,7 +208,7 @@ void RenderingWindow_Gui::frameReady_SLOT( QPixmap *frame,
 {
     uint index = renderer->getFrameIndex();
 
-    LOG_DEBUG("Catch frame <%d> ", renderer->getFrameIndex());
+//    LOG_DEBUG("Catch frame <%d> ", renderer->getFrameIndex());
 
     if( index < frameContainers_.size() )
         displayFrame_( frame , index );
@@ -210,7 +216,7 @@ void RenderingWindow_Gui::frameReady_SLOT( QPixmap *frame,
 
 void RenderingWindow_Gui::finalFrameReady_SLOT( QPixmap *finalFrame )
 {
-    LOG_DEBUG("Set Final Frame" );
+//    LOG_DEBUG("Set Final Frame" );
 
     finalFrame_ = finalFrame;
     ui->frameContainerResult->
@@ -390,6 +396,12 @@ void RenderingWindow_Gui::frameworkReady_SLOT()
     //disable transformations and transfer function when framework is not ready.
     ui->tabWidget->setTabEnabled( TransformationTabIndex , true );
     ui->tabWidget->setTabEnabled( TransferFunctionTabIndex , true );
+
+    ui->xrayButton->setEnabled(true);
+    ui->maxIntensityProjectionButton->setEnabled(true);
+    ui->minIntensityProjectionButton->setEnabled(true);
+    ui->averageIntensityProjectionButton->setEnabled(true);
+    ui->isoSurfaceButton->setEnabled(true);
 
     intializeConnections_();
     startRendering_();
