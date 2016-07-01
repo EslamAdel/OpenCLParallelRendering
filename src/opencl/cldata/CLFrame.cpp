@@ -105,10 +105,7 @@ void CLFrame< T >::writeDeviceData( cl_command_queue cmdQueue ,
                                   ( const void *) hostData_ ,
                                   0 , 0 , &clTransferEvent_ );
     CL_ASSERT( error );
-
-
-    evaluateTransferTime_();
-
+    CL_ASSERT_WARNING( evaluateTransferTime_( ));
 }
 
 template< class T >
@@ -126,11 +123,10 @@ void CLFrame< T >::readDeviceData( cl_command_queue cmdQueue ,
                                  0 , 0 , &clTransferEvent_ );
 
     CL_ASSERT( error );
+    CL_ASSERT_WARNING( evaluateTransferTime_( ));
 
     //Now, neither QPixmap frame_ nor rgbaFrame represents the recent raw data.
     pixmapSynchronized_ = false ;
-
-    evaluateTransferTime_();
 
 }
 
@@ -158,11 +154,11 @@ void CLFrame< T >::readOtherDeviceData(
                 0 , 0 , &sourceFrame.clTransferEvent_ );
 
     CL_ASSERT( error );
+    CL_ASSERT_WARNING( sourceFrame.evaluateTransferTime_( ));
 
     //Now, neither QPixmap frame_ nor rgbaFrame represents the recent raw data.
     pixmapSynchronized_ = false ;
 
-    sourceFrame.evaluateTransferTime_();
 }
 
 template< class T >
@@ -193,7 +189,7 @@ void CLFrame< T >::copyDeviceData(
     if( blocking )
         clFinish( cmdQueue );
 
-    evaluateTransferTime_();
+    CL_ASSERT_WARNING( evaluateTransferTime_());
 }
 
 
@@ -370,7 +366,7 @@ void CLFrame< T >::convertColorToRGBA_( uint Color ,
 }
 
 template< class T >
-void CLFrame< T >::evaluateTransferTime_() const
+cl_int CLFrame< T >::evaluateTransferTime_() const
 {
     QWriteLocker lock( &transferTimeLock_ );
 
@@ -397,12 +393,9 @@ void CLFrame< T >::evaluateTransferTime_() const
                                      &start,
                                      0 );
 
-
-    CL_ASSERT( clErrorCode );
-
-
     transferTime_ = static_cast< float >( end -  start ) / 1e6 ;
 
+    return clErrorCode;
 }
 
 template< class T >

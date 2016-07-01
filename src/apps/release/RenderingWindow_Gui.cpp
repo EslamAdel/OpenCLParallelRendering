@@ -185,7 +185,7 @@ void RenderingWindow_Gui::startRendering_( )
 
 void RenderingWindow_Gui::displayFrame_( QPixmap *frame , uint id )
 {
-    LOG_DEBUG("Set Pixmap<%d>",id );
+//    LOG_DEBUG("Set Pixmap<%d>",id );
     if( frame->isNull() )
         LOG_WARNING("Null frame");
 
@@ -202,7 +202,7 @@ void RenderingWindow_Gui::frameReady_SLOT( QPixmap *frame,
 {
     uint index = renderer->getFrameIndex();
 
-    LOG_DEBUG("Catch frame <%d> ", renderer->getFrameIndex());
+//    LOG_DEBUG("Catch frame <%d> ", renderer->getFrameIndex());
 
     if( index < frameContainers_.size() )
         displayFrame_( frame , index );
@@ -210,7 +210,7 @@ void RenderingWindow_Gui::frameReady_SLOT( QPixmap *frame,
 
 void RenderingWindow_Gui::finalFrameReady_SLOT( QPixmap *finalFrame )
 {
-    LOG_DEBUG("Set Final Frame" );
+//    LOG_DEBUG("Set Final Frame" );
 
     finalFrame_ = finalFrame;
     ui->frameContainerResult->

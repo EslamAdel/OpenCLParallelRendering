@@ -81,8 +81,7 @@ void CLImage2D< T >::writeDeviceData( cl_command_queue cmdQueue,
                 0 , 0 , &this->clTransferEvent_ );
 
     CL_ASSERT( error );
-
-    CLFrame< T >::evaluateTransferTime_();
+    CL_ASSERT_WARNING( CLFrame< T >::evaluateTransferTime_( ));
 }
 
 template< class T >
@@ -107,14 +106,13 @@ void CLImage2D< T >::readDeviceData( cl_command_queue cmdQueue ,
                 0 , 0 , &this->clTransferEvent_ );
 
     CL_ASSERT( error );
-
-    CLFrame< T >::evaluateTransferTime_();
+    CL_ASSERT_WARNING( CLFrame< T >::evaluateTransferTime_( ));
 }
 
 template< class T >
 void CLImage2D< T >::readOtherDeviceData(
         cl_command_queue sourceCmdQueue ,
-        const CLFrame<T> &sourceFrame ,
+        const CLFrame< T > &sourceFrame ,
         const cl_bool blocking )
 {
     if( sourceFrame.getFrameDimensions() != this->dimensions_ )
@@ -144,15 +142,15 @@ void CLImage2D< T >::readOtherDeviceData(
                 0 , 0 , &sourceFrame.clTransferEvent_ );
 
     CL_ASSERT( error );
+    CL_ASSERT_WARNING( sourceFrame.evaluateTransferTime_( ));
+    //    LOG_DEBUG("offset:(%d,%d),region(%d,%d),hostOffset(%d)",
+    //              sourceFrame.offset_.x ,
+    //              sourceFrame.offset_.y ,
+    //              sourceFrame.region_.x ,
+    //              sourceFrame.region_.y ,
+    //              hostOffset );
 
-//    LOG_DEBUG("offset:(%d,%d),region(%d,%d),hostOffset(%d)",
-//              sourceFrame.offset_.x ,
-//              sourceFrame.offset_.y ,
-//              sourceFrame.region_.x ,
-//              sourceFrame.region_.y ,
-//              hostOffset );
 
-    sourceFrame.evaluateTransferTime_();
 }
 
 
