@@ -2593,7 +2593,7 @@ QRadioButton::indicator::checked{ border: 1px solid darkgray; border-radius: 6px
 QRadioButton::indicator::checked{ border: 1px solid darkgray; border-radius: 6px; background-color: blue; width: 10px; height: 10px; margin-left: 5px;}</string>
      </property>
      <property name="text">
-      <string>Max Intensity projection</string>
+      <string>Max Intensity Projection</string>
      </property>
     </widget>
     <widget class="QRadioButton" name="isoSurfaceButton">
