@@ -2486,17 +2486,17 @@ border-radius: 4px;
     </property>
     <property name="font">
      <font>
-      <family>Latin Modern Roman</family>
+      <family>Ubuntu Condensed</family>
       <pointsize>11</pointsize>
       <weight>50</weight>
-      <italic>true</italic>
+      <italic>false</italic>
       <bold>false</bold>
      </font>
     </property>
     <property name="styleSheet">
      <string notr="true">background-color: rgb(26, 26, 26);
 color: rgb(255, 255, 255);
-font: italic 11pt &quot;Latin Modern Roman&quot;;
+font: 11pt &quot;Ubuntu Condensed&quot;;
 QRadioButton::indicator::checked {
    color:#fff; 
 }
@@ -2560,10 +2560,10 @@ QRadioButton::indicator::checked{ border: 1px solid darkgray; border-radius: 6px
      </property>
      <property name="font">
       <font>
-       <family>Latin Modern Roman</family>
+       <family>Ubuntu Condensed</family>
        <pointsize>11</pointsize>
        <weight>50</weight>
-       <italic>true</italic>
+       <italic>false</italic>
        <bold>false</bold>
       </font>
      </property>
