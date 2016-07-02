@@ -47,8 +47,14 @@ RenderingWindow_Gui::RenderingWindow_Gui(
     ui->offsetSlider->setEnabled(false);
     ui->scaleSlider->setEnabled(false);
     ui->isoValueSlider->setEnabled(false);
+    ui->xrayButton->setChecked(true);
 
-
+    // disable active kernel radiobuttons when framework is not ready
+    ui->xrayButton->setEnabled(false);
+    ui->maxIntensityProjectionButton->setEnabled(false);
+    ui->minIntensityProjectionButton->setEnabled(false);
+    ui->averageIntensityProjectionButton->setEnabled(false);
+    ui->isoSurfaceButton->setEnabled(false);
     //disable transformations and transfer function when framework is not ready.
     ui->tabWidget->setTabEnabled( TransformationTabIndex , false );
     ui->tabWidget->setTabEnabled( TransferFunctionTabIndex , false );
@@ -390,6 +396,12 @@ void RenderingWindow_Gui::frameworkReady_SLOT()
     //disable transformations and transfer function when framework is not ready.
     ui->tabWidget->setTabEnabled( TransformationTabIndex , true );
     ui->tabWidget->setTabEnabled( TransferFunctionTabIndex , true );
+
+    ui->xrayButton->setEnabled(true);
+    ui->maxIntensityProjectionButton->setEnabled(true);
+    ui->minIntensityProjectionButton->setEnabled(true);
+    ui->averageIntensityProjectionButton->setEnabled(true);
+    ui->isoSurfaceButton->setEnabled(true);
 
     intializeConnections_();
     startRendering_();
