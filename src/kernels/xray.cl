@@ -98,13 +98,15 @@ __kernel void xray( __write_only image2d_t frameBuffer,
     const uint x = get_global_id( 0 );
     const uint y = get_global_id( 1 );
 
+    const uint offsetX = get_global_offset( 0 );
+    const uint offsetY = get_global_offset( 1 );
+
     // If out of boundaries, return.
-    if( x  >= frameWidth   )
+    if( x - offsetX  >= sortFirstWidth   )
         return ;
 
-    if( y  >= frameHeight  )
+    if( y - offsetY >= sortFirstHeight  )
         return ;
-
 
     const float u = ( x / ( float ) frameWidth ) * 2.f - 1.f;
     const float v = ( y / ( float ) frameHeight ) * 2.f - 1.f;
