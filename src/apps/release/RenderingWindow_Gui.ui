@@ -352,7 +352,7 @@ QTabBar::tab:!selected {
 </string>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>2</number>
     </property>
     <widget class="QWidget" name="Devices">
      <attribute name="title">
@@ -663,7 +663,7 @@ background:#3D3C3A;
         </size>
        </property>
        <property name="styleSheet">
-        <string notr="true">font: 75 italic 11pt &quot;Latin Modern Roman&quot;;</string>
+        <string notr="true"/>
        </property>
        <widget class="QLabel" name="xTranslationValue">
         <property name="geometry">
@@ -1040,7 +1040,6 @@ background:#3D3C3A;
     border-style:   solid;
 	border-color: rgb(255, 255, 255);
 	
-font: italic 11pt &quot;Latin Modern Roman&quot;;
 	/**
 	border-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0.133971 rgba(255, 255, 125, 255), stop:1 rgba(255, 255, 255, 255));
 **/
@@ -1070,7 +1069,7 @@ font: italic 11pt &quot;Latin Modern Roman&quot;;
        </property>
        <property name="styleSheet">
         <string notr="true">
-font: 75 italic 11pt &quot;Latin Modern Roman&quot;;</string>
+</string>
        </property>
        <widget class="QLabel" name="xRotationValue">
         <property name="geometry">
@@ -1466,7 +1465,7 @@ background:#3D3C3A;
         </size>
        </property>
        <property name="styleSheet">
-        <string notr="true">font: italic 11pt &quot;Latin Modern Roman&quot;;</string>
+        <string notr="true"/>
        </property>
        <widget class="QLabel" name="xScalingValue">
         <property name="geometry">
@@ -1971,7 +1970,7 @@ background:#3D3C3A;
         </size>
        </property>
        <property name="styleSheet">
-        <string notr="true">font: italic 11pt &quot;Latin Modern Roman&quot;;</string>
+        <string notr="true"/>
        </property>
        <widget class="QSlider" name="brightnessSlider">
         <property name="geometry">
@@ -2218,7 +2217,6 @@ background:#3D3C3A;
     border-width: 1px;
     border-style:   solid;
 	border-color: rgb(255, 255, 255);
-font: 75 11pt &quot;Latin Modern Roman&quot;;
 }
 </string>
       </property>
@@ -2232,7 +2230,7 @@ font: 75 11pt &quot;Latin Modern Roman&quot;;
         </rect>
        </property>
        <property name="styleSheet">
-        <string notr="true">font: italic 11pt &quot;Latin Modern Roman&quot;;</string>
+        <string notr="true"/>
        </property>
        <property name="text">
         <string>offset</string>
@@ -2342,7 +2340,7 @@ border-radius: 4px;
         </rect>
        </property>
        <property name="styleSheet">
-        <string notr="true">font: italic 11pt &quot;Latin Modern Roman&quot;;</string>
+        <string notr="true"/>
        </property>
        <property name="text">
         <string>scale</string>
@@ -2439,7 +2437,7 @@ border-radius: 4px;
         </rect>
        </property>
        <property name="styleSheet">
-        <string notr="true">font: 75 11pt &quot;Latin Modern Roman&quot;;</string>
+        <string notr="true"/>
        </property>
        <property name="text">
         <string>Transfer Functoin Parameters</string>
@@ -2477,7 +2475,7 @@ border-radius: 4px;
         </rect>
        </property>
        <property name="styleSheet">
-        <string notr="true">font: italic 11pt &quot;Latin Modern Roman&quot;;</string>
+        <string notr="true"/>
        </property>
        <property name="text">
         <string>Enable Transfer Function</string>
@@ -2510,17 +2508,17 @@ border-radius: 4px;
     </property>
     <property name="font">
      <font>
-      <family>Latin Modern Roman</family>
+      <family>Ubuntu Condensed</family>
       <pointsize>11</pointsize>
       <weight>50</weight>
-      <italic>true</italic>
+      <italic>false</italic>
       <bold>false</bold>
      </font>
     </property>
     <property name="styleSheet">
      <string notr="true">background-color: rgb(26, 26, 26);
 color: rgb(255, 255, 255);
-font: italic 11pt &quot;Latin Modern Roman&quot;;
+font: 11pt &quot;Ubuntu Condensed&quot;;
 QRadioButton::indicator::checked {
    color:#fff; 
 }
@@ -2584,10 +2582,10 @@ QRadioButton::indicator::checked{ border: 1px solid darkgray; border-radius: 6px
      </property>
      <property name="font">
       <font>
-       <family>Latin Modern Roman</family>
+       <family>Ubuntu Condensed</family>
        <pointsize>11</pointsize>
        <weight>50</weight>
-       <italic>true</italic>
+       <italic>false</italic>
        <bold>false</bold>
       </font>
      </property>
