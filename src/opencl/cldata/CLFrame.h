@@ -302,7 +302,7 @@ protected:
      * @brief calculateTransferTime_
      * @return
      */
-    void evaluateTransferTime_() const;
+    cl_int evaluateTransferTime_() const;
 protected:
 
     /**

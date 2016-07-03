@@ -67,14 +67,19 @@ shaded( __write_only image2d_t frameBuffer,
         sampler_t transferFuncSampler )
 
 {	
+
+
     const uint x = get_global_id( 0 );
     const uint y = get_global_id( 1 );
 
+    const uint offsetX = get_global_offset( 0 );
+    const uint offsetY = get_global_offset( 1 );
+
     // If out of boundaries, return.
-    if( x  >= frameWidth   )
+    if( x - offsetX  >= sortFirstWidth   )
         return ;
 
-    if( y  >= frameHeight  )
+    if( y - offsetY >= sortFirstHeight  )
         return ;
 
     float u = (x / (float) frameWidth)*2.0f-1.0f;

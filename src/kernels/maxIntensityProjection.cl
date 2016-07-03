@@ -98,14 +98,18 @@ __kernel void maxIntensityProjection(
         uint maxSteps, float tStep )
 {
 
+
     const uint x = get_global_id( 0 );
     const uint y = get_global_id( 1 );
 
+    const uint offsetX = get_global_offset( 0 );
+    const uint offsetY = get_global_offset( 1 );
+
     // If out of boundaries, return.
-    if( x  >= frameWidth   )
+    if( x - offsetX  >= sortFirstWidth   )
         return ;
 
-    if( y  >= frameHeight  )
+    if( y - offsetY >= sortFirstHeight  )
         return ;
 
     const float u = ( x / ( float ) frameWidth ) * 2.f - 1.f;

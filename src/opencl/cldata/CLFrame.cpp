@@ -105,10 +105,7 @@ void CLFrame< T >::writeDeviceData( cl_command_queue cmdQueue ,
                                   ( const void *) hostData_ ,
                                   0 , 0 , &clTransferEvent_ );
     CL_ASSERT( error );
-
-
-    evaluateTransferTime_();
-
+    CL_ASSERT_WARNING( evaluateTransferTime_( ));
 }
 
 template< class T >
@@ -126,11 +123,10 @@ void CLFrame< T >::readDeviceData( cl_command_queue cmdQueue ,
                                  0 , 0 , &clTransferEvent_ );
 
     CL_ASSERT( error );
+    CL_ASSERT_WARNING( evaluateTransferTime_( ));
 
     //Now, neither QPixmap frame_ nor rgbaFrame represents the recent raw data.
     pixmapSynchronized_ = false ;
-
-    evaluateTransferTime_();
 
 }
 
@@ -158,11 +154,11 @@ void CLFrame< T >::readOtherDeviceData(
                 0 , 0 , &sourceFrame.clTransferEvent_ );
 
     CL_ASSERT( error );
+    CL_ASSERT_WARNING( sourceFrame.evaluateTransferTime_( ));
 
     //Now, neither QPixmap frame_ nor rgbaFrame represents the recent raw data.
     pixmapSynchronized_ = false ;
 
-    sourceFrame.evaluateTransferTime_();
 }
 
 template< class T >
@@ -193,7 +189,7 @@ void CLFrame< T >::copyDeviceData(
     if( blocking )
         clFinish( cmdQueue );
 
-    evaluateTransferTime_();
+    CL_ASSERT_WARNING( evaluateTransferTime_());
 }
 
 
@@ -220,17 +216,10 @@ QPixmap &CLFrame<T>::getFramePixmap()
             pixmapData_ = reinterpret_cast< uchar* >( hostData_ ) ;
         else
             // Conversion needed.
-            for( int i = 0; i < region_.imageSize() ; i++ )
-            {
-                pixmapData_[ 4 * i ] =
-                        static_cast< uchar >( hostData_[  4 * i ] );
-                pixmapData_[ 4 * i + 1 ] =
-                        static_cast< uchar >( hostData_[  4 * i + 1 ]);
-                pixmapData_[ 4 * i + 2 ] =
-                        static_cast< uchar >( hostData_[  4 * i + 2 ]);
-                pixmapData_[ 4 * i + 3 ] =
-                        static_cast< uchar >( hostData_[  4 * i + 3 ]);
-            }
+            for( int i = 0; i < region_.imageSize() * channelsInPixel() ; i++ )
+                pixmapData_[ i ] =
+                        static_cast< uchar >( hostData_[ i ] );
+
 
         // Create a QImage and send it back to the rendering window.
         const QImage image( pixmapData_,
@@ -238,7 +227,7 @@ QPixmap &CLFrame<T>::getFramePixmap()
                             QImage::Format_ARGB32);
 
 
-        *pixmap_ = pixmap_->fromImage( image );
+        *pixmap_ = QPixmap::fromImage( image );
 
     }
 
@@ -251,7 +240,7 @@ QPixmap &CLFrame<T>::getFramePixmap()
         const QImage image( pixmapData_,
                             region_.x , region_.y ,
                             QImage::Format_Grayscale8 );
-        *pixmap_ = pixmap_->fromImage( image );
+        *pixmap_ = QPixmap::fromImage( image );
     }
 
     return *pixmap_ ;
@@ -370,7 +359,7 @@ void CLFrame< T >::convertColorToRGBA_( uint Color ,
 }
 
 template< class T >
-void CLFrame< T >::evaluateTransferTime_() const
+cl_int CLFrame< T >::evaluateTransferTime_() const
 {
     QWriteLocker lock( &transferTimeLock_ );
 
@@ -397,12 +386,9 @@ void CLFrame< T >::evaluateTransferTime_() const
                                      &start,
                                      0 );
 
-
-    CL_ASSERT( clErrorCode );
-
-
     transferTime_ = static_cast< float >( end -  start ) / 1e6 ;
 
+    return clErrorCode;
 }
 
 template< class T >

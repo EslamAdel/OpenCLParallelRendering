@@ -80,6 +80,8 @@ private: // Private Member Variables
 #define CL_ASSERT( success ) if( success != CL_SUCCESS )                        \
         LOG_ERROR("OpenCL Error:%s!", oclHWDL::Error::getErrorString( success ).c_str())
 
+#define CL_ASSERT_WARNING( success ) if( success != CL_SUCCESS )                        \
+        LOG_WARNING("OpenCL Error:%s!", oclHWDL::Error::getErrorString( success ).c_str())
 
 #ifdef DEBUG_OPENGL_LOOP
 /** \brief Log debugging information for OpenGL loop */
