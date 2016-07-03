@@ -104,7 +104,9 @@ private slots:
 
     void mouseReleased_SLOT(QVector2D releasedPosition);
 
+    void newMouseXRotation( );
 
+    void newMouseYRotation( );
 
 private:
     Ui::RenderingWindow_Gui *ui;
@@ -124,9 +126,9 @@ private:
     QVector2D lastMousePosition_;
     QVector2D mousePositionDifference_;
 
-    float mouseXRotationAngle_ = 0;
-    float mouseYRotationAngle_ = 0;
-    float mouseZRotationAngle_=  0;
+    float mouseXRotationAngle_;
+    float mouseYRotationAngle_;
+    float mouseZRotationAngle_;
 
     //std::vector
 };

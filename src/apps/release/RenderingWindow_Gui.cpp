@@ -454,15 +454,17 @@ void RenderingWindow_Gui::mouseMoved_SLOT(QVector2D newMousePosition)
     mousePositionDifference_ = newMousePosition - lastMousePosition_;
 
     // Rotation axis is perpendicular to the mouse position difference
+
     // x rotation
     if(mousePositionDifference_.x() == 0.0)
     {
         // update x rotation angle
+        mouseXRotationAngle_ = ui->xRotationSlider->value();
         mouseXRotationAngle_ += mousePositionDifference_.y();
+
         if(mouseXRotationAngle_ <= 360)
         {
-        ui->xRotationSlider->setValue( mouseXRotationAngle_);
-        parallelRenderer_->updateRotationX_SLOT( mouseXRotationAngle_ );
+        newMouseXRotation( );
         LOG_DEBUG("y diff :%f", mousePositionDifference_.y() );
         LOG_DEBUG("Rot x :%f",  mouseXRotationAngle_ );
         }
@@ -474,11 +476,12 @@ void RenderingWindow_Gui::mouseMoved_SLOT(QVector2D newMousePosition)
     else if(mousePositionDifference_.y() == 0.0)
     {
         // update y rotation angle
+        mouseYRotationAngle_ = ui->yRotationSlider->value();
         mouseYRotationAngle_ += mousePositionDifference_.x();
+
         if(mouseYRotationAngle_ <= 360)
         {
-            ui->yRotationSlider->setValue( mouseYRotationAngle_);
-            parallelRenderer_->updateRotationY_SLOT( mouseYRotationAngle_ );
+            newMouseYRotation( );
             LOG_DEBUG("x diff :%f", mousePositionDifference_.x() );
             LOG_DEBUG("Rot y :%f",  mouseYRotationAngle_ );
         }
@@ -486,10 +489,9 @@ void RenderingWindow_Gui::mouseMoved_SLOT(QVector2D newMousePosition)
             mouseYRotationAngle_ = 0;
     }
     // z rotation
-    /*
+
     else
     {
-
         // update z rotation angle
         mouseZRotationAngle_ += (mousePositionDifference_.x() + mousePositionDifference_.y());
         if(mouseZRotationAngle_ <= 360)
@@ -503,7 +505,7 @@ void RenderingWindow_Gui::mouseMoved_SLOT(QVector2D newMousePosition)
         else
            mouseZRotationAngle_ = 0;
      }
-     */
+
 
     // update last position
     lastMousePosition_ = newMousePosition;
@@ -515,6 +517,19 @@ void RenderingWindow_Gui::mouseReleased_SLOT(QVector2D releasedPosition)
     LOG_DEBUG("Mouse released");
 }
 
+void RenderingWindow_Gui::newMouseXRotation( )
+{
+    ui->xRotationSlider->setValue( mouseXRotationAngle_);
+    parallelRenderer_->updateRotationX_SLOT( mouseXRotationAngle_ );
+}
+
+
+void RenderingWindow_Gui::newMouseYRotation( )
+{
+    ui->yRotationSlider->setValue( mouseYRotationAngle_);
+    parallelRenderer_->updateRotationY_SLOT( mouseYRotationAngle_ );
+
+}
 
 void RenderingWindow_Gui::captureView_SLOT()
 {
