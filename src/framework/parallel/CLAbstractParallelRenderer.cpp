@@ -310,6 +310,13 @@ void CLAbstractParallelRenderer::benchmark_( )
 }
 
 
+void CLAbstractParallelRenderer::assertThread_()
+{
+    if( QThread::currentThread() != this->thread())
+        LOG_ERROR("Current thread != object thread");
+}
+
+
 void CLAbstractParallelRenderer::updateTransferFunction_SLOT(
         float *transferFunction , uint length )
 {

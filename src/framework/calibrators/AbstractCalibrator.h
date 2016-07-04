@@ -14,7 +14,7 @@ class AbstractCalibrator : public QObject
 public:
     AbstractCalibrator( QObject *parent = 0 );
 
-signals:
+Q_SIGNALS:
     void finishedCalibration_SIGNAL( double meanTime , uint64_t gpuIdx );
 
 

@@ -48,7 +48,7 @@ public:
     TransferFunctionEditor(QWidget* tfParentWidget = 0 );
     ~TransferFunctionEditor();
 
-signals:
+Q_SIGNALS:
     void gradientStopsChanged( const QGradientStops& stops );
     void transferFunctionChanged( UInt8Vector tf );
 

@@ -33,7 +33,7 @@ void TaskMakePixmap::run()
     if( frame_ == nullptr )
         LOG_ERROR("Null ptr!");
 
-    emit this->pixmapReady_SIGNAL( &( frame_->getFramePixmap( )) , clRenderer_ );
+    Q_EMIT this->pixmapReady_SIGNAL( &( frame_->getFramePixmap( )) , clRenderer_ );
     TOC( frameworkProfile.convertToPixmap_TIMER );
 }
 

@@ -292,7 +292,7 @@ void CLFrame< T >::setHostData( T *data , bool deepCopy )
         copyHostData( data );
     else
     {
-        if( hostData_ != nullptr ) delete [] hostData_ ;
+        if( hostData_ != 0 ) delete [] hostData_ ;
         hostData_ = data ;
         pixmapSynchronized_ = false ;
     }
@@ -396,6 +396,15 @@ float CLFrame< T >::getTransferTime() const
 {
     QReadLocker lock( &transferTimeLock_ );
     return transferTime_;
+}
+
+template< class T >
+T CLFrame< T >::checksum() const
+{
+    T sum = static_cast< T >(0) ;
+    for( uint64_t i = 0 ; i < dimensions_.imageSize() * channelsInPixel() ; i++ )
+        sum += hostData_[ i ];
+    return sum;
 }
 
 template< class T >

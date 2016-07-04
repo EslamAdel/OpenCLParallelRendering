@@ -89,7 +89,7 @@ void VirtualParallelRendering::addCLCompositor(const uint64_t gpuIndex)
         compositingTasks_.push_back( compositingTask ) ;
 
 
-        // Map signals from collecting tasks and compositing tasks to the
+        // Map Q_SIGNALS from collecting tasks and compositing tasks to the
         // correspondint slots.
         connect( collectingTask ,
                  SIGNAL( frameLoadedToDevice_SIGNAL( CLAbstractRenderer* )) ,
@@ -159,7 +159,7 @@ void VirtualParallelRendering::frameLoadedToDevice_SLOT(
 {
     LOG_DEBUG("Frame<%d> Loaded to Device" , renderer->getGPUIndex() );
 
-    emit this->frameReady_SIGNAL( &renderer->
+    Q_EMIT this->frameReady_SIGNAL( &renderer->
                                   getCLFrame().
                                   value< CLData::CLImage2D< float >* >()->
                                   getFramePixmap() ,
@@ -183,7 +183,7 @@ void VirtualParallelRendering::compositingFinished_SLOT()
 
 
 
-    emit this->finalFrameReady_SIGNAL(
+    Q_EMIT this->finalFrameReady_SIGNAL(
                 &compositor_->getFinalFrame().
                 value< CLData::CLImage2D< float >*>()->
                 getFramePixmap( ));

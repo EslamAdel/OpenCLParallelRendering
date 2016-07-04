@@ -30,7 +30,7 @@ void TaskComposite::run()
         TIC( compositingProfile.loadFinalFromDevice_TIMER );
         compositor_->loadFinalFrame( );
         TOC( compositingProfile.loadFinalFromDevice_TIMER );
-        emit this->compositingFinished_SIGNAL( );
+        Q_EMIT this->compositingFinished_SIGNAL( );
     }
 }
 

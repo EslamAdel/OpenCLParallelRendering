@@ -18,5 +18,5 @@ void clparen::Task::VirtualTaskCollect::run()
                                CL_TRUE );
 
 
-    emit this->frameLoadedToDevice_SIGNAL( renderer_ );
+    Q_EMIT this->frameLoadedToDevice_SIGNAL( renderer_ );
 }

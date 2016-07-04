@@ -217,14 +217,14 @@ protected:
     /**
      * @brief calculateRenderingTime_
      */
-    virtual float calculateRenderingTime_( );
+    virtual cl_int calculateRenderingTime_( );
 
     /**
      * @brief defaultRenderingMode_
      * @return
      */
     virtual CLKernel::RenderingMode defaultRenderingMode_() const;
-signals:
+Q_SIGNALS:
     /**
      * @brief finishedRendering
      * Inform the outside world if rendering is finished.
@@ -234,7 +234,7 @@ signals:
     void finishedRendering( Renderer::CLAbstractRenderer *thisPtr );
 
 
-public slots:
+public Q_SLOTS:
 
 
 private:

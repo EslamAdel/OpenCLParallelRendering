@@ -31,7 +31,7 @@ void TaskCollect::run()
     TOC( COLLECTING_PROFILE(renderer_).transferingBuffer_TIMER ) ;
 
 
-    emit this->frameLoadedToDevice_SIGNAL( renderer_ );
+    Q_EMIT this->frameLoadedToDevice_SIGNAL( renderer_ );
 
 }
 

@@ -57,12 +57,12 @@ private:
      */
     void displayFrame_( QPixmap *frame , uint id );
 
-public slots:
+public Q_SLOTS:
     void frameReady_SLOT( QPixmap *frame,
                           const Renderer::CLAbstractRenderer *renderer );
     void finalFrameReady_SLOT( QPixmap *finalFrame ) ;
 
-private slots:
+private Q_SLOTS:
 
     void newXRotation_SLOT( int value );
 

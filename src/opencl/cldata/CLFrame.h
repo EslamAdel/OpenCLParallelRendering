@@ -271,6 +271,12 @@ public:
      */
     float getTransferTime() const;
 
+
+    /**
+     * @brief checksum
+     * @return
+     */
+    T checksum() const;
 protected:
     /**
      * @brief releaseDeviceData_
@@ -390,5 +396,12 @@ protected:
 
 }
 }
+
+Q_DECLARE_METATYPE( clparen::CLData::CLFrame< uint8_t >* )
+Q_DECLARE_METATYPE( clparen::CLData::CLFrame< uint16_t >* )
+Q_DECLARE_METATYPE( clparen::CLData::CLFrame< uint32_t >* )
+Q_DECLARE_METATYPE( clparen::CLData::CLFrame< half >* )
+Q_DECLARE_METATYPE( clparen::CLData::CLFrame< float >* )
+
 
 #endif // CLFrame_H

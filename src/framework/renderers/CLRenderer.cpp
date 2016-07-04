@@ -73,7 +73,7 @@ void CLRenderer< V , F >::applyTransformation( )
 {
     this->paint_( );
 
-    emit this->finishedRendering( this );
+    Q_EMIT this->finishedRendering( this );
 }
 
 template< class V , class F >
@@ -188,13 +188,12 @@ void CLRenderer< V , F >::renderFrame_()
                 &clGPUExecution_ );
 
 
-//    clFinish( commandQueue_ );
+    clFinish( commandQueue_ );
 
-    clErrorCode |=
-            clWaitForEvents( 1 , &clGPUExecution_ );
+    //    clErrorCode |=
+    //            clWaitForEvents( 1 , &clGPUExecution_ );
 
-    QWriteLocker renderingTimelocker( &renderingTimeLock_ );
-    renderingTime_ = calculateRenderingTime_();
+    CL_ASSERT_WARNING(  calculateRenderingTime_());
 
     CL_ASSERT( clErrorCode );
 

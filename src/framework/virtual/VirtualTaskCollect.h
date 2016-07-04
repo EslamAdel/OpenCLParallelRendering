@@ -20,7 +20,7 @@ public:
                         Compositor::CLAbstractCompositor *compositor );
 
 
-signals:
+Q_SIGNALS:
 
     void frameLoadedToDevice_SIGNAL(
             Renderer::CLAbstractRenderer *renderer );

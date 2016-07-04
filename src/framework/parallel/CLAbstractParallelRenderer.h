@@ -112,7 +112,7 @@ public:
      */
     uint64_t getFrameHeight() const ;
 
-signals:
+Q_SIGNALS:
 
     /**
      * @brief frameworkReady_SIGNAL
@@ -148,7 +148,7 @@ signals:
      */
     void finishedRendering_SIGNAL( Renderer::CLAbstractRenderer* );
 
-public slots :
+public Q_SLOTS:
 
     /**
      * @brief finishedRendering_SLOT
@@ -315,12 +315,14 @@ protected:
      */
     virtual void benchmark_() ;
 
-signals:
 
-public slots:
+    /**
+     * @brief assertThread_
+     */
+    void assertThread_();
 
 
-protected :
+protected:
     //oclHWDl utilities
     /**
      * @brief clHardware_

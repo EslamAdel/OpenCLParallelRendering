@@ -30,7 +30,7 @@ private:
     Ui::MainWindow *ui;
 
 
-private slots:
+private Q_SLOTS:
     void on_xRotationSlider_valueChanged(int value);
 
     void on_yRotationSlider_valueChanged(int value);
@@ -66,18 +66,18 @@ private:
 
 public:
 
-public slots:
+public Q_SLOTS:
     /**
      * @brief displayFrame_
      */
     void displayFrame( QPixmap* frame );
 
-private slots:
+private Q_SLOTS:
 
 private:
     clparen::Parallel::CLAbstractParallelRenderer &parallelRenderer_ ;
 
-signals:
+Q_SIGNALS:
     void gradientStopsChanged( const QGradientStops& stops );
     void transferFunctionChanged( UInt8Vector tf );
 

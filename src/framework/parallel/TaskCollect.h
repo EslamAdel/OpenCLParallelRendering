@@ -34,7 +34,7 @@ public:
     TaskCollect( Renderer::CLAbstractRenderer *renderer ,
                  Compositor::CLAbstractCompositor *compositor );
 
-signals:
+Q_SIGNALS:
     /**
      * @brief frameLoadedToDevice_SIGNAL
      * Inform the outside world the task is done.

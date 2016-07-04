@@ -27,7 +27,7 @@ public:
 protected:
     void run() ;
 
-signals:
+Q_SIGNALS:
     void pixmapReady_SIGNAL(  QPixmap *pixmap ,
                               const Renderer::CLAbstractRenderer* clRenderer);
 

@@ -39,7 +39,7 @@ public:
 
     void startRendering();
 
-public slots:
+public Q_SLOTS:
     void frameLoadedToDevice_SLOT( Renderer::CLAbstractRenderer *renderer );
 
     void finishedRendering_SLOT( Renderer::CLAbstractRenderer *renderer );

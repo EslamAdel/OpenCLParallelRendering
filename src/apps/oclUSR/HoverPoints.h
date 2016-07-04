@@ -190,7 +190,7 @@ public:
      */
     bool eventFilter( QObject* object, QEvent* hoverEvent ) Q_DECL_OVERRIDE;
 
-public slots:
+public Q_SLOTS:
 
     /**
      * setEnabled
@@ -204,7 +204,7 @@ public slots:
      */
     void setDisabled( bool disabled ) { setEnabled(!disabled); }
 
-signals:
+Q_SIGNALS:
 
     /**
      * pointsChanged signal.
@@ -222,7 +222,7 @@ public:
 private:
     QRectF _pointBoundingRectangle( int i ) const;
 
-    void _movePoint( int i, const QPointF& newPos, bool emitChange = true );
+    void _movePoint( int i, const QPointF& newPos, bool Q_EMITChange = true );
 
     QWidget *_tfWidget;
     ConnectionType _connectionType;

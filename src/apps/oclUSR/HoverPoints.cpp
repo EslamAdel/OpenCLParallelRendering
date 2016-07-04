@@ -420,12 +420,12 @@ void HoverPoints::setPoints( const QPolygonF& listPoints )
 }
 
 void HoverPoints::_movePoint( const int index, const QPointF& point,
-                              const bool emitUpdate )
+                              const bool Q_EMITUpdate )
 {
     // Get the point bounding object to move it.
     _tfPoints[index] = getBoundPoint( point, getBoundingRect(), _locks.at( index ));
 
-    if( emitUpdate )
+    if( Q_EMITUpdate )
         firePointChange();
 }
 
@@ -467,7 +467,7 @@ void HoverPoints::firePointChange()
     }
 
     // Emit the signal to activate the change.
-    emit pointsChanged( _tfPoints );
+    Q_EMIT pointsChanged( _tfPoints );
 }
 
 void HoverPoints::setBoundingRect( const QRectF& boundingRect )

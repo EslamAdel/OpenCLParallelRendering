@@ -223,7 +223,7 @@ void CLAbstractRenderer::setSortFirstSettings(
 }
 
 
-float CLAbstractRenderer::calculateRenderingTime_()
+cl_int CLAbstractRenderer::calculateRenderingTime_()
 {
     // Assuming that every thing is going in the right direction.
     cl_int clErrorCode = CL_SUCCESS;
@@ -241,11 +241,13 @@ float CLAbstractRenderer::calculateRenderingTime_()
                                      CL_PROFILING_COMMAND_START,
                                      sizeof(cl_ulong),
                                      &start,
-                                     0 );
+                                     0 ); 
 
-    CL_ASSERT( clErrorCode );
+    QWriteLocker lock( &renderingTimeLock_ );
+    renderingTime_ = static_cast< float >( end -  start ) / 1e6 ;
 
-    return static_cast< float >( end -  start ) / 1e6 ;
+
+    return clErrorCode;
 }
 
 const Dimensions2D &CLAbstractRenderer::getSortFirstOffset() const

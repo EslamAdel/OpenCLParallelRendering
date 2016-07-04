@@ -101,7 +101,7 @@ public:
      */
     UInt8Vector getCurve() const;
 
-signals:
+Q_SIGNALS:
 
     /**
      * ColorsChanged signal.

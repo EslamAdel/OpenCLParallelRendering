@@ -77,7 +77,7 @@ void SortLastRenderer< V , F >::addCLRenderer( const uint64_t gpuIndex )
     collectorPool_.setMaxThreadCount( inUseGPUs_.size( ));
     pixmapMakerPool_.setMaxThreadCount( inUseGPUs_.size());
 
-    // Map the signal emitted from rendering node after rendering is finished
+    // Map the signal Q_EMITted from rendering node after rendering is finished
     // to the corresponding slot.
     connect( renderer ,
              SIGNAL( finishedRendering( Renderer::CLAbstractRenderer* )),
@@ -198,7 +198,7 @@ void SortLastRenderer< V , F >::distributeBaseVolume1D()
                    renderers_[ renderingDevice ]->getGPUIndex( ));
     }
 
-    emit this->frameworkReady_SIGNAL();
+    Q_EMIT this->frameworkReady_SIGNAL();
 }
 
 template< class V , class F >
@@ -227,7 +227,7 @@ void SortLastRenderer< V , F >::distributeBaseVolumeWeighted()
                    renderers_[ renderingDevice ]->getGPUIndex( ));
     }
 
-    emit this->frameworkReady_SIGNAL();
+    Q_EMIT this->frameworkReady_SIGNAL();
 
 }
 
@@ -258,7 +258,7 @@ void SortLastRenderer< V , F >::distributeBaseVolumeMemoryWeighted()
                    renderers_[ renderingDevice ]->getGPUIndex( ));
     }
 
-    emit this->frameworkReady_SIGNAL();
+    Q_EMIT this->frameworkReady_SIGNAL();
 }
 
 
@@ -282,7 +282,7 @@ void SortLastRenderer< V , F >::finishedRendering_SLOT(
                                         CL_TRUE );
         QPixmap &pixmap = rendererdFrame->getFramePixmap();
 
-        emit this->finalFrameReady_SIGNAL( &pixmap );
+        Q_EMIT this->finalFrameReady_SIGNAL( &pixmap );
 
         renderersReady_ = true ;
 
@@ -344,9 +344,9 @@ void SortLastRenderer< V , F >::pixmapReady_SLOT(
         const Renderer::CLAbstractRenderer *renderer )
 {
     if( renderer == nullptr )
-        emit this->finalFrameReady_SIGNAL( pixmap );
+        Q_EMIT this->finalFrameReady_SIGNAL( pixmap );
     else
-        emit this->frameReady_SIGNAL( pixmap , renderer );
+        Q_EMIT this->frameReady_SIGNAL( pixmap , renderer );
 }
 
 

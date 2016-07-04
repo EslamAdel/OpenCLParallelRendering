@@ -28,7 +28,7 @@ public:
                    Volume< uchar > *volume  ,
                    const uint iterations );
 
-signals:
+Q_SIGNALS:
 
     /**
      * @brief taskCalibrattionFinsished

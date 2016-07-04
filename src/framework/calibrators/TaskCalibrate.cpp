@@ -78,7 +78,7 @@ void TaskCalibrate::run()
         LOG_DEBUG("GPU#%d[%s]:%f",gpuIndex , name.c_str() ,
                   renderingTimes_[ gpuIndex ]) ;
     }
-    emit calibrationFinsished_SIGNAL( renderingTimes_ );
+    Q_EMIT calibrationFinsished_SIGNAL( renderingTimes_ );
 
 }
 

@@ -16,8 +16,7 @@ SortFirstRenderer< V , F >::SortFirstRenderer(
     : CLAbstractParallelRenderer( frameWidth , frameHeight , channelOrder ),
       renderingLoopCounter_( 0 )
 {
-    if( QThread::currentThread() != this->thread())
-        LOG_ERROR("Foreign thread!");
+    assertThread_();
 
     baseVolume_.reset( volume );
 
@@ -42,8 +41,8 @@ SortFirstRenderer< V , F >::SortFirstRenderer(
 template< class V , class F >
 void SortFirstRenderer< V , F >::addCLRenderer( const uint64_t gpuIndex )
 {
-    if( QThread::currentThread() != this->thread())
-        LOG_ERROR("Foreign thread!");
+    assertThread_();
+
 
     // if device already occupied by a rendering node, return.
     if( renderers_.keys().contains( listGPUs_.at( gpuIndex ))) return;
@@ -86,8 +85,8 @@ void SortFirstRenderer< V , F >::addCLCompositor( const uint64_t gpuIndex )
 template< class V , class F >
 void SortFirstRenderer< V , F >::distributeBaseVolume( )
 {
-    if( QThread::currentThread() != this->thread())
-        LOG_ERROR("Foreign thread!");
+    assertThread_();
+
 
     VolumeVariant volume = VolumeVariant::fromValue( baseVolume_.data( ));
 
@@ -109,8 +108,8 @@ template< class V , class F >
 void SortFirstRenderer< V , F >::initializeRenderers()
 {
 
-    if( QThread::currentThread() != this->thread())
-        LOG_ERROR("Foreign thread!");
+    assertThread_();
+
 
     if( renderers_.isEmpty())
     {
@@ -156,9 +155,7 @@ void SortFirstRenderer< V , F >::finishedRendering_SLOT(
         Renderer::CLAbstractRenderer *renderer )
 {
 
-    if( QThread::currentThread() != this->thread())
-        LOG_ERROR("Foreign thread!");
-
+    assertThread_();
 
 
     QtConcurrent::run(  this , &SortFirstRenderer::assemble2_ ,
@@ -170,8 +167,8 @@ template< class V , class F >
 void SortFirstRenderer< V , F >::compositingFinished_SLOT( )
 {
 
-    if( QThread::currentThread() != this->thread())
-        LOG_ERROR("Foreign thread!");
+    assertThread_();
+
 
     if( ++assembledFramesCount_ != renderers_.size( ))
         return;
@@ -207,7 +204,7 @@ void SortFirstRenderer< V , F >::compositingFinished_SLOT( )
 
 #ifndef BENCHMARKING
     TIC( frameworkProfile.convertToPixmap_TIMER );
-    emit this->frameReady_SIGNAL( &clFrame_->getFramePixmap( ) , nullptr );
+    Q_EMIT this->frameReady_SIGNAL( &clFrame_->getFramePixmap( ) , nullptr );
     TOC( frameworkProfile.convertToPixmap_TIMER );
 //    QtConcurrent::run( this ,  &SortFirstRenderer::clone_ );
 #endif
@@ -223,13 +220,13 @@ void SortFirstRenderer< V , F >::frameLoadedToDevice_SLOT(
 
 template< class V , class F >
 void SortFirstRenderer< V , F >::pixmapReady_SLOT(
-        QPixmap *pixmap, const Renderer::CLAbstractRenderer *renderer )
+        QPixmap *pixmap, const Renderer::CLAbstractRenderer * )
 {
-    if( QThread::currentThread() != this->thread())
-        LOG_ERROR("Foreign thread!");
+    assertThread_();
 
 
-    emit this->finalFrameReady_SIGNAL( pixmap );
+
+    Q_EMIT this->finalFrameReady_SIGNAL( pixmap );
 }
 
 template< class V , class F >
@@ -242,8 +239,7 @@ void SortFirstRenderer< V , F >::setLoadBalancing( bool useLoadBalancing )
 template< class V , class F >
 void SortFirstRenderer< V , F >::applyTransformation_()
 {
-    if( QThread::currentThread() != this->thread())
-        LOG_ERROR("Foreign thread!");
+    assertThread_();
 
 
     renderersReady_ = false;
@@ -291,8 +287,8 @@ void SortFirstRenderer< V , F >::benchmark_()
 template< class V , class F >
 void SortFirstRenderer< V , F >::heuristicLoadBalance_( )
 {
-    if( QThread::currentThread() != this->thread())
-        LOG_ERROR("Foreign thread!");
+    assertThread_();
+
 
     const uint renderersCount = renderers_.size();
     const float tolerance = 0.01f ;
@@ -406,8 +402,8 @@ template< class V , class F >
 void SortFirstRenderer< V , F >::calculateTransferTimeMean_()
 {
 
-    if( QThread::currentThread() != this->thread())
-        LOG_ERROR("Foreign thread!");
+    assertThread_();
+
 
     if( renderingLoopCounter_ == 0 )
         return;
@@ -433,7 +429,7 @@ void SortFirstRenderer< V , F >::SortFirstRenderer::render_(
 {
     renderer->applyTransformation();
 
-    emit this->finishedRendering_SIGNAL( renderer );
+    Q_EMIT this->finishedRendering_SIGNAL( renderer );
 }
 
 template< class V , class F >
@@ -512,7 +508,7 @@ void SortFirstRenderer< V , F >::assemble_(
         }
     frameCopyMutex_.unlock();
 
-    emit this->finishedCompositing_SIGNAL();
+    Q_EMIT this->finishedCompositing_SIGNAL();
 }
 
 template< class V , class F >
@@ -528,7 +524,7 @@ void SortFirstRenderer< V , F >::assemble2_(
                                      *clFrame , CL_TRUE );
     frameCopyMutex_.unlock();
 
-    emit this->finishedCompositing_SIGNAL();
+    Q_EMIT this->finishedCompositing_SIGNAL();
 }
 
 
@@ -541,7 +537,7 @@ void SortFirstRenderer< V , F >::clone_( )
 
     frameCopyMutex_.lockForWrite();
     clFrameReadout_->copyHostData( *clFrame_.data( ));
-    emit this->frameReady_SIGNAL( &clFrameReadout_->getFramePixmap( ) , nullptr );
+    Q_EMIT this->frameReady_SIGNAL( &clFrameReadout_->getFramePixmap( ) , nullptr );
     frameCopyMutex_.unlock();
 }
 

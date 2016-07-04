@@ -30,7 +30,7 @@ public:
     TaskComposite( Compositor::CLAbstractCompositor *compositor ,
                    Renderer::CLAbstractRenderer *cLRenderer );
 
-signals:
+Q_SIGNALS:
     /**
      * @brief compositingFinished_SIGNAL
      * Emit a signal when compositing is done.
