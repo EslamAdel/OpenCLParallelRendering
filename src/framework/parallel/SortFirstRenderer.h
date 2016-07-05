@@ -81,7 +81,7 @@ protected:
      */
     void calculateTransferTimeMean_();
 private:
-    void render_( Renderer::CLRenderer< V , F > *renderer );
+    void render_( uint gpuIndex );
 
     void assemble_(  Renderer::CLRenderer< V , F >  *renderer,
                      CLData::CLFrame< F > *finalFrame   );

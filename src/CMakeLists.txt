@@ -6,7 +6,6 @@
 SET( CLPAREN_SOURCE_FILES
     framework/renderers/CLAbstractRenderer.cpp
     framework/compositors/CLAbstractCompositor.cpp
-    framework/compositors/CLCompositorAccumulate.cpp
     framework/calibrators/AbstractCalibrator.cpp
     framework/calibrators/Calibrator.cpp
     framework/calibrators/TaskCalibrate.cpp
@@ -14,14 +13,7 @@ SET( CLPAREN_SOURCE_FILES
     framework/parallel/SortLastRenderer.cpp
     framework/parallel/SortFirstRenderer.cpp
     framework/renderers/CLRenderer.cpp
-    framework/renderers/TaskRender.cpp
-    framework/parallel/TaskCollect.cpp
-    framework/compositors/TaskComposite.cpp
     framework/compositors/CLCompositor.cpp
-    framework/virtual/VirtualParallelRendering.cpp
-    framework/virtual/VirtualCLRenderer.cpp
-    framework/virtual/VirtualCLCompositor.cpp
-    framework/virtual/VirtualTaskCollect.cpp
     data/Transformation.cpp
     auxillary/VolumeUtilities.cpp
     data/Image.cpp
@@ -63,8 +55,6 @@ SET( CLPAREN_HEADER_FILES
     framework/clparen.h
     framework/renderers/CLAbstractRenderer.h
     framework/compositors/CLAbstractCompositor.h
-    framework/compositors/CLCompositorAccumulate.h
-    framework/compositors/CLCompositorAccumulate.ipp
     framework/compositors/CLCompositor.h
     framework/compositors/CLCompositor.ipp
     framework/renderers/CLRenderer.h
@@ -78,15 +68,6 @@ SET( CLPAREN_HEADER_FILES
     framework/parallel/SortFirstRenderer.ipp
     framework/parallel/SortLastRenderer.h
     framework/parallel/SortLastRenderer.ipp
-    framework/parallel/TaskCollect.h
-    framework/compositors/TaskComposite.h
-    framework/renderers/TaskRender.h
-    framework/virtual/VirtualCLCompositor.h
-    framework/virtual/VirtualCLCompositor.ipp
-    framework/virtual/VirtualParallelRendering.h
-    framework/virtual/VirtualCLRenderer.h
-    framework/virtual/VirtualCLRenderer.ipp
-    framework/virtual/VirtualTaskCollect.h
     data/Transformation.h
     auxillary/half.hpp
     auxillary/VolumeUtilities.h
@@ -166,7 +147,6 @@ set( CLPAREN_KERNELS
 
 include_directories( framework )
 include_directories( framework/parallel )
-include_directories( framework/virtual )
 include_directories( framework/compositors )
 include_directories( framework/renderers )
 include_directories( framework/calibrators )

@@ -23,6 +23,7 @@ SortLastRenderer< V , F >::SortLastRenderer(
 
     clCompositor_ = 0;
     compositorPool_.setMaxThreadCount( 1 );
+
 }
 
 
@@ -52,24 +53,11 @@ void SortLastRenderer< V , F >::addCLRenderer( const uint64_t gpuIndex )
     clRenderers_[ gpuIndex ] = renderer;
     renderers_[ gpuIndex ] = renderer;
 
-    // Create the TaskRender that wrap the rendering instruction,
-    // to be executed concurrently on each device.
-    Renderer::Task::TaskRender *taskRender =
-            new Renderer::Task::TaskRender( *renderer  );
-
-    // Add the new task object to
-    // the map < rendering node , corresponding rendering task >
-    renderingTasks_[ gpuIndex ] = taskRender;
-
-
 
     // Set the maximum number of active threads of the rendering thread pool and
     // the collector thread pool  to the current number of deployed GPUs.
     rendererPool_.setMaxThreadCount( clRenderers_.size( ));
     collectorPool_.setMaxThreadCount( clRenderers_.size( ));
-
-    connect( renderer , SIGNAL( finishedRendering( uint )),
-             this , SLOT( finishedRendering_SLOT( uint )));
 
 }
 
@@ -113,11 +101,7 @@ void SortLastRenderer< V , F >::addCLCompositor( const uint64_t gpuIndex )
         }
 
 
-    connect( this , SIGNAL( compositingFinished_SIGNAL( )) ,
-             this , SLOT( compositingFinished_SLOT( )));
 
-    connect( this , SIGNAL( frameLoadedToDevice_SIGNAL( uint )) ,
-             this , SLOT( frameLoadedToDevice_SLOT( uint )));
 
     LOG_INFO("[DONE] Linking Rendering Units with Compositing Unit...");
 }
@@ -147,12 +131,12 @@ void SortLastRenderer< V , F >::distributeBaseVolume1D()
                    renderer->getGPUIndex( ));
     }
 
-    Q_EMIT this->frameworkReady_SIGNAL();
 }
 
 template< class V , class F >
 void SortLastRenderer< V , F >::distributeBaseVolumeWeighted()
 {
+
     QVector< uint > computingPowerScores ;
     for( const uint gpuIdnex : clRenderers_.keys( ))
         computingPowerScores.append(
@@ -175,7 +159,6 @@ void SortLastRenderer< V , F >::distributeBaseVolumeWeighted()
                    renderer->getGPUIndex( ));
     }
 
-    Q_EMIT this->frameworkReady_SIGNAL();
 
 }
 
@@ -203,12 +186,13 @@ void SortLastRenderer< V , F >::distributeBaseVolumeMemoryWeighted()
                    renderer->getGPUIndex( ));
     }
 
-    Q_EMIT this->frameworkReady_SIGNAL();
 }
 
 template< class V , class F >
 void SortLastRenderer< V , F >::applyTransformation_()
 {
+
+    assertThread_();
     TIC( frameworkProfile.renderingLoop_TIMER );
 
     // fetch new transformations if exists.
@@ -219,7 +203,9 @@ void SortLastRenderer< V , F >::applyTransformation_()
 
         TIC( renderingProfiles.value( clRenderers_[ gpuIndex ] )->threadSpawning_TIMER );
         // Spawn threads and start rendering on each rendering node.
-        rendererPool_.start( renderingTasks_[ gpuIndex ]);
+        QtConcurrent::run( &rendererPool_ , this ,
+                           &SortLastRenderer::render_ ,
+                           gpuIndex );
     }
 
     pendingTransformations_ = false;
@@ -254,32 +240,12 @@ void SortLastRenderer< V , F >::benchmark_()
 }
 
 
-
-template< class V , class F >
-void SortLastRenderer< V , F >::collectFrame_( uint gpuIndex )
-{
-
-    LOG_DEBUG("Transfering frame<%d> to compositor", gpuIndex);
-
-
-    //upload frame from rendering GPU to HOST.
-    TIC( COLLECTING_PROFILE( renderers_[ gpuIndex ] ).transferingBuffer_TIMER );
-
-    clCompositor_->collectFrame( renderers_[ gpuIndex ] ,
-                                 CL_TRUE );
-
-    LOG_DEBUG("[DONE] Transfering frame<%d> to compositor", gpuIndex);
-    TOC( COLLECTING_PROFILE( renderers_[ gpuIndex ] ).transferingBuffer_TIMER ) ;
-
-
-    Q_EMIT frameLoadedToDevice_SIGNAL( gpuIndex );
-}
-
-
 template< class V , class F >
 void SortLastRenderer< V , F >::finishedRendering_SLOT(
         uint gpuIndex )
 {
+
+    assertThread_();
 
     if( clRenderers_.size() > 1 )
     {
@@ -307,6 +273,8 @@ void SortLastRenderer< V , F >::finishedRendering_SLOT(
 template< class V , class F >
 void SortLastRenderer< V , F >::compositingFinished_SLOT()
 {
+
+    assertThread_();
 
     TOC( frameworkProfile.renderingLoop_TIMER );
 
@@ -336,7 +304,8 @@ template< class V , class F >
 void SortLastRenderer< V , F >::frameLoadedToDevice_SLOT(
         uint gpuIndex )
 {
-    TIC( compositingProfile.threadSpawning_TIMER );
+
+    assertThread_();
 
     LOG_DEBUG("Frame[%d] Loaded to device" , gpuIndex );
 
@@ -357,6 +326,8 @@ void SortLastRenderer< V , F >::pixmapReady_SLOT(
         QPixmap *pixmap,
         uint gpuIndex )
 {
+    assertThread_();
+
 
     Q_EMIT this->frameReady_SIGNAL( pixmap , gpuIndex );
 }
@@ -384,6 +355,9 @@ void SortLastRenderer< V , F >::distributeBaseVolume()
         LOG_ERROR("Unexpected value!");
     }
 
+    Q_EMIT this->frameworkReady_SIGNAL();
+
+
 }
 
 template< class V , class F >
@@ -402,10 +376,12 @@ void SortLastRenderer< V , F >::makePixmap_( uint gpuIndex )
 
 
 template< class V , class F >
-void SortLastRenderer< V , F >::composite_( uint gpuIndex )
+void SortLastRenderer< V , F >::composite_( uint )
 {
-    TOC( compositingProfile.threadSpawning_TIMER ) ;
 
+    QMutexLocker lock( &compositingMutex_ );
+
+    LOG_DEBUG("Compositing");
     compositor_->composite( );
 
     if( compositor_->readOutReady( ))
@@ -414,9 +390,40 @@ void SortLastRenderer< V , F >::composite_( uint gpuIndex )
         compositor_->loadFinalFrame( );
         TOC( compositingProfile.loadFinalFromDevice_TIMER );
         Q_EMIT compositingFinished_SIGNAL( );
+
+        LOG_DEBUG("[DONE] Compositing");
     }
 }
 
+template< class V , class F >
+void SortLastRenderer< V , F >::render_(
+        uint gpuIndex )
+{
+    renderers_[ gpuIndex ]->applyTransformation();
+
+    Q_EMIT finishedRendering_SIGNAL( gpuIndex );
+}
+
+
+template< class V , class F >
+void SortLastRenderer< V , F >::collectFrame_( uint gpuIndex )
+{
+
+    LOG_DEBUG("Transfering frame<%d> to compositor", gpuIndex);
+
+
+    //upload frame from rendering GPU to HOST.
+    TIC( COLLECTING_PROFILE( renderers_[ gpuIndex ] ).transferingBuffer_TIMER );
+
+    clCompositor_->collectFrame( renderers_[ gpuIndex ] ,
+                                 CL_TRUE );
+
+    LOG_DEBUG("[DONE] Transfering frame<%d> to compositor", gpuIndex);
+    TOC( COLLECTING_PROFILE( renderers_[ gpuIndex ] ).transferingBuffer_TIMER ) ;
+
+
+    Q_EMIT frameLoadedToDevice_SIGNAL( gpuIndex );
+}
 
 }
 }

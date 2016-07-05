@@ -28,11 +28,6 @@ SortFirstRenderer< V , F >::SortFirstRenderer(
     clFrameReadout_.reset( new CLData::CLImage2D< F >( frameDimension ,
                                                        channelOrder ));
 
-    connect( this , SIGNAL(compositingFinished_SIGNAL()) ,
-             this , SLOT(compositingFinished_SLOT( )));
-
-    connect( this , SIGNAL(frameReady_SIGNAL( QPixmap*, uint )) ,
-             this, SLOT( pixmapReady_SLOT( QPixmap*, uint )));
 
 }
 
@@ -63,9 +58,6 @@ void SortFirstRenderer< V , F >::addCLRenderer( const uint64_t gpuIndex )
     renderers_[ gpuIndex  ] = renderer;
 
     rendererPool_.setMaxThreadCount( renderers_.size( ));
-
-    connect( this , SIGNAL( finishedRendering_SIGNAL( uint )),
-             this , SLOT( finishedRendering_SLOT( uint )));
 
 
     ATTACH_RENDERING_PROFILE( renderer );
@@ -244,9 +236,9 @@ void SortFirstRenderer< V , F >::applyTransformation_()
 
     TIC( frameworkProfile.renderingLoop_TIMER );
 
-    for( Renderer::CLRenderer< V , F > *renderer : clRenderers_ )
+    for( const Renderer::CLRenderer< V , F > *renderer : clRenderers_ )
         QtConcurrent::run( this , &SortFirstRenderer::render_ ,
-                           renderer );
+                           renderer->getGPUIndex( ));
 
 }
 
@@ -413,12 +405,11 @@ void SortFirstRenderer< V , F >::calculateTransferTimeMean_()
 
 
 template< class V , class F >
-void SortFirstRenderer< V , F >::SortFirstRenderer::render_(
-        Renderer::CLRenderer< V , F > *renderer )
+void SortFirstRenderer< V , F >::SortFirstRenderer::render_( uint gpuIndex )
 {
-    renderer->applyTransformation();
+    clRenderers_[ gpuIndex ]->applyTransformation();
 
-    Q_EMIT this->finishedRendering_SIGNAL( renderer->getGPUIndex( ));
+    Q_EMIT finishedRendering_SIGNAL( gpuIndex );
 }
 
 template< class V , class F >

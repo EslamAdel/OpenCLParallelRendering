@@ -5,7 +5,6 @@
 #include <QMainWindow>
 #include <Headers.hh>
 #include "clparen.h"
-#include "VirtualParallelRendering.h"
 #include "CLRenderer.h"
 #include <vector>
 #include <QLabel>

@@ -15,10 +15,7 @@
 #include <oclHWDL.h>
 #include "CLVolumeVariants.hh"
 #include "Transformation.h"
-
-#include "TaskRender.h"
-#include "TaskCollect.h"
-#include "TaskComposite.h"
+#include "CLAbstractCompositor.h"
 
 
 namespace clparen {
@@ -26,12 +23,6 @@ namespace Parallel {
 
 
 typedef QMap< uint , Renderer::CLAbstractRenderer* > Renderers;
-
-typedef QMap< uint , Renderer::Task::TaskRender*> RenderingTasks;
-
-typedef QMap< uint , Compositor::Task::TaskComposite*> CompositingTasks;
-
-typedef QMap< uint , Task::TaskCollect*> CollectingTasks;
 
 
 
@@ -340,19 +331,6 @@ protected:
     QThreadPool collectorPool_ ; //[producer] for renderer pool AND
     //[consumer] for renderer pool.
 
-    /**
-     * @brief renderingTasks_
-     */
-    RenderingTasks  renderingTasks_ ;
-    /**
-     * @brief collectingTasks_
-     */
-    CollectingTasks collectingTasks_ ;
-
-    /**
-     * @brief compositingTasks_
-     */
-    CompositingTasks compositingTasks_ ;
 
 
     // Transformations

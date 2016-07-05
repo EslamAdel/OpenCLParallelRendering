@@ -4,7 +4,7 @@
 
 #include "CLAbstractParallelRenderer.h"
 #include "CLRenderer.h"
-#include "CLAbstractCompositor.h"
+#include "CLCompositor.h"
 
 
 
@@ -118,6 +118,12 @@ private:
      * @param gpuIndex
      */
     void composite_( uint gpuIndex );
+
+    /**
+     * @brief render_
+     * @param gpuIndex
+     */
+    void render_( uint gpuIndex );
 protected:
 
 
@@ -144,6 +150,10 @@ protected:
      */
     QMap< uint , Renderer::CLRenderer< V , F >*> clRenderers_ ;
 
+    /**
+     * @brief compositingMutex_
+     */
+    QMutex compositingMutex_ ;
 };
 
 }

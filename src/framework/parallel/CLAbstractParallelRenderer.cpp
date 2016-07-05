@@ -65,6 +65,21 @@ CLAbstractParallelRenderer::CLAbstractParallelRenderer(
     transformation_.apexAngle = 0.1f ;
 
     compositor_ = 0;
+
+
+    connect( this , SIGNAL(compositingFinished_SIGNAL()) ,
+             this , SLOT(compositingFinished_SLOT( )));
+
+    connect( this , SIGNAL(frameReady_SIGNAL( QPixmap*, uint )) ,
+             this, SLOT( pixmapReady_SLOT( QPixmap*, uint )));
+
+    connect( this , SIGNAL( finishedRendering_SIGNAL( uint )),
+             this , SLOT( finishedRendering_SLOT( uint )));
+
+    connect( this , SIGNAL( frameLoadedToDevice_SIGNAL( uint )) ,
+             this , SLOT( frameLoadedToDevice_SLOT( uint )));
+
+
 }
 
 void CLAbstractParallelRenderer::startRendering()
@@ -77,27 +92,6 @@ void CLAbstractParallelRenderer::startRendering()
     applyTransformation_();
 
     LOG_INFO("[DONE] Triggering Rendering Nodes");
-}
-
-
-void CLAbstractParallelRenderer::applyTransformation_()
-{
-
-    TIC( frameworkProfile.renderingLoop_TIMER );
-
-    // fetch new transformations if exists.
-    syncTransformation_();
-
-    for( uint gpuIndex : renderers_.keys())
-    {
-
-        TIC( renderingProfiles.value( renderers_[ gpuIndex ] )->threadSpawning_TIMER );
-        // Spawn threads and start rendering on each rendering node.
-        rendererPool_.start( renderingTasks_[ gpuIndex ]);
-    }
-
-    pendingTransformations_ = false;
-    renderersReady_ = false;
 }
 
 void CLAbstractParallelRenderer::syncTransformation_()

@@ -75,40 +75,7 @@ qt5_use_modules( ${OCL_MGPUVR_BENCHMARK_EXECUTABLE} Core Widgets OpenGL Gui )
 # Install the executable (generate with 'make install' in the bin directory)
 install( TARGETS ${OCL_MGPUVR_BENCHMARK_EXECUTABLE} DESTINATION bin )
 
-###------------------------------- VIRTUAL SETTING --------------------------------###
 
-
-message("Virtual Setting...")
-### Application name
-set( OCL_MGPUVR_VIRTUAL_EXECUTABLE "oclMGPUVR_Virtual" )
-
-### Application source/header/ui files
-set( OCL_MGPUVR_VIRTUAL_HEADER_FILES CommandLineParser.h RenderingWindow.h
-                                     CommandLineParser_Virtual.h
-                                     )
-set( OCL_MGPUVR_VIRTUAL_SOURCE_FILES oclMGPUVR_Virtual.cpp
-                                     CommandLineParser.cpp
-                                     CommandLineParser_Virtual.cpp
-                                     RenderingWindow.cpp )
-
-set( OCL_MGPUVR_VIRTUAL_APP_FORMS RenderingWindow.ui )
-qt5_wrap_ui( OCL_MGPUVR_VIRTUAL_APP_FORMS_MOC ${OCL_MGPUVR_VIRTUAL_APP_FORMS} )
-
-### Generate the executable
-add_executable( ${OCL_MGPUVR_VIRTUAL_EXECUTABLE}
-    ${OCL_MGPUVR_VIRTUAL_HEADER_FILES}
-    ${OCL_MGPUVR_VIRTUAL_SOURCE_FILES}
-    ${OCL_MGPUVR_VIRTUAL_APP_FORMS}
-)
-
-### Link the application against the oclMGPUVR library
-target_link_libraries( ${OCL_MGPUVR_VIRTUAL_EXECUTABLE} ${CLPAREN_LIBRARY} )
-
-### Make sure to use the required Qt modules
-qt5_use_modules( ${OCL_MGPUVR_VIRTUAL_EXECUTABLE} Core Widgets OpenGL Gui )
-
-# Install the executable (generate with 'make install' in the bin directory)
-install( TARGETS ${OCL_MGPUVR_VIRTUAL_EXECUTABLE} DESTINATION bin )
 
 ## -------------------------- Calibrate SETTING--------------------------------##
 
