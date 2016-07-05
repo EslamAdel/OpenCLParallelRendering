@@ -35,11 +35,13 @@ public:
 
     ~CLRenderer();
 
+
+
     /**
      * @brief loadVolume
      * @param volume
      */
-    void loadVolume( VolumeVariant &volume ) Q_DECL_OVERRIDE ;
+    void loadVolume( Volume< V > *volume );
 
     /**
      * @brief applyTransformation
@@ -100,6 +102,22 @@ public:
             float *transferFunction , uint length ) Q_DECL_OVERRIDE;
 
     CLData::FRAME_CHANNEL_ORDER getFrameChannelOrder() const Q_DECL_OVERRIDE;
+
+
+    /**
+     * @brief getCLImage2D
+     * @param frame
+     * @return
+     */
+    const CLData::CLImage2D< F > &getCLImage2D( ) const;
+
+    /**
+     * @brief finalPixmap
+     * @return
+     */
+    QPixmap &finalPixmap();
+
+    void downloadFrame() Q_DECL_OVERRIDE;
 
 protected:
 

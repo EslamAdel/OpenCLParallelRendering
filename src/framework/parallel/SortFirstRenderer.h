@@ -2,8 +2,6 @@
 #define SORTFIRSTRENDERER_H
 
 #include "CLAbstractParallelRenderer.h"
-#include <QtConcurrent/QtConcurrent>
-#include <QFuture>
 #include <QScopedPointer>
 #include <QScopedArrayPointer>
 #include <QReadWriteLock>
@@ -48,16 +46,16 @@ public:
 
     void initializeRenderers( ) Q_DECL_OVERRIDE;
 
-    void finishedRendering_SLOT( Renderer::CLAbstractRenderer *renderer ) Q_DECL_OVERRIDE;
+    void finishedRendering_SLOT( uint ) Q_DECL_OVERRIDE;
 
     void compositingFinished_SLOT( ) Q_DECL_OVERRIDE;
 
 
-    void frameLoadedToDevice_SLOT( Renderer::CLAbstractRenderer *renderer ) Q_DECL_OVERRIDE;
+    void frameLoadedToDevice_SLOT( uint ) Q_DECL_OVERRIDE;
 
 
     void pixmapReady_SLOT( QPixmap *pixmap ,
-                           const Renderer::CLAbstractRenderer * renderer ) Q_DECL_OVERRIDE;
+                           uint ) Q_DECL_OVERRIDE;
 
 
 
@@ -83,17 +81,21 @@ protected:
      */
     void calculateTransferTimeMean_();
 private:
-    void render_( Renderer::CLAbstractRenderer *renderer );
+    void render_( Renderer::CLRenderer< V , F > *renderer );
 
-    void assemble_(  Renderer::CLAbstractRenderer *renderer,
+    void assemble_(  Renderer::CLRenderer< V , F >  *renderer,
                      CLData::CLFrame< F > *finalFrame   );
-
-    void assemble2_(  Renderer::CLAbstractRenderer *renderer,
-                      CLData::CLFrame< F > *finalFrame   );
 
     void clone_( );
 
 protected:
+    typedef QMap< uint , Renderer::CLRenderer< V , F >* > CLRenderers;
+
+    /**
+     * @brief clRenderers_
+     */
+    CLRenderers clRenderers_;
+
     //Volume Data
     /**
      * @brief baseVolume_
@@ -141,6 +143,8 @@ protected:
      * @brief useLoadBalancing_
      */
     bool useLoadBalancing_ ;
+
+
 
 };
 

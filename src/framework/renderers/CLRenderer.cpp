@@ -73,7 +73,7 @@ void CLRenderer< V , F >::applyTransformation( )
 {
     this->paint_( );
 
-    Q_EMIT this->finishedRendering( this );
+    Q_EMIT finishedRendering( gpuIndex_ );
 }
 
 template< class V , class F >
@@ -82,17 +82,14 @@ const Coordinates3D &CLRenderer< V , F >::getCurrentCenter() const
     return currentCenter_ ;
 }
 
-
 template< class V , class F >
-void CLRenderer< V , F >::loadVolume( VolumeVariant &volume )
+void CLRenderer< V , F >::loadVolume( Volume< V > *volume )
 {
-    Volume< V > *newVolume = volume.value< Volume< V > *>() ;
-
     // If no volume yet loaded, initialize the current center.
     if( !volume_ )
-        currentCenter_ = newVolume->getUnitCubeCenter();
+        currentCenter_ = volume->getUnitCubeCenter();
 
-    volume_ =  newVolume ;
+    volume_ =  volume ;
 
     LOG_DEBUG("Loaded Volume D(%d,%d,%d)" , volume_->getDimensions().x ,
               volume_->getDimensions().y , volume_->getDimensions().z );
@@ -175,6 +172,9 @@ void CLRenderer< V , F >::renderFrame_()
         activeRenderingKernel_->setZScale( transformation_.ultrasoundScale.z );
         activeRenderingKernel_->setApexAngle( transformation_.apexAngle );
     }
+
+
+    QMutexLocker renderingLock( &renderingMutex_ );
     // Enqueue the kernel for execution
     clErrorCode |= clEnqueueNDRangeKernel(
                 commandQueue_,
@@ -511,6 +511,27 @@ template< class V , class F >
 CLData::FRAME_CHANNEL_ORDER CLRenderer< V , F >::getFrameChannelOrder() const
 {
     return frameChannelOrder_ ;
+}
+
+template< class V , class F >
+CLData::CLImage2D< F >
+const &CLRenderer< V , F >::getCLImage2D() const
+{
+    return *clFrame_;
+}
+
+template< class V , class F >
+QPixmap &CLRenderer< V , F >::finalPixmap()
+{
+    clFrame_->getFramePixmap();
+}
+
+
+template< class V , class F >
+void CLRenderer< V , F >::downloadFrame()
+{
+    QMutexLocker lock( &renderingMutex_ );
+    clFrame_->readDeviceData( commandQueue_ , CL_TRUE );
 }
 
 template< class V , class F >

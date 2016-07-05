@@ -28,13 +28,11 @@ SortFirstRenderer< V , F >::SortFirstRenderer(
     clFrameReadout_.reset( new CLData::CLImage2D< F >( frameDimension ,
                                                        channelOrder ));
 
-    connect( this , SIGNAL(finishedCompositing_SIGNAL( )) ,
+    connect( this , SIGNAL(compositingFinished_SIGNAL()) ,
              this , SLOT(compositingFinished_SLOT( )));
 
-    connect( this , SIGNAL(frameReady_SIGNAL( QPixmap*,
-                                              const Renderer::CLAbstractRenderer* )) ,
-             this, SLOT( pixmapReady_SLOT( QPixmap*,
-                                           const Renderer::CLAbstractRenderer*)));
+    connect( this , SIGNAL(frameReady_SIGNAL( QPixmap*, uint )) ,
+             this, SLOT( pixmapReady_SLOT( QPixmap*, uint )));
 
 }
 
@@ -45,7 +43,7 @@ void SortFirstRenderer< V , F >::addCLRenderer( const uint64_t gpuIndex )
 
 
     // if device already occupied by a rendering node, return.
-    if( renderers_.keys().contains( listGPUs_.at( gpuIndex ))) return;
+    if( clRenderers_.keys().contains( gpuIndex )) return;
 
     if( gpuIndex >= listGPUs_.size() )
     {
@@ -53,23 +51,21 @@ void SortFirstRenderer< V , F >::addCLRenderer( const uint64_t gpuIndex )
         return;
     }
 
-    inUseGPUs_ << listGPUs_.at( gpuIndex );
 
-    Renderer::CLAbstractRenderer *renderer =
+    Renderer::CLRenderer< V , F > *renderer =
             new Renderer::CLRenderer< V , F >(
                 gpuIndex, transformationAsync_ ,
                 Dimensions2D( frameWidth_ , frameHeight_ ));
 
 
     // Add the rendering node to the map< gpu , rendering node >.
-    renderers_[ listGPUs_.at( gpuIndex ) ] = renderer;
+    clRenderers_[ gpuIndex ] = renderer ;
+    renderers_[ gpuIndex  ] = renderer;
 
     rendererPool_.setMaxThreadCount( renderers_.size( ));
 
-    connect( this ,
-             SIGNAL( finishedRendering_SIGNAL( Renderer::CLAbstractRenderer* )),
-             this ,
-             SLOT( finishedRendering_SLOT( Renderer::CLAbstractRenderer* )));
+    connect( this , SIGNAL( finishedRendering_SIGNAL( uint )),
+             this , SLOT( finishedRendering_SLOT( uint )));
 
 
     ATTACH_RENDERING_PROFILE( renderer );
@@ -88,16 +84,13 @@ void SortFirstRenderer< V , F >::distributeBaseVolume( )
     assertThread_();
 
 
-    VolumeVariant volume = VolumeVariant::fromValue( baseVolume_.data( ));
-
-
     QVector< QFuture< void >> loadVolumeFuture;
 
-    for( Renderer::CLAbstractRenderer *renderer : renderers_ )
+    for( Renderer::CLRenderer< V , F > *renderer : clRenderers_ )
         loadVolumeFuture.append(
                     QtConcurrent::run( renderer ,
-                                       &Renderer::CLAbstractRenderer::loadVolume,
-                                       volume ));
+                                       &Renderer::CLRenderer< V , F >::loadVolume,
+                                       baseVolume_.data( )));
 
     for( QFuture< void > &future : loadVolumeFuture )
         future.waitForFinished();
@@ -127,7 +120,8 @@ void SortFirstRenderer< V , F >::initializeRenderers()
     LOG_DEBUG("Frame size:(%d,%d) [SF:%d]", frameWidth_ , frameHeight_ , sortFirstHeight );
 
     uint64_t i = 0 ;
-    CLRenderers::iterator it = renderers_.begin();
+
+    QMap< uint , Renderer::CLAbstractRenderer* >::iterator it = renderers_.begin();
 
     while( it != renderers_.end( ))
     {
@@ -152,14 +146,14 @@ void SortFirstRenderer< V , F >::initializeRenderers()
 
 template< class V , class F >
 void SortFirstRenderer< V , F >::finishedRendering_SLOT(
-        Renderer::CLAbstractRenderer *renderer )
+        uint gpuIndex )
 {
 
     assertThread_();
 
 
-    QtConcurrent::run(  this , &SortFirstRenderer::assemble2_ ,
-                        renderer , clFrame_.data( ));
+    QtConcurrent::run(  this , &SortFirstRenderer< V , F >::assemble_ ,
+                        clRenderers_[ gpuIndex ] , clFrame_.data( ));
 
 }
 
@@ -204,27 +198,22 @@ void SortFirstRenderer< V , F >::compositingFinished_SLOT( )
 
 #ifndef BENCHMARKING
     TIC( frameworkProfile.convertToPixmap_TIMER );
-    Q_EMIT this->frameReady_SIGNAL( &clFrame_->getFramePixmap( ) , nullptr );
+    Q_EMIT this->frameReady_SIGNAL( &clFrame_->getFramePixmap( ) , 0 );
     TOC( frameworkProfile.convertToPixmap_TIMER );
-//    QtConcurrent::run( this ,  &SortFirstRenderer::clone_ );
 #endif
 
 }
 
 template< class V , class F >
-void SortFirstRenderer< V , F >::frameLoadedToDevice_SLOT(
-        Renderer::CLAbstractRenderer * )
+void SortFirstRenderer< V , F >::frameLoadedToDevice_SLOT( uint )
 {
     LOG_ERROR("Don't Invoke me.");
 }
 
 template< class V , class F >
-void SortFirstRenderer< V , F >::pixmapReady_SLOT(
-        QPixmap *pixmap, const Renderer::CLAbstractRenderer * )
+void SortFirstRenderer< V , F >::pixmapReady_SLOT( QPixmap *pixmap, uint )
 {
     assertThread_();
-
-
 
     Q_EMIT this->finalFrameReady_SIGNAL( pixmap );
 }
@@ -255,7 +244,7 @@ void SortFirstRenderer< V , F >::applyTransformation_()
 
     TIC( frameworkProfile.renderingLoop_TIMER );
 
-    for( Renderer::CLAbstractRenderer *renderer : renderers_ )
+    for( Renderer::CLRenderer< V , F > *renderer : clRenderers_ )
         QtConcurrent::run( this , &SortFirstRenderer::render_ ,
                            renderer );
 
@@ -425,106 +414,26 @@ void SortFirstRenderer< V , F >::calculateTransferTimeMean_()
 
 template< class V , class F >
 void SortFirstRenderer< V , F >::SortFirstRenderer::render_(
-        Renderer::CLAbstractRenderer *renderer )
+        Renderer::CLRenderer< V , F > *renderer )
 {
     renderer->applyTransformation();
 
-    Q_EMIT this->finishedRendering_SIGNAL( renderer );
+    Q_EMIT this->finishedRendering_SIGNAL( renderer->getGPUIndex( ));
 }
 
 template< class V , class F >
 void SortFirstRenderer< V , F >::assemble_(
-        Renderer::CLAbstractRenderer *renderer ,
+        Renderer::CLRenderer< V , F >  *renderer,
         CLData::CLFrame< F > *finalFrame )
 {
-#ifdef BENCHMARKING
-    LOG_ERROR("This not to be invoked in benchmarking mode");
-#endif
-
-    CLData::CLImage2D< F > *clFrame =
-            renderer->getCLFrame().value< CLData::CLImage2D< F > *>();
-
-    clFrame->readDeviceData( renderer->getCommandQueue() ,
-                             CL_TRUE );
-
-    const Dimensions2D finalFrameSize = finalFrame->getFrameDimensions();
-
-    const Dimensions2D &offset = renderer->getSortFirstOffset();
-    const Dimensions2D &frameSize = renderer->getSortFirstDimensions();
-
-    if( offset.x + frameSize.x > frameWidth_  ||
-            offset.y + frameSize.y > frameHeight_ )
-        LOG_ERROR("Main frame exceeded!");
-
-    F *finalFrameBuffer = finalFrame->getHostData();
-    F *frameBuffer = clFrame->getHostData();
-
-    frameCopyMutex_.lockForRead();
-
-    if( clFrame->channelOrder() == CLData::FRAME_CHANNEL_ORDER::ORDER_INTENSITY )
-        // Frames Assembly.
-        for( uint64_t i = 0 ; i < frameSize.x ; i++ )
-        {
-            const uint64_t x = i + offset.x ;
-            for( uint64_t j = 0 ; j < frameSize.y ; j++ )
-            {
-                const uint64_t y = j + offset.y ;
-
-                // small frame flat index.
-                const uint64_t frameIndex =  i +  frameSize.x * j ;
-                // big frame flat index.
-                const uint64_t finalFrameIndex = x + finalFrameSize.x * y ;
-
-                finalFrameBuffer[ finalFrameIndex ] = frameBuffer[ frameIndex ];
-            }
-        }
-
-    else if ( clFrame->channelOrder() ==
-              CLData::FRAME_CHANNEL_ORDER::ORDER_RGBA )
-        for( uint64_t i = 0 ; i < frameSize.x ; i++ )
-        {
-            const uint64_t x = i + offset.x ;
-            for( uint64_t j = 0 ; j < frameSize.y ; j++ )
-            {
-                const uint64_t y = j + offset.y ;
-
-                // small frame flat index.
-                const uint64_t frameIndex =  i +  frameSize.x * j ;
-                // big frame flat index.
-                const uint64_t finalFrameIndex = x + finalFrameSize.x * y ;
-
-                finalFrameBuffer[ finalFrameIndex * 4 ] =
-                        frameBuffer[ frameIndex * 4 ];
-
-                finalFrameBuffer[ finalFrameIndex * 4 + 1 ] =
-                        frameBuffer[ frameIndex * 4 + 1 ];
-
-                finalFrameBuffer[ finalFrameIndex * 4 + 2 ] =
-                        frameBuffer[ frameIndex * 4 + 2 ];
-
-                finalFrameBuffer[ finalFrameIndex * 4 + 3 ] =
-                        frameBuffer[ frameIndex * 4 + 3 ];
-            }
-        }
-    frameCopyMutex_.unlock();
-
-    Q_EMIT this->finishedCompositing_SIGNAL();
-}
-
-template< class V , class F >
-void SortFirstRenderer< V , F >::assemble2_(
-        Renderer::CLAbstractRenderer *renderer,
-        CLData::CLFrame< F > *finalFrame )
-{
-    CLData::CLImage2D< F > *clFrame =
-            renderer->getCLFrame().value< CLData::CLImage2D< F > *>();
+    const CLData::CLImage2D< F > &clFrame = renderer->getCLImage2D();
 
     frameCopyMutex_.lockForRead();
     finalFrame->readOtherDeviceData( renderer->getCommandQueue() ,
-                                     *clFrame , CL_TRUE );
+                                     clFrame , CL_TRUE );
     frameCopyMutex_.unlock();
 
-    Q_EMIT this->finishedCompositing_SIGNAL();
+    Q_EMIT compositingFinished_SIGNAL();
 }
 
 
@@ -537,7 +446,7 @@ void SortFirstRenderer< V , F >::clone_( )
 
     frameCopyMutex_.lockForWrite();
     clFrameReadout_->copyHostData( *clFrame_.data( ));
-    Q_EMIT this->frameReady_SIGNAL( &clFrameReadout_->getFramePixmap( ) , nullptr );
+    Q_EMIT this->frameReady_SIGNAL( &clFrameReadout_->getFramePixmap( ) , 0 );
     frameCopyMutex_.unlock();
 }
 

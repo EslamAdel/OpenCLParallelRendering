@@ -26,14 +26,15 @@ void VirtualParallelRendering::addCLRenderer( const uint64_t gpuIndex )
                 frameHeight_ ,
                 transformationAsync_ );
 
-    renderers_.push_back( renderer );
+    renderers_[ gpuIndex ] =  renderer ;
+    clRenderers_[ gpuIndex ] = renderer ;
     renderer->setFrameIndex( gpuIndex );
 
     this->rendererPool_.setMaxThreadCount( renderers_.size( ));
     this->collectorPool_.setMaxThreadCount( renderers_.size( ));
 
-    connect( renderer , SIGNAL( finishedRendering( CLAbstractRenderer* )),
-             this , SLOT( finishedRendering_SLOT( CLAbstractRenderer* )));
+    connect( renderer , SIGNAL( finishedRendering( uint )),
+             this , SLOT( finishedRendering_SLOT( uint )));
 
 
 }
@@ -42,7 +43,7 @@ void VirtualParallelRendering::addCLCompositor(const uint64_t gpuIndex)
 {
     LOG_DEBUG("Adding Virtual Compositing Node");
 
-    if( inUseGPUs_.size() > 1 )
+    if( renderers_.size() > 1 )
         compositor_ = new Compositor::CLCompositor< float >( gpuIndex ,
                                                              frameWidth_ ,
                                                              frameHeight_ );
@@ -50,14 +51,6 @@ void VirtualParallelRendering::addCLCompositor(const uint64_t gpuIndex)
         LOG_ERROR("Signle GPU not supported for the moment!");
 
 
-    LOG_DEBUG("[DONE] Initialize Compositing Unit");
-    this->finalFramePixmapTask_ = new Task::TaskMakePixmap( );
-
-    connect( finalFramePixmapTask_ ,
-             SIGNAL( pixmapReady_SIGNAL( QPixmap* ,
-                                         const CLAbstractRenderer* )) ,
-             this , SLOT(pixmapReady_SLOT( QPixmap* ,
-                                           const CLAbstractRenderer* )));
 
     // for each rendering task finished, a collecting task and a
     // compositing task will follow!
@@ -119,13 +112,12 @@ void VirtualParallelRendering::distributeBaseVolume1D()
 
     int i = 0;
 
-    for( Renderer::CLAbstractRenderer* renderer  : renderers_ )
+    for( Renderer::CLRenderer< uchar , float >* renderer  : clRenderers_ )
     {
         LOG_DEBUG( "Loading subVolume to device" );
 
         Volume8 *subVolume = bricks[ i++ ];
-        VolumeVariant volumeVariant = VolumeVariant::fromValue( subVolume );
-        renderer->loadVolume( volumeVariant );
+        renderer->loadVolume( subVolume );
 
         LOG_DEBUG( "[DONE] Loading subVolume to GPU <%d>",
                    renderer->getGPUIndex( ));
@@ -154,26 +146,22 @@ void VirtualParallelRendering::startRendering()
     LOG_INFO("[DONE] Triggering Rendering Nodes");
 }
 
-void VirtualParallelRendering::frameLoadedToDevice_SLOT(
-        Renderer::CLAbstractRenderer *renderer )
+void VirtualParallelRendering::frameLoadedToDevice_SLOT( uint gpuIndex )
 {
-    LOG_DEBUG("Frame<%d> Loaded to Device" , renderer->getGPUIndex() );
+    LOG_DEBUG("Frame<%d> Loaded to Device" , gpuIndex );
 
-    Q_EMIT this->frameReady_SIGNAL( &renderer->
-                                  getCLFrame().
-                                  value< CLData::CLImage2D< float >* >()->
-                                  getFramePixmap() ,
-                                  renderer  );
+    Q_EMIT this->frameReady_SIGNAL( &clRenderers_[ gpuIndex ]->finalPixmap() ,
+                                    0  );
 
     //accumulate the recently loaded frame to the collage frame.
-    compositorPool_.start( compositingTasks_[ renderer->getGPUIndex() ] );
+    compositorPool_.start( compositingTasks_[ gpuIndex ] );
 }
 
 void VirtualParallelRendering::finishedRendering_SLOT(
-        Renderer::CLAbstractRenderer *finishedRenderer )
+        uint gpuIndex )
 {
 
-    collectorPool_.start( collectingTasks_[ finishedRenderer->getGPUIndex() ]);
+    collectorPool_.start( collectingTasks_[ gpuIndex ]);
 
 }
 
@@ -198,7 +186,6 @@ void VirtualParallelRendering::compositingFinished_SLOT()
 
 void VirtualParallelRendering::applyTransformation_()
 {
-    this->readyPixmapsCount_ = 0 ;
 
     // fetch new transformations if exists.
     this->syncTransformation_();

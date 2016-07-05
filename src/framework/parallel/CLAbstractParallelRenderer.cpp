@@ -36,12 +36,10 @@ CLAbstractParallelRenderer::CLAbstractParallelRenderer(
       frameHeight_( frameHeight ),
       renderersReady_( false ),
       compositedFramesCount_( 0 ) ,
-      compositor_( nullptr ),
       frameChannelOrder_( channelOrder )
 {
 
     listGPUs_ = clHardware_.getListGPUs();
-    machineGPUsCount_ = listGPUs_.size();
 
     // Translation
     transformation_.translation.x = INITIAL_VOLUME_CENTER_X;
@@ -66,18 +64,12 @@ CLAbstractParallelRenderer::CLAbstractParallelRenderer(
     transformation_.stepSize = 0.01 ;
     transformation_.apexAngle = 0.1f ;
 
+    compositor_ = 0;
 }
-
-int CLAbstractParallelRenderer::getCLRenderersCount() const
-{
-    return renderers_.size();
-}
-
-
 
 void CLAbstractParallelRenderer::startRendering()
 {
-    activeRenderers_ =  inUseGPUs_.size();
+    activeRenderers_ =  renderers_.size();
 
     LOG_INFO("Triggering Rendering Nodes");
 
@@ -87,23 +79,21 @@ void CLAbstractParallelRenderer::startRendering()
     LOG_INFO("[DONE] Triggering Rendering Nodes");
 }
 
+
 void CLAbstractParallelRenderer::applyTransformation_()
 {
-    readyPixmapsCount_ = 0 ;
 
     TIC( frameworkProfile.renderingLoop_TIMER );
 
     // fetch new transformations if exists.
     syncTransformation_();
 
-    for( const oclHWDL::Device *renderingDevice : inUseGPUs_ )
+    for( uint gpuIndex : renderers_.keys())
     {
-        const Renderer::CLAbstractRenderer *renderer =
-                renderers_[ renderingDevice ];
 
-        TIC( renderingProfiles.value( renderer )->threadSpawning_TIMER );
+        TIC( renderingProfiles.value( renderers_[ gpuIndex ] )->threadSpawning_TIMER );
         // Spawn threads and start rendering on each rendering node.
-        rendererPool_.start( renderingTasks_[ renderer ]);
+        rendererPool_.start( renderingTasks_[ gpuIndex ]);
     }
 
     pendingTransformations_ = false;
@@ -116,34 +106,6 @@ void CLAbstractParallelRenderer::syncTransformation_()
     transformationAsync_ = transformation_ ;
 }
 
-
-const Renderer::CLAbstractRenderer &
-CLAbstractParallelRenderer::getCLRenderer( const uint64_t gpuIndex ) const
-{
-    // handle some minor exceptions.
-    const oclHWDL::Device *device = listGPUs_.at( gpuIndex );
-
-    if(!( inUseGPUs_.contains( device )))
-        LOG_ERROR("No such rendering node!");
-
-    return *renderers_[ device ];
-
-}
-
-
-
-const Compositor::CLAbstractCompositor
-&CLAbstractParallelRenderer::getCLCompositor() const
-{
-    return  *compositor_  ;
-}
-
-
-uint CLAbstractParallelRenderer::getMachineGPUsCount() const
-{
-    return machineGPUsCount_;
-}
-
 uint64_t CLAbstractParallelRenderer::getFrameWidth() const
 {
     return frameWidth_;
@@ -152,6 +114,17 @@ uint64_t CLAbstractParallelRenderer::getFrameWidth() const
 uint64_t CLAbstractParallelRenderer::getFrameHeight() const
 {
     return frameHeight_;
+}
+
+Compositor::CLAbstractCompositor &CLAbstractParallelRenderer::getCLCompositor()
+{
+    return *compositor_;
+}
+
+Renderer::CLAbstractRenderer &CLAbstractParallelRenderer::getCLRenderer(
+            uint gpuIndex )
+{
+    return *renderers_[ gpuIndex ];
 }
 
 void CLAbstractParallelRenderer::updateRotationX_SLOT( int angle )
@@ -269,44 +242,17 @@ void CLAbstractParallelRenderer::updateIsoValue_SLOT(float isoValue)
 }
 
 void CLAbstractParallelRenderer::activateRenderingKernel_SLOT(
-        CLKernel::RenderingMode type )
+            CLKernel::RenderingMode type )
 {
-    for( Renderer::CLAbstractRenderer *renderer : renderers_.values())
+    for( Renderer::CLAbstractRenderer *renderer : renderers_ )
         renderer->switchRenderingKernel( type );
 
-    if( compositor_ != nullptr )
+    if( compositor_ != 0 )
         compositor_->switchCompositingKernel( type );
 
 
     if( renderersReady_ ) applyTransformation_();
     else pendingTransformations_ = true ;
-}
-
-void CLAbstractParallelRenderer::benchmark_( )
-{
-
-    for( Renderer::CLAbstractRenderer *renderer : renderers_ )
-    {
-        RENDERING_PROFILE_TAG( renderer );
-        PRINT( RENDERING_PROFILE( renderer ).threadSpawning_TIMER );
-        PRINT( RENDERING_PROFILE( renderer ).mvMatrix_TIMER );
-        PRINT( RENDERING_PROFILE( renderer ).rendering_TIMER );
-
-        COLLECTING_PROFILE_TAG( renderer , compositor_ );
-        PRINT( COLLECTING_PROFILE( renderer ).threadSpawning_TIMER );
-        PRINT( COLLECTING_PROFILE( renderer ).transferingBuffer_TIMER );
-    }
-
-    COMPOSITING_PROFILE_TAG( compositor_ );
-    PRINT( compositingProfile.loadFinalFromDevice_TIMER ) ;
-    PRINT( compositingProfile.compositing_TIMER ) ;
-
-
-    FRAMEWORK_PROFILE_TAG( );
-    PRINT( frameworkProfile.renderingLoop_TIMER );
-
-
-    EXIT_PROFILING();
 }
 
 
@@ -320,7 +266,7 @@ void CLAbstractParallelRenderer::assertThread_()
 void CLAbstractParallelRenderer::updateTransferFunction_SLOT(
         float *transferFunction , uint length )
 {
-    for( Renderer::CLAbstractRenderer *renderer : renderers_.values())
+    for( Renderer::CLAbstractRenderer *renderer : renderers_ )
         renderer->updateTransferFunction( transferFunction , length );
 
     if( renderersReady_ ) applyTransformation_();

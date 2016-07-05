@@ -21,6 +21,7 @@ SortLastRenderer< V , F >::SortLastRenderer(
       CLAbstractParallelRenderer( frameWidth , frameHeight , channelOrder )
 {
 
+    clCompositor_ = 0;
     compositorPool_.setMaxThreadCount( 1 );
 }
 
@@ -29,7 +30,7 @@ template< class V , class F >
 void SortLastRenderer< V , F >::addCLRenderer( const uint64_t gpuIndex )
 {
     // if device already occupied by a rendering node, return.
-    if( inUseGPUs_.contains( listGPUs_.at( gpuIndex ))) return;
+    if( clRenderers_.keys().contains( gpuIndex )) return;
 
 
     // pass transformations by reference.
@@ -37,22 +38,19 @@ void SortLastRenderer< V , F >::addCLRenderer( const uint64_t gpuIndex )
     // will be accessed by multithreads. So,
     // they should not be modified during the life of the threads.
 
-    Renderer::CLAbstractRenderer *renderer =
+    Renderer::CLRenderer< V , F > *renderer =
             new Renderer::CLRenderer< V , F >(
-                gpuIndex, transformationAsync_ ,
+                gpuIndex , transformationAsync_ ,
                 Dimensions2D( frameWidth_ , frameHeight_ ) ,
                 frameChannelOrder_ );
 
     ATTACH_RENDERING_PROFILE( renderer );
     ATTACH_COLLECTING_PROFILE( renderer );
 
-    auto attachedGPU = listGPUs_.at( gpuIndex );
-
-    // Add the recently attached GPU to Set of usedGPUs.
-    inUseGPUs_ << attachedGPU;
 
     // Add the rendering node to the map< gpu , rendering node >.
-    renderers_[ attachedGPU ] = renderer;
+    clRenderers_[ gpuIndex ] = renderer;
+    renderers_[ gpuIndex ] = renderer;
 
     // Create the TaskRender that wrap the rendering instruction,
     // to be executed concurrently on each device.
@@ -61,37 +59,18 @@ void SortLastRenderer< V , F >::addCLRenderer( const uint64_t gpuIndex )
 
     // Add the new task object to
     // the map < rendering node , corresponding rendering task >
-    renderingTasks_[ renderer ] = taskRender;
+    renderingTasks_[ gpuIndex ] = taskRender;
 
 
-    Task::TaskMakePixmap *taskPixmap = new Task::TaskMakePixmap( );
-    taskPixmap->setFrame( renderer->getCLFrame( ).
-                          value< CLData::CLImage2D< F > *>());
-    taskPixmap->setRenderer( renderer );
-
-    makePixmapTasks_[ renderer ] = taskPixmap ;
 
     // Set the maximum number of active threads of the rendering thread pool and
     // the collector thread pool  to the current number of deployed GPUs.
-    rendererPool_.setMaxThreadCount( inUseGPUs_.size( ));
-    collectorPool_.setMaxThreadCount( inUseGPUs_.size( ));
-    pixmapMakerPool_.setMaxThreadCount( inUseGPUs_.size());
+    rendererPool_.setMaxThreadCount( clRenderers_.size( ));
+    collectorPool_.setMaxThreadCount( clRenderers_.size( ));
 
-    // Map the signal Q_EMITted from rendering node after rendering is finished
-    // to the corresponding slot.
-    connect( renderer ,
-             SIGNAL( finishedRendering( Renderer::CLAbstractRenderer* )),
-             this ,
-             SLOT( finishedRendering_SLOT( Renderer::CLAbstractRenderer* )));
+    connect( renderer , SIGNAL( finishedRendering( uint )),
+             this , SLOT( finishedRendering_SLOT( uint )));
 
-    connect( taskPixmap ,
-             SIGNAL(pixmapReady_SIGNAL(
-                        QPixmap*,
-                        const Renderer::CLAbstractRenderer* )) ,
-             this ,
-             SLOT(pixmapReady_SLOT(
-                      QPixmap*,
-                      const Renderer::CLAbstractRenderer* )));
 }
 
 
@@ -108,65 +87,37 @@ void SortLastRenderer< V , F >::addCLCompositor( const uint64_t gpuIndex )
 
     // If multiple renderers deployed, use compositor.
     // Otherwise, no compositing to be performed.
-    if( inUseGPUs_.size() > 1 )
-        compositor_ = new Compositor::CLCompositor< F >( gpuIndex ,
-                                                         frameWidth_ ,
-                                                         frameHeight_ );
+    if( clRenderers_.size() > 1 )
+    {
+        clCompositor_ = new Compositor::CLCompositor< F >( gpuIndex ,
+                                                           frameWidth_ ,
+                                                           frameHeight_ );
+        compositor_ = clCompositor_;
+    }
 
 
     LOG_DEBUG("[DONE] Initialize Compositor");
 
-    finalFramePixmapTask_ = new Task::TaskMakePixmap( );
-    connect( finalFramePixmapTask_ ,
-             SIGNAL( pixmapReady_SIGNAL(
-                         QPixmap* ,
-                         const Renderer::CLAbstractRenderer* )) ,
-             this ,
-             SLOT(pixmapReady_SLOT(
-                      QPixmap* ,
-                      const Renderer::CLAbstractRenderer* )));
 
     // for each rendering task finished, a collecting task and a
     // compositing task will be assigned!
-    if( inUseGPUs_.size() > 1 )
-        for( auto renderingDevice : inUseGPUs_ )
+    if( clRenderers_.size() > 1 )
+        for( Renderer::CLRenderer< V , F > *renderer : clRenderers_ )
         {
-            auto renderer = renderers_[ renderingDevice ];
-
             LOG_DEBUG("Connecting CLRenderer< %d >" ,
                       renderer->getGPUIndex( ));
 
             //register a frame to be allocated in the compositor device.
-            compositor_->allocateFrame( renderer );
+            clCompositor_->allocateFrame( renderer );
 
-            Compositor::Task::TaskComposite *compositingTask =
-                    new Compositor::Task::TaskComposite( compositor_ ,
-                                                         renderer );
-
-            compositingTasks_[ renderer ] = compositingTask ;
-
-            // Now add collectingTasks that transfer buffer from The rendering device
-            // (rendering node) to the compositing device (compositing node),
-            auto collectingTask =
-                    new Task::TaskCollect( renderer , compositor_ );
-
-            // Add the collecting task to
-            // the map < rendering node , collecting task >
-            collectingTasks_[ renderer ] = collectingTask ;
-
-
-            // Map signals from collecting tasks and compositing tasks to the
-            // correspondint slots.
-            connect( collectingTask ,
-                     SIGNAL( frameLoadedToDevice_SIGNAL(
-                                 Renderer::CLAbstractRenderer* )) ,
-                     this , SLOT( frameLoadedToDevice_SLOT(
-                                      Renderer::CLAbstractRenderer* )));
-
-            connect( compositingTask , SIGNAL( compositingFinished_SIGNAL( )) ,
-                     this , SLOT( compositingFinished_SLOT( )));
         }
 
+
+    connect( this , SIGNAL( compositingFinished_SIGNAL( )) ,
+             this , SLOT( compositingFinished_SLOT( )));
+
+    connect( this , SIGNAL( frameLoadedToDevice_SIGNAL( uint )) ,
+             this , SLOT( frameLoadedToDevice_SLOT( uint )));
 
     LOG_INFO("[DONE] Linking Rendering Units with Compositing Unit...");
 }
@@ -175,7 +126,7 @@ void SortLastRenderer< V , F >::addCLCompositor( const uint64_t gpuIndex )
 template< class V , class F >
 void SortLastRenderer< V , F >::distributeBaseVolume1D()
 {
-    const int nDevices = inUseGPUs_.size();
+    const int nDevices = clRenderers_.size();
 
     if( nDevices == 0 )
         LOG_ERROR( "No deployed devices to distribute volume!");
@@ -185,17 +136,15 @@ void SortLastRenderer< V , F >::distributeBaseVolume1D()
     QVector< Volume< V > *> bricks = baseVolume_->heuristicBricking( nDevices );
     int i = 0;
 
-    for( auto renderingDevice  : inUseGPUs_ )
+    for( Renderer::CLRenderer< V , F > *renderer : clRenderers_ )
     {
         LOG_DEBUG( "Loading subVolume to device" );
 
         auto subVolume = bricks[ i++ ];
-        VolumeVariant volume = VolumeVariant::fromValue( subVolume );
-
-        renderers_[ renderingDevice ]->loadVolume( volume );
+        renderer->loadVolume( subVolume );
 
         LOG_DEBUG( "[DONE] Loading subVolume to GPU <%d>",
-                   renderers_[ renderingDevice ]->getGPUIndex( ));
+                   renderer->getGPUIndex( ));
     }
 
     Q_EMIT this->frameworkReady_SIGNAL();
@@ -205,26 +154,25 @@ template< class V , class F >
 void SortLastRenderer< V , F >::distributeBaseVolumeWeighted()
 {
     QVector< uint > computingPowerScores ;
-    for( const oclHWDL::Device *device : inUseGPUs_ )
-    {
-        computingPowerScores.append( device->getMaxComputeUnits( ));
-    }
+    for( const uint gpuIdnex : clRenderers_.keys( ))
+        computingPowerScores.append(
+                    listGPUs_[ gpuIdnex ]->getMaxComputeUnits( ));
+
 
     QVector< BrickParameters< V > > bricks =
             baseVolume_->weightedBricking1D( computingPowerScores );
 
     int i = 0;
-    for( auto renderingDevice  : inUseGPUs_ )
+    for( Renderer::CLRenderer< V , F > *renderer : clRenderers_ )
     {
         LOG_DEBUG( "Loading subVolume to device" );
 
         Volume< V > *subVolume = new Volume< V >( bricks[ i++ ]);
-        VolumeVariant volume = VolumeVariant::fromValue( subVolume );
 
-        renderers_[ renderingDevice ]->loadVolume( volume );
+        renderer->loadVolume( subVolume );
 
         LOG_DEBUG( "[DONE] Loading subVolume to GPU <%d>",
-                   renderers_[ renderingDevice ]->getGPUIndex( ));
+                   renderer->getGPUIndex( ));
     }
 
     Q_EMIT this->frameworkReady_SIGNAL();
@@ -236,56 +184,122 @@ void SortLastRenderer< V , F >::distributeBaseVolumeMemoryWeighted()
 {
 
     QVector< uint > memoryScores ;
-    for( const oclHWDL::Device *device : inUseGPUs_ )
-    {
-        memoryScores.append( device->getGlobalMemorySize() / 1024 );
-    }
+    for( const uint gpuIndex : clRenderers_.keys( ))
+        memoryScores.append( listGPUs_[ gpuIndex ]->getGlobalMemorySize() / 1024 );
+
 
     QVector< BrickParameters< V > > bricks =
             baseVolume_->weightedBricking1D( memoryScores );
 
     int i = 0;
-    for( auto renderingDevice  : inUseGPUs_ )
+    for( Renderer::CLRenderer< V , F > *renderer : clRenderers_ )
     {
         LOG_DEBUG( "Loading subVolume to device" );
 
         Volume< V > *subVolume = new Volume< V >( bricks[ i++ ]);
-        VolumeVariant volume = VolumeVariant::fromValue( subVolume );
-
-        renderers_[ renderingDevice ]->loadVolume( volume );
+        renderer->loadVolume( subVolume );
 
         LOG_DEBUG( "[DONE] Loading subVolume to GPU <%d>",
-                   renderers_[ renderingDevice ]->getGPUIndex( ));
+                   renderer->getGPUIndex( ));
     }
 
     Q_EMIT this->frameworkReady_SIGNAL();
 }
 
+template< class V , class F >
+void SortLastRenderer< V , F >::applyTransformation_()
+{
+    TIC( frameworkProfile.renderingLoop_TIMER );
+
+    // fetch new transformations if exists.
+    syncTransformation_();
+
+    for( uint gpuIndex : clRenderers_.keys( ))
+    {
+
+        TIC( renderingProfiles.value( clRenderers_[ gpuIndex ] )->threadSpawning_TIMER );
+        // Spawn threads and start rendering on each rendering node.
+        rendererPool_.start( renderingTasks_[ gpuIndex ]);
+    }
+
+    pendingTransformations_ = false;
+    renderersReady_ = false;
+}
+
+template< class V , class F >
+void SortLastRenderer< V , F >::benchmark_()
+{
+    for( Renderer::CLRenderer< V , F > *renderer : clRenderers_ )
+    {
+        RENDERING_PROFILE_TAG( renderer );
+        PRINT( RENDERING_PROFILE( renderer ).threadSpawning_TIMER );
+        PRINT( RENDERING_PROFILE( renderer ).mvMatrix_TIMER );
+        PRINT( RENDERING_PROFILE( renderer ).rendering_TIMER );
+
+        COLLECTING_PROFILE_TAG( renderer , compositor_ );
+        PRINT( COLLECTING_PROFILE( renderer ).threadSpawning_TIMER );
+        PRINT( COLLECTING_PROFILE( renderer ).transferingBuffer_TIMER );
+    }
+
+    COMPOSITING_PROFILE_TAG( compositor_ );
+    PRINT( compositingProfile.loadFinalFromDevice_TIMER ) ;
+    PRINT( compositingProfile.compositing_TIMER ) ;
+
+
+    FRAMEWORK_PROFILE_TAG( );
+    PRINT( frameworkProfile.renderingLoop_TIMER );
+
+
+    EXIT_PROFILING();
+}
+
+
+
+template< class V , class F >
+void SortLastRenderer< V , F >::collectFrame_( uint gpuIndex )
+{
+
+    LOG_DEBUG("Transfering frame<%d> to compositor", gpuIndex);
+
+
+    //upload frame from rendering GPU to HOST.
+    TIC( COLLECTING_PROFILE( renderers_[ gpuIndex ] ).transferingBuffer_TIMER );
+
+    clCompositor_->collectFrame( renderers_[ gpuIndex ] ,
+                                 CL_TRUE );
+
+    LOG_DEBUG("[DONE] Transfering frame<%d> to compositor", gpuIndex);
+    TOC( COLLECTING_PROFILE( renderers_[ gpuIndex ] ).transferingBuffer_TIMER ) ;
+
+
+    Q_EMIT frameLoadedToDevice_SIGNAL( gpuIndex );
+}
+
 
 template< class V , class F >
 void SortLastRenderer< V , F >::finishedRendering_SLOT(
-        Renderer::CLAbstractRenderer *renderer )
+        uint gpuIndex )
 {
-    //    LOG_DEBUG("Finished Rendering");
 
-    if( renderers_.size() > 1 )
+    if( clRenderers_.size() > 1 )
     {
-        TIC( collectingProfiles.value( renderer )->threadSpawning_TIMER );
-        collectorPool_.start( collectingTasks_[ renderer ]);
+        LOG_DEBUG("Finished Rendering< %d >", gpuIndex);
+
+//        TIC( collectingProfiles.value( clRenderers_[ gpuIndex ] )->threadSpawning_TIMER );
+//        collectorPool_.start( collectingTasks_[ gpuIndex ]);
+
+        QtConcurrent::run( &collectorPool_ , this ,
+                           &SortLastRenderer::collectFrame_ ,
+                           gpuIndex );
     }
     else
     {
-        CLData::CLImage2D< F > *rendererdFrame =
-                renderer->getCLFrame().value< CLData::CLImage2D< F > *>( );
+        clRenderers_[ gpuIndex ]->downloadFrame();
 
-        rendererdFrame->readDeviceData( renderer->getCommandQueue() ,
-                                        CL_TRUE );
-        QPixmap &pixmap = rendererdFrame->getFramePixmap();
-
-        Q_EMIT this->finalFrameReady_SIGNAL( &pixmap );
+        Q_EMIT finalFrameReady_SIGNAL(
+                    &clRenderers_[ gpuIndex ]->finalPixmap( ));
 
         renderersReady_ = true ;
-
     }
 
 }
@@ -297,10 +311,7 @@ void SortLastRenderer< V , F >::compositingFinished_SLOT()
     TOC( frameworkProfile.renderingLoop_TIMER );
 
 #ifndef BENCHMARKING
-    finalFramePixmapTask_->setFrame(
-                compositor_->getFinalFrame().value< CLData::CLImage2D< F >*>( ));
-
-    pixmapMakerPool_.start( finalFramePixmapTask_ );
+    Q_EMIT finalFrameReady_SIGNAL( & clCompositor_->getCLImage2D().getFramePixmap());
 #endif
 
     if( pendingTransformations_ )
@@ -323,17 +334,20 @@ void SortLastRenderer< V , F >::compositingFinished_SLOT()
 
 template< class V , class F >
 void SortLastRenderer< V , F >::frameLoadedToDevice_SLOT(
-        Renderer::CLAbstractRenderer *renderer )
+        uint gpuIndex )
 {
     TIC( compositingProfile.threadSpawning_TIMER );
 
-    //    LOG_DEBUG("Frame[%d] Loaded to device" , node->getFrameIndex( ));
+    LOG_DEBUG("Frame[%d] Loaded to device" , gpuIndex );
 
-    //accumulate the recently loaded frame to the collage frame.
-    compositorPool_.start( compositingTasks_[ renderer ]);
+    //accumulate the recently loaded frame to the final frame.
+    QtConcurrent::run( &compositorPool_ , this ,
+                       &SortLastRenderer::composite_ ,
+                       gpuIndex );
 
-#ifndef BENCHMARKING
-    pixmapMakerPool_.start( makePixmapTasks_[ renderer ]);
+#ifndef BENCHMARKING    
+    QtConcurrent::run( this , &SortLastRenderer< V , F >::makePixmap_ ,
+                       gpuIndex );
 #endif
 
 }
@@ -341,12 +355,10 @@ void SortLastRenderer< V , F >::frameLoadedToDevice_SLOT(
 template< class V , class F >
 void SortLastRenderer< V , F >::pixmapReady_SLOT(
         QPixmap *pixmap,
-        const Renderer::CLAbstractRenderer *renderer )
+        uint gpuIndex )
 {
-    if( renderer == nullptr )
-        Q_EMIT this->finalFrameReady_SIGNAL( pixmap );
-    else
-        Q_EMIT this->frameReady_SIGNAL( pixmap , renderer );
+
+    Q_EMIT this->frameReady_SIGNAL( pixmap , gpuIndex );
 }
 
 
@@ -378,6 +390,31 @@ template< class V , class F >
 void SortLastRenderer< V , F >::initializeRenderers()
 {
 
+}
+
+template< class V , class F >
+void SortLastRenderer< V , F >::makePixmap_( uint gpuIndex )
+{
+    QPixmap &pixmap = clRenderers_[ gpuIndex ]->finalPixmap();
+
+    Q_EMIT frameReady_SIGNAL( &pixmap , gpuIndex );
+}
+
+
+template< class V , class F >
+void SortLastRenderer< V , F >::composite_( uint gpuIndex )
+{
+    TOC( compositingProfile.threadSpawning_TIMER ) ;
+
+    compositor_->composite( );
+
+    if( compositor_->readOutReady( ))
+    {
+        TIC( compositingProfile.loadFinalFromDevice_TIMER );
+        compositor_->loadFinalFrame( );
+        TOC( compositingProfile.loadFinalFromDevice_TIMER );
+        Q_EMIT compositingFinished_SIGNAL( );
+    }
 }
 
 

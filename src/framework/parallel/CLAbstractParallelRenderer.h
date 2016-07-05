@@ -9,6 +9,9 @@
 #include <QSet>
 #include <QMap>
 #include <QThreadPool>
+#include <QtConcurrent/QtConcurrent>
+#include <QFuture>
+
 #include <oclHWDL.h>
 #include "CLVolumeVariants.hh"
 #include "Transformation.h"
@@ -16,21 +19,20 @@
 #include "TaskRender.h"
 #include "TaskCollect.h"
 #include "TaskComposite.h"
-#include "TaskMakePixmap.h"
 
 
 namespace clparen {
 namespace Parallel {
 
-typedef QMap< const oclHWDL::Device*, Renderer::CLAbstractRenderer*> CLRenderers;
 
-typedef QMap< const Renderer::CLAbstractRenderer* , Renderer::Task::TaskRender*> RenderingTasks;
+typedef QMap< uint , Renderer::CLAbstractRenderer* > Renderers;
 
-typedef QMap< const Renderer::CLAbstractRenderer* , Compositor::Task::TaskComposite*> CompositingTasks;
+typedef QMap< uint , Renderer::Task::TaskRender*> RenderingTasks;
 
-typedef QMap< const Renderer::CLAbstractRenderer* , Task::TaskCollect*> CollectingTasks;
+typedef QMap< uint , Compositor::Task::TaskComposite*> CompositingTasks;
 
-typedef QMap< const Renderer::CLAbstractRenderer* , Task::TaskMakePixmap*> MakePixmapTasks;
+typedef QMap< uint , Task::TaskCollect*> CollectingTasks;
+
 
 
 class CLAbstractParallelRenderer : public QObject
@@ -53,12 +55,6 @@ public:
      */
     virtual void addCLRenderer( const uint64_t gpuIndex ) = 0;
 
-    /**
-     * @brief getCLRenderersCount
-     * @return
-     */
-    virtual int getCLRenderersCount() const ;
-
 
     /**
      * @brief addCLCompositor
@@ -74,31 +70,14 @@ public:
      * @brief startRendering
      * Spark the rendering loop.
      */
-    virtual void startRendering( );
+    virtual void startRendering( ) ;
 
 
     /**
      * @brief initializeRenderers
      */
     virtual void initializeRenderers( ) = 0 ;
-    /**
-     * @brief getCLRenderer
-     * @param gpuIndex
-     * @return
-     */
-    const Renderer::CLAbstractRenderer &getCLRenderer( const uint64_t gpuIndex ) const ;
 
-
-    /**
-     * @brief getCLCompositor
-     * @return
-     */
-    const Compositor::CLAbstractCompositor &getCLCompositor( ) const ;
-    /**
-     * @brief machineGPUsCount
-     * @return
-     */
-    virtual uint getMachineGPUsCount() const;
 
     /**
      * @brief getFrameWidth
@@ -112,6 +91,12 @@ public:
      */
     uint64_t getFrameHeight() const ;
 
+
+    Compositor::CLAbstractCompositor &getCLCompositor();
+
+
+    Renderer::CLAbstractRenderer &getCLRenderer( uint gpuIndex );
+
 Q_SIGNALS:
 
     /**
@@ -124,7 +109,7 @@ Q_SIGNALS:
      * For each rendered frame done, emit a signal.
      */
     void frameReady_SIGNAL( QPixmap *pixmap ,
-                            const Renderer::CLAbstractRenderer * node );
+                            uint gpuIndex );
 
     /**
      * @brief finalFrameReady_SIGNAL
@@ -140,55 +125,49 @@ Q_SIGNALS:
     /**
      * @brief finishedCompositing_SIGNAL
      */
-    void finishedCompositing_SIGNAL( );
+    void compositingFinished_SIGNAL( );
 
 
     /**
      * @brief finishedRendering_SIGNAL
      */
-    void finishedRendering_SIGNAL( Renderer::CLAbstractRenderer* );
+    void finishedRendering_SIGNAL( uint gpuIndex );
 
+
+    /**
+     * @brief frameLoadedToDevice_SIGNAL
+     * @param gpuIndex
+     */
+    void frameLoadedToDevice_SIGNAL( uint gpuIndex );
 public Q_SLOTS:
 
     /**
      * @brief finishedRendering_SLOT
-     * When a CLRenderer finishs rendering, the signal emitted will be
-     * mapped to this slot, so it initiates a collecting task to transfer
-     * buffers from the rendering GPU to the compositing GPU.
-     * @param finishedNode
+     * @param gpuIndex
      */
-    virtual void finishedRendering_SLOT( Renderer::CLAbstractRenderer *renderer ) = 0;
+    virtual void finishedRendering_SLOT( uint gpuIndex ) = 0;
 
     /**
      * @brief compositingFinished_SLOT
-     * When a CLCompositor finishs compositing, the signal emitted will be
-     * mapped to this slot, where proper routines will be performed.
      */
     virtual void compositingFinished_SLOT( ) = 0 ;
 
+
     /**
      * @brief frameLoadedToDevice_SLOT
-     * When a collecting task finishs transfering buffers from the rendering
-     * GPU to the compositing GPU, it emits a signal mapped to this slot,
-     * so this slot initiates a compositing task.
-     * @param finishedNode
+     * @param gpuIndex
      */
-    virtual void frameLoadedToDevice_SLOT( Renderer::CLAbstractRenderer *renderer ) = 0;
+    virtual void frameLoadedToDevice_SLOT( uint gpuIndex ) = 0;
+
 
 
     /**
      * @brief pixmapReady_SLOT
-     * When a thread is done with converting a raw frame to pixmap a signal
-     * emitted will be mapped to this slot.
      * @param pixmap
-     * produced pixmap.
-     * @param node
-     * JUST IDENTIFIER for whom this pixmap belongs!
-     * if it is nullptr then it belongs to the CompositorNode,
-     * otherwise, it belongs to CLRenderer referenced by the pointer.
+     * @param gpuIndex
      */
     virtual void pixmapReady_SLOT( QPixmap *pixmap ,
-                                   const Renderer::CLAbstractRenderer * renderer ) = 0;
+                                   uint gpuIndex ) = 0;
 
     /**
      * @brief updateRotationX_SLOT
@@ -301,7 +280,7 @@ protected:
      * @brief applyTransformation
      * Start rendering and apply the desired transformation.
      */
-    virtual void applyTransformation_() ;
+    virtual void applyTransformation_() = 0;
 
     /**
      * @brief syncTransformation
@@ -313,7 +292,7 @@ protected:
     /**
      * @brief benchmark_
      */
-    virtual void benchmark_() ;
+    virtual void benchmark_() = 0 ;
 
 
     /**
@@ -327,29 +306,23 @@ protected:
     /**
      * @brief clHardware_
      */
-    oclHWDL::Hardware               clHardware_;
-
-    /**
-     * @brief inUseGPUs_
-     */
-    QSet< const oclHWDL::Device* >  inUseGPUs_;
+    oclHWDL::Hardware clHardware_;
 
     /**
      * @brief listGPUs_
      */
-    oclHWDL::Devices                listGPUs_;
+    oclHWDL::Devices listGPUs_;
+
 
     /**
      * @brief renderers_
      */
-    CLRenderers renderers_;
+    Renderers renderers_ ;
 
     /**
      * @brief compositor_
      */
     Compositor::CLAbstractCompositor *compositor_;
-
-
     //threadpools
     /**
      * @brief rendererPool_
@@ -366,10 +339,6 @@ protected:
      */
     QThreadPool collectorPool_ ; //[producer] for renderer pool AND
     //[consumer] for renderer pool.
-    /**
-     * @brief pixmapMakerPool_
-     */
-    QThreadPool pixmapMakerPool_;
 
     /**
      * @brief renderingTasks_
@@ -385,39 +354,48 @@ protected:
      */
     CompositingTasks compositingTasks_ ;
 
-    /**
-     * @brief finalFramePixmapTask_
-     */
-    Task::TaskMakePixmap *finalFramePixmapTask_;
 
+    // Transformations
     /**
-     * @brief makePixmapTasks_
+     * @brief transformation_
      */
-    MakePixmapTasks makePixmapTasks_ ;
-
-    //Transformations
     Transformation transformation_ ;
 
-    //shared data for multithreads, must not be modified during
-    //the activity rendering threads.
-    //modified using syncTransformation_()
+    // thread-safe copy
+    /**
+     * @brief transformationAsync_
+     */
     Transformation transformationAsync_ ;
 
     //flags
+    /**
+     * @brief pendingTransformations_
+     */
     bool pendingTransformations_;
+    /**
+     * @brief renderersReady_
+     */
     bool renderersReady_;
 
     //counters
     uint8_t activeRenderers_;
-    uint8_t readyPixmapsCount_;
     uint8_t compositedFramesCount_ ;
 
-    //facts
-    uint machineGPUsCount_;
+
+    /**
+     * @brief frameWidth_
+     */
     const uint64_t frameWidth_ ;
+
+    /**
+     * @brief frameHeight_
+     */
     const uint64_t frameHeight_ ;
 
 
+    /**
+     * @brief frameChannelOrder_
+     */
     const CLData::FRAME_CHANNEL_ORDER frameChannelOrder_ ;
 
 };

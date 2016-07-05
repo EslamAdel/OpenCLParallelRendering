@@ -14,7 +14,6 @@ namespace clparen {
 namespace Parallel {
 
 
-
 enum LoadBalancingMode { LOAD_BALANCING_MEMORY ,
                          LOAD_BALANCING_COMPUTATIONAL ,
                          LOAD_BALANCING_OFF };
@@ -61,16 +60,16 @@ public:
 
 
 
-    void finishedRendering_SLOT( Renderer::CLAbstractRenderer *renderer ) Q_DECL_OVERRIDE;
+    void finishedRendering_SLOT( uint ) Q_DECL_OVERRIDE;
 
     void compositingFinished_SLOT( ) Q_DECL_OVERRIDE;
 
 
-    void frameLoadedToDevice_SLOT( Renderer::CLAbstractRenderer *renderer ) Q_DECL_OVERRIDE;
+    void frameLoadedToDevice_SLOT( uint ) Q_DECL_OVERRIDE;
 
 
     void pixmapReady_SLOT( QPixmap *pixmap ,
-                           const Renderer::CLAbstractRenderer * renderer ) Q_DECL_OVERRIDE;
+                           uint ) Q_DECL_OVERRIDE;
 
 
     virtual void distributeBaseVolume() Q_DECL_OVERRIDE;
@@ -96,11 +95,36 @@ protected:
      */
     virtual void distributeBaseVolumeMemoryWeighted();
 
+    void applyTransformation_() Q_DECL_OVERRIDE;
 
+    void benchmark_() Q_DECL_OVERRIDE;
+
+
+private:
+    /**
+     * @brief makePixmap_
+     * @param gpuIndex
+     */
+    void makePixmap_( uint gpuIndex );
+
+    /**
+     * @brief collectFrame_
+     * @param gpuIndex
+     */
+    void collectFrame_( uint gpuIndex );
+
+    /**
+     * @brief composite_
+     * @param gpuIndex
+     */
+    void composite_( uint gpuIndex );
 protected:
 
 
     //Volume Data
+    /**
+     * @brief baseVolume_
+     */
     Volume< V > *baseVolume_;
 
 
@@ -108,6 +132,18 @@ protected:
      * @brief loadBalancingMode_
      */
     const LoadBalancingMode loadBalancingMode_;
+
+
+    /**
+     * @brief clCompositor_
+     */
+    Compositor::CLCompositor< F > *clCompositor_ ;
+
+    /**
+     * @brief clRenderers_
+     */
+    QMap< uint , Renderer::CLRenderer< V , F >*> clRenderers_ ;
+
 };
 
 }

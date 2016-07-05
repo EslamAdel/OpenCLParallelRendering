@@ -51,11 +51,6 @@ public:
      */
     virtual void setFrameIndex( const uint frameIndex  ) = 0 ;
 
-    /**
-     * @brief loadVolume
-     * @param volume
-     */
-    virtual void loadVolume( VolumeVariant &volume ) = 0 ;
 
     /**
      * @brief getGPUIndex
@@ -186,6 +181,7 @@ public:
     virtual void updateTransferFunction(
             float *transferFunction , uint length  ) = 0 ;
 
+    virtual void downloadFrame() = 0 ;
 protected:
 
     /**
@@ -231,7 +227,7 @@ Q_SIGNALS:
      * @param thisPtr
      * Pass this pointer as Identifier to this node.
      */
-    void finishedRendering( Renderer::CLAbstractRenderer *thisPtr );
+    void finishedRendering( uint );
 
 
 public Q_SLOTS:
@@ -323,6 +319,11 @@ protected:
      * @brief switchKernelMutex_
      */
     QMutex switchKernelMutex_ ;
+
+    /**
+     * @brief renderingMutex_
+     */
+    QMutex renderingMutex_ ;
 
     /**
      * @brief renderingKernels_

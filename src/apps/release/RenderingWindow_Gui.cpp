@@ -129,14 +129,8 @@ void RenderingWindow_Gui::intializeConnections_()
     //            this , SLOT(tFunctionSLiderControl_SLOT(int)));
 
     //parallelRenderer_
-    connect( parallelRenderer_ ,
-             SIGNAL( frameReady_SIGNAL(
-                         QPixmap * ,
-                         const Renderer::CLAbstractRenderer* )),
-             this ,
-             SLOT( frameReady_SLOT(
-                       QPixmap * ,
-                       const Renderer::CLAbstractRenderer* )));
+    connect( parallelRenderer_ , SIGNAL( frameReady_SIGNAL( QPixmap * , uint)),
+             this , SLOT( frameReady_SLOT( QPixmap * , uint )));
 
 
     connect( parallelRenderer_ , SIGNAL( finalFrameReady_SIGNAL( QPixmap* )) ,
@@ -204,9 +198,8 @@ void RenderingWindow_Gui::displayFrame_( QPixmap *frame , uint id )
 }
 
 void RenderingWindow_Gui::frameReady_SLOT( QPixmap *frame,
-                                           const Renderer::CLAbstractRenderer *renderer )
+                                           uint index )
 {
-    uint index = renderer->getFrameIndex();
 
 //    LOG_DEBUG("Catch frame <%d> ", renderer->getFrameIndex());
 

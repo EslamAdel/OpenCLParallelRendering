@@ -18,7 +18,6 @@ SET( CLPAREN_SOURCE_FILES
     framework/parallel/TaskCollect.cpp
     framework/compositors/TaskComposite.cpp
     framework/compositors/CLCompositor.cpp
-    framework/parallel/TaskMakePixmap.cpp
     framework/virtual/VirtualParallelRendering.cpp
     framework/virtual/VirtualCLRenderer.cpp
     framework/virtual/VirtualCLCompositor.cpp
@@ -81,7 +80,6 @@ SET( CLPAREN_HEADER_FILES
     framework/parallel/SortLastRenderer.ipp
     framework/parallel/TaskCollect.h
     framework/compositors/TaskComposite.h
-    framework/parallel/TaskMakePixmap.h
     framework/renderers/TaskRender.h
     framework/virtual/VirtualCLCompositor.h
     framework/virtual/VirtualCLCompositor.ipp

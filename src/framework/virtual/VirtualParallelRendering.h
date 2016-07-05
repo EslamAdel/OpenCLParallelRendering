@@ -40,9 +40,9 @@ public:
     void startRendering();
 
 public Q_SLOTS:
-    void frameLoadedToDevice_SLOT( Renderer::CLAbstractRenderer *renderer );
+    void frameLoadedToDevice_SLOT( uint );
 
-    void finishedRendering_SLOT( Renderer::CLAbstractRenderer *renderer );
+    void finishedRendering_SLOT( uint );
 
     void compositingFinished_SLOT( );
 
@@ -52,7 +52,7 @@ protected:
 private:
 
     //for virtual GPUs only.
-    std::vector< Renderer::CLAbstractRenderer* > renderers_ ;
+    QMap< uint , Renderer::CLRenderer< uchar , float >* > clRenderers_ ;
     Compositor::CLAbstractCompositor *compositor_ ;
     const uint virtualGPUsCount_ ;
 

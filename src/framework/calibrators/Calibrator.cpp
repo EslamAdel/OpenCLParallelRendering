@@ -52,7 +52,7 @@ double Calibrator< V , F >::startCalibration()
 template< class V , class F >
 void Calibrator< V , F >::loadVolume( VolumeVariant &volume )
 {
-    rendererEngine_.loadVolume( volume );
+    rendererEngine_.loadVolume( volume.value< Volume< V > *>() );
 }
 
 template< class V , class F >

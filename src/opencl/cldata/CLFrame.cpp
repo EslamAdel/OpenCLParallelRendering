@@ -200,7 +200,7 @@ T *CLFrame<T>::getHostData() const
 }
 
 template< class T >
-QPixmap &CLFrame<T>::getFramePixmap()
+QPixmap &CLFrame<T>::getFramePixmap( )
 {
     if ( !pixmap_ )
         pixmap_ = new QPixmap();

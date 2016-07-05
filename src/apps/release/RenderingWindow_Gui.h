@@ -58,8 +58,7 @@ private:
     void displayFrame_( QPixmap *frame , uint id );
 
 public Q_SLOTS:
-    void frameReady_SLOT( QPixmap *frame,
-                          const Renderer::CLAbstractRenderer *renderer );
+    void frameReady_SLOT( QPixmap *frame , uint index );
     void finalFrameReady_SLOT( QPixmap *finalFrame ) ;
 
 private Q_SLOTS:

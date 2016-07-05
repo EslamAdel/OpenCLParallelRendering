@@ -35,15 +35,8 @@ public:
                  Compositor::CLAbstractCompositor *compositor );
 
 Q_SIGNALS:
-    /**
-     * @brief frameLoadedToDevice_SIGNAL
-     * Inform the outside world the task is done.
-     * @param node
-     * pass the CLRenderer pointer as Identifier for: the
-     * CLRenderer and the CLCompositor and the frameIndex_ .
-     * Considering each CLRenderer is mapped to a CLCompositor.
-     */
-    void frameLoadedToDevice_SIGNAL( Renderer::CLAbstractRenderer *renderer );
+
+    void frameLoadedToDevice_SIGNAL( uint );
 
 protected:
     void run();

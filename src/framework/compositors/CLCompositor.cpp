@@ -164,7 +164,7 @@ const CLData::CLFrameVariant
 }
 
 template< class T >
-const CLData::CLImage2D< T > &CLCompositor< T >::getFinalFrame( bool )
+CLData::CLImage2D< T > &CLCompositor< T >::getCLImage2D()
 {
     return *finalFrameReadout_;
 }

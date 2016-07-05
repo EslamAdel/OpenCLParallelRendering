@@ -124,7 +124,7 @@ public:
      * @brief getFramePixmap
      * @return
      */
-    QPixmap &getFramePixmap() ;
+    QPixmap &getFramePixmap( );
 
     /**
      * @brief copyHostData

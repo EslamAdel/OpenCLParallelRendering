@@ -63,10 +63,10 @@ public:
 
     /**
      * @brief getFinalFrame
-     * @param clImage2D
      * @return
      */
-    const CLData::CLImage2D< T > &getFinalFrame( bool clImage2D );
+    CLData::CLImage2D< T > &getCLImage2D( );
+
 
     /**
      * @brief framesCount
