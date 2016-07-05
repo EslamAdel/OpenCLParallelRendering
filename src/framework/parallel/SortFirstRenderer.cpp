@@ -29,6 +29,8 @@ SortFirstRenderer< V , F >::SortFirstRenderer(
                                                        channelOrder ));
 
 
+    connect( this , SIGNAL(frameReady_SIGNAL( QPixmap*, uint )) ,
+             this, SLOT( pixmapReady_SLOT( QPixmap*, uint )));
 }
 
 template< class V , class F >

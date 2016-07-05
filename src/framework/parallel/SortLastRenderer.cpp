@@ -276,6 +276,8 @@ void SortLastRenderer< V , F >::compositingFinished_SLOT()
 
     assertThread_();
 
+    LOG_DEBUG("Finished compositing");
+
     TOC( frameworkProfile.renderingLoop_TIMER );
 
 #ifndef BENCHMARKING
@@ -379,7 +381,7 @@ template< class V , class F >
 void SortLastRenderer< V , F >::composite_( uint )
 {
 
-    QMutexLocker lock( &compositingMutex_ );
+//    QMutexLocker lock( &compositingMutex_ );
 
     LOG_DEBUG("Compositing");
     compositor_->composite( );

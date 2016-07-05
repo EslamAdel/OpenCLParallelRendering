@@ -99,6 +99,8 @@ void CLCompositor< T >::composite( )
 {
     QMutexLocker lock( &criticalMutex_ );
 
+
+    LOG_DEBUG("Compositing %d/%d",framesInCompositor_ , imagesArray_->size( ) );
     if( framesInCompositor_ != imagesArray_->size( ))
         return ;
 

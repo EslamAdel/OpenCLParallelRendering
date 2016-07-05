@@ -67,11 +67,10 @@ CLAbstractParallelRenderer::CLAbstractParallelRenderer(
     compositor_ = 0;
 
 
-    connect( this , SIGNAL(compositingFinished_SIGNAL()) ,
+    connect( this , SIGNAL(compositingFinished_SIGNAL( )) ,
              this , SLOT(compositingFinished_SLOT( )));
 
-    connect( this , SIGNAL(frameReady_SIGNAL( QPixmap*, uint )) ,
-             this, SLOT( pixmapReady_SLOT( QPixmap*, uint )));
+
 
     connect( this , SIGNAL( finishedRendering_SIGNAL( uint )),
              this , SLOT( finishedRendering_SLOT( uint )));
