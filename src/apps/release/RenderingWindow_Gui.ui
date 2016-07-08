@@ -1068,8 +1068,7 @@ background:#3D3C3A;
         </size>
        </property>
        <property name="styleSheet">
-        <string notr="true">
-</string>
+        <string notr="true"/>
        </property>
        <widget class="QLabel" name="xRotationValue">
         <property name="geometry">

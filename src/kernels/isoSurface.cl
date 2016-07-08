@@ -184,12 +184,13 @@ __kernel void isoSurface(
         // Accumulate the result by mixing what is currently in the
         // _intensityBuffer_ with the new intensity value that was sampled from
         // the volume, with the corrsponding alpha components
-        //float alpha = intensity.w * density ;
-        //intensityBuffer = mix( intensityBuffer, intensity ,
-        //( float4 )( alpha, alpha, alpha, alpha ));
-        if( intensity.x > isoValue )
+        float alpha = intensity.w * density ;
+
+        if( intensity.x >= isoValue )
         {
-            intensityBuffer = intensity;
+            //intensityBuffer = intensity;
+            intensityBuffer = mix( intensityBuffer, intensity ,
+            ( float4 )( alpha, alpha, alpha, alpha ));
         }
 
         // Get the parametric value of the next sample along the ray

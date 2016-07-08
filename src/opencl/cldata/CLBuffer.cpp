@@ -13,7 +13,7 @@ CLBuffer< T >::CLBuffer()
     context_ = nullptr ;
     inDevice_ = false ;
     size_ = 0 ;
-    hostData_ = nullptr;
+    hostData_ = 0 ;
 }
 
 template< class T >
@@ -42,8 +42,8 @@ void CLBuffer< T >::createDeviceData( cl_context context )
 
     context_ = context ;
     deviceData_ =
-            clCreateBuffer( context , CL_MEM_READ_WRITE ,
-                            size_ * sizeof( T ) ,  hostData_ ,
+            clCreateBuffer( context , CL_MEM_READ_WRITE | CL_MEM_USE_HOST_PTR ,
+                            size_ * sizeof( T ) , hostData_ ,
                             &error) ;
 
     CL_ASSERT( error );
