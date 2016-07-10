@@ -106,6 +106,21 @@ CLAbstractCompositor::allocateKernels_( ) const
                 "maxIntensityProjection_compositing.cl" ,
                 kernelDirectory_ );
 
+    kernels[ CLKernel::RenderingMode::RENDERING_MODE_AverageIntensity ] =
+            new CLKernel::CLAverageIntensityProjectionCompositingKernel(
+                context_ ,
+                "averageIntensityProjection_compositing" ,
+                "averageIntensityProjection_compositing.cl" ,
+                kernelDirectory_ );
+
+
+    kernels[ CLKernel::RenderingMode::RENDERING_MODE_IsoSurface ] =
+            new CLKernel::CLIsoSurfaceCompositingKernel(
+                context_ ,
+                "isoSurface_compositing_patch" ,
+                "iso_compositing.cl" ,
+                kernelDirectory_ );
+
 
     return kernels;
 }

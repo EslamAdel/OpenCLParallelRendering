@@ -303,8 +303,8 @@ void RenderingWindow_Gui::newDensity_SLOT(int value)
 
 void RenderingWindow_Gui::newIsoValue_SLOT(int value)
 {
-    float isoValue = value/10.0 ;
-    ui->isoValue->setText( QString::number( isoValue ));
+    float isoValue = value / 255.0;
+    ui->isoValue->setText( QString::number( value ));
     parallelRenderer_->updateIsoValue_SLOT( isoValue );
 
 }

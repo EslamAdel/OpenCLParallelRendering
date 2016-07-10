@@ -21,7 +21,7 @@ public:
      */
     CLAverageIntensityProjectionCompositingKernel(
             const cl_context clContext ,
-            const std::string kernelName = "averageIntensityProjection_compositing" ,
+            const std::string kernelName = "averageIntensityProjection_compositing_accumulate" ,
             const std::string kernelFile = "averageIntensityProjection_compositing.cl" ,
             const std::string kernelDirectory = "." );
 

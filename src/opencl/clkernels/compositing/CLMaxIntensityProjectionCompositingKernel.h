@@ -21,7 +21,7 @@ public:
      */
     CLMaxIntensityProjectionCompositingKernel(
             const cl_context clContext ,
-            const std::string kernelName = "maxIntensityProjection_compositing" ,
+            const std::string kernelName = "maxIntensityProjection_compositing_accumulate" ,
             const std::string kernelFile = "maxIntensityProjection_compositing.cl" ,
             const std::string kernelDirectory = "." );
 

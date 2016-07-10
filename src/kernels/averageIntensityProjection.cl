@@ -167,8 +167,9 @@ __kernel void averageIntensityProjection(
     float4 intensityBuffer = ( float4 )( 0.f, 0.f, 0.f, 0.f );
     float4 averageIntensityBuffer = ( float4 )( 0.f, 0.f, 0.f, 0.f );
     float t = tFar;
+    uint i = 0;
 
-    for( uint i = 0 ; i < maxSteps ; i++ )
+    for( i = 0 ; i < maxSteps ; i++ )
     {
         // Current position along the ray
         float4 position = eyeRayOrigin + eyeRayDirection * t;
@@ -207,7 +208,10 @@ __kernel void averageIntensityProjection(
             break;
     }
     // get the average value accross the ray
-    averageIntensityBuffer = intensityBuffer / maxSteps;
+    if(i !=0 )
+        averageIntensityBuffer = intensityBuffer / i;
+    else
+        averageIntensityBuffer = intensityBuffer;
     // Adjust the brightness of the pixel
     averageIntensityBuffer *= brightness;
 

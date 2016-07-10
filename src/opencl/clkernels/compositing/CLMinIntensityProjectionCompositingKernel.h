@@ -21,7 +21,7 @@ public:
      */
     CLMinIntensityProjectionCompositingKernel(
             const cl_context clContext ,
-            const std::string kernelName = "minIntensityProjection_compositing" ,
+            const std::string kernelName = "minIntensityProjection_compositing_accumulate" ,
             const std::string kernelFile = "minIntensityProjection_compositing.cl" ,
             const std::string kernelDirectory = "." );
 

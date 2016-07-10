@@ -32,22 +32,6 @@ float4 convertColorToRGBAF( uint Color )
     return rgba ;
 }
 
-__kernel
-void maxIntensityProjection_compositing_accumulate(   __global uint* collageFrame ,
-                                                      __global uint* frame )
-{
-    const uint index = get_global_id(0);
-
-    float4 frameRGBA = convertColorToRGBAF( frame[ index ]  );
-
-    float4 collageRGBA = convertColorToRGBAF( collageFrame[ index ] );
-
-    float4 finalColor = clamp( frameRGBA + collageRGBA , 0.f , 1.f ) ;
-
-    collageFrame[ index ] = rgbaFloatToInt( finalColor ) ;
-}
-
-
 
 
 const sampler_t sampler   = CLK_NORMALIZED_COORDS_FALSE |

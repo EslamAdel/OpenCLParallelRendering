@@ -160,9 +160,22 @@ __kernel void minIntensityProjection(
     if( tNear < 0.f )
         tNear = 0.f;
 
-    // March along the ray accumulating the densities
-    float4 intensityBuffer = ( float4 )( 1.f, 1.f, 1.f, 1.f );
     float t = tFar;
+
+    // March along the ray accumulating the densities
+    float4 pos = eyeRayOrigin + eyeRayDirection * t;
+
+    // Center the texture at the origin, and mapping the positions
+    // between 0.f and 1.f
+    pos = pos * 0.5f + 0.5f;    // map position to [0, 1] coordinates
+
+    // Sample the 3D volume data using the _volumeSampler_ at the specified
+    // positions along the ray.
+    const float4 initialIntensity = read_imagef( volume, volumeSampler, pos );
+
+    float4 intensityBuffer = initialIntensity;
+
+
 
     for( uint i = 0 ; i < maxSteps ; i++ )
     {

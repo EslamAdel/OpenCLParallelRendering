@@ -181,7 +181,7 @@ __kernel void maxIntensityProjection(
         const float4 intensity = read_imagef( volume, volumeSampler, position );
 
         // update intensity buffer to  maximum value
-        if(intensityBuffer.x < intensity.x)
+        if(intensityBuffer.x <= intensity.x)
             intensityBuffer = intensity;
 
         /**
