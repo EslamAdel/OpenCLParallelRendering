@@ -118,7 +118,7 @@ CLAbstractCompositor::allocateKernels_( ) const
             new CLKernel::CLIsoSurfaceCompositingKernel(
                 context_ ,
                 "isoSurface_compositing_patch" ,
-                "iso_compositing.cl" ,
+                "isoSurface_compositing.cl" ,
                 kernelDirectory_ );
 
 
