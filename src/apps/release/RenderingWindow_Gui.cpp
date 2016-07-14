@@ -175,6 +175,9 @@ void RenderingWindow_Gui::intializeConnections_()
              SIGNAL( mouseReleased(QVector2D) ),
              this , SLOT ( mouseReleased_SLOT(QVector2D) ));
 
+    connect (ui->frameContainerResult ,
+             SIGNAL( mouseWheelMoved(QWheelEvent*)) ,
+             this , SLOT ( mouseWheelMoved_SLOT(QWheelEvent*) ));
 
 }
 
@@ -482,12 +485,12 @@ void RenderingWindow_Gui::mouseMoved_SLOT(QVector2D newMousePosition)
     if(mouseXRotationAngle_ >= 360)
         mouseXRotationAngle_ = 0;
 
-    newMouseXRotation( );
+    newMouseXRotation_( );
 
     if(mouseYRotationAngle_ >= 360)
         mouseYRotationAngle_ = 0;
 
-    newMouseYRotation( );
+    newMouseYRotation_( );
 
     // update last position
     lastMousePosition_ = newMousePosition;
@@ -499,19 +502,43 @@ void RenderingWindow_Gui::mouseReleased_SLOT(QVector2D releasedPosition)
     LOG_DEBUG("Mouse released");
 }
 
-void RenderingWindow_Gui::newMouseXRotation( )
+void RenderingWindow_Gui::mouseWheelMoved_SLOT(QWheelEvent *event)
+{
+    LOG_DEBUG("Mouse wheel moved");
+
+    int zScale = ui->zScalingSlider->value();
+    int numDegrees = event->delta() / 8;
+    int numSteps = numDegrees / 15;
+    zScale += numSteps;
+
+    if ( zScale < 1)
+        zScale = 1;
+
+    newMouseZScaling_(zScale);
+}
+
+void RenderingWindow_Gui::newMouseXRotation_( )
 {
     ui->xRotationSlider->setValue( mouseXRotationAngle_);
     parallelRenderer_->updateRotationX_SLOT( mouseXRotationAngle_ );
 }
 
 
-void RenderingWindow_Gui::newMouseYRotation( )
+void RenderingWindow_Gui::newMouseYRotation_( )
 {
     ui->yRotationSlider->setValue( mouseYRotationAngle_);
     parallelRenderer_->updateRotationY_SLOT( mouseYRotationAngle_ );
 
 }
+
+void RenderingWindow_Gui::newMouseZScaling_(int value)
+{
+    LOG_DEBUG("zScale %d " , value );
+    ui->zScalingSlider->setValue( value);
+    parallelRenderer_->updateScaleZ_SLOT( value );
+}
+
+
 
 void RenderingWindow_Gui::captureView_SLOT()
 {

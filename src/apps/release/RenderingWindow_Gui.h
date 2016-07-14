@@ -52,6 +52,13 @@ private:
      */
     void startRendering_( );
 
+    void newMouseXRotation_( );
+
+    void newMouseYRotation_( );
+
+    void newMouseZScaling_(int value );
+
+
     /**
      * @brief displayFrame_
      */
@@ -104,16 +111,12 @@ private slots:
 
     void mouseReleased_SLOT(QVector2D releasedPosition);
 
-    void newMouseXRotation( );
-
-    void newMouseYRotation( );
+    void mouseWheelMoved_SLOT(QWheelEvent* event);
 
 private:
     Ui::RenderingWindow_Gui *ui;
 
-
     Parallel::CLAbstractParallelRenderer *parallelRenderer_ ;
-
 
     bool frameworkReady_ ;
     QVector< uint > deployGPUs_ ;
@@ -129,7 +132,6 @@ private:
     float mouseXRotationAngle_;
     float mouseYRotationAngle_;
 
-    //std::vector
 };
 
 #endif // RENDERINGWINDOW_GUI_H

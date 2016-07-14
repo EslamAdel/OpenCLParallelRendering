@@ -24,3 +24,8 @@ void MouseNavigator::mouseReleaseEvent(QMouseEvent *event)
     emit mouseReleased(QVector2D(event->localPos()));
 }
 
+void MouseNavigator::wheelEvent(QWheelEvent *event)
+{
+    emit mouseWheelMoved(event);
+}
+
