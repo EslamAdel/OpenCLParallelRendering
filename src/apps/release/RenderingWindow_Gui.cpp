@@ -4,7 +4,8 @@
 #include <QFileDialog>
 #include <QDateTime>
 #include <QPicture>
-#include "QLabelMouseEvents.h"
+//#include "QLabelMouseEvents.h"
+#include "MouseNavigator.h"
 #include "Logger.h"
 #include "QtMath"
 RenderingWindow_Gui::RenderingWindow_Gui(

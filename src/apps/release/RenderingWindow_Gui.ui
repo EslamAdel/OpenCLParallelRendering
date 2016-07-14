@@ -197,7 +197,7 @@ color:#fff;
       <string/>
      </property>
     </widget>
-    <widget class="QLabelMouseEvents" name="frameContainerResult">
+    <widget class="MouseNavigator" name="frameContainerResult">
      <property name="geometry">
       <rect>
        <x>40</x>
@@ -1068,8 +1068,7 @@ background:#3D3C3A;
         </size>
        </property>
        <property name="styleSheet">
-        <string notr="true">
-</string>
+        <string notr="true"/>
        </property>
        <widget class="QLabel" name="xRotationValue">
         <property name="geometry">
@@ -2769,9 +2768,9 @@ border-radius: 4px;
    <header>GPUListView.h</header>
   </customwidget>
   <customwidget>
-   <class>QLabelMouseEvents</class>
+   <class>MouseNavigator</class>
    <extends>QLabel</extends>
-   <header>QLabelMouseEvents.h</header>
+   <header>MouseNavigator.h</header>
   </customwidget>
  </customwidgets>
  <resources/>
