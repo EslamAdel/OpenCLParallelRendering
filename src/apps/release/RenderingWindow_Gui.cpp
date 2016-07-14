@@ -506,15 +506,12 @@ void RenderingWindow_Gui::mouseWheelMoved_SLOT(QWheelEvent *event)
 {
     LOG_DEBUG("Mouse wheel moved");
 
-    int zScale = ui->zScalingSlider->value();
+    int translationZ = ui->zTranslationSlider->value();
     int numDegrees = event->delta() / 8;
     int numSteps = numDegrees / 15;
-    zScale += numSteps;
+    translationZ += numSteps;
 
-    if ( zScale < 1)
-        zScale = 1;
-
-    newMouseZScaling_(zScale);
+    newMouseZTranslation_(translationZ);
 }
 
 void RenderingWindow_Gui::newMouseXRotation_( )
@@ -531,11 +528,11 @@ void RenderingWindow_Gui::newMouseYRotation_( )
 
 }
 
-void RenderingWindow_Gui::newMouseZScaling_(int value)
+void RenderingWindow_Gui::newMouseZTranslation_(int value)
 {
-    LOG_DEBUG("zScale %d " , value );
-    ui->zScalingSlider->setValue( value);
-    parallelRenderer_->updateScaleZ_SLOT( value );
+    LOG_DEBUG("zTranslate %d " , value );
+    ui->zTranslationSlider->setValue( value);
+    parallelRenderer_->updateTranslationZ_SLOT( value );
 }
 
 

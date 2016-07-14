@@ -56,7 +56,7 @@ private:
 
     void newMouseYRotation_( );
 
-    void newMouseZScaling_(int value );
+    void newMouseZTranslation_(int value );
 
 
     /**
