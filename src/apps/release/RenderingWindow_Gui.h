@@ -6,7 +6,7 @@
 #include <Headers.hh>
 #include <vector>
 #include <QLabel>
-
+#include <QVector2D>
 #include "SortLastRenderer.h"
 #include "CLRenderer.h"
 #include "ProfilingExterns.h"
@@ -52,6 +52,13 @@ private:
      */
     void startRendering_( );
 
+    void newMouseXRotation_( );
+
+    void newMouseYRotation_( );
+
+    void newMouseZTranslation_(int value );
+
+
     /**
      * @brief displayFrame_
      */
@@ -91,24 +98,24 @@ private Q_SLOTS:
 
     void captureView_SLOT() ;
 
-//    void newTransferFunctionScale_SLOT(int value);
-
-//    void newTransferFunctionOffset_SLOT(int value);
-
-//    void tFunctionSLiderControl_SLOT(int state);
-
     void initializeFramework_SLOT( );
 
     void frameworkReady_SLOT( );
 
     void switchRenderingKernel_SLOT( );
 
+    void mousePressed_SLOT( QVector2D mousePressedPosition);
+
+    void mouseMoved_SLOT( QVector2D newPosition);
+
+    void mouseReleased_SLOT(QVector2D releasedPosition);
+
+    void mouseWheelMoved_SLOT(QWheelEvent* event);
+
 private:
     Ui::RenderingWindow_Gui *ui;
 
-
     Parallel::CLAbstractParallelRenderer *parallelRenderer_ ;
-
 
     bool frameworkReady_ ;
     QVector< uint > deployGPUs_ ;
@@ -117,7 +124,13 @@ private:
     QVector< QLabel*  > frameContainers_;
     QVector< QPixmap* > pixmaps_;
     QPixmap *finalFrame_;
-    //std::vector
+
+    QVector2D lastMousePosition_;
+    QVector2D mousePositionDifference_;
+
+    float mouseXRotationAngle_;
+    float mouseYRotationAngle_;
+
 };
 
 #endif // RENDERINGWINDOW_GUI_H

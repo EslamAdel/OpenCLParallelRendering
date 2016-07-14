@@ -4,9 +4,10 @@
 #include <QFileDialog>
 #include <QDateTime>
 #include <QPicture>
-
+//#include "QLabelMouseEvents.h"
+#include "MouseNavigator.h"
 #include "Logger.h"
-
+#include "QtMath"
 RenderingWindow_Gui::RenderingWindow_Gui(
         clparen::Parallel::CLAbstractParallelRenderer *parallelRenderer ,
         QWidget *parent )
@@ -156,6 +157,22 @@ void RenderingWindow_Gui::intializeConnections_()
              SIGNAL( toggled( bool )) ,
              this , SLOT( switchRenderingKernel_SLOT( )));
 
+    connect (ui->frameContainerResult,
+             SIGNAL( mousePressed( QVector2D )),
+             this , SLOT (mousePressed_SLOT( QVector2D )));
+
+    connect (ui->frameContainerResult ,
+             SIGNAL( mouseMoved( QVector2D )),
+             this , SLOT ( mouseMoved_SLOT(QVector2D)) );
+
+    connect (ui->frameContainerResult ,
+             SIGNAL( mouseReleased(QVector2D) ),
+             this , SLOT ( mouseReleased_SLOT(QVector2D) ));
+
+    connect (ui->frameContainerResult ,
+             SIGNAL( mouseWheelMoved(QWheelEvent*)) ,
+             this , SLOT ( mouseWheelMoved_SLOT(QWheelEvent*) ));
+
 }
 
 
@@ -177,7 +194,6 @@ void RenderingWindow_Gui::startRendering_( )
     newXYZScaling_SLOT( ui->xyzScalingSlider->value( ) );
     newBrightness_SLOT( ui->brightnessSlider->value( ));
     newDensity_SLOT( ui->densitySlider->value( ));
-
 
     parallelRenderer_->startRendering( );
 
@@ -431,6 +447,88 @@ void RenderingWindow_Gui::switchRenderingKernel_SLOT()
 
     ui->isoValueSlider->setEnabled( ui->isoSurfaceButton->isChecked( ));
 }
+
+void RenderingWindow_Gui::mousePressed_SLOT(QVector2D mousePressedPosition)
+{
+
+    LOG_DEBUG("Mouse pressed!" );
+    lastMousePosition_ =  mousePressedPosition;
+
+}
+
+void RenderingWindow_Gui::mouseMoved_SLOT(QVector2D newMousePosition)
+{
+
+    LOG_DEBUG("Mouse moved");
+
+    mousePositionDifference_ = newMousePosition - lastMousePosition_;
+
+    // Rotation axis is perpendicular to the mouse position difference
+    // update x rotation angle
+    mouseXRotationAngle_ = ui->xRotationSlider->value();
+    mouseXRotationAngle_ += mousePositionDifference_.y();
+    // update y rotation angle
+    mouseYRotationAngle_ = ui->yRotationSlider->value();
+    mouseYRotationAngle_ += mousePositionDifference_.x();
+
+    LOG_DEBUG("y diff :%f", mousePositionDifference_.y() );
+    LOG_DEBUG("x diff :%f", mousePositionDifference_.x() );
+    LOG_DEBUG("Rot x :%f",  mouseXRotationAngle_ );
+    LOG_DEBUG("Rot y :%f",  mouseYRotationAngle_ );
+
+    if(mouseXRotationAngle_ >= 360)
+        mouseXRotationAngle_ = 0;
+
+    newMouseXRotation_( );
+
+    if(mouseYRotationAngle_ >= 360)
+        mouseYRotationAngle_ = 0;
+
+    newMouseYRotation_( );
+
+    // update last position
+    lastMousePosition_ = newMousePosition;
+
+}
+
+void RenderingWindow_Gui::mouseReleased_SLOT(QVector2D releasedPosition)
+{
+    LOG_DEBUG("Mouse released");
+}
+
+void RenderingWindow_Gui::mouseWheelMoved_SLOT(QWheelEvent *event)
+{
+    LOG_DEBUG("Mouse wheel moved");
+
+    int translationZ = ui->zTranslationSlider->value();
+    int numDegrees = event->delta() / 8;
+    int numSteps = numDegrees / 15;
+    translationZ += numSteps;
+
+    newMouseZTranslation_(translationZ);
+}
+
+void RenderingWindow_Gui::newMouseXRotation_( )
+{
+    ui->xRotationSlider->setValue( mouseXRotationAngle_);
+    parallelRenderer_->updateRotationX_SLOT( mouseXRotationAngle_ );
+}
+
+
+void RenderingWindow_Gui::newMouseYRotation_( )
+{
+    ui->yRotationSlider->setValue( mouseYRotationAngle_);
+    parallelRenderer_->updateRotationY_SLOT( mouseYRotationAngle_ );
+
+}
+
+void RenderingWindow_Gui::newMouseZTranslation_(int value)
+{
+    LOG_DEBUG("zTranslate %d " , value );
+    ui->zTranslationSlider->setValue( value);
+    parallelRenderer_->updateTranslationZ_SLOT( value );
+}
+
 
 
 void RenderingWindow_Gui::captureView_SLOT()
