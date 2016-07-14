@@ -466,58 +466,27 @@ void RenderingWindow_Gui::mouseMoved_SLOT(QVector2D newMousePosition)
     mousePositionDifference_ = newMousePosition - lastMousePosition_;
 
     // Rotation axis is perpendicular to the mouse position difference
+    // update x rotation angle
+    mouseXRotationAngle_ = ui->xRotationSlider->value();
+    mouseXRotationAngle_ += mousePositionDifference_.y();
+    // update y rotation angle
+    mouseYRotationAngle_ = ui->yRotationSlider->value();
+    mouseYRotationAngle_ += mousePositionDifference_.x();
 
-    // x rotation
-    if(mousePositionDifference_.x() == 0.0)
-    {
-        // update x rotation angle
-        mouseXRotationAngle_ = ui->xRotationSlider->value();
-        mouseXRotationAngle_ += mousePositionDifference_.y();
+    LOG_DEBUG("y diff :%f", mousePositionDifference_.y() );
+    LOG_DEBUG("x diff :%f", mousePositionDifference_.x() );
+    LOG_DEBUG("Rot x :%f",  mouseXRotationAngle_ );
+    LOG_DEBUG("Rot y :%f",  mouseYRotationAngle_ );
 
-        if(mouseXRotationAngle_ <= 360)
-        {
-        newMouseXRotation( );
-        LOG_DEBUG("y diff :%f", mousePositionDifference_.y() );
-        LOG_DEBUG("Rot x :%f",  mouseXRotationAngle_ );
-        }
-        else
-           mouseXRotationAngle_ = 0;
+    if(mouseXRotationAngle_ >= 360)
+        mouseXRotationAngle_ = 0;
 
-    }
-    // y rotation
-    else if(mousePositionDifference_.y() == 0.0)
-    {
-        // update y rotation angle
-        mouseYRotationAngle_ = ui->yRotationSlider->value();
-        mouseYRotationAngle_ += mousePositionDifference_.x();
+    newMouseXRotation( );
 
-        if(mouseYRotationAngle_ <= 360)
-        {
-            newMouseYRotation( );
-            LOG_DEBUG("x diff :%f", mousePositionDifference_.x() );
-            LOG_DEBUG("Rot y :%f",  mouseYRotationAngle_ );
-        }
-        else
-            mouseYRotationAngle_ = 0;
-    }
-    // z rotation
+    if(mouseYRotationAngle_ >= 360)
+        mouseYRotationAngle_ = 0;
 
-    else
-    {
-        // update z rotation angle
-        mouseZRotationAngle_ += (mousePositionDifference_.x() + mousePositionDifference_.y());
-        if(mouseZRotationAngle_ <= 360)
-        {
-        ui->zRotationSlider->setValue( mouseZRotationAngle_);
-        parallelRenderer_->updateRotationZ_SLOT( mouseZRotationAngle_ );
-        LOG_DEBUG("y diff :%f", mousePositionDifference_.y() );
-        LOG_DEBUG("x diff :%f", mousePositionDifference_.x() );
-        LOG_DEBUG("Rot z :%f",  mouseZRotationAngle_ );
-        }
-        else
-           mouseZRotationAngle_ = 0;
-     }
-
+    newMouseYRotation( );
 
     // update last position
     lastMousePosition_ = newMousePosition;

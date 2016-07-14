@@ -128,7 +128,6 @@ private:
 
     float mouseXRotationAngle_;
     float mouseYRotationAngle_;
-    float mouseZRotationAngle_;
 
     //std::vector
 };
