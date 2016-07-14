@@ -1,5 +1,8 @@
 #include "CLIsoSurfaceCompositingKernel.h"
 
+namespace clparen {
+namespace CLKernel {
+
 
 clparen::CLKernel::CLIsoSurfaceCompositingKernel::
 CLIsoSurfaceCompositingKernel( const cl_context clContext ,
@@ -10,4 +13,6 @@ CLIsoSurfaceCompositingKernel( const cl_context clContext ,
                            kernelName , kernelFile , kernelDirectory  )
 {
 
+}
+}
 }

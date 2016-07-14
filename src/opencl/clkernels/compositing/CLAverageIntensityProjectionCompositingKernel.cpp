@@ -1,5 +1,6 @@
 #include "CLAverageIntensityProjectionCompositingKernel.h"
-
+namespace clparen {
+namespace CLKernel {
 
 clparen::CLKernel::CLAverageIntensityProjectionCompositingKernel::
 CLAverageIntensityProjectionCompositingKernel( const cl_context clContext ,
@@ -10,4 +11,8 @@ CLAverageIntensityProjectionCompositingKernel( const cl_context clContext ,
                            kernelName , kernelFile , kernelDirectory  )
 {
 
+}
+
+
+}
 }
