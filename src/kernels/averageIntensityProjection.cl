@@ -165,11 +165,10 @@ __kernel void averageIntensityProjection(
 
     // March along the ray accumulating the densities
     float4 intensityBuffer = ( float4 )( 0.f, 0.f, 0.f, 0.f );
-    float4 averageIntensityBuffer = ( float4 )( 0.f, 0.f, 0.f, 0.f );
-    float t = tFar;
-    uint i = 0;
 
-    for( i = 0 ; i < maxSteps ; i++ )
+    float t = tFar;
+
+    for(uint i = 0 ; i < maxSteps ; i++ )
     {
         // Current position along the ray
         float4 position = eyeRayOrigin + eyeRayDirection * t;
@@ -204,19 +203,18 @@ __kernel void averageIntensityProjection(
 
         // Get the parametric value of the next sample along the ray
         t -= tStep;
-        if( t < tNear )
-            break;
+        if( t < tNear ){
+             if(i != 0 )    intensityBuffer /= i;
+             else           intensityBuffer = intensity ;
+             break;
+            }
     }
-    // get the average value accross the ray
-    if(i !=0 )
-        averageIntensityBuffer = intensityBuffer / i;
-    else
-        averageIntensityBuffer = intensityBuffer;
+
     // Adjust the brightness of the pixel
-    averageIntensityBuffer *= brightness;
+    intensityBuffer *= brightness;
 
     // Get a 1D index of the pixel in the _frameBuffer_
     const int2 location = (int2)( x , y  );
-    write_imagef( frameBuffer , location , averageIntensityBuffer );
+    write_imagef( frameBuffer , location , intensityBuffer );
 
 }
