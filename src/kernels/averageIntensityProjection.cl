@@ -205,7 +205,7 @@ __kernel void averageIntensityProjection(
         t -= tStep;
         if( t < tNear ){
              if(i != 0 )    intensityBuffer /= i;
-             else           intensityBuffer = intensity ;
+             else           intensityBuffer =  0;
              break;
             }
     }
