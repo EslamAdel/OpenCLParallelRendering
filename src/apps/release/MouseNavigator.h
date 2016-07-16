@@ -20,16 +20,12 @@ public:
 
      void mousePressEvent(QMouseEvent *event);
 
-     void mouseReleaseEvent(QMouseEvent *event);
-
      void wheelEvent(QWheelEvent *event);
 
 Q_SIGNALS:
      void mouseMoved(QVector2D);
 
      void mousePressed(QVector2D);
-
-     void mouseReleased(QVector2D);
 
      void mouseWheelMoved(QWheelEvent *event);
 
