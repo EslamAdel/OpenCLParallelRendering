@@ -4,7 +4,6 @@
 #include <QFileDialog>
 #include <QDateTime>
 #include <QPicture>
-//#include "QLabelMouseEvents.h"
 #include "MouseNavigator.h"
 #include "Logger.h"
 #include "QtMath"
@@ -164,10 +163,6 @@ void RenderingWindow_Gui::intializeConnections_()
     connect (ui->frameContainerResult ,
              SIGNAL( mouseMoved( QVector2D )),
              this , SLOT ( mouseMoved_SLOT(QVector2D)) );
-
-    connect (ui->frameContainerResult ,
-             SIGNAL( mouseReleased(QVector2D) ),
-             this , SLOT ( mouseReleased_SLOT(QVector2D) ));
 
     connect (ui->frameContainerResult ,
              SIGNAL( mouseWheelMoved(QWheelEvent*)) ,
@@ -451,7 +446,6 @@ void RenderingWindow_Gui::switchRenderingKernel_SLOT()
 void RenderingWindow_Gui::mousePressed_SLOT(QVector2D mousePressedPosition)
 {
 
-    LOG_DEBUG("Mouse pressed!" );
     lastMousePosition_ =  mousePressedPosition;
 
 }
@@ -459,22 +453,19 @@ void RenderingWindow_Gui::mousePressed_SLOT(QVector2D mousePressedPosition)
 void RenderingWindow_Gui::mouseMoved_SLOT(QVector2D newMousePosition)
 {
 
-    LOG_DEBUG("Mouse moved");
 
     mousePositionDifference_ = newMousePosition - lastMousePosition_;
 
     // Rotation axis is perpendicular to the mouse position difference
+
     // update x rotation angle
     mouseXRotationAngle_ = ui->xRotationSlider->value();
     mouseXRotationAngle_ += mousePositionDifference_.y();
+
     // update y rotation angle
     mouseYRotationAngle_ = ui->yRotationSlider->value();
     mouseYRotationAngle_ += mousePositionDifference_.x();
 
-    LOG_DEBUG("y diff :%f", mousePositionDifference_.y() );
-    LOG_DEBUG("x diff :%f", mousePositionDifference_.x() );
-    LOG_DEBUG("Rot x :%f",  mouseXRotationAngle_ );
-    LOG_DEBUG("Rot y :%f",  mouseYRotationAngle_ );
 
     if(mouseXRotationAngle_ >= 360)
         mouseXRotationAngle_ = 0;
@@ -491,15 +482,9 @@ void RenderingWindow_Gui::mouseMoved_SLOT(QVector2D newMousePosition)
 
 }
 
-void RenderingWindow_Gui::mouseReleased_SLOT(QVector2D releasedPosition)
-{
-    LOG_DEBUG("Mouse released");
-}
 
 void RenderingWindow_Gui::mouseWheelMoved_SLOT(QWheelEvent *event)
 {
-    LOG_DEBUG("Mouse wheel moved");
-
     int translationZ = ui->zTranslationSlider->value();
     int numDegrees = event->delta() / 8;
     int numSteps = numDegrees / 15;
@@ -524,7 +509,7 @@ void RenderingWindow_Gui::newMouseYRotation_( )
 
 void RenderingWindow_Gui::newMouseZTranslation_(int value)
 {
-    LOG_DEBUG("zTranslate %d " , value );
+    //LOG_DEBUG("zTranslate %d " , value );
     ui->zTranslationSlider->setValue( value);
     parallelRenderer_->updateTranslationZ_SLOT( value );
 }

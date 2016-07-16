@@ -108,8 +108,6 @@ private Q_SLOTS:
 
     void mouseMoved_SLOT( QVector2D newPosition);
 
-    void mouseReleased_SLOT(QVector2D releasedPosition);
-
     void mouseWheelMoved_SLOT(QWheelEvent* event);
 
 private:

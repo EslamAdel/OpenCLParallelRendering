@@ -24,7 +24,7 @@ public:
 
      void wheelEvent(QWheelEvent *event);
 
-signals:
+Q_SIGNALS:
      void mouseMoved(QVector2D);
 
      void mousePressed(QVector2D);
