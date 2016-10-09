@@ -35,6 +35,12 @@ public:
               const std::string& functionName,
               const char *string, ... );
 
+    /**
+     * @brief setFileDescriptor
+     * @param filePtr
+     */
+    static void setFileDescriptor( FILE* filePtr );
+
 private:
     /**
      * @brief Logger

@@ -335,7 +335,7 @@ public: // Public functions
             const BrickParameters< T > &brickParamters );
 
     /**
-     * @brief bufferDeleter_
+     * @brief bufferDeleter
      * @param p
      */
     static void bufferDeleter( T  *p );
@@ -376,9 +376,6 @@ protected: // Protected functions
      * dimensions.
      */
     virtual void zeroPad_();
-
-
-
 
 protected:
     /**
