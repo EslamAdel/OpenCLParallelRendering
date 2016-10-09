@@ -3,8 +3,7 @@
 
 template< class T >
 Volume< T >::Volume( const bool drawBoundingBox  )
-    : data_( nullptr ),
-      mmapAddr_( nullptr ),
+    : mmapAddr_( nullptr ),
       drawBoundingBox_( drawBoundingBox )
 {
 
@@ -14,9 +13,7 @@ template< class T >
 Volume< T >::Volume( const std::string prefix,
                      const bool memoryMapVolume,
                      const bool drawBoundingBox )
-    : drawBoundingBox_( drawBoundingBox ),
-      data_( nullptr ),
-      mmapAddr_( nullptr )
+    : drawBoundingBox_( drawBoundingBox )
 {
 
     loadFile( prefix , memoryMapVolume );
@@ -32,16 +29,14 @@ Volume< T >::Volume( const Coordinates3D brickCoordinates,
                      const Coordinates3D brickUnitCubeCenter,
                      const Coordinates3D brickUnitCubeScaleFactors,
                      T *brickData, const bool drawBoundingBox )
-    : drawBoundingBox_( drawBoundingBox ),
-      data_( nullptr ),
-      mmapAddr_( nullptr )
+    : drawBoundingBox_( drawBoundingBox )
 {
 
     coordinates_    = brickCoordinates ;
     dimensions_     = brickDimensions ;
     unitCubeCenter_ = brickUnitCubeCenter ;
     unitCubeScaleFactors_ = brickUnitCubeScaleFactors ;
-    data_ = brickData ;
+    data_.reset( brickData , []( T *p ){ delete []p ;} );
 
     //    LOG_DEBUG("Coor(%f,%f,%f),D(%d,%d,%d),unitCenter(%f,%f,%f),"
     //              "unitScale(%f,%f,%f)",
@@ -56,13 +51,11 @@ Volume< T >::Volume( const Coordinates3D brickCoordinates,
 template< class T >
 Volume< T >::Volume( const BrickParameters< T > brickParameters ,
                      const bool drawBoundingBox )
-    : drawBoundingBox_( drawBoundingBox ),
-      data_( nullptr ),
-      mmapAddr_( nullptr )
+    : drawBoundingBox_( drawBoundingBox )
 {
 
     // The array that will be filled with the brick data
-    data_ = new T[ brickParameters.dimensions_.volumeSize() ];
+    data_.reset( new T[ brickParameters.dimensions_.volumeSize() ] , &bufferDeleter );
     dimensions_ = brickParameters.dimensions_ ;
     coordinates_ = brickParameters.coordinates_ ;
     unitCubeCenter_ = brickParameters.unitCubeCenter_ ;
@@ -129,11 +122,8 @@ void Volume< T >::loadVolumeData_( const std::string prefix )
 {
     loadHeaderData_( prefix );
 
-    if( data_ )
-        delete [] data_ ;
-
     // Allocate the volume
-    data_ = new T[ dimensions_.volumeSize() ];
+    data_.reset( new T[ dimensions_.volumeSize() ] , &bufferDeleter );
 
     std::string filePath = prefix + std::string( ".img" );
 
@@ -145,7 +135,7 @@ void Volume< T >::loadVolumeData_( const std::string prefix )
         printf( "Could not open the volume file [%s]", filePath.c_str() );
     }
 
-    imgFileStream.read(( char* ) data_, dimensions_.volumeSize());
+    imgFileStream.read(( char* ) data_.get(), dimensions_.volumeSize());
 
     // Close the stream
     imgFileStream.close();
@@ -169,17 +159,13 @@ void Volume< T >::mapVolumeData_( const std::string prefix )
         LOG_ERROR( "Could not open the volume file [%s]", filePath.c_str( ));
     }
 
-
-    if( mmapAddr_ != nullptr )
-    {
-        if (munmap( mmapAddr_, sizeInBytes_) == -1)
-            LOG_WARNING("Error un-mmapping the file. Memory Leakage is possible.");
-    }
-
+    auto mmapDeleter =
+            [this]( void *p ) {  if (munmap( p, sizeInBytes_) == -1)
+            LOG_WARNING("Error un-mmapping the file. Memory Leakage is possible."); };
 
     //Map the volume to virtual addresses
-    mmapAddr_= ( T* ) mmap( NULL , sizeInBytes_ , PROT_READ ,
-                            MAP_PRIVATE , fd , 0 );
+    mmapAddr_.reset( ( T* ) mmap( NULL , sizeInBytes_ , PROT_READ , MAP_PRIVATE , fd , 0 ) ,
+                     mmapDeleter );
 
     //Close the file
     close(fd);
@@ -327,7 +313,7 @@ BrickParameters<T> Volume< T >::getBrickParameters( const u_int64_t xi ,
     brickParameters.origin_.y = yi ;
     brickParameters.origin_.z = zi ;
 
-    brickParameters.baseData_ = ( data_ == nullptr )? mmapAddr_ : data_ ;
+    brickParameters.baseData_ = ( data_.get() == nullptr )? mmapAddr_ : data_ ;
     brickParameters.baseDimensions_ = dimensions_ ;
     brickParameters.dimensions_ = brickDimensions ;
     brickParameters.coordinates_ = brickCoordinates ;
@@ -597,7 +583,7 @@ T* Volume< T >::getValue( const uint64_t x,
 {
     const uint64_t index = get1DIndex( x, y, z );
     T* value = new T[ 1 ];
-    *value = ( data_ != nullptr )? data_[index] : mmapAddr_[index];
+    *value = ( data_.get() != nullptr )? data_.get()[index] : mmapAddr_.get()[index];
     return value;
 }
 
@@ -606,28 +592,31 @@ T *Volume<T>::getValue( const Voxel3DIndex xyz ) const
 {
     const u_int64_t index = get1DIndex( xyz.x, xyz.y, xyz.z );
     T* value = new T[ 1 ];
-    *value = ( data_ != nullptr )? data_[index] : mmapAddr_[index];
+    *value = ( data_.get() != nullptr )? data_.get()[index] : mmapAddr_.get()[index];
     return value;
 }
 
 template< class T >
 T* Volume< T >::getData() const
 {
-    return ( data_ == nullptr )? mmapAddr_ : data_ ;
+    return ( data_.get() == nullptr )? mmapAddr_.get() : data_.get() ;
 }
 
 template< class T >
 T &Volume< T >::operator[]( const uint64_t index )
 {
-    return ( data_ == nullptr )? mmapAddr_[ index ] : data_[ index ];
+    return ( data_.get() == nullptr )? mmapAddr_.get()[ index ] : data_.get()[ index ];
 }
 
 template< class T >
 void Volume< T >::copyData( const T *data )
 {
 
+    if ( data_.get() == nullptr )
+        data_.reset( new T[ dimensions_.volumeSize() ] , &bufferDeleter );
+
     std::copy( &data[ 0 ] , &data[ dimensions_.volumeSize() - 1 ] ,
-            ( data_ == nullptr )? mmapAddr_ : data_ );
+            &data_.get()[ 0 ] );
 
 
 }
@@ -639,29 +628,36 @@ void Volume< T >::copyData( const BrickParameters< T > &brickParameters )
     {
         LOG_ERROR("Dimensions mismatch!");
     }
+    auto data = data_.get();
+    const auto srcData = brickParameters.baseData_.get();
 
-    for( uint64_t i = 0; i < brickParameters.dimensions_.x; i++ )
+    const auto origin = brickParameters.origin_;
+    const auto baseDimensions = brickParameters.baseDimensions_;
+    const auto dimensions = brickParameters.dimensions_;
+    const auto xFinal = dimensions.x;
+    const auto yFinal = dimensions.y;
+    const auto zFinal = dimensions.z;
+
+    for( uint64_t i = 0; i < xFinal ; i++ )
     {
-        for( uint64_t j = 0; j < brickParameters.dimensions_.y; j++ )
+        for( uint64_t j = 0; j < yFinal ; j++ )
         {
-            for( uint64_t k = 0; k < brickParameters.dimensions_.z; k++ )
+            for( uint64_t k = 0; k <  zFinal ; k++ )
             {
                 // The 1D index of the extracted brick
                 const uint64_t brickIndex =
-                        VolumeUtilities::get1DIndex(
-                            i, j, k, brickParameters.dimensions_ );
+                        VolumeUtilities::get1DIndex( i, j, k, dimensions );
 
                 // The 1D index of the original 'big' volume
                 const uint64_t volumeIndex =
                         VolumeUtilities::get1DIndex(
-                            brickParameters.origin_.x + i,
-                            brickParameters.origin_.y + j,
-                            brickParameters.origin_.z + k ,
-                            brickParameters.baseDimensions_ );
+                            origin.x + i,
+                            origin.y + j,
+                            origin.z + k ,
+                            baseDimensions );
 
                 //Get brick data from the big volume
-                data_[ brickIndex ] =
-                        brickParameters.baseData_[ volumeIndex ] ;
+                data[ brickIndex ] = srcData[ volumeIndex ] ;
             }
         }
     }
@@ -670,7 +666,7 @@ void Volume< T >::copyData( const BrickParameters< T > &brickParameters )
 template< class T >
 T* Volume< T >::getMmapAddr() const
 {
-    return mmapAddr_;
+    return mmapAddr_.get();
 }
 
 template< class T >
@@ -700,7 +696,7 @@ void Volume< T >::loadFile( const std::string prefix ,
 template< class T >
 void Volume< T >::addBoundingBox_()
 {
-    T* ptr = ( data_ == nullptr )? mmapAddr_ : data_ ;
+    T* ptr = ( data_.get() == nullptr )? mmapAddr_.get() : data_.get() ;
     for ( u_int64_t i = 0; i < dimensions_.z; i++ )
     {
         for ( u_int64_t j = 0; j < dimensions_.y; j++ )
@@ -708,17 +704,17 @@ void Volume< T >::addBoundingBox_()
             for ( u_int64_t k = 0; k < dimensions_.x; k++ )
             {
                 if ((( i < 4 )                 && ( j < 4 ))                  ||
-                        (( j < 4 )                 && ( k < 4 ))                  ||
-                        (( k < 4 )                 && ( i < 4 ))                  ||
-                        (( i < 4 )                 && ( j > dimensions_.y - 5 ))  ||
-                        (( j < 4 )                 && ( k > dimensions_.x - 5 ))  ||
-                        (( k < 4 )                 && ( i > dimensions_.z - 5 ))  ||
-                        (( i > dimensions_.z - 5 ) && ( j > dimensions_.y - 5 ))  ||
-                        (( j > dimensions_.y - 5 ) && ( k > dimensions_.x - 5 ))  ||
-                        (( k > dimensions_.x - 5 ) && ( i > dimensions_.z - 5 ))  ||
-                        (( i > dimensions_.z - 5 ) && ( j < 4 ))                  ||
-                        (( j > dimensions_.y - 5 ) && ( k < 4 ))                  ||
-                        (( k > dimensions_.x - 5 ) && ( i < 4 )))
+                    (( j < 4 )                 && ( k < 4 ))                  ||
+                    (( k < 4 )                 && ( i < 4 ))                  ||
+                    (( i < 4 )                 && ( j > dimensions_.y - 5 ))  ||
+                    (( j < 4 )                 && ( k > dimensions_.x - 5 ))  ||
+                    (( k < 4 )                 && ( i > dimensions_.z - 5 ))  ||
+                    (( i > dimensions_.z - 5 ) && ( j > dimensions_.y - 5 ))  ||
+                    (( j > dimensions_.y - 5 ) && ( k > dimensions_.x - 5 ))  ||
+                    (( k > dimensions_.x - 5 ) && ( i > dimensions_.z - 5 ))  ||
+                    (( i > dimensions_.z - 5 ) && ( j < 4 ))                  ||
+                    (( j > dimensions_.y - 5 ) && ( k < 4 ))                  ||
+                    (( k > dimensions_.x - 5 ) && ( i < 4 )))
                 {
                     *ptr = 255;
                 }
@@ -735,18 +731,11 @@ void Volume< T >::zeroPad_()
 }
 
 template< class T >
-void Volume< T >::releaseData_()
+void Volume< T >::bufferDeleter( T *p )
 {
-    if( data_ != nullptr )
-        delete [] data_ ;
-
-    if( mmapAddr_ != nullptr )
-    {
-        if (munmap( mmapAddr_, sizeInBytes_) == -1)
-            LOG_WARNING("Error un-mmapping the file. Memory Leakage is possible.");
-
-    }
+    delete[] p;
 }
+
 
 template< class T >
 Image<T>* Volume< T >::getSliceX( const u_int64_t x ) const
@@ -755,16 +744,12 @@ Image<T>* Volume< T >::getSliceX( const u_int64_t x ) const
     Dimensions2D sliceDimensions( dimensions_.y, dimensions_.z );
     T* sliceData = new T[ sliceDimensions.imageSize() ];
 
+    const auto data = ( data_.get() != nullptr  )? data_.get()
+                                                 : mmapAddr_.get();
     u_int64_t sliceIndex = 0;
     for( u_int64_t i = 0; i < dimensions_.y; i++ )
-    {
         for( u_int64_t j = 0; j < dimensions_.z; j++ )
-        {
-            sliceData[sliceIndex] = data_ != nullptr ? data_[get1DIndex(x, i, j)]
-                    : mmapAddr_[get1DIndex(x, i, j)];
-            sliceIndex++;
-        }
-    }
+            sliceData[sliceIndex++] = data[get1DIndex(x, i, j)];
 
     Image< T >* slice = new Image< T >( sliceDimensions, sliceData );
     return slice;
@@ -775,17 +760,14 @@ Image<T>* Volume< T >::getSliceY( const u_int64_t y ) const
 {
     Dimensions2D sliceDimensions( dimensions_.x, dimensions_.z );
     T* sliceData = new T[ sliceDimensions.imageSize() ];
-
+    const auto data = ( data_.get() != nullptr  )? data_.get()
+                                                 : mmapAddr_.get();
     u_int64_t sliceIndex = 0;
     for( u_int64_t i = 0; i < dimensions_.x; i++ )
-    {
         for( u_int64_t j = 0; j < dimensions_.z; j++ )
-        {
-            sliceData[sliceIndex] = data_ != nullptr ? data_[get1DIndex(i, y ,j)]
-                    : mmapAddr_[get1DIndex(i, y , j)];
-            sliceIndex++;
-        }
-    }
+            sliceData[sliceIndex++] = data[get1DIndex(i, y ,j)];
+
+
 
     Image< T >* slice = new Image< T >( sliceDimensions, sliceData );
     return slice;
@@ -797,16 +779,13 @@ Image<T>* Volume< T >::getSliceZ( const u_int64_t z ) const
     Dimensions2D sliceDimensions( dimensions_.x, dimensions_.y );
     T* sliceData = new T[ sliceDimensions.imageSize() ];
 
+    const auto data = ( data_.get() != nullptr  )? data_.get()
+                                                 : mmapAddr_.get();
+
     u_int64_t sliceIndex = 0;
     for( u_int64_t i = 0; i < dimensions_.x; i++ )
-    {
         for( u_int64_t j = 0; j < dimensions_.y; j++ )
-        {
-            sliceData[sliceIndex] = data_ != nullptr ? data_[get1DIndex(i, j ,z)]
-                    : mmapAddr_[get1DIndex(i, j ,z)];
-            sliceIndex++;
-        }
-    }
+            sliceData[sliceIndex++] = data[get1DIndex(i, j ,z)];
 
     Image< T >* slice = new Image< T >( sliceDimensions, sliceData );
     return slice;
@@ -817,7 +796,8 @@ Image< T >* Volume< T >::getProjectionX( ) const
 {
     Dimensions2D sliceDimensions( dimensions_.y, dimensions_.z );
     T* sliceData = new T[ sliceDimensions.imageSize() ];
-
+    const auto srcData = data_.get() != nullptr ? data_.get()
+                                                : mmapAddr_.get();
     // Save the result in a float array to avoid the overflow.
     float* sliceDataFloat = new float[ sliceDimensions.imageSize() ];
     for(u_int64_t i = 0; i < sliceDimensions.imageSize(); i++)
@@ -827,15 +807,9 @@ Image< T >* Volume< T >::getProjectionX( ) const
     {
         u_int64_t pixelIndex = 0;
         for( u_int64_t i = 0; i < dimensions_.y; i++ )
-        {
             for( u_int64_t j = 0; j < dimensions_.z; j++ )
-            {
-                sliceDataFloat[pixelIndex] +=
-                        data_ != nullptr ? data_[get1DIndex(sliceIdx, i, j)]
-                        : mmapAddr_[get1DIndex(sliceIdx, i, j)];
-                pixelIndex++;
-            }
-        }
+                sliceDataFloat[pixelIndex++] += srcData[get1DIndex(sliceIdx, i, j)];
+
     }
 
     float maxValue = 0;
@@ -859,6 +833,9 @@ Image<T> * Volume< T >::getProjectionY() const
     Dimensions2D sliceDimensions( dimensions_.x, dimensions_.z );
     T* sliceData = new T[ sliceDimensions.imageSize() ];
 
+    const auto srcData = data_.get() != nullptr ? data_.get()
+                                                : mmapAddr_.get();
+
     // Save the result in a float array to avoid the overflow.
     float* sliceDataFloat = new float[ sliceDimensions.imageSize() ];
     for(u_int64_t i = 0; i < sliceDimensions.imageSize(); i++)
@@ -871,9 +848,7 @@ Image<T> * Volume< T >::getProjectionY() const
         {
             for( u_int64_t j = 0; j < dimensions_.z; j++ )
             {
-                sliceDataFloat[pixelIndex] +=
-                        data_ != nullptr ? data_[get1DIndex(i, sliceIdx , j)]
-                        : mmapAddr_[get1DIndex(i, sliceIdx , j)];
+                sliceDataFloat[pixelIndex] += srcData[get1DIndex(i, sliceIdx , j)];
 
                 pixelIndex++;
             }
@@ -901,6 +876,9 @@ Image<T>* Volume<T>::getProjectionZ() const
     Dimensions2D sliceDimensions( dimensions_.x, dimensions_.y );
     T* sliceData = new T[ sliceDimensions.imageSize() ];
 
+    const auto srcData = data_.get() != nullptr ? data_.get()
+                                                : mmapAddr_.get();
+
     // Save the result in a float array to avoid the overflow.
     float* sliceDataFloat = new float[ sliceDimensions.imageSize() ];
     for(u_int64_t i = 0; i < sliceDimensions.imageSize(); i++)
@@ -913,9 +891,7 @@ Image<T>* Volume<T>::getProjectionZ() const
         {
             for( u_int64_t j = 0; j < dimensions_.y; j++ )
             {
-                sliceDataFloat[pixelIndex] +=
-                        data_ != nullptr ? data_[get1DIndex(i, j ,sliceIdx )]
-                        : mmapAddr_[get1DIndex(i, j ,sliceIdx)];
+                sliceDataFloat[pixelIndex] += srcData[get1DIndex(i, j ,sliceIdx)];
                 pixelIndex++;
             }
         }
@@ -940,13 +916,11 @@ template< class T >
 Volume< T >::~Volume()
 {
 
-    releaseData_();
 }
 
 template< class T >
 Volume< T > &Volume< T >::operator=( const Volume<T> &volume )
 {
-    releaseData_();
 
     dimensions_           = volume.dimensions_ ;
     coordinates_          = volume.coordinates_ ;

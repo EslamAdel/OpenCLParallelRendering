@@ -2,6 +2,7 @@
 #define BRICKPARAMETERS_H
 
 #include "Typedefs.hh"
+#include <memory>
 
 // forward declaration
 template< class T > class Volume;
@@ -23,7 +24,7 @@ private:
     Coordinates3D coordinates_ ;
     Coordinates3D unitCubeCenter_ ;
     Coordinates3D unitCubeScaleFactors_ ;
-    T *baseData_ ;
+    std::shared_ptr< T >baseData_ ;
 
 };
 

@@ -2,15 +2,19 @@
 #define VOLUME_H
 
 
-#include "Headers.h"
-#include "Typedefs.hh"
-#include "Image.h"
+
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <sys/mman.h>
 #include <unistd.h>
+#include <memory>
+
 #include <QVector>
+
+#include "Headers.h"
+#include "Typedefs.hh"
+#include "Image.h"
 #include "BrickParameters.h"
 #include "VolumeUtilities.h"
 
@@ -330,6 +334,12 @@ public: // Public functions
     static Volume< T >* fromBrickParameters(
             const BrickParameters< T > &brickParamters );
 
+    /**
+     * @brief bufferDeleter_
+     * @param p
+     */
+    static void bufferDeleter( T  *p );
+
 protected: // Protected functions
 
     /**
@@ -367,12 +377,10 @@ protected: // Protected functions
      */
     virtual void zeroPad_();
 
-    /**
-     * @brief releaseData_
-     */
-    void releaseData_();
 
-protected: // Protected (private) member variables
+
+
+protected:
     /**
      * @brief dimensions_
      */
@@ -401,12 +409,12 @@ protected: // Protected (private) member variables
     /**
      * @brief data_
      */
-    T* data_;
+    std::shared_ptr< T > data_;
 
     /**
      * @brief mmapAddr_
      */
-    T* mmapAddr_;
+    std::shared_ptr< T > mmapAddr_;
 
     /**
      * @brief drawBoundingBox_
