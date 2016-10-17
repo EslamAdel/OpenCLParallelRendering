@@ -27,14 +27,15 @@ CLFrame< T >::CLFrame( const Dimensions2D dimensions ,
     if( isChannelConflict( channelOrder_ ))
         LOG_ERROR("Channel Order conflicts with channel type.");
 
-    hostData_ = new T[ dimensions.imageSize() * channelsInPixel() ];
+    hostData_.reset( new T[ dimensions.imageSize() * channelsInPixel() ] ,
+            []( T const *p) { delete []p; } );
+
     pixmapData_ = new uchar[ dimensions.imageSize() * channelsInPixel()  ];
 }
 
 template< class T >
 CLFrame< T >::CLFrame( const FRAME_CHANNEL_ORDER channelOrder )
-    : hostData_( 0 ) ,
-      pixmapData_( 0 ),
+    : pixmapData_( 0 ),
       pixmapSynchronized_( false ) ,
       inDevice_( false ),
       deviceData_( 0 ),
@@ -53,9 +54,6 @@ template< class T >
 CLFrame< T >::~CLFrame()
 {
     releaseDeviceData_();
-
-    if( hostData_ )
-        delete [] hostData_ ;
 
     if( pixmapData_ )
         delete [] pixmapData_ ;
@@ -102,7 +100,7 @@ void CLFrame< T >::writeDeviceData( cl_command_queue cmdQueue ,
     error = clEnqueueWriteBuffer( cmdQueue , deviceData_ , blocking ,
                                   offset_.imageSize( ) * pixelSize( ) ,
                                   region_.imageSize( ) * pixelSize( ) ,
-                                  ( const void *) hostData_ ,
+                                  ( const void *) hostData_.get() ,
                                   0 , 0 , &clTransferEvent_ );
     CL_ASSERT( error );
     CL_ASSERT_WARNING( evaluateTransferTime_( ));
@@ -119,7 +117,7 @@ void CLFrame< T >::readDeviceData( cl_command_queue cmdQueue ,
     error = clEnqueueReadBuffer( cmdQueue, deviceData_ , blocking ,
                                  offset_.imageSize( ) * pixelSize( ) ,
                                  region_.imageSize( ) * pixelSize( ) ,
-                                 ( void * ) hostData_ ,
+                                 ( void * ) hostData_.get() ,
                                  0 , 0 , &clTransferEvent_ );
 
     CL_ASSERT( error );
@@ -150,7 +148,7 @@ void CLFrame< T >::readOtherDeviceData(
                 sourceCmdQueue , sourceFrame.getDeviceData() , blocking ,
                 sourceFrame.getOffset().imageSize( ) * pixelSize( ) ,
                 sourceFrame.getRegion().imageSize( ) * pixelSize( ) ,
-                ( void * ) &hostData_[ hostOffset ] ,
+                ( void * ) &hostData_.get()[ hostOffset ] ,
                 0 , 0 , &sourceFrame.clTransferEvent_ );
 
     CL_ASSERT( error );
@@ -196,7 +194,7 @@ void CLFrame< T >::copyDeviceData(
 template< class T >
 T *CLFrame<T>::getHostData() const
 {
-    return hostData_;
+    return hostData_.get();
 }
 
 template< class T >
@@ -210,15 +208,18 @@ QPixmap &CLFrame<T>::getFramePixmap( )
 
     QReadLocker lock( &regionLock_ );
 
+    auto hostData = hostData_.get();
+
     if( channelOrder_ == FRAME_CHANNEL_ORDER::ORDER_RGBA )
     {
+        auto hostData = hostData_.get();
         if( clChannelType() == CL_UNORM_INT8 )
-            pixmapData_ = reinterpret_cast< uchar* >( hostData_ ) ;
+            pixmapData_ = reinterpret_cast< uchar* >( hostData ) ;
         else
             // Conversion needed.
             for( int i = 0; i < region_.imageSize() * channelsInPixel() ; i++ )
                 pixmapData_[ i ] =
-                        static_cast< uchar >( hostData_[ i ] );
+                        static_cast< uchar >( hostData[ i ] );
 
 
         // Create a QImage and send it back to the rendering window.
@@ -234,7 +235,7 @@ QPixmap &CLFrame<T>::getFramePixmap( )
     else if( channelOrder_ == FRAME_CHANNEL_ORDER::ORDER_INTENSITY )
     {
         for( int i = 0; i < region_.imageSize() ; i++)
-            pixmapData_[ i ] = F2B( hostData_[i] );
+            pixmapData_[ i ] = F2B( hostData[i] );
 
         // Create a QImage and send it back to the rendering window.
         const QImage image( pixmapData_,
@@ -254,7 +255,7 @@ void CLFrame< T >::copyHostData( const T *data )
 
     std::copy( &data[ 0 ] ,
             &data[ region_.imageSize() * channelsInPixel() - 1 ] ,
-            hostData_ );
+            hostData_.get() );
     pixmapSynchronized_ = false ;
 }
 
@@ -267,7 +268,7 @@ void CLFrame< T >::copyHostData( const CLFrame< T > &sourceFrame )
     const uint64_t frameSize = sourceFrame.getRegion().imageSize() ;
 
     std::copy( &hostData_SOURCE[ 0 ] ,
-            &hostData_SOURCE[ frameSize * channelsInPixel() - 1 ] ,  hostData_ );
+            &hostData_SOURCE[ frameSize * channelsInPixel() - 1 ] ,  hostData_.get() );
 
     pixmapSynchronized_ = false ;
 
@@ -286,14 +287,13 @@ void CLFrame< T >::copyHostData( const Image< T > &sourceFrame )
 template< class T >
 void CLFrame< T >::setHostData( T *data , bool deepCopy )
 {
-    if( data == hostData_ )
+    if( data == hostData_.get() )
         return ;
     else if( deepCopy )
         copyHostData( data );
     else
     {
-        if( hostData_ != 0 ) delete [] hostData_ ;
-        hostData_ = data ;
+        hostData_.reset( data , []( T const *p) { delete []p; }) ;
         pixmapSynchronized_ = false ;
     }
 }
@@ -402,8 +402,9 @@ template< class T >
 T CLFrame< T >::checksum() const
 {
     T sum = static_cast< T >(0) ;
+    auto hostData = hostData_.get();
     for( uint64_t i = 0 ; i < dimensions_.imageSize() * channelsInPixel() ; i++ )
-        sum += hostData_[ i ];
+        sum += hostData[ i ];
     return sum;
 }
 

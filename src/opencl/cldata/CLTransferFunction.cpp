@@ -43,7 +43,7 @@ void CLTransferFunction::writeDeviceData(
                 origin , region ,
                 length_ * sizeof( float ) * 4 ,
                 0 ,
-                ( const void * ) this->hostData_ ,
+                ( const void * ) this->hostData_.get() ,
                 0 , 0 , 0 );
 
     CL_ASSERT( error );

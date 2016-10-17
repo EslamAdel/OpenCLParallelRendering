@@ -77,7 +77,7 @@ void CLImage2D< T >::writeDeviceData( cl_command_queue cmdQueue,
                 origin , region ,
                 this->region_.x * CLFrame< T >::pixelSize()  ,
                 this->region_.imageSize() * CLFrame< T >::pixelSize() ,
-                ( const void * ) this->hostData_ ,
+                ( const void * ) this->hostData_.get() ,
                 0 , 0 , &this->clTransferEvent_ );
 
     CL_ASSERT( error );
@@ -102,7 +102,7 @@ void CLImage2D< T >::readDeviceData( cl_command_queue cmdQueue ,
                 origin , region ,
                 this->region_.x * CLFrame< T >::pixelSize()  ,
                 this->region_.imageSize() * CLFrame< T >::pixelSize() ,
-                ( void *) this->hostData_ ,
+                ( void *) this->hostData_.get() ,
                 0 , 0 , &this->clTransferEvent_ );
 
     CL_ASSERT( error );
@@ -138,7 +138,7 @@ void CLImage2D< T >::readOtherDeviceData(
                 blocking , origin , region ,
                 sourceFrame.region_.x * CLFrame< T >::pixelSize() ,
                 sourceFrame.region_.imageSize() * CLFrame< T >::pixelSize() ,
-                ( void * ) &this->hostData_[ hostOffset ] ,
+                ( void * ) &this->hostData_.get()[ hostOffset ] ,
                 0 , 0 , &sourceFrame.clTransferEvent_ );
 
     CL_ASSERT( error );

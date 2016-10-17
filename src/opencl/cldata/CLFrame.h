@@ -1,14 +1,26 @@
 #ifndef CLIMAGE_H
 #define CLIMAGE_H
+
+// std
+#include <memory>
+
+// Qt
 #include <QPixmap>
-#include "Headers.h"
-#include "Typedefs.hh"
-#include <oclHWDL/ErrorHandler.h>
-#include "Utilities.h"
-#include "Image.h"
 #include <QReadWriteLock>
 #include <QReadLocker>
 #include <QWriteLocker>
+
+// local
+#include "Utilities.h"
+#include "Image.h"
+#include "Headers.h"
+#include "Typedefs.hh"
+#include <oclHWDL/ErrorHandler.h>
+
+
+// Forward declaration
+template< class T > class SerializableFrame ;
+
 
 namespace clparen {
 namespace CLData {
@@ -151,6 +163,7 @@ public:
      */
     virtual void setHostData( T *data ,
                               bool deepCopy = true );
+
 
     /**
      * @brief getDeviceData
@@ -314,7 +327,7 @@ protected:
     /**
      * @brief hostData_
      */
-    T *hostData_;
+    std::shared_ptr< T > hostData_;
 
     /**
      * @brief deviceData_
@@ -391,6 +404,9 @@ protected:
      * @brief transferTimeLock_
      */
     mutable QReadWriteLock transferTimeLock_;
+
+private:
+    friend class SerializableFrame< T > ;
 };
 
 

@@ -4,8 +4,6 @@
 #include "CLFrame.h"
 
 
-// Forward declaration
-template< class T > class SerializableFrame ;
 
 
 namespace clparen {
