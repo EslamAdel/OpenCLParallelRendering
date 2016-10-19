@@ -7,9 +7,10 @@
 // forward declaration
 template< class T > class Volume;
 template< class T > class SerializableVolume;
+template< class T > class VolumeData;
 
 template < class T >
-class BrickParameters
+struct BrickParameters
 {
 public:
     BrickParameters();
@@ -17,6 +18,7 @@ public:
 private:
     friend class Volume< T > ;
     friend class SerializableVolume< T > ;
+    friend class VolumeData< T >;
 
     Dimensions3D dimensions_ ;
     Dimensions3D baseDimensions_ ;
