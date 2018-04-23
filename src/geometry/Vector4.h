@@ -2,6 +2,7 @@
 #define VECTOR4_H
 
 #include "Headers.hh"
+#include <math.h>
 
 template < class T >
 class Vector4

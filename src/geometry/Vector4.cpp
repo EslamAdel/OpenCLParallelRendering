@@ -31,8 +31,8 @@ Vector4< T >::Vector4( const Vector4& v )
 template< class T >
 bool Vector4< T >::HasNaNs() const
 {
-    return isnan( float( x )) || isnan( float( y ))
-            || isnan( float( z )) || isnan( float( w ));
+    return std::isnan( float( x )) || std::isnan( float( y ))
+            || std::isnan( float( z )) || std::isnan( float( w ));
 }
 
 template< class T >
@@ -95,7 +95,7 @@ Vector4< T >& Vector4< T >::operator-=( const Vector4< T >& v )
 template< class T >
 Vector4< T > Vector4< T >::operator*( const T f ) const
 {
-    assert( !isnan( f ));
+    assert( !std::isnan( f ));
 
     return Vector4( f * x, f * y, f * z, f * w );
 }
@@ -103,7 +103,7 @@ Vector4< T > Vector4< T >::operator*( const T f ) const
 template< class T >
 Vector4< T >& Vector4< T >::operator*=( const T f )
 {
-    assert( !isnan( f ));
+    assert( !std::isnan( f ));
 
     x *= f;
     y *= f;
@@ -116,7 +116,7 @@ Vector4< T >& Vector4< T >::operator*=( const T f )
 template< class T >
 Vector4< T > Vector4< T >::operator/( const T f ) const
 {
-    assert( !isnan( f ));
+    assert( !std::isnan( f ));
 
     const T inv = static_cast< T >( 1 ) / f;
     return Vector4( x * inv, y * inv, z * inv, w * inv );
@@ -125,7 +125,7 @@ Vector4< T > Vector4< T >::operator/( const T f ) const
 template< class T >
 Vector4< T >& Vector4< T >::operator/=( const T f )
 {
-    assert( !isnan( f ));
+    assert( !std::isnan( f ));
 
     const float inv = 1.f / f;
     x *= inv;

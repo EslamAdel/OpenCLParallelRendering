@@ -26,7 +26,7 @@ Vector2< T >::Vector2( const Vector2< T >& v )
 template< class T >
 bool Vector2< T >::hasNaNs() const
 {
-    return isnan( float( x )) || isnan( float( y ));
+    return std::isnan( float( x )) || std::isnan( float( y ));
 }
 
 template< class T >
@@ -156,7 +156,7 @@ Vector2< T >& Vector2< T >::operator-=( const Vector2& v )
 template< class T >
 Vector2< T > Vector2< T >::operator*( const T f ) const
 {
-    assert( !isnan( f ));
+    assert( !std::isnan( f ));
 
     return Vector2( f * x, f * y );
 }
@@ -164,7 +164,7 @@ Vector2< T > Vector2< T >::operator*( const T f ) const
 template< class T >
 Vector2< T >& Vector2< T >::operator*=( const T f )
 {
-    assert( !isnan( f ));
+    assert( !std::isnan( f ));
 
     x *= f;
     y *= f;
@@ -175,7 +175,7 @@ Vector2< T >& Vector2< T >::operator*=( const T f )
 template< class T >
 Vector2< T > Vector2< T >::operator/( const T f ) const
 {
-    assert( !isnan( f ));
+    assert( !std::isnan( f ));
 
     const T inv = static_cast< T >( 1 ) / f;
     return Vector2( x * inv, y * inv );
@@ -184,7 +184,7 @@ Vector2< T > Vector2< T >::operator/( const T f ) const
 template< class T >
 Vector2< T >& Vector2< T >::operator/=( const T f )
 {
-    assert( !isnan( f ));
+    assert( !std::isnan( f ));
 
     const float inv = 1.f / f;
     x *= inv;
